@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, integer, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -32,6 +32,17 @@ export const studentDocumentsTable = pgTable("student_documents", {
   mimeType: text("mime_type"),
   uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const id995aFormsTable = pgTable("id995a_forms", {
+  id: serial("id").primaryKey(),
+  submissionId: integer("submission_id").notNull().references(() => studentSubmissionsTable.id, { onDelete: "cascade" }).unique(),
+  formData: jsonb("form_data").notNull().$type<Record<string, string>>().default({}),
+  aiGenerated: boolean("ai_generated").default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+});
+
+export type Id995aForm = typeof id995aFormsTable.$inferSelect;
 
 export const insertStudentSubmissionSchema = createInsertSchema(studentSubmissionsTable).omit({
   id: true, createdAt: true, updatedAt: true, status: true, adminNotes: true,

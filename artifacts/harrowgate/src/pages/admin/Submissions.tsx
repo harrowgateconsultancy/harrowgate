@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 
@@ -122,6 +122,7 @@ export default function Submissions() {
   const [offerLetterUploading, setOfferLetterUploading] = useState(false);
   const [offerLetterSent, setOfferLetterSent] = useState<number | null>(null);
   const offerLetterFileRef = useRef<HTMLInputElement | null>(null);
+  const [id995aOpen, setId995aOpen] = useState(false);
 
   const { data: submissions = [], isLoading } = useQuery<Submission[]>({
     queryKey: ["admin-student-submissions"],
@@ -262,6 +263,17 @@ export default function Submissions() {
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
     } catch { alert("Upload failed."); }
     finally { setUploadingDoc(false); if (adminFileRef.current) adminFileRef.current.value = ""; }
+  };
+
+  const handleId995aDownload = async () => {
+    if (!selected) return;
+    const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/id995a/download`, { credentials: "include" });
+    if (!res.ok) { alert("Failed to download PDF"); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = `ID995A_${selected.name.replace(/\s+/g, "_")}.pdf`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
   };
 
   const filtered = filter === "all" ? submissions : submissions.filter(s => s.status === filter);
@@ -736,18 +748,41 @@ export default function Submissions() {
                   </div>
                 )}
 
-                {/* Final Payment Confirmed */}
+                {/* Final Payment Confirmed + ID995A */}
                 {selected.status === "final_payment_confirmed" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(74,222,128,0.2)" }}>
-                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>✅ Final Payment Confirmed</p>
+                  <>
+                    <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(74,222,128,0.2)" }}>
+                      <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
+                        <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>✅ Final Payment Confirmed</p>
+                      </div>
+                      <div className="px-4 py-3">
+                        <p className="text-xs" style={{ color: "rgba(74,222,128,0.5)" }}>
+                          The student's final payment has been confirmed. They can now download the offer letter from their portal.
+                        </p>
+                      </div>
                     </div>
-                    <div className="px-4 py-3">
-                      <p className="text-xs" style={{ color: "rgba(74,222,128,0.5)" }}>
-                        The student's final payment has been confirmed. They can now download the offer letter from their portal.
-                      </p>
+                    <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.25)" }}>
+                      <button className="w-full px-4 py-3 flex items-center justify-between" onClick={() => setId995aOpen(v => !v)}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">🇭🇰</span>
+                          <span className="text-sm font-semibold" style={{ color: GOLD }}>ID995A — Hong Kong Immigration Form</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button onClick={e => { e.stopPropagation(); handleId995aDownload(); }}
+                            className="text-xs px-3 py-1 rounded-lg border font-medium transition-all hover:opacity-80"
+                            style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD, background: "rgba(162,137,89,0.08)" }}>
+                            ⬇ Download PDF
+                          </button>
+                          <span style={{ color: "rgba(162,137,89,0.4)" }}>{id995aOpen ? "▲" : "▼"}</span>
+                        </div>
+                      </button>
+                      {id995aOpen && (
+                        <div className="border-t" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                          <Id995aPanel submissionId={selected.id} apiBase={getApiBase()} />
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  </>
                 )}
 
                 {/* University Interview — Arranged (awaiting student) */}
@@ -845,6 +880,177 @@ export default function Submissions() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+const FORM_FIELDS: { key: string; label: string; section: string; type?: "select"; options?: string[] }[] = [
+  { section: "Personal Particulars", key: "surnameEnglish",        label: "Surname (English)" },
+  { section: "Personal Particulars", key: "givenNamesEnglish",     label: "Given Names (English)" },
+  { section: "Personal Particulars", key: "nameChineseApplicant",  label: "Name in Chinese (if applicable)" },
+  { section: "Personal Particulars", key: "maidenSurname",         label: "Maiden Surname (if applicable)" },
+  { section: "Personal Particulars", key: "alias",                 label: "Alias (if any)" },
+  { section: "Personal Particulars", key: "sex",                   label: "Sex", type: "select", options: ["Male", "Female"] },
+  { section: "Personal Particulars", key: "dateOfBirth",           label: "Date of Birth (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "placeOfBirth",          label: "Place of Birth" },
+  { section: "Personal Particulars", key: "nationality",           label: "Nationality / Place of Domicile" },
+  { section: "Personal Particulars", key: "maritalStatus",         label: "Marital Status", type: "select", options: ["Bachelor/Spinster", "Married", "Divorced", "Separated", "Widowed", "Others"] },
+  { section: "Personal Particulars", key: "hkIdNumber",            label: "HK Identity Card No. (if any)" },
+  { section: "Personal Particulars", key: "mainlandIdNumber",      label: "Mainland Identity Card No. (if any)" },
+  { section: "Personal Particulars", key: "travelDocType",         label: "Travel Document Type" },
+  { section: "Personal Particulars", key: "travelDocNumber",       label: "Travel Document No." },
+  { section: "Personal Particulars", key: "placeOfIssue",          label: "Place of Issue" },
+  { section: "Personal Particulars", key: "dateOfIssue",           label: "Date of Issue (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "dateOfExpiry",          label: "Date of Expiry (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "emailAddress",          label: "Email Address (if any)" },
+  { section: "Personal Particulars", key: "contactPhone",          label: "Contact Telephone No." },
+  { section: "Personal Particulars", key: "faxNumber",             label: "Fax No. (if any)" },
+  { section: "Personal Particulars", key: "countryOfDomicile",     label: "Country / Territory of Domicile" },
+  { section: "Personal Particulars", key: "hasPermanentResidence", label: "Acquired Permanent Residence in Country of Domicile?", type: "select", options: ["Yes", "No"] },
+  { section: "Personal Particulars", key: "lengthOfResidence",     label: "Length of Residence in Country of Domicile" },
+  { section: "Personal Particulars", key: "occupation",            label: "Occupation" },
+  { section: "Personal Particulars", key: "currentEmployerName",   label: "Name of Current Employer (if applicable)" },
+  { section: "Personal Particulars", key: "currentEmployerAddress",label: "Address of Current Employer (if applicable)" },
+  { section: "Personal Particulars", key: "isCurrentlyInHK",       label: "Is Applicant Currently in Hong Kong?", type: "select", options: ["Yes", "No"] },
+  { section: "Personal Particulars", key: "permittedToRemainUntil",label: "Permitted to Remain Until (if in HK)" },
+  { section: "Personal Particulars", key: "statusInHK",            label: "Status in HK (if in HK)", type: "select", options: ["Employment", "Residence/Dependant", "Visitor", "Others"] },
+  { section: "Personal Particulars", key: "presentAddress",        label: "Present Address" },
+  { section: "Personal Particulars", key: "permanentAddress",      label: "Permanent Address (if different from above)" },
+  { section: "Proposed Stay for Study", key: "proposedDateOfEntry",     label: "Proposed Date of Entry" },
+  { section: "Proposed Stay for Study", key: "proposedDurationOfStay",  label: "Proposed Duration of Stay" },
+  { section: "Accompanying Dependants", key: "dependantsDetails",        label: "Dependants Details (if applicable)" },
+];
+
+function Id995aPanel({ submissionId, apiBase }: { submissionId: number; apiBase: string }) {
+  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [loaded, setLoaded] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [aiGenerated, setAiGenerated] = useState(false);
+
+  const load = async () => {
+    try {
+      const res = await fetch(`${apiBase}/api/admin/student-submissions/${submissionId}/id995a`, { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setFormData((data.formData as Record<string, string>) || {});
+        setAiGenerated(data.aiGenerated || false);
+      }
+    } finally { setLoaded(true); }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleGenerate = async () => {
+    setGenerating(true); setSaved(false);
+    try {
+      const res = await fetch(`${apiBase}/api/admin/student-submissions/${submissionId}/id995a/generate`, {
+        method: "POST", credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json();
+      setFormData((data.formData as Record<string, string>) || {});
+      setAiGenerated(true);
+    } catch { alert("AI generation failed. Please try again."); }
+    finally { setGenerating(false); }
+  };
+
+  const handleSave = async () => {
+    setSaving(true); setSaved(false);
+    try {
+      const res = await fetch(`${apiBase}/api/admin/student-submissions/${submissionId}/id995a`, {
+        method: "PATCH", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formData }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setSaved(true); setTimeout(() => setSaved(false), 3000);
+    } catch { alert("Failed to save form data."); }
+    finally { setSaving(false); }
+  };
+
+  if (!loaded) return (
+    <div className="flex items-center justify-center py-8">
+      <div className="w-5 h-5 rounded-full border-2 animate-spin" style={{ borderColor: GOLD, borderTopColor: "transparent" }} />
+    </div>
+  );
+
+  const sections = [...new Set(FORM_FIELDS.map(f => f.section))];
+
+  return (
+    <div className="px-4 py-4 space-y-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          {aiGenerated && (
+            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>✨ AI pre-filled</span>
+          )}
+          {Object.values(formData).some(v => v) && !aiGenerated && (
+            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.08)", color: "#4ade80" }}>Manually edited</span>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <button onClick={handleGenerate} disabled={generating}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border font-medium transition-all hover:opacity-80 disabled:opacity-40"
+            style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
+            {generating
+              ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Generating…</>
+              : "✨ AI Auto-fill"}
+          </button>
+          <button onClick={handleSave} disabled={saving}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border font-medium transition-all hover:opacity-80 disabled:opacity-40"
+            style={{ borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
+            {saving ? "Saving…" : saved ? "✓ Saved" : "💾 Save"}
+          </button>
+        </div>
+      </div>
+
+      <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>
+        Click <strong style={{ color: GOLD }}>✨ AI Auto-fill</strong> to extract details from the student's documents automatically, then review and edit any fields before downloading the PDF.
+      </p>
+
+      {sections.map(section => (
+        <div key={section} className="space-y-2">
+          <div className="px-3 py-1.5 rounded-lg" style={{ background: "rgba(162,137,89,0.08)" }}>
+            <p className="text-xs font-semibold tracking-wide uppercase" style={{ color: GOLD }}>Part A — {section}</p>
+          </div>
+          {FORM_FIELDS.filter(f => f.section === section).map(field => (
+            <div key={field.key} className="grid grid-cols-[180px_1fr] gap-2 items-center">
+              <label className="text-xs text-right pr-2" style={{ color: "rgba(162,137,89,0.55)" }}>{field.label}</label>
+              {field.type === "select" ? (
+                <select
+                  value={formData[field.key] || ""}
+                  onChange={e => setFormData(d => ({ ...d, [field.key]: e.target.value }))}
+                  className="rounded-lg px-2.5 py-1.5 text-xs border outline-none"
+                  style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }}>
+                  <option value="">— select —</option>
+                  {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              ) : field.key === "presentAddress" || field.key === "permanentAddress" || field.key === "currentEmployerAddress" || field.key === "dependantsDetails" ? (
+                <textarea rows={2}
+                  value={formData[field.key] || ""}
+                  onChange={e => setFormData(d => ({ ...d, [field.key]: e.target.value }))}
+                  className="rounded-lg px-2.5 py-1.5 text-xs border outline-none resize-none"
+                  style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }} />
+              ) : (
+                <input type="text"
+                  value={formData[field.key] || ""}
+                  onChange={e => setFormData(d => ({ ...d, [field.key]: e.target.value }))}
+                  className="rounded-lg px-2.5 py-1.5 text-xs border outline-none"
+                  style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }} />
+              )}
+            </div>
+          ))}
+        </div>
+      ))}
+
+      <div className="flex justify-end pt-2">
+        <button onClick={handleSave} disabled={saving}
+          className="text-xs px-4 py-2 rounded-lg border font-semibold transition-all hover:opacity-80 disabled:opacity-40"
+          style={{ borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
+          {saving ? "Saving…" : saved ? "✓ Saved" : "💾 Save All Changes"}
+        </button>
+      </div>
     </div>
   );
 }
