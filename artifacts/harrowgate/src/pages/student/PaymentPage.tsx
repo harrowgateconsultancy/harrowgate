@@ -98,9 +98,9 @@ export default function PaymentPage({ submission, onUpdated }: Props) {
             <div className="rounded-xl p-4 border flex items-center gap-3" style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.18)" }}>
               <span className="text-xl">✅</span>
               <div>
-                <p className="text-sm font-semibold" style={{ color: "#60a5fa" }}>Receipt Received</p>
+                <p className="text-sm font-semibold" style={{ color: "#60a5fa" }}>Pending Payment Confirmation</p>
                 <p className="text-xs" style={{ color: "rgba(96,165,250,0.55)" }}>
-                  Your payment receipt has been submitted. We'll confirm it shortly.
+                  Your receipt has been submitted and is awaiting confirmation from our consultant.
                   {existingReceipt && ` (${existingReceipt.fileName})`}
                 </p>
               </div>

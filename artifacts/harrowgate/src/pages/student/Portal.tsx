@@ -21,8 +21,8 @@ const statusMap: Record<string, { label: string; color: string; bg: string }> = 
   approved:         { label: "Approved",                  color: "#4ade80", bg: "rgba(74,222,128,0.12)" },
   docs_requested:   { label: "Documents Requested",       color: "#fb923c", bg: "rgba(251,146,60,0.12)" },
   payment_pending:  { label: "Payment Required",          color: "#fb923c", bg: "rgba(251,146,60,0.12)" },
-  payment_received: { label: "Payment Received",          color: "#60a5fa", bg: "rgba(96,165,250,0.12)" },
-  acknowledged:     { label: "Acknowledged ✓",            color: "#4ade80", bg: "rgba(74,222,128,0.12)" },
+  payment_received: { label: "Pending Payment Confirmation", color: "#60a5fa", bg: "rgba(96,165,250,0.12)" },
+  acknowledged:     { label: "Payment Received ✓",          color: "#4ade80", bg: "rgba(74,222,128,0.12)" },
   rejected:         { label: "Application Unsuccessful",  color: "#f87171", bg: "rgba(248,113,113,0.12)" },
 };
 
