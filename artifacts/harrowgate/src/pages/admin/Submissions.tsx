@@ -491,6 +491,82 @@ export default function Submissions() {
                   </div>
                 </div>
 
+                {/* Application Details — always visible summary of all recorded info */}
+                {(selected.interviewZoomLink || selected.interviewDateTime || selected.uniInterviewLink || selected.uniInterviewDateTime || selected.additionalDocsRequestNote || selected.adminNotes) && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.15)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
+                      <p className="text-sm font-semibold" style={{ color: GOLD }}>📋 Application History</p>
+                    </div>
+                    <div className="px-4 py-4 space-y-4">
+
+                      {/* Mock Interview */}
+                      {(selected.interviewZoomLink || selected.interviewDateTime) && (
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(96,165,250,0.7)" }}>🎥 Mock Interview</p>
+                          <div className="space-y-1.5">
+                            {selected.interviewDateTime && (
+                              <div className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.15)", color: "#60a5fa" }}>
+                                <span>📅</span><span>{selected.interviewDateTime}</span>
+                              </div>
+                            )}
+                            {selected.interviewZoomLink && (
+                              <a href={selected.interviewZoomLink} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm hover:opacity-80 transition-opacity truncate"
+                                style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.15)", color: "#60a5fa" }}>
+                                <span>🔗</span><span className="truncate">{selected.interviewZoomLink}</span>
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* University Interview */}
+                      {(selected.uniInterviewLink || selected.uniInterviewDateTime) && (
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(56,189,248,0.7)" }}>
+                            🏫 University Interview{selected.uniInterviewPlatform ? ` · ${selected.uniInterviewPlatform === "zoom" ? "Zoom" : "Teams"}` : ""}
+                          </p>
+                          <div className="space-y-1.5">
+                            {selected.uniInterviewDateTime && (
+                              <div className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                                <span>📅</span><span>{selected.uniInterviewDateTime}</span>
+                              </div>
+                            )}
+                            {selected.uniInterviewLink && (
+                              <a href={selected.uniInterviewLink} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm hover:opacity-80 transition-opacity truncate"
+                                style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                                <span>🔗</span><span className="truncate">{selected.uniInterviewLink}</span>
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Additional Docs Request */}
+                      {selected.additionalDocsRequestNote && (
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(251,146,60,0.7)" }}>📎 Additional Docs Requested</p>
+                          <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.15)", color: "#fb923c" }}>
+                            {selected.additionalDocsRequestNote}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Admin notes read-only preview */}
+                      {selected.adminNotes && (
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(162,137,89,0.6)" }}>📝 Last Note to Student</p>
+                          <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.12)", color: "rgba(162,137,89,0.8)" }}>
+                            {selected.adminNotes}
+                          </div>
+                        </div>
+                      )}
+
+                    </div>
+                  </div>
+                )}
+
                 {/* Notes */}
                 <div>
                   <label className="block text-sm font-semibold mb-2" style={{ color: GOLD }}>Notes for Student</label>
