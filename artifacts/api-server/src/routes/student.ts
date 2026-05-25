@@ -6,6 +6,7 @@ import {
   studentDocumentsTable,
 } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
+import { sendNewApplicationEmail, sendReceiptUploadEmail } from "../email";
 
 const router = Router();
 
@@ -58,6 +59,16 @@ router.post("/student/submissions", requireStudentAuth, async (req: any, res) =>
       .insert(studentSubmissionsTable)
       .values({ clerkUserId: req.clerkUserId, name, dateOfBirth, passportNumber, email })
       .returning();
+
+    // Fire-and-forget email — don't block the response
+    sendNewApplicationEmail({
+      name,
+      email: email || null,
+      passportNumber,
+      dateOfBirth,
+      docCount: 0,
+    }).catch(() => {});
+
     res.status(201).json(created);
   } catch (err) {
     res.status(500).json({ error: "Failed to create submission" });
@@ -106,6 +117,22 @@ router.post("/student/submissions/:id/documents", requireStudentAuth, async (req
       .insert(studentDocumentsTable)
       .values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType })
       .returning();
+
+    // After all 5 docs are uploaded (edu_5 is the last one), send a complete notification
+    if (documentType === "edu_5") {
+      const allDocs = await db
+        .select()
+        .from(studentDocumentsTable)
+        .where(eq(studentDocumentsTable.submissionId, submissionId));
+      sendNewApplicationEmail({
+        name: submission.name,
+        email: submission.email,
+        passportNumber: submission.passportNumber,
+        dateOfBirth: submission.dateOfBirth,
+        docCount: allDocs.length,
+      }).catch(() => {});
+    }
+
     res.status(201).json(doc);
   } catch (err) {
     res.status(500).json({ error: "Failed to save document" });
@@ -146,6 +173,16 @@ router.post("/student/submissions/:id/receipt", requireStudentAuth, async (req: 
       .update(studentSubmissionsTable)
       .set({ status: "payment_received" })
       .where(eq(studentSubmissionsTable.id, submissionId));
+
+    // Notify consultant of receipt upload
+    sendReceiptUploadEmail({
+      name: submission.name,
+      email: submission.email,
+      passportNumber: submission.passportNumber,
+      receiptFileName: fileName,
+      submissionId,
+    }).catch(() => {});
+
     res.json(doc);
   } catch (err) {
     res.status(500).json({ error: "Failed to upload receipt" });
