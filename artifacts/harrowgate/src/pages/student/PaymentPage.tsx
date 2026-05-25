@@ -17,21 +17,26 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
   return { url: objectPath };
 }
 
-type Props = { submission: Submission; onUpdated: () => void };
+type Props = { submission: Submission; onUpdated: () => void; paymentType?: "first" | "second" };
 
-export default function PaymentPage({ submission, onUpdated }: Props) {
+export default function PaymentPage({ submission, onUpdated, paymentType = "first" }: Props) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const existingReceipt = submission.documents.find(d => d.documentType === "payment_receipt");
-  const alreadySubmitted = submission.status === "payment_received" || submission.status === "acknowledged";
+  const isSecond = paymentType === "second";
+  const docType = isSecond ? "second_payment_receipt" : "payment_receipt";
+  const endpoint = isSecond ? "receipt2" : "receipt";
+  const existingReceipt = submission.documents.find(d => d.documentType === docType);
+  const alreadySubmitted = isSecond
+    ? (submission.status === "second_payment_received" || submission.status === "second_payment_confirmed")
+    : (submission.status === "payment_received" || submission.status === "acknowledged");
 
   const handleReceiptUpload = async (file: File) => {
     setUploading(true); setError(null);
     try {
       const { url } = await uploadToStorage(file);
-      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/receipt`, {
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/${endpoint}`, {
         method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
         body: JSON.stringify({ fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type }),
       });
@@ -50,9 +55,9 @@ export default function PaymentPage({ submission, onUpdated }: Props) {
         <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(251,146,60,0.12)" }}>
           <span className="text-xl">💳</span>
           <div>
-            <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>Payment Required</h3>
+            <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>{isSecond ? "2nd Payment Required" : "Payment Required"}</h3>
             <p className="text-xs" style={{ color: "rgba(251,146,60,0.55)" }}>
-              Your application has been approved — please complete payment to proceed
+              {isSecond ? "A second payment is required before proceeding to your university interview" : "Your application has been approved — please complete payment to proceed"}
             </p>
           </div>
         </div>

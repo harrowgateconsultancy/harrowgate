@@ -23,7 +23,10 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   payment_received:     { label: "Receipt Received",     color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
   acknowledged:         { label: "Acknowledged",         color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   interview_arranged:              { label: "Interview Arranged",    color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
-  interview_completed:             { label: "Pending Uni Interview",  color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  interview_completed:             { label: "Mock Interview Done",    color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  second_payment_pending:          { label: "2nd Payment Pending",   color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
+  second_payment_received:         { label: "2nd Receipt Received",  color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
+  second_payment_confirmed:        { label: "2nd Payment Confirmed", color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   university_interview_arranged:   { label: "Uni Interview Arranged", color: "#38bdf8",  bg: "rgba(56,189,248,0.12)" },
   university_interview_completed:  { label: "Uni Interview Done",    color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   rejected:                        { label: "Rejected",              color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
@@ -49,9 +52,15 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
     { label: "Confirm Payment & Acknowledge", nextStatus: "acknowledged", color: GOLD,     icon: "✅" },
   ],
   interview_arranged: [],
-  interview_completed: [],
+  interview_completed: [
+    { label: "Request 2nd Payment", nextStatus: "second_payment_pending", color: "#fb923c", icon: "💳" },
+  ],
+  second_payment_pending: [],
+  second_payment_received: [
+    { label: "Confirm 2nd Payment", nextStatus: "second_payment_confirmed", color: "#4ade80", icon: "✅" },
+  ],
+  second_payment_confirmed: [],
   university_interview_arranged: [],
-
   university_interview_completed: [],
 };
 
@@ -528,8 +537,22 @@ export default function Submissions() {
                   </div>
                 )}
 
-                {/* University Interview — Schedule (interview_completed only) */}
-                {selected.status === "interview_completed" && (
+                {/* 2nd Payment — Receipt received info (second_payment_received) */}
+                {selected.status === "second_payment_received" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(96,165,250,0.2)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#60a5fa" }}>💳 2nd Payment Receipt Received</p>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-xs" style={{ color: "rgba(96,165,250,0.6)" }}>
+                        The student has uploaded their 2nd payment receipt. Review it in the documents section above, then click <strong style={{ color: "#4ade80" }}>Confirm 2nd Payment</strong> below.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* University Interview — Schedule (second_payment_confirmed only) */}
+                {selected.status === "second_payment_confirmed" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(56,189,248,0.2)" }}>
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(56,189,248,0.12)" }}>
                       <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>🏫 University Interview</p>

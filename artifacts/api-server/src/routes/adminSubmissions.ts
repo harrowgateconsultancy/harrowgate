@@ -16,6 +16,7 @@ const VALID_STATUSES = [
   "pending", "approved", "payment_pending", "payment_received",
   "acknowledged", "rejected", "docs_requested",
   "interview_arranged", "interview_completed",
+  "second_payment_pending", "second_payment_received", "second_payment_confirmed",
   "university_interview_arranged", "university_interview_completed",
 ];
 

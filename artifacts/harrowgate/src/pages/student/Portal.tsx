@@ -27,6 +27,9 @@ const statusMap: Record<string, { label: string; color: string; bg: string }> = 
   acknowledged:         { label: "Payment Received ✓",        color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   interview_arranged:              { label: "Interview Arranged",             color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
   interview_completed:             { label: "Interview Completed",            color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  second_payment_pending:          { label: "2nd Payment Required",           color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
+  second_payment_received:         { label: "Pending Payment Confirmation",   color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
+  second_payment_confirmed:        { label: "2nd Payment Received ✓",         color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   university_interview_arranged:   { label: "Uni Interview Arranged",         color: "#38bdf8",   bg: "rgba(56,189,248,0.12)" },
   university_interview_completed:  { label: "Uni Interview Completed",        color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   rejected:                        { label: "Application Unsuccessful",       color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
@@ -39,10 +42,12 @@ function buildTimeline(submission: Submission): TimelineStep[] {
   const ref = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
   const submittedDate = new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
-  const postStatuses = ["acknowledged","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed"];
-  const afterPayment = postStatuses.includes(s);
-  const afterMock    = ["interview_completed","university_interview_arranged","university_interview_completed"].includes(s);
-  const afterUniArr  = ["university_interview_arranged","university_interview_completed"].includes(s);
+  const postStatuses = ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed"];
+  const afterPayment   = postStatuses.includes(s);
+  const afterMock      = ["interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed"].includes(s);
+  const after2ndPay    = ["second_payment_confirmed","university_interview_arranged","university_interview_completed"].includes(s);
+  const in2ndPay       = ["second_payment_pending","second_payment_received"].includes(s);
+  const afterUniArr    = ["university_interview_arranged","university_interview_completed"].includes(s);
 
   return [
     { icon: "✅", label: "Application Submitted",      note: submittedDate,                                          done: true },
@@ -65,15 +70,22 @@ function buildTimeline(submission: Submission): TimelineStep[] {
       current: s === "interview_arranged",
     },
     {
-      icon: s === "interview_completed" ? "🔄" : (afterUniArr ? "✅" : "⬜"),
+      icon: after2ndPay ? "✅" : (in2ndPay || s === "interview_completed" ? "🔄" : "⬜"),
+      label: "2nd Payment",
+      note: after2ndPay ? "Confirmed" : (s === "second_payment_received" ? "Receipt received — awaiting confirmation" : (in2ndPay || s === "interview_completed" ? "Payment required" : "Upcoming")),
+      done: after2ndPay,
+      current: in2ndPay || s === "interview_completed",
+    },
+    {
+      icon: afterUniArr && s === "university_interview_completed" ? "✅" : (s === "university_interview_arranged" ? "🔄" : (after2ndPay ? "🔄" : "⬜")),
       label: "University Interview",
-      note: s === "interview_completed"
+      note: s === "second_payment_confirmed"
         ? "Our team is arranging your university interview"
         : s === "university_interview_arranged"
           ? (submission.uniInterviewDateTime || "Scheduled — check your email")
           : (s === "university_interview_completed" ? "Completed" : "Upcoming"),
       done: s === "university_interview_completed",
-      current: s === "university_interview_arranged" || s === "interview_completed",
+      current: s === "university_interview_arranged" || s === "second_payment_confirmed",
     },
     {
       icon: s === "university_interview_completed" ? "🔄" : "⬜",
@@ -117,7 +129,7 @@ export default function Portal() {
 
   // Auto-show timeline for post-acknowledged statuses
   useEffect(() => {
-    if (submission && ["interview_arranged","interview_completed","university_interview_arranged","university_interview_completed"].includes(submission.status)) {
+    if (submission && ["interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed"].includes(submission.status)) {
       setShowTimeline(true);
     }
   }, [submission?.status]);
@@ -288,7 +300,7 @@ export default function Portal() {
               </div>
             )}
 
-            {/* ── INTERVIEW COMPLETED ── */}
+            {/* ── INTERVIEW COMPLETED (waiting for admin to request 2nd payment) ── */}
             {submission.status === "interview_completed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
                 <div className="text-5xl mb-4">🎓</div>
@@ -297,7 +309,29 @@ export default function Portal() {
                   Well done — your mock interview is complete.
                 </p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>
-                  ⏳ Waiting for University Interview
+                  ⏳ Awaiting Next Steps
+                </p>
+                <p className="text-sm mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>
+                  Our team will be in touch shortly with further instructions.
+                </p>
+              </div>
+            )}
+
+            {/* ── 2ND PAYMENT PENDING ── */}
+            {(submission.status === "second_payment_pending" || submission.status === "second_payment_received") && (
+              <PaymentPage submission={submission} onUpdated={fetchSubmission} paymentType="second" />
+            )}
+
+            {/* ── 2ND PAYMENT CONFIRMED ── */}
+            {submission.status === "second_payment_confirmed" && (
+              <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
+                <div className="text-5xl mb-4">✅</div>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>2nd Payment Confirmed</h3>
+                <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>
+                  Your second payment has been received and confirmed.
+                </p>
+                <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>
+                  ⏳ Awaiting University Interview
                 </p>
                 <p className="text-sm mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>
                   Our team is coordinating with the university. You will be notified as soon as your interview is scheduled.

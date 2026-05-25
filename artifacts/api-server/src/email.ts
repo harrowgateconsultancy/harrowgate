@@ -55,6 +55,27 @@ export async function sendReceiptUploadEmail(opts: {
   } catch (err) { console.error("[email] Failed:", err); }
 }
 
+// ── Notify admin: 2nd payment receipt uploaded ─────────────────────────────
+export async function sendSecondReceiptUploadEmail(opts: {
+  name: string; email: string | null; passportNumber: string;
+  receiptFileName: string; submissionId: number;
+}) {
+  const transport = createTransport();
+  if (!transport) { console.warn("[email] credentials not set — skipping"); return; }
+  try {
+    await transport.sendMail({
+      from: `"HARROWGATE Portal" <${process.env.GMAIL_USER}>`,
+      to: NOTIFY_TO,
+      subject: `Student Application Submission - Website (2nd Payment Receipt) — ${opts.name}`,
+      html: adminHtml("💳 2nd Payment Receipt Received", `A student has uploaded their second payment receipt and is awaiting confirmation.`, [
+        ["Full Name", opts.name], ["Email", opts.email || "—"],
+        ["Passport Number", opts.passportNumber], ["Receipt File", opts.receiptFileName],
+      ], "Confirm 2nd Payment →"),
+    });
+    console.log(`[email] 2nd receipt upload notification sent for ${opts.name}`);
+  } catch (err) { console.error("[email] Failed:", err); }
+}
+
 // ── Notify student: application approved ────────────────────────────────────
 export async function sendApprovalEmail(opts: {
   name: string; studentEmail: string; portalUrl?: string;

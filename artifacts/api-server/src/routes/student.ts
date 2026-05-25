@@ -4,7 +4,7 @@ import { getAuth } from "@clerk/express";
 import { db } from "@workspace/db";
 import { studentSubmissionsTable, studentDocumentsTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
-import { sendNewApplicationEmail, sendReceiptUploadEmail, sendResubmitEmail } from "../email";
+import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail } from "../email";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 
 const router = Router();
@@ -170,6 +170,24 @@ router.post("/student/submissions/:id/receipt", requireStudentAuth, async (req: 
     sendReceiptUploadEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, receiptFileName: fileName, submissionId }).catch(() => {});
     res.json(doc);
   } catch { res.status(500).json({ error: "Failed to upload receipt" }); }
+});
+
+router.post("/student/submissions/:id/receipt2", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+    if (submission.status !== "second_payment_pending") return res.status(400).json({ error: "Submission is not awaiting 2nd payment" });
+    const { fileName, fileUrl, fileSize, mimeType } = req.body;
+    await db.delete(studentDocumentsTable)
+      .where(and(eq(studentDocumentsTable.submissionId, submissionId), eq(studentDocumentsTable.documentType, "second_payment_receipt")));
+    const [doc] = await db.insert(studentDocumentsTable)
+      .values({ submissionId, documentType: "second_payment_receipt", fileName, fileUrl, fileSize, mimeType }).returning();
+    await db.update(studentSubmissionsTable).set({ status: "second_payment_received" }).where(eq(studentSubmissionsTable.id, submissionId));
+    sendSecondReceiptUploadEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, receiptFileName: fileName, submissionId }).catch(() => {});
+    res.json(doc);
+  } catch { res.status(500).json({ error: "Failed to upload 2nd receipt" }); }
 });
 
 export default router;
