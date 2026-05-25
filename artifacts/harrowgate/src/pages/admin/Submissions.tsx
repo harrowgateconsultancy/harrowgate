@@ -23,7 +23,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   payment_received:     { label: "Receipt Received",     color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
   acknowledged:         { label: "Acknowledged",         color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   interview_arranged:              { label: "Interview Arranged",    color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
-  interview_completed:             { label: "Interview Completed",   color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  interview_completed:             { label: "Pending Uni Interview",  color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   university_interview_arranged:   { label: "Uni Interview Arranged", color: "#38bdf8",  bg: "rgba(56,189,248,0.12)" },
   university_interview_completed:  { label: "Uni Interview Done",    color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   rejected:                        { label: "Rejected",              color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
