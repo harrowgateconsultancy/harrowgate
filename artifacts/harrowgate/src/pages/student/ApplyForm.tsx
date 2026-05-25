@@ -1,24 +1,16 @@
 import { useState, useRef } from "react";
+import { useLocation } from "wouter";
 
+const BG = "#0f2d18";
+const GOLD = "#a28959";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function getApiBase() {
   return `${window.location.origin}${BASE}`;
 }
 
-type Props = {
-  user: any;
-  onSubmitted: () => void;
-};
-
-type UploadState = {
-  file: File | null;
-  uploading: boolean;
-  url: string | null;
-  name: string | null;
-  error: string | null;
-};
-
+type Props = { user: any; onSubmitted: () => void };
+type UploadState = { file: File | null; uploading: boolean; url: string | null; name: string | null; error: string | null };
 const emptyUpload = (): UploadState => ({ file: null, uploading: false, url: null, name: null, error: null });
 
 const docLabels = [
@@ -29,7 +21,7 @@ const docLabels = [
   "Additional Supporting Document (if any)",
 ];
 
-async function uploadToStorage(file: File): Promise<{ url: string; objectPath: string }> {
+async function uploadToStorage(file: File): Promise<{ url: string }> {
   const res = await fetch(`${getApiBase()}/api/storage/uploads/request-url`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -38,16 +30,12 @@ async function uploadToStorage(file: File): Promise<{ url: string; objectPath: s
   });
   if (!res.ok) throw new Error("Failed to get upload URL");
   const { uploadURL, objectPath } = await res.json();
-  const put = await fetch(uploadURL, {
-    method: "PUT",
-    headers: { "Content-Type": file.type },
-    body: file,
-  });
-  if (!put.ok) throw new Error("Failed to upload file");
-  return { url: objectPath, objectPath };
+  await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+  return { url: objectPath };
 }
 
 export default function ApplyForm({ user, onSubmitted }: Props) {
+  const [, setLocation] = useLocation();
   const [name, setName] = useState(user?.fullName || "");
   const [dob, setDob] = useState("");
   const [passport, setPassport] = useState("");
@@ -58,60 +46,31 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
 
   const handleFileChange = async (index: number, file: File | null) => {
     if (!file) return;
-    setDocs(prev => {
-      const next = [...prev];
-      next[index] = { ...next[index], file, uploading: true, error: null };
-      return next;
-    });
+    setDocs(prev => { const n = [...prev]; n[index] = { ...n[index], file, uploading: true, error: null }; return n; });
     try {
       const { url } = await uploadToStorage(file);
-      setDocs(prev => {
-        const next = [...prev];
-        next[index] = { file, uploading: false, url, name: file.name, error: null };
-        return next;
-      });
-    } catch (e: any) {
-      setDocs(prev => {
-        const next = [...prev];
-        next[index] = { ...next[index], uploading: false, error: "Upload failed. Please try again." };
-        return next;
-      });
+      setDocs(prev => { const n = [...prev]; n[index] = { file, uploading: false, url, name: file.name, error: null }; return n; });
+    } catch {
+      setDocs(prev => { const n = [...prev]; n[index] = { ...n[index], uploading: false, error: "Upload failed. Please try again." }; return n; });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!name.trim() || !dob || !passport.trim()) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-    const requiredDocs = docs.slice(0, 1);
-    if (!requiredDocs.every(d => d.url)) {
-      setError("Please upload at least your first education document.");
-      return;
-    }
-    if (docs.some(d => d.uploading)) {
-      setError("Please wait for all uploads to finish.");
-      return;
-    }
-
+    if (!name.trim() || !dob || !passport.trim()) { setError("Please fill in all required fields."); return; }
+    if (!docs[0].url) { setError("Please upload at least your first education document."); return; }
+    if (docs.some(d => d.uploading)) { setError("Please wait for all uploads to finish."); return; }
     setSubmitting(true);
     try {
       const res = await fetch(`${getApiBase()}/api/student/submissions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          name: name.trim(),
-          dateOfBirth: dob,
-          passportNumber: passport.trim(),
-          email: user?.primaryEmailAddress?.emailAddress,
-        }),
+        body: JSON.stringify({ name: name.trim(), dateOfBirth: dob, passportNumber: passport.trim(), email: user?.primaryEmailAddress?.emailAddress }),
       });
-      if (!res.ok) throw new Error("Failed to create submission");
+      if (!res.ok) throw new Error("Failed");
       const submission = await res.json();
-
       for (let i = 0; i < docs.length; i++) {
         const d = docs[i];
         if (d.url && d.name) {
@@ -119,18 +78,12 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({
-              documentType: `edu_${i + 1}`,
-              fileName: d.name,
-              fileUrl: d.url,
-              fileSize: d.file?.size,
-              mimeType: d.file?.type,
-            }),
+            body: JSON.stringify({ documentType: `edu_${i + 1}`, fileName: d.name, fileUrl: d.url, fileSize: d.file?.size, mimeType: d.file?.type }),
           });
         }
       }
       onSubmitted();
-    } catch (e: any) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
@@ -139,144 +92,97 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
 
   return (
     <div>
-      <div className="mb-10">
-        <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "rgba(162,137,89,0.5)" }}>
-          Student Portal
-        </p>
-        <h1 className="text-4xl font-bold mb-3" style={{ color: "#a28959" }}>Start Your Application</h1>
+      {/* Back button */}
+      <button
+        onClick={() => setLocation("/")}
+        className="flex items-center gap-2 text-sm mb-8 transition-opacity hover:opacity-70"
+        style={{ color: "rgba(162,137,89,0.55)" }}
+      >
+        ← Back to Home
+      </button>
+
+      <div className="mb-8">
+        <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "rgba(162,137,89,0.45)" }}>Student Portal</p>
+        <h1 className="text-4xl font-bold mb-3" style={{ color: GOLD }}>Start Your Application</h1>
         <p className="text-base" style={{ color: "rgba(162,137,89,0.6)" }}>
           Complete the form below to submit your student visa application. All fields marked * are required.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Personal Details */}
-        <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.15)" }}>
+        <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
           <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
-            <h2 className="text-base font-semibold" style={{ color: "#a28959" }}>Personal Information</h2>
+            <h2 className="text-base font-semibold" style={{ color: GOLD }}>Personal Information</h2>
           </div>
           <div className="px-6 py-6 grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Full Name */}
-            <div className="md:col-span-1">
-              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.7)" }}>
-                Full Name *
-              </label>
+            <div>
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Full Name *</label>
               <input
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="As in passport"
-                required
+                type="text" value={name} onChange={e => setName(e.target.value)}
+                placeholder="As in passport" required
                 className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition-all"
-                style={{
-                  background: "rgba(162,137,89,0.06)",
-                  borderColor: "rgba(162,137,89,0.2)",
-                  color: "#a28959",
-                }}
+                style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: GOLD }}
               />
             </div>
-            {/* DOB */}
             <div>
-              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.7)" }}>
-                Date of Birth *
-              </label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Date of Birth *</label>
               <input
-                type="date"
-                value={dob}
-                onChange={e => setDob(e.target.value)}
-                required
+                type="date" value={dob} onChange={e => setDob(e.target.value)} required
                 className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition-all"
-                style={{
-                  background: "rgba(162,137,89,0.06)",
-                  borderColor: "rgba(162,137,89,0.2)",
-                  color: "#a28959",
-                  colorScheme: "dark",
-                }}
+                style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: GOLD, colorScheme: "dark" }}
               />
             </div>
-            {/* Passport */}
             <div>
-              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.7)" }}>
-                Passport Number *
-              </label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Passport Number *</label>
               <input
-                type="text"
-                value={passport}
-                onChange={e => setPassport(e.target.value.toUpperCase())}
-                placeholder="e.g. A12345678"
-                required
+                type="text" value={passport} onChange={e => setPassport(e.target.value.toUpperCase())}
+                placeholder="e.g. A12345678" required
                 className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition-all tracking-widest font-mono"
-                style={{
-                  background: "rgba(162,137,89,0.06)",
-                  borderColor: "rgba(162,137,89,0.2)",
-                  color: "#a28959",
-                }}
+                style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: GOLD }}
               />
             </div>
           </div>
         </div>
 
         {/* Documents */}
-        <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.15)" }}>
+        <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
           <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
-            <h2 className="text-base font-semibold" style={{ color: "#a28959" }}>Education Documents *</h2>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.5)" }}>
-              Upload your education certificates and transcripts (PDF, JPG, PNG — max 20MB each)
-            </p>
+            <h2 className="text-base font-semibold" style={{ color: GOLD }}>Education Documents *</h2>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Upload your education certificates and transcripts (PDF, JPG, PNG — max 20MB each)</p>
           </div>
           <div className="px-6 py-6 space-y-4">
             {docs.map((doc, i) => (
               <div key={i} className="flex items-center gap-4">
-                <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "rgba(162,137,89,0.15)", color: "#a28959" }}>
+                <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "rgba(162,137,89,0.12)", color: GOLD }}>
                   {i + 1}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium mb-1.5" style={{ color: "rgba(162,137,89,0.6)" }}>
+                  <p className="text-xs font-medium mb-1.5" style={{ color: "rgba(162,137,89,0.55)" }}>
                     {docLabels[i]}{i === 0 ? " *" : ""}
                   </p>
                   {doc.url ? (
-                    <div className="flex items-center gap-3 rounded-xl px-4 py-2.5 border" style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.25)" }}>
+                    <div className="flex items-center gap-3 rounded-xl px-4 py-2.5 border" style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
                       <span className="text-sm">📄</span>
-                      <span className="text-sm flex-1 truncate" style={{ color: "#a28959" }}>{doc.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setDocs(prev => { const n = [...prev]; n[i] = emptyUpload(); return n; });
-                        }}
+                      <span className="text-sm flex-1 truncate" style={{ color: GOLD }}>{doc.name}</span>
+                      <button type="button" onClick={() => { setDocs(prev => { const n = [...prev]; n[i] = emptyUpload(); return n; }); }}
                         className="text-xs px-3 py-1 rounded-full border transition-all hover:opacity-80"
-                        style={{ borderColor: "rgba(162,137,89,0.3)", color: "rgba(162,137,89,0.6)" }}
-                      >
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: "rgba(162,137,89,0.55)" }}>
                         Remove
                       </button>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => inputRefs.current[i]?.click()}
-                      disabled={doc.uploading}
+                    <button type="button" onClick={() => inputRefs.current[i]?.click()} disabled={doc.uploading}
                       className="w-full rounded-xl px-4 py-2.5 border text-sm text-left transition-all hover:opacity-80 flex items-center gap-2"
-                      style={{
-                        background: "rgba(162,137,89,0.04)",
-                        borderColor: "rgba(162,137,89,0.15)",
-                        color: "rgba(162,137,89,0.5)",
-                        borderStyle: "dashed",
-                      }}
-                    >
-                      {doc.uploading ? (
-                        <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin" style={{ borderColor: "#a28959", borderTopColor: "transparent" }} /> Uploading…</>
-                      ) : (
-                        <><span>📎</span> Click to upload</>
-                      )}
+                      style={{ background: "rgba(162,137,89,0.03)", borderColor: "rgba(162,137,89,0.12)", color: "rgba(162,137,89,0.45)", borderStyle: "dashed" }}>
+                      {doc.uploading
+                        ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Uploading…</>
+                        : <><span>📎</span> Click to upload</>}
                     </button>
                   )}
                   {doc.error && <p className="text-xs mt-1" style={{ color: "#f87171" }}>{doc.error}</p>}
-                  <input
-                    ref={el => { inputRefs.current[i] = el; }}
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                    className="hidden"
-                    onChange={e => handleFileChange(i, e.target.files?.[0] || null)}
-                  />
+                  <input ref={el => { inputRefs.current[i] = el; }} type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" className="hidden"
+                    onChange={e => handleFileChange(i, e.target.files?.[0] || null)} />
                 </div>
               </div>
             ))}
@@ -284,17 +190,14 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
         </div>
 
         {error && (
-          <div className="rounded-xl px-4 py-3 text-sm border" style={{ background: "rgba(248,113,113,0.08)", borderColor: "rgba(248,113,113,0.25)", color: "#f87171" }}>
+          <div className="rounded-xl px-4 py-3 text-sm border" style={{ background: "rgba(248,113,113,0.07)", borderColor: "rgba(248,113,113,0.2)", color: "#f87171" }}>
             {error}
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting || docs.some(d => d.uploading)}
+        <button type="submit" disabled={submitting || docs.some(d => d.uploading)}
           className="w-full py-4 rounded-2xl text-base font-semibold transition-all hover:opacity-90 disabled:opacity-50"
-          style={{ background: "#a28959", color: "#a13300" }}
-        >
+          style={{ background: GOLD, color: BG }}>
           {submitting ? "Submitting…" : "Submit Application"}
         </button>
       </form>

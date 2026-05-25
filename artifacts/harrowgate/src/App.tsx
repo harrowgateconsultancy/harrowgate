@@ -53,16 +53,16 @@ const clerkAppearance = {
   options: {
     logoPlacement: "inside" as const,
     logoLinkUrl: basePath || "/",
-    logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
+    logoImageUrl: `${window.location.origin}${basePath}/harrowgate-logo.png`,
   },
   variables: {
     colorPrimary: "#a28959",
-    colorForeground: "#f5e6d3",
-    colorMutedForeground: "rgba(245,230,211,0.55)",
+    colorForeground: "#e8d5b0",
+    colorMutedForeground: "rgba(232,213,176,0.5)",
     colorDanger: "#f87171",
-    colorBackground: "#1a0500",
+    colorBackground: "#0d2615",
     colorInput: "rgba(162,137,89,0.1)",
-    colorInputForeground: "#f5e6d3",
+    colorInputForeground: "#e8d5b0",
     colorNeutral: "rgba(162,137,89,0.3)",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
     borderRadius: "0.75rem",
@@ -97,33 +97,61 @@ const clerkAppearance = {
 };
 
 function SignInPage() {
+  const [, setLocation] = useLocation();
   return (
     <div
-      className="flex min-h-[100dvh] items-center justify-center px-4 py-12"
-      style={{ background: "#a13300" }}
+      className="flex flex-col min-h-[100dvh] px-4 py-8"
+      style={{ background: "#0f2d18" }}
     >
-      <SignIn
-        routing="path"
-        path={`${basePath}/sign-in`}
-        signUpUrl={`${basePath}/sign-up`}
-        forceRedirectUrl={`${basePath}/portal`}
-      />
+      <div className="flex items-center justify-between mb-6 max-w-lg mx-auto w-full">
+        <button
+          onClick={() => setLocation("/")}
+          className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
+          style={{ color: "rgba(162,137,89,0.6)" }}
+        >
+          ← Back
+        </button>
+        <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-10 object-contain" />
+        <div className="w-16" />
+      </div>
+      <div className="flex flex-1 items-center justify-center">
+        <SignIn
+          routing="path"
+          path={`${basePath}/sign-in`}
+          signUpUrl={`${basePath}/sign-up`}
+          forceRedirectUrl={`${basePath}/portal`}
+        />
+      </div>
     </div>
   );
 }
 
 function SignUpPage() {
+  const [, setLocation] = useLocation();
   return (
     <div
-      className="flex min-h-[100dvh] items-center justify-center px-4 py-12"
-      style={{ background: "#a13300" }}
+      className="flex flex-col min-h-[100dvh] px-4 py-8"
+      style={{ background: "#0f2d18" }}
     >
-      <SignUp
-        routing="path"
-        path={`${basePath}/sign-up`}
-        signInUrl={`${basePath}/sign-in`}
-        forceRedirectUrl={`${basePath}/portal`}
-      />
+      <div className="flex items-center justify-between mb-6 max-w-lg mx-auto w-full">
+        <button
+          onClick={() => setLocation("/")}
+          className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
+          style={{ color: "rgba(162,137,89,0.6)" }}
+        >
+          ← Back
+        </button>
+        <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-10 object-contain" />
+        <div className="w-16" />
+      </div>
+      <div className="flex flex-1 items-center justify-center">
+        <SignUp
+          routing="path"
+          path={`${basePath}/sign-up`}
+          signInUrl={`${basePath}/sign-in`}
+          forceRedirectUrl={`${basePath}/portal`}
+        />
+      </div>
     </div>
   );
 }
