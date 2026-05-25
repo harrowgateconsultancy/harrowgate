@@ -15,6 +15,7 @@ const objectStorageService = new ObjectStorageService();
 const VALID_STATUSES = [
   "pending", "approved", "payment_pending", "payment_received",
   "acknowledged", "rejected", "docs_requested",
+  "interview_arranged", "interview_completed",
 ];
 
 router.get("/admin/student-submissions", async (_req, res) => {
@@ -54,39 +55,72 @@ router.patch("/admin/student-submissions/:id/status", async (req, res) => {
 
     const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
 
-    // Fire approval email when admin approves the application
     if (status === "approved" && updated.email) {
-      sendApprovalEmail({
-        name: updated.name,
-        studentEmail: updated.email,
-        portalUrl,
-      }).catch(() => {});
+      sendApprovalEmail({ name: updated.name, studentEmail: updated.email, portalUrl }).catch(() => {});
     }
-
-    // Fire docs-requested email when admin requests more documents
     if (status === "docs_requested" && updated.email) {
-      sendDocsRequestedEmail({
-        name: updated.name,
-        studentEmail: updated.email,
-        adminNotes: adminNotes || undefined,
-        portalUrl,
-      }).catch(() => {});
+      sendDocsRequestedEmail({ name: updated.name, studentEmail: updated.email, adminNotes: adminNotes || undefined, portalUrl }).catch(() => {});
     }
 
     res.json(updated);
   } catch { res.status(500).json({ error: "Failed to update status" }); }
 });
 
-// Download a document with proper filename header
+// Send mock interview invite + update status to interview_arranged
+router.post("/admin/student-submissions/:id/send-interview-invite", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { zoomLink, dateTime, notes } = req.body;
+    if (!zoomLink || !dateTime) return res.status(400).json({ error: "zoomLink and dateTime are required" });
+
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    if (!submission.email) return res.status(400).json({ error: "Student has no email on record" });
+
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({ status: "interview_arranged", interviewZoomLink: zoomLink, interviewDateTime: dateTime })
+      .where(eq(studentSubmissionsTable.id, id))
+      .returning();
+
+    const refCode = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
+    await sendInterviewInviteEmail({
+      name: submission.name,
+      studentEmail: submission.email,
+      zoomLink,
+      dateTime,
+      refCode,
+      notes,
+    });
+
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to send interview invite" }); }
+});
+
+// Admin marks interview as completed
+router.post("/admin/student-submissions/:id/complete-interview", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    if (submission.status !== "interview_arranged") return res.status(400).json({ error: "Interview not yet arranged" });
+
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({ status: "interview_completed" })
+      .where(eq(studentSubmissionsTable.id, id))
+      .returning();
+
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to complete interview" }); }
+});
+
+// Download a document
 router.get("/admin/student-submissions/:id/documents/:docId/download", async (req: any, res) => {
   try {
     const submissionId = parseInt(req.params.id);
     const docId = parseInt(req.params.docId);
     const [doc] = await db.select().from(studentDocumentsTable)
-      .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId)))
-      .limit(1);
+      .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId))).limit(1);
     if (!doc) return res.status(404).json({ error: "Document not found" });
-
     const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
     const response = await objectStorageService.downloadObject(objectFile, 0);
     res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(doc.fileName)}"`);
@@ -94,9 +128,7 @@ router.get("/admin/student-submissions/:id/documents/:docId/download", async (re
       if (key.toLowerCase() !== "content-disposition") res.setHeader(key, value);
     });
     res.status(response.status);
-    if (response.body) {
-      Readable.fromWeb(response.body as ReadableStream<Uint8Array>).pipe(res);
-    } else { res.end(); }
+    if (response.body) { Readable.fromWeb(response.body as ReadableStream<Uint8Array>).pipe(res); } else { res.end(); }
   } catch (err) {
     if (err instanceof ObjectNotFoundError) return res.status(404).json({ error: "File not found in storage" });
     res.status(500).json({ error: "Failed to download document" });
@@ -109,10 +141,8 @@ router.get("/admin/student-submissions/:id/documents/:docId/view", async (req: a
     const submissionId = parseInt(req.params.id);
     const docId = parseInt(req.params.docId);
     const [doc] = await db.select().from(studentDocumentsTable)
-      .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId)))
-      .limit(1);
+      .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId))).limit(1);
     if (!doc) return res.status(404).json({ error: "Document not found" });
-
     const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
     const response = await objectStorageService.downloadObject(objectFile, 0);
     res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(doc.fileName)}"`);
@@ -120,9 +150,7 @@ router.get("/admin/student-submissions/:id/documents/:docId/view", async (req: a
       if (key.toLowerCase() !== "content-disposition") res.setHeader(key, value);
     });
     res.status(response.status);
-    if (response.body) {
-      Readable.fromWeb(response.body as ReadableStream<Uint8Array>).pipe(res);
-    } else { res.end(); }
+    if (response.body) { Readable.fromWeb(response.body as ReadableStream<Uint8Array>).pipe(res); } else { res.end(); }
   } catch (err) {
     if (err instanceof ObjectNotFoundError) return res.status(404).json({ error: "File not found in storage" });
     res.status(500).json({ error: "Failed to view document" });
@@ -140,28 +168,6 @@ router.post("/admin/student-submissions/:id/documents", async (req: any, res) =>
     const [doc] = await db.insert(studentDocumentsTable).values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType }).returning();
     res.status(201).json(doc);
   } catch { res.status(500).json({ error: "Failed to attach document" }); }
-});
-
-// Send mock interview invite to student
-router.post("/admin/student-submissions/:id/send-interview-invite", async (req: any, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    const { zoomLink, dateTime, notes } = req.body;
-    if (!zoomLink || !dateTime) return res.status(400).json({ error: "zoomLink and dateTime are required" });
-    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
-    if (!submission) return res.status(404).json({ error: "Not found" });
-    if (!submission.email) return res.status(400).json({ error: "Student has no email on record" });
-    const refCode = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
-    await sendInterviewInviteEmail({
-      name: submission.name,
-      studentEmail: submission.email,
-      zoomLink,
-      dateTime,
-      refCode,
-      notes,
-    });
-    res.json({ success: true });
-  } catch { res.status(500).json({ error: "Failed to send interview invite" }); }
 });
 
 // Admin deletes a document

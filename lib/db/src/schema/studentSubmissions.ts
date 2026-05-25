@@ -11,6 +11,8 @@ export const studentSubmissionsTable = pgTable("student_submissions", {
   passportNumber: text("passport_number").notNull(),
   status: text("status").notNull().default("pending"),
   adminNotes: text("admin_notes"),
+  interviewZoomLink: text("interview_zoom_link"),
+  interviewDateTime: text("interview_date_time"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

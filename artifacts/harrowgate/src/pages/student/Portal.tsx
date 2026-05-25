@@ -13,18 +13,62 @@ export type Submission = {
   id: number; clerkUserId: string; name: string; dateOfBirth: string;
   passportNumber: string; email: string | null; status: string;
   adminNotes: string | null; createdAt: string;
+  interviewZoomLink?: string | null; interviewDateTime?: string | null;
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };
 
 const statusMap: Record<string, { label: string; color: string; bg: string }> = {
-  pending:          { label: "Under Review",              color: GOLD,      bg: "rgba(162,137,89,0.12)" },
-  approved:         { label: "Approved",                  color: "#4ade80", bg: "rgba(74,222,128,0.12)" },
-  docs_requested:   { label: "Documents Requested",       color: "#fb923c", bg: "rgba(251,146,60,0.12)" },
-  payment_pending:  { label: "Payment Required",          color: "#fb923c", bg: "rgba(251,146,60,0.12)" },
-  payment_received: { label: "Pending Payment Confirmation", color: "#60a5fa", bg: "rgba(96,165,250,0.12)" },
-  acknowledged:     { label: "Payment Received ✓",          color: "#4ade80", bg: "rgba(74,222,128,0.12)" },
-  rejected:         { label: "Application Unsuccessful",  color: "#f87171", bg: "rgba(248,113,113,0.12)" },
+  pending:              { label: "Under Review",              color: GOLD,        bg: "rgba(162,137,89,0.12)" },
+  approved:             { label: "Approved",                  color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  docs_requested:       { label: "Documents Requested",       color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
+  payment_pending:      { label: "Payment Required",          color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
+  payment_received:     { label: "Pending Payment Confirmation", color: "#60a5fa", bg: "rgba(96,165,250,0.12)" },
+  acknowledged:         { label: "Payment Received ✓",        color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  interview_arranged:   { label: "Interview Arranged",        color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
+  interview_completed:  { label: "Interview Completed",       color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  rejected:             { label: "Application Unsuccessful",  color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
+
+type TimelineStep = { icon: string; label: string; note: string; done: boolean; current?: boolean };
+
+function buildTimeline(submission: Submission): TimelineStep[] {
+  const s = submission.status;
+  const ref = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
+  const submittedDate = new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+  const allDone    = (step: string) => ["acknowledged","interview_arranged","interview_completed"].includes(s) || step === "done";
+  const afterPayment = ["acknowledged","interview_arranged","interview_completed"].includes(s);
+
+  return [
+    { icon: "✅", label: "Application Submitted",          note: submittedDate,                                        done: true },
+    { icon: "✅", label: "Documents Reviewed",              note: "Approved by HARROWGATE consultant",                  done: true },
+    { icon: "✅", label: "Payment Confirmed",               note: `Acknowledgement code: ${ref}`,                       done: true },
+    {
+      icon: afterPayment && s !== "acknowledged" ? "✅" : (s === "acknowledged" ? "🔄" : "⬜"),
+      label: "Awaiting Interview Arrangement",
+      note: s === "acknowledged" ? "Our team will contact you to schedule your mock interview" : (afterPayment ? "Arranged" : "Upcoming"),
+      done: afterPayment && s !== "acknowledged",
+      current: s === "acknowledged",
+    },
+    {
+      icon: s === "interview_arranged" ? "🔄" : (s === "interview_completed" ? "✅" : "⬜"),
+      label: "Mock Interview",
+      note: s === "interview_arranged"
+        ? (submission.interviewDateTime || "Scheduled — check your email for the Zoom link")
+        : (s === "interview_completed" ? "Completed" : "To be scheduled"),
+      done: s === "interview_completed",
+      current: s === "interview_arranged",
+    },
+    {
+      icon: s === "interview_completed" ? "🔄" : "⬜",
+      label: "Waiting for University Interview",
+      note: s === "interview_completed" ? "Awaiting university interview scheduling" : "Upcoming",
+      done: false,
+      current: s === "interview_completed",
+    },
+    { icon: "⬜", label: "Visa Application Submitted", note: "Final step", done: false },
+  ];
+}
 
 export default function Portal() {
   const { user, isLoaded } = useUser();
@@ -44,6 +88,13 @@ export default function Portal() {
   };
 
   useEffect(() => { if (isLoaded) fetchSubmission(); }, [isLoaded]);
+
+  // Auto-show timeline for post-acknowledged statuses
+  useEffect(() => {
+    if (submission && ["interview_arranged", "interview_completed"].includes(submission.status)) {
+      setShowTimeline(true);
+    }
+  }, [submission?.status]);
 
   if (!isLoaded || loading) {
     return (
@@ -78,7 +129,6 @@ export default function Portal() {
       </nav>
 
       <main className="max-w-5xl mx-auto px-6 py-10">
-        {/* No submission yet */}
         {submission === null && <ApplyForm user={user} onSubmitted={fetchSubmission} />}
 
         {submission && (
@@ -157,7 +207,7 @@ export default function Portal() {
               <PaymentPage submission={submission} onUpdated={fetchSubmission} />
             )}
 
-            {/* ── ACKNOWLEDGED ── */}
+            {/* ── ACKNOWLEDGED — code + Close ── */}
             {submission.status === "acknowledged" && !showTimeline && (
               <div className="mt-6 rounded-2xl p-8 text-center border" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
                 <div className="text-5xl mb-4">✅</div>
@@ -180,47 +230,52 @@ export default function Portal() {
               </div>
             )}
 
-            {/* ── TIMELINE (after Close) ── */}
-            {submission.status === "acknowledged" && showTimeline && (
-              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.12)" }}>
-                <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
-                  <h3 className="text-base font-semibold" style={{ color: GOLD }}>Application Progress</h3>
-                  <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>
-                    Reference: <span className="font-mono font-semibold">STU{submission.passportNumber.slice(-4).toUpperCase()}</span>
-                  </p>
-                </div>
-                <div className="px-6 py-6">
-                  {[
-                    { icon: "✅", label: "Application Submitted",        done: true,    note: new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) },
-                    { icon: "✅", label: "Documents Reviewed",            done: true,    note: "Approved by HARROWGATE consultant" },
-                    { icon: "✅", label: "Payment Confirmed",             done: true,    note: `Acknowledgement code: STU${submission.passportNumber.slice(-4).toUpperCase()}` },
-                    { icon: "🔄", label: "Awaiting Interview Arrangement", done: false,   note: "Our team will contact you to schedule your mock interview", current: true },
-                    { icon: "⬜", label: "Mock Interview",                 done: false,   note: "To be scheduled" },
-                    { icon: "⬜", label: "Visa Application Submitted",     done: false,   note: "Final step" },
-                  ].map((step, i, arr) => (
-                    <div key={step.label} className="flex gap-4" style={{ marginBottom: i < arr.length - 1 ? "0" : "0" }}>
-                      <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 font-bold"
-                          style={{
-                            background: step.done ? "rgba(74,222,128,0.12)" : step.current ? "rgba(162,137,89,0.1)" : "rgba(162,137,89,0.05)",
-                            border: `1.5px solid ${step.done ? "rgba(74,222,128,0.3)" : step.current ? "rgba(162,137,89,0.25)" : "rgba(162,137,89,0.1)"}`,
-                          }}>
-                          {step.icon}
-                        </div>
-                        {i < arr.length - 1 && (
-                          <div className="w-px flex-1 my-1" style={{ background: step.done ? "rgba(74,222,128,0.2)" : "rgba(162,137,89,0.08)", minHeight: 24 }} />
-                        )}
+            {/* ── INTERVIEW ARRANGED ── */}
+            {submission.status === "interview_arranged" && (
+              <div className="mt-6 rounded-2xl p-8 border" style={{ background: "rgba(167,139,250,0.04)", borderColor: "rgba(167,139,250,0.2)" }}>
+                <div className="text-5xl mb-4 text-center">🎥</div>
+                <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#a78bfa" }}>Mock Interview Scheduled</h3>
+                <p className="text-sm text-center mb-6" style={{ color: "rgba(167,139,250,0.65)" }}>
+                  Your mock interview has been arranged. Please join on time and ensure your camera and microphone are working.
+                </p>
+                <div className="rounded-2xl border p-5 mb-6" style={{ background: "rgba(167,139,250,0.06)", borderColor: "rgba(167,139,250,0.2)" }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {submission.interviewDateTime && (
+                      <div>
+                        <p className="text-xs font-medium mb-1" style={{ color: "rgba(167,139,250,0.5)" }}>Date & Time</p>
+                        <p className="text-sm font-semibold" style={{ color: "#a78bfa" }}>{submission.interviewDateTime}</p>
                       </div>
-                      <div className="pb-5 flex-1 min-w-0">
-                        <p className="text-sm font-semibold leading-tight" style={{ color: step.done ? "#4ade80" : step.current ? GOLD : "rgba(162,137,89,0.35)" }}>
-                          {step.label}
-                          {step.current && <span className="ml-2 text-xs px-2 py-0.5 rounded-full font-medium align-middle" style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>Current</span>}
-                        </p>
-                        <p className="text-xs mt-0.5" style={{ color: step.done ? "rgba(74,222,128,0.5)" : "rgba(162,137,89,0.35)" }}>{step.note}</p>
-                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs font-medium mb-1" style={{ color: "rgba(167,139,250,0.5)" }}>Platform</p>
+                      <p className="text-sm font-semibold" style={{ color: "#a78bfa" }}>Zoom</p>
                     </div>
-                  ))}
+                  </div>
                 </div>
+                {submission.interviewZoomLink && (
+                  <a href={submission.interviewZoomLink} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-base font-semibold transition-all hover:opacity-90"
+                    style={{ background: "#a78bfa", color: "#0f2d18" }}>
+                    🎥 Join Zoom Meeting →
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* ── INTERVIEW COMPLETED ── */}
+            {submission.status === "interview_completed" && (
+              <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
+                <div className="text-5xl mb-4">🎓</div>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>Mock Interview Completed</h3>
+                <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>
+                  Well done — your mock interview is complete.
+                </p>
+                <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>
+                  ⏳ Waiting for University Interview
+                </p>
+                <p className="text-sm mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>
+                  Our team is coordinating with the university. You will be notified as soon as your interview is scheduled.
+                </p>
               </div>
             )}
 
@@ -240,8 +295,45 @@ export default function Portal() {
               </div>
             )}
 
-            {/* ── Details card (for non-payment / non-doc statuses) ── */}
-            {!["payment_pending","payment_received","acknowledged","docs_requested"].includes(submission.status) && (
+            {/* ── TIMELINE ── */}
+            {showTimeline && ["acknowledged","interview_arranged","interview_completed"].includes(submission.status) && (
+              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.12)" }}>
+                <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+                  <h3 className="text-base font-semibold" style={{ color: GOLD }}>Application Progress</h3>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>
+                    Reference: <span className="font-mono font-semibold">STU{submission.passportNumber.slice(-4).toUpperCase()}</span>
+                  </p>
+                </div>
+                <div className="px-6 py-6">
+                  {buildTimeline(submission).map((step, i, arr) => (
+                    <div key={step.label} className="flex gap-4">
+                      <div className="flex flex-col items-center">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0"
+                          style={{
+                            background: step.done ? "rgba(74,222,128,0.12)" : step.current ? "rgba(162,137,89,0.1)" : "rgba(162,137,89,0.04)",
+                            border: `1.5px solid ${step.done ? "rgba(74,222,128,0.3)" : step.current ? "rgba(162,137,89,0.25)" : "rgba(162,137,89,0.08)"}`,
+                          }}>
+                          {step.icon}
+                        </div>
+                        {i < arr.length - 1 && (
+                          <div className="w-px flex-1 my-1" style={{ background: step.done ? "rgba(74,222,128,0.2)" : "rgba(162,137,89,0.07)", minHeight: 24 }} />
+                        )}
+                      </div>
+                      <div className="pb-5 flex-1 min-w-0">
+                        <p className="text-sm font-semibold leading-tight" style={{ color: step.done ? "#4ade80" : step.current ? GOLD : "rgba(162,137,89,0.3)" }}>
+                          {step.label}
+                          {step.current && <span className="ml-2 text-xs px-2 py-0.5 rounded-full font-medium align-middle" style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>Current</span>}
+                        </p>
+                        <p className="text-xs mt-0.5" style={{ color: step.done ? "rgba(74,222,128,0.5)" : "rgba(162,137,89,0.35)" }}>{step.note}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── Details card (non-payment / non-doc / non-interview statuses) ── */}
+            {!["payment_pending","payment_received","acknowledged","docs_requested","interview_arranged","interview_completed"].includes(submission.status) && (
               <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.1)" }}>
                 <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                   <h3 className="text-sm font-semibold" style={{ color: GOLD }}>Application Details</h3>

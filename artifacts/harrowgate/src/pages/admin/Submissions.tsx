@@ -12,16 +12,19 @@ type Submission = {
   id: number; name: string; email: string | null; dateOfBirth: string;
   passportNumber: string; status: string; adminNotes: string | null;
   createdAt: string; documents: Document[];
+  interviewZoomLink?: string | null; interviewDateTime?: string | null;
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
-  pending:          { label: "Pending",            color: GOLD,      bg: "rgba(162,137,89,0.12)" },
-  approved:         { label: "Approved",           color: "#4ade80", bg: "rgba(74,222,128,0.12)" },
-  docs_requested:   { label: "Docs Requested",     color: "#fb923c", bg: "rgba(251,146,60,0.12)" },
-  payment_pending:  { label: "Payment Pending",    color: "#fb923c", bg: "rgba(251,146,60,0.12)" },
-  payment_received: { label: "Receipt Received",   color: "#60a5fa", bg: "rgba(96,165,250,0.12)" },
-  acknowledged:     { label: "Acknowledged",       color: "#4ade80", bg: "rgba(74,222,128,0.12)" },
-  rejected:         { label: "Rejected",           color: "#f87171", bg: "rgba(248,113,113,0.12)" },
+  pending:              { label: "Pending",              color: GOLD,        bg: "rgba(162,137,89,0.12)" },
+  approved:             { label: "Approved",             color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  docs_requested:       { label: "Docs Requested",       color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
+  payment_pending:      { label: "Payment Pending",      color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
+  payment_received:     { label: "Receipt Received",     color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
+  acknowledged:         { label: "Acknowledged",         color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  interview_arranged:   { label: "Interview Arranged",   color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
+  interview_completed:  { label: "Interview Completed",  color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  rejected:             { label: "Rejected",             color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
 const nextActions: Record<string, { label: string; nextStatus: string; color: string; icon: string }[]> = {
@@ -43,6 +46,7 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
   payment_received: [
     { label: "Confirm Payment & Acknowledge", nextStatus: "acknowledged", color: GOLD,     icon: "✅" },
   ],
+  interview_arranged: [],
 };
 
 function isImage(f: string, m?: string | null) { return m?.startsWith("image/") || /\.(jpe?g|png|gif|webp)$/i.test(f); }
@@ -123,10 +127,26 @@ export default function Submissions() {
         body: JSON.stringify(interviewForm),
       });
       if (!res.ok) throw new Error("Failed");
+      const updated = await res.json();
       setInviteSent(selected.id);
       setInterviewForm(null);
+      setSelected(prev => prev ? { ...prev, status: updated.status, interviewZoomLink: updated.interviewZoomLink, interviewDateTime: updated.interviewDateTime } : null);
+      qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
     } catch { alert("Failed to send interview invite. Please check the student has an email on file."); }
     finally { setSendingInvite(false); }
+  };
+
+  const handleCompleteInterview = async () => {
+    if (!selected) return;
+    try {
+      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/complete-interview`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed");
+      const updated = await res.json();
+      setSelected(prev => prev ? { ...prev, status: updated.status } : null);
+      qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
+    } catch { alert("Failed to mark interview as completed."); }
   };
 
   const handleAdminUpload = async (file: File) => {
@@ -391,8 +411,8 @@ export default function Submissions() {
                   </div>
                 )}
 
-                {/* Mock Interview */}
-                {["payment_received", "acknowledged"].includes(selected.status) && (
+                {/* Mock Interview — Schedule (acknowledged only) */}
+                {selected.status === "acknowledged" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(96,165,250,0.18)" }}>
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
                       <p className="text-sm font-semibold" style={{ color: "#60a5fa" }}>🎥 Mock Interview</p>
@@ -447,6 +467,34 @@ export default function Submissions() {
                           </div>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Mock Interview — Confirm Completed (interview_arranged only) */}
+                {selected.status === "interview_arranged" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(167,139,250,0.2)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(167,139,250,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#a78bfa" }}>🎥 Mock Interview — Arranged</p>
+                    </div>
+                    <div className="px-4 py-4 space-y-3">
+                      {selected.interviewDateTime && (
+                        <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(167,139,250,0.05)", borderColor: "rgba(167,139,250,0.15)", color: "#a78bfa" }}>
+                          📅 {selected.interviewDateTime}
+                        </div>
+                      )}
+                      {selected.interviewZoomLink && (
+                        <a href={selected.interviewZoomLink} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm truncate hover:opacity-80 transition-opacity"
+                          style={{ background: "rgba(167,139,250,0.05)", borderColor: "rgba(167,139,250,0.15)", color: "#a78bfa" }}>
+                          🔗 {selected.interviewZoomLink}
+                        </a>
+                      )}
+                      <button onClick={handleCompleteInterview}
+                        className="w-full py-3 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 flex items-center justify-center gap-2"
+                        style={{ background: "rgba(74,222,128,0.08)", borderColor: "rgba(74,222,128,0.28)", color: "#4ade80" }}>
+                        ✅ Confirm Interview Completed
+                      </button>
                     </div>
                   </div>
                 )}

@@ -191,6 +191,12 @@ export async function sendInterviewInviteEmail(opts: {
     await transport.sendMail({
       from: `"HARROWGATE Consultancy" <${process.env.GMAIL_USER}>`,
       to: opts.studentEmail,
+      replyTo: process.env.GMAIL_USER,
+      headers: {
+        "X-Priority": "1",
+        "X-MSMail-Priority": "High",
+        "Importance": "high",
+      },
       subject: `Mock Interview Invitation — HARROWGATE Consultancy`,
       html: `
         <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0f2d18;border-radius:12px;overflow:hidden">
