@@ -192,6 +192,35 @@ router.post("/student/submissions/:id/additional-docs", requireStudentAuth, asyn
   } catch { res.status(500).json({ error: "Failed to submit additional docs" }); }
 });
 
+// Student views a document inline (gated: offer_letter requires final_payment_confirmed)
+router.get("/student/submissions/:id/documents/:docId/view", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const docId = parseInt(req.params.docId);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+    if (!submission) return res.status(403).json({ error: "Forbidden" });
+    const [doc] = await db.select().from(studentDocumentsTable)
+      .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId))).limit(1);
+    if (!doc) return res.status(404).json({ error: "Document not found" });
+    if (doc.documentType === "offer_letter" && submission.status !== "final_payment_confirmed") {
+      return res.status(403).json({ error: "Final payment must be confirmed before viewing the offer letter" });
+    }
+    const { Readable } = await import("stream");
+    const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
+    const response = await objectStorageService.downloadObject(objectFile, 0);
+    res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(doc.fileName)}"`);
+    response.headers.forEach((value: string, key: string) => {
+      if (key.toLowerCase() !== "content-disposition") res.setHeader(key, value);
+    });
+    res.status(response.status);
+    if (response.body) { Readable.fromWeb(response.body as ReadableStream<Uint8Array>).pipe(res); } else { res.end(); }
+  } catch (err) {
+    if ((err as any)?.constructor?.name === "ObjectNotFoundError") return res.status(404).json({ error: "File not found" });
+    res.status(500).json({ error: "Failed to view document" });
+  }
+});
+
 // Student downloads a document (gated: offer_letter requires final_payment_confirmed)
 router.get("/student/submissions/:id/documents/:docId/download", requireStudentAuth, async (req: any, res) => {
   try {

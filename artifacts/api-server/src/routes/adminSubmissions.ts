@@ -7,7 +7,7 @@ import {
 } from "@workspace/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
-import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail } from "../email";
+import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail } from "../email";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -63,6 +63,24 @@ router.patch("/admin/student-submissions/:id/status", async (req, res) => {
     }
     if (status === "docs_requested" && updated.email) {
       sendDocsRequestedEmail({ name: updated.name, studentEmail: updated.email, adminNotes: adminNotes || undefined, portalUrl }).catch(() => {});
+    }
+    if (status === "final_payment_confirmed" && updated.email) {
+      (async () => {
+        try {
+          const [offerDoc] = await db.select().from(studentDocumentsTable)
+            .where(and(eq(studentDocumentsTable.submissionId, id), eq(studentDocumentsTable.documentType, "offer_letter"))).limit(1);
+          if (!offerDoc) return;
+          const objectFile = await objectStorageService.getObjectEntityFile(offerDoc.fileUrl);
+          const response = await objectStorageService.downloadObject(objectFile, 0);
+          const arrayBuf = await response.arrayBuffer();
+          const buffer = Buffer.from(arrayBuf);
+          await sendOfferLetterConfirmedEmail({
+            name: updated.name, studentEmail: updated.email!,
+            attachment: { content: buffer, filename: offerDoc.fileName, contentType: offerDoc.mimeType || "application/pdf" },
+            portalUrl,
+          });
+        } catch (err) { console.error("[email] Failed to send offer letter with attachment:", err); }
+      })();
     }
 
     res.json(updated);

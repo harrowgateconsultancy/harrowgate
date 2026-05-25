@@ -503,13 +503,23 @@ export default function Portal() {
                   </div>
                   <div className="px-6 py-5">
                     {offerDoc ? (
-                      <a
-                        href={`${getApiBase()}/api/student/submissions/${submission.id}/documents/${offerDoc.id}/download`}
-                        download={offerDoc.fileName}
-                        className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
-                        style={{ background: "rgba(74,222,128,0.08)", borderColor: "rgba(74,222,128,0.3)", color: "#4ade80" }}>
-                        <span>📄</span> Download Offer Letter
-                      </a>
+                      <div className="flex gap-3">
+                        <a
+                          href={`${getApiBase()}/api/student/submissions/${submission.id}/documents/${offerDoc.id}/view`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
+                          style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)", color: "#4ade80" }}>
+                          <span>👁</span> View
+                        </a>
+                        <a
+                          href={`${getApiBase()}/api/student/submissions/${submission.id}/documents/${offerDoc.id}/download`}
+                          download={offerDoc.fileName}
+                          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
+                          style={{ background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.35)", color: "#4ade80" }}>
+                          <span>📄</span> Download
+                        </a>
+                      </div>
                     ) : (
                       <p className="text-center text-sm" style={{ color: "rgba(74,222,128,0.45)" }}>Offer letter not yet available. Please contact your consultant.</p>
                     )}
