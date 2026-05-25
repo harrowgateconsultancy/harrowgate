@@ -102,6 +102,35 @@ export async function sendApprovalEmail(opts: {
   } catch (err) { console.error("[email] Failed to send approval email:", err); }
 }
 
+// ── Notify admin: student resubmitted ───────────────────────────────────────
+export async function sendResubmitEmail(opts: {
+  name: string; email: string | null; passportNumber: string;
+  dateOfBirth: string; docCount: number; submissionId: number;
+}) {
+  const transport = createTransport();
+  if (!transport) { console.warn("[email] credentials not set — skipping"); return; }
+  try {
+    await transport.sendMail({
+      from: `"HARROWGATE Portal" <${process.env.GMAIL_USER}>`,
+      to: NOTIFY_TO,
+      subject: `Student Application Resubmitted — ${opts.name}`,
+      html: adminHtml(
+        "📤 Application Resubmitted",
+        `A student has uploaded additional documents and resubmitted their application for review.`,
+        [
+          ["Full Name", opts.name],
+          ["Email", opts.email || "—"],
+          ["Passport Number", opts.passportNumber],
+          ["Date of Birth", opts.dateOfBirth],
+          ["Documents on File", String(opts.docCount)],
+        ],
+        "Review Resubmission →"
+      ),
+    });
+    console.log(`[email] Resubmit notification sent for ${opts.name}`);
+  } catch (err) { console.error("[email] Failed to send resubmit email:", err); }
+}
+
 // ── Notify student: additional documents requested ───────────────────────────
 export async function sendDocsRequestedEmail(opts: {
   name: string; studentEmail: string; adminNotes?: string; portalUrl?: string;

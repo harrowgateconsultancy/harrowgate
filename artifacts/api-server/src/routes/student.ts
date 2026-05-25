@@ -4,7 +4,7 @@ import { getAuth } from "@clerk/express";
 import { db } from "@workspace/db";
 import { studentSubmissionsTable, studentDocumentsTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
-import { sendNewApplicationEmail, sendReceiptUploadEmail } from "../email";
+import { sendNewApplicationEmail, sendReceiptUploadEmail, sendResubmitEmail } from "../email";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 
 const router = Router();
@@ -99,6 +99,15 @@ router.post("/student/submissions/:id/resubmit", requireStudentAuth, async (req:
     if (submission.status !== "docs_requested") return res.status(400).json({ error: "Submission is not awaiting resubmission" });
     const [updated] = await db.update(studentSubmissionsTable).set({ status: "pending", adminNotes: null })
       .where(eq(studentSubmissionsTable.id, submissionId)).returning();
+    const allDocs = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, submissionId));
+    sendResubmitEmail({
+      name: submission.name,
+      email: submission.email,
+      passportNumber: submission.passportNumber,
+      dateOfBirth: submission.dateOfBirth,
+      docCount: allDocs.length,
+      submissionId,
+    }).catch(() => {});
     res.json(updated);
   } catch { res.status(500).json({ error: "Failed to resubmit" }); }
 });
