@@ -7,56 +7,42 @@ import {
 } from "@workspace/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
+import { sendApprovalEmail, sendDocsRequestedEmail } from "../email";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
 
+const VALID_STATUSES = [
+  "pending", "approved", "payment_pending", "payment_received",
+  "acknowledged", "rejected", "docs_requested",
+];
+
 router.get("/admin/student-submissions", async (_req, res) => {
   try {
-    const submissions = await db
-      .select()
-      .from(studentSubmissionsTable)
-      .orderBy(desc(studentSubmissionsTable.createdAt));
-    const withDocs = await Promise.all(
-      submissions.map(async (s) => {
-        const documents = await db
-          .select()
-          .from(studentDocumentsTable)
-          .where(eq(studentDocumentsTable.submissionId, s.id));
-        return { ...s, documents };
-      }),
-    );
+    const submissions = await db.select().from(studentSubmissionsTable).orderBy(desc(studentSubmissionsTable.createdAt));
+    const withDocs = await Promise.all(submissions.map(async (s) => {
+      const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, s.id));
+      return { ...s, documents };
+    }));
     res.json(withDocs);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch submissions" });
-  }
+  } catch { res.status(500).json({ error: "Failed to fetch submissions" }); }
 });
 
 router.get("/admin/student-submissions/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const [submission] = await db
-      .select()
-      .from(studentSubmissionsTable)
-      .where(eq(studentSubmissionsTable.id, id))
-      .limit(1);
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
     if (!submission) return res.status(404).json({ error: "Not found" });
-    const documents = await db
-      .select()
-      .from(studentDocumentsTable)
-      .where(eq(studentDocumentsTable.submissionId, id));
+    const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, id));
     res.json({ ...submission, documents });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch submission" });
-  }
+  } catch { res.status(500).json({ error: "Failed to fetch submission" }); }
 });
 
 router.patch("/admin/student-submissions/:id/status", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { status, adminNotes } = req.body;
-    const validStatuses = ["pending", "approved", "payment_pending", "payment_received", "acknowledged", "rejected"];
-    if (!validStatuses.includes(status)) {
+    if (!VALID_STATUSES.includes(status)) {
       return res.status(400).json({ error: "Invalid status" });
     }
     const [updated] = await db
@@ -65,10 +51,30 @@ router.patch("/admin/student-submissions/:id/status", async (req, res) => {
       .where(eq(studentSubmissionsTable.id, id))
       .returning();
     if (!updated) return res.status(404).json({ error: "Not found" });
+
+    const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
+
+    // Fire approval email when admin approves the application
+    if (status === "approved" && updated.email) {
+      sendApprovalEmail({
+        name: updated.name,
+        studentEmail: updated.email,
+        portalUrl,
+      }).catch(() => {});
+    }
+
+    // Fire docs-requested email when admin requests more documents
+    if (status === "docs_requested" && updated.email) {
+      sendDocsRequestedEmail({
+        name: updated.name,
+        studentEmail: updated.email,
+        adminNotes: adminNotes || undefined,
+        portalUrl,
+      }).catch(() => {});
+    }
+
     res.json(updated);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update status" });
-  }
+  } catch { res.status(500).json({ error: "Failed to update status" }); }
 });
 
 // Download a document with proper filename header
@@ -76,103 +82,64 @@ router.get("/admin/student-submissions/:id/documents/:docId/download", async (re
   try {
     const submissionId = parseInt(req.params.id);
     const docId = parseInt(req.params.docId);
-
-    const [doc] = await db
-      .select()
-      .from(studentDocumentsTable)
-      .where(and(
-        eq(studentDocumentsTable.id, docId),
-        eq(studentDocumentsTable.submissionId, submissionId),
-      ))
+    const [doc] = await db.select().from(studentDocumentsTable)
+      .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId)))
       .limit(1);
     if (!doc) return res.status(404).json({ error: "Document not found" });
 
     const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
     const response = await objectStorageService.downloadObject(objectFile, 0);
-
     res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(doc.fileName)}"`);
     response.headers.forEach((value: string, key: string) => {
       if (key.toLowerCase() !== "content-disposition") res.setHeader(key, value);
     });
     res.status(response.status);
-
     if (response.body) {
-      const nodeStream = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
-      nodeStream.pipe(res);
-    } else {
-      res.end();
-    }
+      Readable.fromWeb(response.body as ReadableStream<Uint8Array>).pipe(res);
+    } else { res.end(); }
   } catch (err) {
-    if (err instanceof ObjectNotFoundError) {
-      return res.status(404).json({ error: "File not found in storage" });
-    }
+    if (err instanceof ObjectNotFoundError) return res.status(404).json({ error: "File not found in storage" });
     res.status(500).json({ error: "Failed to download document" });
   }
 });
 
-// View/inline a document (opens in browser)
+// View/inline a document
 router.get("/admin/student-submissions/:id/documents/:docId/view", async (req: any, res) => {
   try {
     const submissionId = parseInt(req.params.id);
     const docId = parseInt(req.params.docId);
-
-    const [doc] = await db
-      .select()
-      .from(studentDocumentsTable)
-      .where(and(
-        eq(studentDocumentsTable.id, docId),
-        eq(studentDocumentsTable.submissionId, submissionId),
-      ))
+    const [doc] = await db.select().from(studentDocumentsTable)
+      .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId)))
       .limit(1);
     if (!doc) return res.status(404).json({ error: "Document not found" });
 
     const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
     const response = await objectStorageService.downloadObject(objectFile, 0);
-
     res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(doc.fileName)}"`);
     response.headers.forEach((value: string, key: string) => {
       if (key.toLowerCase() !== "content-disposition") res.setHeader(key, value);
     });
     res.status(response.status);
-
     if (response.body) {
-      const nodeStream = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
-      nodeStream.pipe(res);
-    } else {
-      res.end();
-    }
+      Readable.fromWeb(response.body as ReadableStream<Uint8Array>).pipe(res);
+    } else { res.end(); }
   } catch (err) {
-    if (err instanceof ObjectNotFoundError) {
-      return res.status(404).json({ error: "File not found in storage" });
-    }
+    if (err instanceof ObjectNotFoundError) return res.status(404).json({ error: "File not found in storage" });
     res.status(500).json({ error: "Failed to view document" });
   }
 });
 
-// Admin attaches a document to a submission
+// Admin attaches a document
 router.post("/admin/student-submissions/:id/documents", async (req: any, res) => {
   try {
     const submissionId = parseInt(req.params.id);
-    const [submission] = await db
-      .select()
-      .from(studentSubmissionsTable)
-      .where(eq(studentSubmissionsTable.id, submissionId))
-      .limit(1);
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, submissionId)).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
-
     const { documentType, fileName, fileUrl, fileSize, mimeType } = req.body;
-    if (!documentType || !fileName || !fileUrl) {
-      return res.status(400).json({ error: "documentType, fileName, and fileUrl are required" });
-    }
-
-    const [doc] = await db
-      .insert(studentDocumentsTable)
-      .values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType })
-      .returning();
+    if (!documentType || !fileName || !fileUrl) return res.status(400).json({ error: "documentType, fileName, and fileUrl are required" });
+    const [doc] = await db.insert(studentDocumentsTable).values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType }).returning();
     res.status(201).json(doc);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to attach document" });
-  }
+  } catch { res.status(500).json({ error: "Failed to attach document" }); }
 });
 
 // Admin deletes a document
@@ -180,16 +147,9 @@ router.delete("/admin/student-submissions/:id/documents/:docId", async (req: any
   try {
     const submissionId = parseInt(req.params.id);
     const docId = parseInt(req.params.docId);
-    await db
-      .delete(studentDocumentsTable)
-      .where(and(
-        eq(studentDocumentsTable.id, docId),
-        eq(studentDocumentsTable.submissionId, submissionId),
-      ));
+    await db.delete(studentDocumentsTable).where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId)));
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to delete document" });
-  }
+  } catch { res.status(500).json({ error: "Failed to delete document" }); }
 });
 
 export default router;
