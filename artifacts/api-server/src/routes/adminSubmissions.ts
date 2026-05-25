@@ -1,12 +1,15 @@
 import { Router } from "express";
+import { Readable } from "stream";
 import { db } from "@workspace/db";
 import {
   studentSubmissionsTable,
   studentDocumentsTable,
 } from "@workspace/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
+import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 
 const router = Router();
+const objectStorageService = new ObjectStorageService();
 
 router.get("/admin/student-submissions", async (_req, res) => {
   try {
@@ -65,6 +68,127 @@ router.patch("/admin/student-submissions/:id/status", async (req, res) => {
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: "Failed to update status" });
+  }
+});
+
+// Download a document with proper filename header
+router.get("/admin/student-submissions/:id/documents/:docId/download", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const docId = parseInt(req.params.docId);
+
+    const [doc] = await db
+      .select()
+      .from(studentDocumentsTable)
+      .where(and(
+        eq(studentDocumentsTable.id, docId),
+        eq(studentDocumentsTable.submissionId, submissionId),
+      ))
+      .limit(1);
+    if (!doc) return res.status(404).json({ error: "Document not found" });
+
+    const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
+    const response = await objectStorageService.downloadObject(objectFile, 0);
+
+    res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(doc.fileName)}"`);
+    response.headers.forEach((value: string, key: string) => {
+      if (key.toLowerCase() !== "content-disposition") res.setHeader(key, value);
+    });
+    res.status(response.status);
+
+    if (response.body) {
+      const nodeStream = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
+      nodeStream.pipe(res);
+    } else {
+      res.end();
+    }
+  } catch (err) {
+    if (err instanceof ObjectNotFoundError) {
+      return res.status(404).json({ error: "File not found in storage" });
+    }
+    res.status(500).json({ error: "Failed to download document" });
+  }
+});
+
+// View/inline a document (opens in browser)
+router.get("/admin/student-submissions/:id/documents/:docId/view", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const docId = parseInt(req.params.docId);
+
+    const [doc] = await db
+      .select()
+      .from(studentDocumentsTable)
+      .where(and(
+        eq(studentDocumentsTable.id, docId),
+        eq(studentDocumentsTable.submissionId, submissionId),
+      ))
+      .limit(1);
+    if (!doc) return res.status(404).json({ error: "Document not found" });
+
+    const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
+    const response = await objectStorageService.downloadObject(objectFile, 0);
+
+    res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(doc.fileName)}"`);
+    response.headers.forEach((value: string, key: string) => {
+      if (key.toLowerCase() !== "content-disposition") res.setHeader(key, value);
+    });
+    res.status(response.status);
+
+    if (response.body) {
+      const nodeStream = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
+      nodeStream.pipe(res);
+    } else {
+      res.end();
+    }
+  } catch (err) {
+    if (err instanceof ObjectNotFoundError) {
+      return res.status(404).json({ error: "File not found in storage" });
+    }
+    res.status(500).json({ error: "Failed to view document" });
+  }
+});
+
+// Admin attaches a document to a submission
+router.post("/admin/student-submissions/:id/documents", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db
+      .select()
+      .from(studentSubmissionsTable)
+      .where(eq(studentSubmissionsTable.id, submissionId))
+      .limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+
+    const { documentType, fileName, fileUrl, fileSize, mimeType } = req.body;
+    if (!documentType || !fileName || !fileUrl) {
+      return res.status(400).json({ error: "documentType, fileName, and fileUrl are required" });
+    }
+
+    const [doc] = await db
+      .insert(studentDocumentsTable)
+      .values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType })
+      .returning();
+    res.status(201).json(doc);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to attach document" });
+  }
+});
+
+// Admin deletes a document
+router.delete("/admin/student-submissions/:id/documents/:docId", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const docId = parseInt(req.params.docId);
+    await db
+      .delete(studentDocumentsTable)
+      .where(and(
+        eq(studentDocumentsTable.id, docId),
+        eq(studentDocumentsTable.submissionId, submissionId),
+      ));
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete document" });
   }
 });
 
