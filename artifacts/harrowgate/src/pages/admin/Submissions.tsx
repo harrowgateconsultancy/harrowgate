@@ -225,6 +225,14 @@ export default function Submissions() {
                 <p className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>{selected.email} · {selected.passportNumber} · DOB {selected.dateOfBirth}</p>
               </div>
               <div className="flex items-center gap-3">
+                {["payment_received", "acknowledged"].includes(selected.status) && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border" style={{ borderColor: "rgba(74,222,128,0.25)", background: "rgba(74,222,128,0.07)" }}>
+                    <span className="text-xs font-medium" style={{ color: "rgba(74,222,128,0.55)" }}>Code</span>
+                    <span className="text-sm font-bold tracking-widest font-mono" style={{ color: "#4ade80" }}>
+                      STU{selected.passportNumber.slice(-4).toUpperCase()}
+                    </span>
+                  </div>
+                )}
                 {statusConfig[selected.status] && (
                   <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ color: statusConfig[selected.status].color, background: statusConfig[selected.status].bg }}>
                     {statusConfig[selected.status].label}

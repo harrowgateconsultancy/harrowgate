@@ -94,11 +94,19 @@ export default function Portal() {
                     Submitted {new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                   </p>
                 </div>
-                {statusMap[submission.status] && (
-                  <span className="px-4 py-1.5 rounded-full text-sm font-semibold" style={{ color: statusMap[submission.status].color, background: statusMap[submission.status].bg }}>
-                    {statusMap[submission.status].label}
-                  </span>
-                )}
+                <div className="flex flex-col items-end gap-2">
+                  {statusMap[submission.status] && (
+                    <span className="px-4 py-1.5 rounded-full text-sm font-semibold" style={{ color: statusMap[submission.status].color, background: statusMap[submission.status].bg }}>
+                      {statusMap[submission.status].label}
+                    </span>
+                  )}
+                  <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border" style={{ borderColor: "rgba(162,137,89,0.2)", background: "rgba(162,137,89,0.06)" }}>
+                    <span className="text-xs font-medium" style={{ color: "rgba(162,137,89,0.5)" }}>Reference</span>
+                    <span className="text-sm font-bold tracking-widest font-mono" style={{ color: GOLD }}>
+                      STU{submission.passportNumber.slice(-4).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
               </div>
               {submission.adminNotes && submission.status !== "docs_requested" && (
                 <div className="mt-4 pt-4 border-t" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
@@ -152,10 +160,17 @@ export default function Portal() {
             {submission.status === "acknowledged" && (
               <div className="mt-6 rounded-2xl p-8 text-center border" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
                 <div className="text-5xl mb-4">✅</div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>Application Acknowledged</h3>
-                <p className="text-sm" style={{ color: "rgba(74,222,128,0.65)" }}>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>Payment Received</h3>
+                <p className="text-sm mb-6" style={{ color: "rgba(74,222,128,0.65)" }}>
                   Your payment has been confirmed and your application is now being fully processed. Our team will be in touch shortly.
                 </p>
+                <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border" style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)" }}>
+                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(74,222,128,0.5)" }}>Your Acknowledgement Code</p>
+                  <p className="text-3xl font-bold tracking-widest font-mono" style={{ color: "#4ade80" }}>
+                    STU{submission.passportNumber.slice(-4).toUpperCase()}
+                  </p>
+                  <p className="text-xs mt-1" style={{ color: "rgba(74,222,128,0.4)" }}>Keep this code for your records</p>
+                </div>
               </div>
             )}
 
