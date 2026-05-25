@@ -1,0 +1,1 @@
+- [IMMD ID995A PDF filling](id995a-pdf-filling.md) — official PDF is AES-encrypted; only pypdf+cryptography can parse/fill it; pdf-lib completely fails on this PDF.

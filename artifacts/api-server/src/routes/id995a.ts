@@ -1,59 +1,121 @@
 import { Router } from "express";
-import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { spawn } from "child_process";
 import { db } from "@workspace/db";
 import { studentSubmissionsTable, studentDocumentsTable, id995aFormsTable } from "@workspace/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { ObjectStorageService } from "../lib/objectStorage";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-function requireAdmin(req: any, res: any, next: any) {
-  next();
-}
+function requireAdmin(_req: any, _res: any, next: any) { next(); }
 
-// ── ID995A field definitions ───────────────────────────────────────────────
-export const FORM_FIELDS: { key: string; label: string; section: string; type?: "select" | "text"; options?: string[] }[] = [
-  { section: "Personal Particulars", key: "surnameEnglish",       label: "Surname (English)" },
-  { section: "Personal Particulars", key: "givenNamesEnglish",    label: "Given Names (English)" },
-  { section: "Personal Particulars", key: "nameChineseApplicant", label: "Name in Chinese (if applicable)" },
-  { section: "Personal Particulars", key: "maidenSurname",        label: "Maiden Surname (if applicable)" },
-  { section: "Personal Particulars", key: "alias",                label: "Alias (if any)" },
-  { section: "Personal Particulars", key: "sex",                  label: "Sex", type: "select", options: ["Male", "Female"] },
-  { section: "Personal Particulars", key: "dateOfBirth",          label: "Date of Birth (dd/mm/yyyy)" },
-  { section: "Personal Particulars", key: "placeOfBirth",         label: "Place of Birth" },
-  { section: "Personal Particulars", key: "nationality",          label: "Nationality / Place of Domicile" },
-  { section: "Personal Particulars", key: "maritalStatus",        label: "Marital Status", type: "select", options: ["Bachelor/Spinster", "Married", "Divorced", "Separated", "Widowed", "Others"] },
-  { section: "Personal Particulars", key: "hkIdNumber",           label: "HK Identity Card No. (if any)" },
-  { section: "Personal Particulars", key: "mainlandIdNumber",     label: "Mainland Identity Card No. (if any)" },
-  { section: "Personal Particulars", key: "travelDocType",        label: "Travel Document Type" },
-  { section: "Personal Particulars", key: "travelDocNumber",      label: "Travel Document No." },
-  { section: "Personal Particulars", key: "placeOfIssue",         label: "Place of Issue" },
-  { section: "Personal Particulars", key: "dateOfIssue",          label: "Date of Issue (dd/mm/yyyy)" },
-  { section: "Personal Particulars", key: "dateOfExpiry",         label: "Date of Expiry (dd/mm/yyyy)" },
-  { section: "Personal Particulars", key: "emailAddress",         label: "Email Address (if any)" },
-  { section: "Personal Particulars", key: "contactPhone",         label: "Contact Telephone No." },
-  { section: "Personal Particulars", key: "faxNumber",            label: "Fax No. (if any)" },
-  { section: "Personal Particulars", key: "countryOfDomicile",    label: "Country / Territory of Domicile" },
-  { section: "Personal Particulars", key: "hasPermanentResidence",label: "Acquired Permanent Residence in Country of Domicile?", type: "select", options: ["Yes", "No"] },
-  { section: "Personal Particulars", key: "lengthOfResidence",    label: "Length of Residence in Country of Domicile (years & months)" },
-  { section: "Personal Particulars", key: "occupation",           label: "Occupation" },
-  { section: "Personal Particulars", key: "currentEmployerName",  label: "Name of Current Employer (if applicable)" },
-  { section: "Personal Particulars", key: "currentEmployerAddress",label: "Address of Current Employer (if applicable)" },
-  { section: "Personal Particulars", key: "isCurrentlyInHK",      label: "Is Applicant Currently in Hong Kong?", type: "select", options: ["Yes", "No"] },
-  { section: "Personal Particulars", key: "permittedToRemainUntil",label: "Permitted to Remain Until (if in HK)" },
-  { section: "Personal Particulars", key: "statusInHK",           label: "Status in HK (if in HK)", type: "select", options: ["Employment", "Residence/Dependant", "Visitor", "Others"] },
-  { section: "Personal Particulars", key: "presentAddress",       label: "Present Address" },
-  { section: "Personal Particulars", key: "permanentAddress",     label: "Permanent Address (if different from above)" },
-  { section: "Proposed Stay in Hong Kong for Study", key: "proposedDateOfEntry",     label: "Proposed Date of Entry" },
-  { section: "Proposed Stay in Hong Kong for Study", key: "proposedDurationOfStay",  label: "Proposed Duration of Stay" },
-  { section: "Accompanying Dependants", key: "dependantsDetails", label: "Dependants Details (if applicable)" },
+// ── ID995A form field definitions (keys match fill_id995a.py) ─────────────
+export const FORM_FIELDS: {
+  key: string; label: string; section: string;
+  type?: "select" | "text"; options?: string[];
+}[] = [
+  // ── Personal Particulars ──────────────────────────────────────────────────
+  { section: "Personal Particulars", key: "surnameEnglish",          label: "Surname (English)" },
+  { section: "Personal Particulars", key: "givenNamesEnglish",       label: "Given Names (English)" },
+  { section: "Personal Particulars", key: "nameChineseApplicant",    label: "Name in Chinese (if any)" },
+  { section: "Personal Particulars", key: "maidenSurname",           label: "Maiden Surname (if applicable)" },
+  { section: "Personal Particulars", key: "alias",                   label: "Alias (if any)" },
+  { section: "Personal Particulars", key: "sex",                     label: "Sex", type: "select", options: ["Male", "Female"] },
+  { section: "Personal Particulars", key: "dateOfBirth",             label: "Date of Birth (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "placeOfBirth",            label: "Place of Birth" },
+  { section: "Personal Particulars", key: "nationality",             label: "Nationality / Place of Domicile" },
+  { section: "Personal Particulars", key: "maritalStatus",           label: "Marital / Relationship Status", type: "select", options: ["Bachelor/Spinster", "Married", "Divorced", "Separated", "Widowed", "Others"] },
+  { section: "Personal Particulars", key: "maritalStatusOther",      label: "Marital Status – Others (specify)" },
+  { section: "Personal Particulars", key: "hkIdNumber",              label: "HK Identity Card No. (if any)" },
+  { section: "Personal Particulars", key: "mainlandIdNumber",        label: "Mainland Identity Card No. (if any)" },
+  { section: "Personal Particulars", key: "travelDocType",           label: "Travel Document Type" },
+  { section: "Personal Particulars", key: "travelDocNumber",         label: "Travel Document No." },
+  { section: "Personal Particulars", key: "placeOfIssue",            label: "Place of Issue" },
+  { section: "Personal Particulars", key: "dateOfIssue",             label: "Date of Issue (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "dateOfExpiry",            label: "Date of Expiry (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "emailAddress",            label: "Email Address (if any)" },
+  { section: "Personal Particulars", key: "contactPhone",            label: "Contact Telephone No." },
+  { section: "Personal Particulars", key: "faxNumber",               label: "Fax No. (if any)" },
+  { section: "Personal Particulars", key: "countryOfDomicile",       label: "Country / Territory of Domicile" },
+  { section: "Personal Particulars", key: "hasPermanentResidence",   label: "Acquired Permanent Residence in Country of Domicile?", type: "select", options: ["Yes", "No"] },
+  { section: "Personal Particulars", key: "lengthOfResidenceYears",  label: "Length of Residence – Years" },
+  { section: "Personal Particulars", key: "lengthOfResidenceMonths", label: "Length of Residence – Months" },
+  { section: "Personal Particulars", key: "occupation",              label: "Occupation" },
+  { section: "Personal Particulars", key: "currentEmployerName",     label: "Name of Current Employer (if applicable)" },
+  { section: "Personal Particulars", key: "currentEmployerAddress",  label: "Address of Current Employer (if applicable)" },
+  { section: "Personal Particulars", key: "isCurrentlyInHK",         label: "Is Applicant Currently in HK?", type: "select", options: ["Yes", "No"] },
+  { section: "Personal Particulars", key: "permittedToRemainUntil",  label: "Permitted to Remain Until (dd/mm/yyyy, if in HK)" },
+  { section: "Personal Particulars", key: "statusInHK",              label: "Status in HK", type: "select", options: ["Employment", "Residence/Dependant", "Visitor", "Others"] },
+  { section: "Personal Particulars", key: "statusInHKOther",         label: "Status in HK – Others (specify)" },
+  { section: "Personal Particulars", key: "presentAddress1",         label: "Present Address – Line 1" },
+  { section: "Personal Particulars", key: "presentAddress2",         label: "Present Address – Line 2" },
+  { section: "Personal Particulars", key: "presentAddress3",         label: "Present Address – Line 3 / Country" },
+  { section: "Personal Particulars", key: "permanentAddress1",       label: "Permanent Address – Line 1 (if different)" },
+  { section: "Personal Particulars", key: "permanentAddress2",       label: "Permanent Address – Line 2" },
+  { section: "Personal Particulars", key: "permanentAddress3",       label: "Permanent Address – Line 3 / Country" },
+
+  // ── Proposed Stay ─────────────────────────────────────────────────────────
+  { section: "Proposed Stay in HK for Study", key: "proposedDateOfEntry",    label: "Proposed Date of Entry (dd/mm/yyyy)" },
+  { section: "Proposed Stay in HK for Study", key: "proposedDurationOfStay", label: "Proposed Duration of Stay" },
+  { section: "Proposed Stay in HK for Study", key: "schoolNameAddress",      label: "Name & Address of School / Institution" },
+  { section: "Proposed Stay in HK for Study", key: "classToAttend",          label: "Class / Course to Attend" },
+
+  // ── Educational Background ────────────────────────────────────────────────
+  { section: "Educational Background", key: "edu1SchoolName",  label: "School/Inst. 1 – Name" },
+  { section: "Educational Background", key: "edu1MajorSubject",label: "School/Inst. 1 – Major Subject" },
+  { section: "Educational Background", key: "edu1Degree",      label: "School/Inst. 1 – Degree/Award" },
+  { section: "Educational Background", key: "edu1From",        label: "School/Inst. 1 – From (mm/yyyy)" },
+  { section: "Educational Background", key: "edu1To",          label: "School/Inst. 1 – To (mm/yyyy)" },
+  { section: "Educational Background", key: "edu2SchoolName",  label: "School/Inst. 2 – Name" },
+  { section: "Educational Background", key: "edu2MajorSubject",label: "School/Inst. 2 – Major Subject" },
+  { section: "Educational Background", key: "edu2Degree",      label: "School/Inst. 2 – Degree/Award" },
+  { section: "Educational Background", key: "edu2From",        label: "School/Inst. 2 – From (mm/yyyy)" },
+  { section: "Educational Background", key: "edu2To",          label: "School/Inst. 2 – To (mm/yyyy)" },
+  { section: "Educational Background", key: "edu3SchoolName",  label: "School/Inst. 3 – Name" },
+  { section: "Educational Background", key: "edu3MajorSubject",label: "School/Inst. 3 – Major Subject" },
+  { section: "Educational Background", key: "edu3Degree",      label: "School/Inst. 3 – Degree/Award" },
+  { section: "Educational Background", key: "edu3From",        label: "School/Inst. 3 – From (mm/yyyy)" },
+  { section: "Educational Background", key: "edu3To",          label: "School/Inst. 3 – To (mm/yyyy)" },
+
+  // ── Financial Resources ───────────────────────────────────────────────────
+  { section: "Financial Resources", key: "schoolFeeCost",      label: "School Fees – Estimated Cost (HK$)" },
+  { section: "Financial Resources", key: "accommodationCost",  label: "Accommodation – Estimated Cost (HK$)" },
+  { section: "Financial Resources", key: "totalCost",          label: "Total Estimated Cost (HK$)" },
 ];
+
+// ── Helper: spawn Python fill script ──────────────────────────────────────
+function fillOfficialPDF(formData: Record<string, any>): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const scriptPath = join(process.cwd(), "src/assets/fill_id995a.py");
+    const py = spawn("python3", [scriptPath]);
+    const chunks: Buffer[] = [];
+    const errChunks: string[] = [];
+
+    py.stdout.on("data", (d: Buffer) => chunks.push(d));
+    py.stderr.on("data", (d: Buffer) => {
+      const msg = d.toString();
+      if (!msg.includes("Font dictionary") && !msg.includes("defaulting to")) {
+        errChunks.push(msg);
+      }
+    });
+    py.on("close", (code) => {
+      if (code !== 0 || chunks.length === 0) {
+        reject(new Error(`Python exit ${code}: ${errChunks.join("")}`));
+      } else {
+        resolve(Buffer.concat(chunks));
+      }
+    });
+    py.on("error", reject);
+
+    py.stdin.write(JSON.stringify(formData));
+    py.stdin.end();
+  });
+}
 
 // ── GET /admin/student-submissions/:id/id995a ──────────────────────────────
 router.get("/admin/student-submissions/:id/id995a", requireAdmin, async (req: any, res) => {
@@ -62,7 +124,9 @@ router.get("/admin/student-submissions/:id/id995a", requireAdmin, async (req: an
     const [form] = await db.select().from(id995aFormsTable).where(eq(id995aFormsTable.submissionId, submissionId)).limit(1);
     if (!form) return res.json({ formData: {}, aiGenerated: false, exists: false });
     res.json({ ...form, exists: true });
-  } catch { res.status(500).json({ error: "Failed to fetch ID995A form" }); }
+  } catch {
+    res.status(500).json({ error: "Failed to fetch ID995A form" });
+  }
 });
 
 // ── PATCH /admin/student-submissions/:id/id995a ────────────────────────────
@@ -80,7 +144,9 @@ router.patch("/admin/student-submissions/:id/id995a", requireAdmin, async (req: 
       const [created] = await db.insert(id995aFormsTable).values({ submissionId, formData, aiGenerated: false }).returning();
       return res.status(201).json(created);
     }
-  } catch { res.status(500).json({ error: "Failed to save ID995A form" }); }
+  } catch {
+    res.status(500).json({ error: "Failed to save ID995A form" });
+  }
 });
 
 // ── POST /admin/student-submissions/:id/id995a/generate ───────────────────
@@ -92,61 +158,52 @@ router.post("/admin/student-submissions/:id/id995a/generate", requireAdmin, asyn
 
     const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, submissionId));
 
-    // Build content parts — send passport + any image docs to AI
-    const parts: any[] = [];
-    const systemPrompt = `You are an expert immigration form assistant for Hong Kong visa applications. 
-Extract information from the student's uploaded documents to fill in the HK Immigration ID995A form.
-Respond ONLY with a valid JSON object where keys are the field names listed below and values are strings.
-If you cannot find a value, use an empty string "".
+    const systemPrompt = `You are an expert Hong Kong immigration form assistant.
+Extract every possible detail from the student documents to fill the official HK Immigration ID995A form.
+Respond ONLY with a valid JSON object — keys are field names, values are strings.
+Use "" for missing fields. For dates use dd/mm/yyyy. For period fields (edu From/To) use mm/yyyy.
 
-Fields to extract:
-${FORM_FIELDS.map(f => `- ${f.key}: ${f.label}`).join("\n")}
+Field names and what to extract:
+${FORM_FIELDS.map(f => `  "${f.key}": ${f.label}`).join("\n")}
 
-For dates, format as dd/mm/yyyy.
-For sex: use "Male" or "Female" only.
-For maritalStatus: use one of: Bachelor/Spinster, Married, Divorced, Separated, Widowed, Others.
-For hasPermanentResidence: use "Yes" or "No".
-For isCurrentlyInHK: use "Yes" or "No" (default "No" unless documents show otherwise).
-For travelDocType: usually "Ordinary Passport".`;
+Rules:
+- sex: exactly "Male" or "Female"
+- maritalStatus: exactly one of: Bachelor/Spinster, Married, Divorced, Separated, Widowed, Others
+- hasPermanentResidence: "Yes" or "No"
+- isCurrentlyInHK: "Yes" or "No" (default "No" unless evidence shows otherwise)
+- travelDocType: usually "Ordinary Passport" if document is a passport
+- hkIdNumber: format as A123456(7) if HK ID card found, else ""
+- For address fields split across 3 lines: line 1 = building/flat, line 2 = street/district, line 3 = city/country
+- Extract full educational history from any transcripts or certificates`;
 
-    // Pre-fill from submission data
     const preFilled: Record<string, string> = {
-      surnameEnglish: submission.name?.split(" ").slice(-1)[0] || "",
+      surnameEnglish:    submission.name?.split(" ").slice(-1)[0] || "",
       givenNamesEnglish: submission.name?.split(" ").slice(0, -1).join(" ") || "",
-      dateOfBirth: submission.dateOfBirth || "",
-      travelDocNumber: submission.passportNumber || "",
-      emailAddress: submission.email || "",
-      travelDocType: "Ordinary Passport",
-      isCurrentlyInHK: "No",
+      dateOfBirth:       submission.dateOfBirth || "",
+      travelDocNumber:   submission.passportNumber || "",
+      emailAddress:      submission.email || "",
+      travelDocType:     "Ordinary Passport",
+      isCurrentlyInHK:   "No",
     };
 
-    const userTextContent = `Student application data:
-- Full Name: ${submission.name}
-- Date of Birth: ${submission.dateOfBirth}
-- Passport Number: ${submission.passportNumber}
-- Email: ${submission.email || "not provided"}
+    const parts: any[] = [];
+    parts.push({
+      type: "text",
+      text: `Student application data:\n- Full Name: ${submission.name}\n- Date of Birth: ${submission.dateOfBirth}\n- Passport Number: ${submission.passportNumber}\n- Email: ${submission.email || "not provided"}\n\nDocuments uploaded: ${documents.length > 0 ? documents.map(d => d.documentType).join(", ") : "none"}\n\nExtract all fields from documents and return JSON.`,
+    });
 
-${documents.length > 0 ? `The student has ${documents.length} uploaded document(s): ${documents.map(d => d.documentType).join(", ")}.` : "No documents uploaded."}
-
-Please extract all available information and return a JSON object. For any field not clearly visible in the data, use an empty string.`;
-
-    parts.push({ type: "text", text: userTextContent });
-
-    // Attach passport images if available
-    const passportDoc = documents.find(d => d.documentType === "passport");
-    if (passportDoc && passportDoc.mimeType?.startsWith("image/")) {
-      try {
-        const objectFile = await objectStorageService.getObjectEntityFile(passportDoc.fileUrl);
-        const response = await objectStorageService.downloadObject(objectFile, 0);
-        const arrayBuf = await response.arrayBuffer();
-        const b64 = Buffer.from(arrayBuf).toString("base64");
-        const mediaType = (passportDoc.mimeType || "image/jpeg") as "image/jpeg" | "image/png" | "image/gif" | "image/webp";
-        parts.push({
-          type: "image_url",
-          image_url: { url: `data:${mediaType};base64,${b64}`, detail: "high" },
-        });
-      } catch (e) {
-        console.error("[id995a] Could not load passport image:", e);
+    // Attach passport / document images
+    for (const doc of documents) {
+      if (doc.mimeType?.startsWith("image/")) {
+        try {
+          const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
+          const response = await objectStorageService.downloadObject(objectFile, 0);
+          const b64 = Buffer.from(await response.arrayBuffer()).toString("base64");
+          const mediaType = (doc.mimeType || "image/jpeg") as "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+          parts.push({ type: "image_url", image_url: { url: `data:${mediaType};base64,${b64}`, detail: "high" } });
+        } catch (e) {
+          console.error("[id995a] Could not load document image:", doc.documentType, e);
+        }
       }
     }
 
@@ -168,8 +225,11 @@ Please extract all available information and return a JSON object. For any field
 
     const formData: Record<string, string> = { ...preFilled };
     for (const field of FORM_FIELDS) {
-      if (aiData[field.key] !== undefined) formData[field.key] = String(aiData[field.key]);
-      else if (!formData[field.key]) formData[field.key] = "";
+      if (aiData[field.key] !== undefined && aiData[field.key] !== "") {
+        formData[field.key] = String(aiData[field.key]);
+      } else if (!formData[field.key]) {
+        formData[field.key] = "";
+      }
     }
 
     const [existing] = await db.select().from(id995aFormsTable).where(eq(id995aFormsTable.submissionId, submissionId)).limit(1);
@@ -195,125 +255,14 @@ router.get("/admin/student-submissions/:id/id995a/download", requireAdmin, async
     if (!submission) return res.status(404).json({ error: "Submission not found" });
 
     const [form] = await db.select().from(id995aFormsTable).where(eq(id995aFormsTable.submissionId, submissionId)).limit(1);
-    const formData: Record<string, string> = (form?.formData as Record<string, string>) || {};
+    const formData: Record<string, any> = (form?.formData as Record<string, any>) || {};
 
-    // Try to fill the official PDF form first
-    try {
-      const templatePath = join(__dirname, "../assets/id995a_template.pdf");
-      const pdfBytes = readFileSync(templatePath);
-      const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
-
-      const pdfForm = pdfDoc.getForm();
-      const fields = pdfForm.getFields();
-
-      if (fields.length > 0) {
-        // Map our keys to possible PDF field names
-        const fieldMap: Record<string, string[]> = {
-          surnameEnglish:        ["Surname", "surname", "Surname in English", "surnameEnglish"],
-          givenNamesEnglish:     ["Given names", "givenNames", "Given names in English", "givenNamesEnglish"],
-          nameChineseApplicant:  ["Name in Chinese", "nameChinese", "nameChineseApplicant"],
-          sex:                   ["Sex", "sex"],
-          dateOfBirth:           ["Date of birth", "dateOfBirth", "dob"],
-          placeOfBirth:          ["Place of birth", "placeOfBirth"],
-          nationality:           ["Nationality", "nationality"],
-          maritalStatus:         ["Marital", "maritalStatus"],
-          travelDocType:         ["Travel document type", "travelDocType"],
-          travelDocNumber:       ["Travel document no", "travelDocNumber", "travelDocNo"],
-          placeOfIssue:          ["Place of issue", "placeOfIssue"],
-          emailAddress:          ["E-mail", "email", "emailAddress"],
-          contactPhone:          ["Contact telephone", "contactPhone"],
-          countryOfDomicile:     ["Country", "countryOfDomicile"],
-          occupation:            ["Occupation", "occupation"],
-          presentAddress:        ["Present address", "presentAddress"],
-          proposedDateOfEntry:   ["Proposed date of entry", "proposedDateOfEntry"],
-          proposedDurationOfStay:["Proposed duration", "proposedDurationOfStay"],
-        };
-
-        for (const field of fields) {
-          const fieldName = field.getName();
-          for (const [ourKey, candidates] of Object.entries(fieldMap)) {
-            if (candidates.some(c => fieldName.toLowerCase().includes(c.toLowerCase()))) {
-              try {
-                if (field.constructor.name.includes("Text")) {
-                  (field as any).setText(formData[ourKey] || "");
-                }
-              } catch { /* field type mismatch, skip */ }
-              break;
-            }
-          }
-        }
-
-        pdfForm.flatten();
-        const filledBytes = await pdfDoc.save();
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", `attachment; filename="ID995A_${submission.name.replace(/\s+/g, "_")}.pdf"`);
-        return res.send(Buffer.from(filledBytes));
-      }
-    } catch (e) {
-      console.warn("[id995a] PDF form fill failed, generating summary:", e);
-    }
-
-    // Fallback: generate a clean summary PDF using pdf-lib
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([595, 842]); // A4
-    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-    const green = rgb(0.06, 0.18, 0.09);
-    const gold = rgb(0.64, 0.54, 0.35);
-    const white = rgb(1, 1, 1);
-    const lightGray = rgb(0.95, 0.95, 0.95);
-    const darkText = rgb(0.15, 0.15, 0.15);
-
-    let y = 800;
-    const left = 50;
-    const right = 545;
-    const lineH = 18;
-
-    // Header bar
-    page.drawRectangle({ x: 0, y: 810, width: 595, height: 32, color: green });
-    page.drawText("HARROWGATE Immigration Consultancy", { x: left, y: 818, size: 11, font: boldFont, color: gold });
-    page.drawText("ID995A — Application for Entry for Study in Hong Kong", { x: left, y: 790, size: 14, font: boldFont, color: green });
-    page.drawText(`Prepared for: ${submission.name}  |  Ref: STU${submission.passportNumber.slice(-4).toUpperCase()}`, { x: left, y: 772, size: 9, font, color: rgb(0.4, 0.4, 0.4) });
-    y = 755;
-
-    let currentSection = "";
-    for (const field of FORM_FIELDS) {
-      if (field.section !== currentSection) {
-        currentSection = field.section;
-        y -= 8;
-        page.drawRectangle({ x: left - 2, y: y - 4, width: right - left + 4, height: 16, color: green });
-        page.drawText(`Part A — ${field.section}`, { x: left + 2, y: y, size: 8, font: boldFont, color: gold });
-        y -= lineH + 4;
-      }
-
-      const value = formData[field.key] || "";
-      // Alternating row background
-      if (FORM_FIELDS.indexOf(field) % 2 === 0) {
-        page.drawRectangle({ x: left - 2, y: y - 5, width: right - left + 4, height: lineH - 2, color: lightGray });
-      }
-      page.drawText(field.label + ":", { x: left, y, size: 7.5, font: boldFont, color: rgb(0.3, 0.3, 0.3) });
-      const valueText = value.length > 70 ? value.slice(0, 68) + "…" : value;
-      page.drawText(valueText || "—", { x: 230, y, size: 8, font, color: value ? darkText : rgb(0.7, 0.7, 0.7) });
-      y -= lineH;
-
-      if (y < 60) {
-        const newPage = pdfDoc.addPage([595, 842]);
-        y = 800;
-      }
-    }
-
-    // Footer
-    const pages = pdfDoc.getPages();
-    for (const p of pages) {
-      p.drawText("This document is confidential and prepared for immigration purposes only.", { x: left, y: 30, size: 7, font, color: rgb(0.5, 0.5, 0.5) });
-      p.drawLine({ start: { x: left, y: 42 }, end: { x: right, y: 42 }, thickness: 0.5, color: rgb(0.8, 0.8, 0.8) });
-    }
-
-    const pdfBytes = await pdfDoc.save();
+    const pdfBuffer = await fillOfficialPDF(formData);
+    const safeName = submission.name.replace(/[^a-zA-Z0-9_\-]/g, "_");
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="ID995A_${submission.name.replace(/\s+/g, "_")}.pdf"`);
-    res.send(Buffer.from(pdfBytes));
+    res.setHeader("Content-Disposition", `attachment; filename="ID995A_${safeName}.pdf"`);
+    res.setHeader("Content-Length", pdfBuffer.length);
+    res.send(pdfBuffer);
   } catch (err) {
     console.error("[id995a] Download failed:", err);
     res.status(500).json({ error: "Failed to generate PDF" });

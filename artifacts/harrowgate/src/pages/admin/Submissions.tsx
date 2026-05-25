@@ -885,40 +885,70 @@ export default function Submissions() {
 }
 
 const FORM_FIELDS: { key: string; label: string; section: string; type?: "select"; options?: string[] }[] = [
-  { section: "Personal Particulars", key: "surnameEnglish",        label: "Surname (English)" },
-  { section: "Personal Particulars", key: "givenNamesEnglish",     label: "Given Names (English)" },
-  { section: "Personal Particulars", key: "nameChineseApplicant",  label: "Name in Chinese (if applicable)" },
-  { section: "Personal Particulars", key: "maidenSurname",         label: "Maiden Surname (if applicable)" },
-  { section: "Personal Particulars", key: "alias",                 label: "Alias (if any)" },
-  { section: "Personal Particulars", key: "sex",                   label: "Sex", type: "select", options: ["Male", "Female"] },
-  { section: "Personal Particulars", key: "dateOfBirth",           label: "Date of Birth (dd/mm/yyyy)" },
-  { section: "Personal Particulars", key: "placeOfBirth",          label: "Place of Birth" },
-  { section: "Personal Particulars", key: "nationality",           label: "Nationality / Place of Domicile" },
-  { section: "Personal Particulars", key: "maritalStatus",         label: "Marital Status", type: "select", options: ["Bachelor/Spinster", "Married", "Divorced", "Separated", "Widowed", "Others"] },
-  { section: "Personal Particulars", key: "hkIdNumber",            label: "HK Identity Card No. (if any)" },
-  { section: "Personal Particulars", key: "mainlandIdNumber",      label: "Mainland Identity Card No. (if any)" },
-  { section: "Personal Particulars", key: "travelDocType",         label: "Travel Document Type" },
-  { section: "Personal Particulars", key: "travelDocNumber",       label: "Travel Document No." },
-  { section: "Personal Particulars", key: "placeOfIssue",          label: "Place of Issue" },
-  { section: "Personal Particulars", key: "dateOfIssue",           label: "Date of Issue (dd/mm/yyyy)" },
-  { section: "Personal Particulars", key: "dateOfExpiry",          label: "Date of Expiry (dd/mm/yyyy)" },
-  { section: "Personal Particulars", key: "emailAddress",          label: "Email Address (if any)" },
-  { section: "Personal Particulars", key: "contactPhone",          label: "Contact Telephone No." },
-  { section: "Personal Particulars", key: "faxNumber",             label: "Fax No. (if any)" },
-  { section: "Personal Particulars", key: "countryOfDomicile",     label: "Country / Territory of Domicile" },
-  { section: "Personal Particulars", key: "hasPermanentResidence", label: "Acquired Permanent Residence in Country of Domicile?", type: "select", options: ["Yes", "No"] },
-  { section: "Personal Particulars", key: "lengthOfResidence",     label: "Length of Residence in Country of Domicile" },
-  { section: "Personal Particulars", key: "occupation",            label: "Occupation" },
-  { section: "Personal Particulars", key: "currentEmployerName",   label: "Name of Current Employer (if applicable)" },
-  { section: "Personal Particulars", key: "currentEmployerAddress",label: "Address of Current Employer (if applicable)" },
-  { section: "Personal Particulars", key: "isCurrentlyInHK",       label: "Is Applicant Currently in Hong Kong?", type: "select", options: ["Yes", "No"] },
-  { section: "Personal Particulars", key: "permittedToRemainUntil",label: "Permitted to Remain Until (if in HK)" },
-  { section: "Personal Particulars", key: "statusInHK",            label: "Status in HK (if in HK)", type: "select", options: ["Employment", "Residence/Dependant", "Visitor", "Others"] },
-  { section: "Personal Particulars", key: "presentAddress",        label: "Present Address" },
-  { section: "Personal Particulars", key: "permanentAddress",      label: "Permanent Address (if different from above)" },
-  { section: "Proposed Stay for Study", key: "proposedDateOfEntry",     label: "Proposed Date of Entry" },
-  { section: "Proposed Stay for Study", key: "proposedDurationOfStay",  label: "Proposed Duration of Stay" },
-  { section: "Accompanying Dependants", key: "dependantsDetails",        label: "Dependants Details (if applicable)" },
+  // ── Personal Particulars ──────────────────────────────────────────────────
+  { section: "Personal Particulars", key: "surnameEnglish",          label: "Surname (English)" },
+  { section: "Personal Particulars", key: "givenNamesEnglish",       label: "Given Names (English)" },
+  { section: "Personal Particulars", key: "nameChineseApplicant",    label: "Name in Chinese (if any)" },
+  { section: "Personal Particulars", key: "maidenSurname",           label: "Maiden Surname (if applicable)" },
+  { section: "Personal Particulars", key: "alias",                   label: "Alias (if any)" },
+  { section: "Personal Particulars", key: "sex",                     label: "Sex", type: "select", options: ["Male", "Female"] },
+  { section: "Personal Particulars", key: "dateOfBirth",             label: "Date of Birth (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "placeOfBirth",            label: "Place of Birth" },
+  { section: "Personal Particulars", key: "nationality",             label: "Nationality / Place of Domicile" },
+  { section: "Personal Particulars", key: "maritalStatus",           label: "Marital / Relationship Status", type: "select", options: ["Bachelor/Spinster", "Married", "Divorced", "Separated", "Widowed", "Others"] },
+  { section: "Personal Particulars", key: "maritalStatusOther",      label: "Marital Status – Others (specify)" },
+  { section: "Personal Particulars", key: "hkIdNumber",              label: "HK Identity Card No. (if any)" },
+  { section: "Personal Particulars", key: "mainlandIdNumber",        label: "Mainland Identity Card No. (if any)" },
+  { section: "Personal Particulars", key: "travelDocType",           label: "Travel Document Type" },
+  { section: "Personal Particulars", key: "travelDocNumber",         label: "Travel Document No." },
+  { section: "Personal Particulars", key: "placeOfIssue",            label: "Place of Issue" },
+  { section: "Personal Particulars", key: "dateOfIssue",             label: "Date of Issue (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "dateOfExpiry",            label: "Date of Expiry (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "emailAddress",            label: "Email Address (if any)" },
+  { section: "Personal Particulars", key: "contactPhone",            label: "Contact Telephone No." },
+  { section: "Personal Particulars", key: "faxNumber",               label: "Fax No. (if any)" },
+  { section: "Personal Particulars", key: "countryOfDomicile",       label: "Country / Territory of Domicile" },
+  { section: "Personal Particulars", key: "hasPermanentResidence",   label: "Acquired Permanent Residence?", type: "select", options: ["Yes", "No"] },
+  { section: "Personal Particulars", key: "lengthOfResidenceYears",  label: "Length of Residence – Years" },
+  { section: "Personal Particulars", key: "lengthOfResidenceMonths", label: "Length of Residence – Months" },
+  { section: "Personal Particulars", key: "occupation",              label: "Occupation" },
+  { section: "Personal Particulars", key: "currentEmployerName",     label: "Current Employer Name (if any)" },
+  { section: "Personal Particulars", key: "currentEmployerAddress",  label: "Current Employer Address (if any)" },
+  { section: "Personal Particulars", key: "isCurrentlyInHK",         label: "Is Applicant Currently in HK?", type: "select", options: ["Yes", "No"] },
+  { section: "Personal Particulars", key: "permittedToRemainUntil",  label: "Permitted to Remain Until (dd/mm/yyyy)" },
+  { section: "Personal Particulars", key: "statusInHK",              label: "Status in HK", type: "select", options: ["Employment", "Residence/Dependant", "Visitor", "Others"] },
+  { section: "Personal Particulars", key: "statusInHKOther",         label: "Status in HK – Others (specify)" },
+  { section: "Personal Particulars", key: "presentAddress1",         label: "Present Address – Line 1" },
+  { section: "Personal Particulars", key: "presentAddress2",         label: "Present Address – Line 2" },
+  { section: "Personal Particulars", key: "presentAddress3",         label: "Present Address – Line 3 / Country" },
+  { section: "Personal Particulars", key: "permanentAddress1",       label: "Permanent Address – Line 1 (if different)" },
+  { section: "Personal Particulars", key: "permanentAddress2",       label: "Permanent Address – Line 2" },
+  { section: "Personal Particulars", key: "permanentAddress3",       label: "Permanent Address – Line 3 / Country" },
+  // ── Proposed Stay ─────────────────────────────────────────────────────────
+  { section: "Proposed Stay in HK for Study", key: "proposedDateOfEntry",    label: "Proposed Date of Entry (dd/mm/yyyy)" },
+  { section: "Proposed Stay in HK for Study", key: "proposedDurationOfStay", label: "Proposed Duration of Stay" },
+  { section: "Proposed Stay in HK for Study", key: "schoolNameAddress",      label: "Name & Address of School / Institution" },
+  { section: "Proposed Stay in HK for Study", key: "classToAttend",          label: "Class / Course to Attend" },
+  // ── Educational Background ────────────────────────────────────────────────
+  { section: "Educational Background", key: "edu1SchoolName",   label: "School 1 – Name" },
+  { section: "Educational Background", key: "edu1MajorSubject", label: "School 1 – Major Subject" },
+  { section: "Educational Background", key: "edu1Degree",       label: "School 1 – Degree/Award" },
+  { section: "Educational Background", key: "edu1From",         label: "School 1 – From (mm/yyyy)" },
+  { section: "Educational Background", key: "edu1To",           label: "School 1 – To (mm/yyyy)" },
+  { section: "Educational Background", key: "edu2SchoolName",   label: "School 2 – Name" },
+  { section: "Educational Background", key: "edu2MajorSubject", label: "School 2 – Major Subject" },
+  { section: "Educational Background", key: "edu2Degree",       label: "School 2 – Degree/Award" },
+  { section: "Educational Background", key: "edu2From",         label: "School 2 – From (mm/yyyy)" },
+  { section: "Educational Background", key: "edu2To",           label: "School 2 – To (mm/yyyy)" },
+  { section: "Educational Background", key: "edu3SchoolName",   label: "School 3 – Name" },
+  { section: "Educational Background", key: "edu3MajorSubject", label: "School 3 – Major Subject" },
+  { section: "Educational Background", key: "edu3Degree",       label: "School 3 – Degree/Award" },
+  { section: "Educational Background", key: "edu3From",         label: "School 3 – From (mm/yyyy)" },
+  { section: "Educational Background", key: "edu3To",           label: "School 3 – To (mm/yyyy)" },
+  // ── Financial Resources ───────────────────────────────────────────────────
+  { section: "Financial Resources", key: "schoolFeeCost",     label: "School Fees – Estimated Cost (HK$)" },
+  { section: "Financial Resources", key: "accommodationCost", label: "Accommodation – Estimated Cost (HK$)" },
+  { section: "Financial Resources", key: "totalCost",         label: "Total Estimated Cost (HK$)" },
 ];
 
 function Id995aPanel({ submissionId, apiBase }: { submissionId: number; apiBase: string }) {
@@ -1026,12 +1056,6 @@ function Id995aPanel({ submissionId, apiBase }: { submissionId: number; apiBase:
                   <option value="">— select —</option>
                   {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
-              ) : field.key === "presentAddress" || field.key === "permanentAddress" || field.key === "currentEmployerAddress" || field.key === "dependantsDetails" ? (
-                <textarea rows={2}
-                  value={formData[field.key] || ""}
-                  onChange={e => setFormData(d => ({ ...d, [field.key]: e.target.value }))}
-                  className="rounded-lg px-2.5 py-1.5 text-xs border outline-none resize-none"
-                  style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }} />
               ) : (
                 <input type="text"
                   value={formData[field.key] || ""}
