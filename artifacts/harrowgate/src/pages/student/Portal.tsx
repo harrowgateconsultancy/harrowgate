@@ -14,6 +14,7 @@ export type Submission = {
   passportNumber: string; email: string | null; status: string;
   adminNotes: string | null; createdAt: string;
   interviewZoomLink?: string | null; interviewDateTime?: string | null;
+  uniInterviewLink?: string | null; uniInterviewDateTime?: string | null; uniInterviewPlatform?: string | null;
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };
 
@@ -24,9 +25,11 @@ const statusMap: Record<string, { label: string; color: string; bg: string }> = 
   payment_pending:      { label: "Payment Required",          color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
   payment_received:     { label: "Pending Payment Confirmation", color: "#60a5fa", bg: "rgba(96,165,250,0.12)" },
   acknowledged:         { label: "Payment Received ✓",        color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  interview_arranged:   { label: "Interview Arranged",        color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
-  interview_completed:  { label: "Interview Completed",       color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  rejected:             { label: "Application Unsuccessful",  color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
+  interview_arranged:              { label: "Interview Arranged",             color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
+  interview_completed:             { label: "Interview Completed",            color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  university_interview_arranged:   { label: "Uni Interview Arranged",         color: "#38bdf8",   bg: "rgba(56,189,248,0.12)" },
+  university_interview_completed:  { label: "Uni Interview Completed",        color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  rejected:                        { label: "Application Unsuccessful",       color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
 type TimelineStep = { icon: string; label: string; note: string; done: boolean; current?: boolean };
@@ -36,35 +39,48 @@ function buildTimeline(submission: Submission): TimelineStep[] {
   const ref = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
   const submittedDate = new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
-  const allDone    = (step: string) => ["acknowledged","interview_arranged","interview_completed"].includes(s) || step === "done";
-  const afterPayment = ["acknowledged","interview_arranged","interview_completed"].includes(s);
+  const postStatuses = ["acknowledged","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed"];
+  const afterPayment = postStatuses.includes(s);
+  const afterMock    = ["interview_completed","university_interview_arranged","university_interview_completed"].includes(s);
+  const afterUniArr  = ["university_interview_arranged","university_interview_completed"].includes(s);
 
   return [
-    { icon: "✅", label: "Application Submitted",          note: submittedDate,                                        done: true },
-    { icon: "✅", label: "Documents Reviewed",              note: "Approved by HARROWGATE consultant",                  done: true },
-    { icon: "✅", label: "Payment Confirmed",               note: `Acknowledgement code: ${ref}`,                       done: true },
+    { icon: "✅", label: "Application Submitted",      note: submittedDate,                                          done: true },
+    { icon: "✅", label: "Documents Reviewed",          note: "Approved by HARROWGATE consultant",                    done: true },
+    { icon: "✅", label: "Payment Confirmed",           note: `Acknowledgement code: ${ref}`,                         done: true },
     {
       icon: afterPayment && s !== "acknowledged" ? "✅" : (s === "acknowledged" ? "🔄" : "⬜"),
-      label: "Awaiting Interview Arrangement",
+      label: "Awaiting Mock Interview Arrangement",
       note: s === "acknowledged" ? "Our team will contact you to schedule your mock interview" : (afterPayment ? "Arranged" : "Upcoming"),
       done: afterPayment && s !== "acknowledged",
       current: s === "acknowledged",
     },
     {
-      icon: s === "interview_arranged" ? "🔄" : (s === "interview_completed" ? "✅" : "⬜"),
+      icon: s === "interview_arranged" ? "🔄" : (afterMock ? "✅" : "⬜"),
       label: "Mock Interview",
       note: s === "interview_arranged"
-        ? (submission.interviewDateTime || "Scheduled — check your email for the Zoom link")
-        : (s === "interview_completed" ? "Completed" : "To be scheduled"),
-      done: s === "interview_completed",
+        ? (submission.interviewDateTime || "Scheduled — check your email")
+        : (afterMock ? "Completed" : "To be scheduled"),
+      done: afterMock,
       current: s === "interview_arranged",
     },
     {
-      icon: s === "interview_completed" ? "🔄" : "⬜",
-      label: "Waiting for University Interview",
-      note: s === "interview_completed" ? "Awaiting university interview scheduling" : "Upcoming",
+      icon: s === "interview_completed" ? "🔄" : (afterUniArr ? "✅" : "⬜"),
+      label: "University Interview",
+      note: s === "interview_completed"
+        ? "Our team is arranging your university interview"
+        : s === "university_interview_arranged"
+          ? (submission.uniInterviewDateTime || "Scheduled — check your email")
+          : (s === "university_interview_completed" ? "Completed" : "Upcoming"),
+      done: s === "university_interview_completed",
+      current: s === "university_interview_arranged" || s === "interview_completed",
+    },
+    {
+      icon: s === "university_interview_completed" ? "🔄" : "⬜",
+      label: "Waiting for University's Response",
+      note: s === "university_interview_completed" ? "Awaiting decision from the university" : "Upcoming",
       done: false,
-      current: s === "interview_completed",
+      current: s === "university_interview_completed",
     },
     { icon: "⬜", label: "Visa Application Submitted", note: "Final step", done: false },
   ];
@@ -76,6 +92,7 @@ export default function Portal() {
   const [submission, setSubmission] = useState<Submission | null | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [showTimeline, setShowTimeline] = useState(false);
+  const [completingUni, setCompletingUni] = useState(false);
 
   const fetchSubmission = async () => {
     try {
@@ -89,9 +106,18 @@ export default function Portal() {
 
   useEffect(() => { if (isLoaded) fetchSubmission(); }, [isLoaded]);
 
+  const handleCompleteUni = async () => {
+    if (!submission) return;
+    setCompletingUni(true);
+    try {
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/complete-university-interview`, { method: "POST", credentials: "include" });
+      if (res.ok) fetchSubmission();
+    } finally { setCompletingUni(false); }
+  };
+
   // Auto-show timeline for post-acknowledged statuses
   useEffect(() => {
-    if (submission && ["interview_arranged", "interview_completed"].includes(submission.status)) {
+    if (submission && ["interview_arranged","interview_completed","university_interview_arranged","university_interview_completed"].includes(submission.status)) {
       setShowTimeline(true);
     }
   }, [submission?.status]);
@@ -279,6 +305,68 @@ export default function Portal() {
               </div>
             )}
 
+            {/* ── UNIVERSITY INTERVIEW ARRANGED ── */}
+            {submission.status === "university_interview_arranged" && (() => {
+              const isTeams = submission.uniInterviewPlatform === "teams";
+              const platformLabel = isTeams ? "Microsoft Teams" : "Zoom";
+              const platformColor = isTeams ? "#6264a7" : "#2d8cff";
+              const platformEmoji = isTeams ? "💼" : "🎥";
+              return (
+                <div className="mt-6 rounded-2xl p-8 border" style={{ background: "rgba(56,189,248,0.04)", borderColor: "rgba(56,189,248,0.2)" }}>
+                  <div className="text-5xl mb-4 text-center">{platformEmoji}</div>
+                  <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#38bdf8" }}>University Interview Scheduled</h3>
+                  <p className="text-sm text-center mb-6" style={{ color: "rgba(56,189,248,0.65)" }}>
+                    Your university interview has been arranged. Please be on time and ensure your camera and microphone are working.
+                  </p>
+                  <div className="rounded-2xl border p-5 mb-6" style={{ background: "rgba(56,189,248,0.06)", borderColor: "rgba(56,189,248,0.2)" }}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {submission.uniInterviewDateTime && (
+                        <div>
+                          <p className="text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.5)" }}>Date & Time</p>
+                          <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>{submission.uniInterviewDateTime}</p>
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.5)" }}>Platform</p>
+                        <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>{platformLabel}</p>
+                      </div>
+                    </div>
+                  </div>
+                  {submission.uniInterviewLink && (
+                    <a href={submission.uniInterviewLink} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-base font-semibold transition-all hover:opacity-90 mb-4"
+                      style={{ background: platformColor, color: "#ffffff" }}>
+                      {platformEmoji} Join {platformLabel} →
+                    </a>
+                  )}
+                  <button onClick={handleCompleteUni} disabled={completingUni}
+                    className="w-full py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                    style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.25)", color: "#4ade80" }}>
+                    {completingUni
+                      ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#4ade80", borderTopColor: "transparent" }} /> Updating…</>
+                      : "✅ University Interview Completed"}
+                  </button>
+                </div>
+              );
+            })()}
+
+            {/* ── UNIVERSITY INTERVIEW COMPLETED ── */}
+            {submission.status === "university_interview_completed" && (
+              <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
+                <div className="text-5xl mb-4">🎓</div>
+                <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>University Interview Completed</h3>
+                <p className="text-sm mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>
+                  Congratulations on completing your university interview.
+                </p>
+                <div className="mt-5 px-6 py-5 rounded-2xl border" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
+                  <p className="text-base font-semibold" style={{ color: GOLD }}>⏳ Waiting for University's Response</p>
+                  <p className="text-sm mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>
+                    The university is reviewing your application. Our team will keep you updated as soon as a decision is made.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* ── REJECTED ── */}
             {submission.status === "rejected" && (
               <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(248,113,113,0.04)", borderColor: "rgba(248,113,113,0.18)" }}>
@@ -296,7 +384,7 @@ export default function Portal() {
             )}
 
             {/* ── TIMELINE ── */}
-            {showTimeline && ["acknowledged","interview_arranged","interview_completed"].includes(submission.status) && (
+            {showTimeline && ["acknowledged","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed"].includes(submission.status) && (
               <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.12)" }}>
                 <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                   <h3 className="text-base font-semibold" style={{ color: GOLD }}>Application Progress</h3>
@@ -333,7 +421,7 @@ export default function Portal() {
             )}
 
             {/* ── Details card (non-payment / non-doc / non-interview statuses) ── */}
-            {!["payment_pending","payment_received","acknowledged","docs_requested","interview_arranged","interview_completed"].includes(submission.status) && (
+            {!["payment_pending","payment_received","acknowledged","docs_requested","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed"].includes(submission.status) && (
               <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.1)" }}>
                 <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                   <h3 className="text-sm font-semibold" style={{ color: GOLD }}>Application Details</h3>

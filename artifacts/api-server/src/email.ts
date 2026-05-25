@@ -243,6 +243,70 @@ export async function sendInterviewInviteEmail(opts: {
   } catch (err) { console.error("[email] Failed to send interview invite:", err); }
 }
 
+// ── Notify student: university interview invite ──────────────────────────────
+export async function sendUniversityInterviewInviteEmail(opts: {
+  name: string; studentEmail: string; link: string;
+  platform: "zoom" | "teams"; dateTime: string; refCode: string; notes?: string;
+}) {
+  if (!opts.studentEmail) return;
+  const transport = createTransport();
+  if (!transport) return;
+  const isTeams = opts.platform === "teams";
+  const platformLabel = isTeams ? "Microsoft Teams" : "Zoom";
+  const platformEmoji = isTeams ? "💼" : "🎥";
+  const platformColor = isTeams ? "#6264a7" : "#2d8cff";
+  try {
+    await transport.sendMail({
+      from: `"HARROWGATE Consultancy" <${process.env.GMAIL_USER}>`,
+      to: opts.studentEmail,
+      replyTo: process.env.GMAIL_USER,
+      headers: { "X-Priority": "1", "X-MSMail-Priority": "High", "Importance": "high" },
+      subject: `University Interview Invitation — HARROWGATE Consultancy`,
+      html: `
+        <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0f2d18;border-radius:12px;overflow:hidden">
+          <div style="background:#0a2010;padding:24px 32px;text-align:center;border-bottom:1px solid rgba(162,137,89,0.2)">
+            <h1 style="margin:0;color:#a28959;font-size:20px;letter-spacing:2px">HARROWGATE</h1>
+            <p style="margin:4px 0 0;color:rgba(162,137,89,0.5);font-size:11px;letter-spacing:3px;text-transform:uppercase">Consultancy</p>
+          </div>
+          <div style="padding:32px">
+            <h2 style="margin:0 0 4px;color:#a28959;font-size:22px">${platformEmoji} University Interview Invitation</h2>
+            <p style="margin:0 0 24px;color:rgba(162,137,89,0.55);font-size:13px">Reference: ${opts.refCode}</p>
+            <p style="margin:0 0 20px;color:rgba(162,137,89,0.7);font-size:15px;line-height:1.6">Dear ${opts.name},</p>
+            <p style="margin:0 0 20px;color:rgba(162,137,89,0.7);font-size:15px;line-height:1.6">
+              We are pleased to inform you that your <strong style="color:#a28959">university interview</strong> has been arranged. Please join the meeting on time.
+            </p>
+            <div style="background:rgba(162,137,89,0.07);border:1px solid rgba(162,137,89,0.2);border-radius:10px;padding:20px 24px;margin:20px 0">
+              <table style="width:100%;border-collapse:collapse">
+                <tr>
+                  <td style="padding:8px 0;color:rgba(162,137,89,0.5);font-size:13px;width:40%;border-bottom:1px solid rgba(162,137,89,0.08)">Date &amp; Time</td>
+                  <td style="padding:8px 0;color:#a28959;font-size:13px;font-weight:600;border-bottom:1px solid rgba(162,137,89,0.08)">${opts.dateTime}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0;color:rgba(162,137,89,0.5);font-size:13px;width:40%">Platform</td>
+                  <td style="padding:8px 0;color:#a28959;font-size:13px;font-weight:600">${platformLabel}</td>
+                </tr>
+              </table>
+            </div>
+            ${opts.notes ? `<div style="background:rgba(162,137,89,0.05);border:1px solid rgba(162,137,89,0.15);border-radius:10px;padding:16px 20px;margin:16px 0;font-size:14px;color:rgba(162,137,89,0.65);line-height:1.6"><strong>Additional notes:</strong><br>${opts.notes}</div>` : ""}
+            <div style="margin-top:28px;text-align:center">
+              <a href="${opts.link}" style="display:inline-block;background:${platformColor};color:#ffffff;padding:14px 32px;border-radius:999px;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.5px">
+                ${platformEmoji} Join ${platformLabel} →
+              </a>
+            </div>
+            <p style="margin:20px 0 0;color:rgba(162,137,89,0.45);font-size:12px;text-align:center">
+              Please be punctual and ensure your camera and microphone are working before the session.
+            </p>
+          </div>
+          <div style="padding:16px 32px;text-align:center;border-top:1px solid rgba(162,137,89,0.1)">
+            <p style="margin:0;color:rgba(162,137,89,0.3);font-size:11px">HARROWGATE Consultancy · Hong Kong</p>
+          </div>
+        </div>
+      `,
+    });
+    console.log(`[email] University interview invite sent to ${opts.studentEmail}`);
+  } catch (err) { console.error("[email] Failed to send university interview invite:", err); }
+}
+
 // ── Shared admin email template ──────────────────────────────────────────────
 function adminHtml(heading: string, intro: string, rows: [string, string][], cta: string) {
   return `

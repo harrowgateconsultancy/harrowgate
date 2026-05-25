@@ -139,6 +139,21 @@ router.get("/student/submissions/:id/documents/:docId/view", requireStudentAuth,
   }
 });
 
+// Student marks university interview as completed
+router.post("/student/submissions/:id/complete-university-interview", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+    if (submission.status !== "university_interview_arranged") return res.status(400).json({ error: "Interview not yet arranged" });
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({ status: "university_interview_completed" })
+      .where(eq(studentSubmissionsTable.id, submissionId)).returning();
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to complete university interview" }); }
+});
+
 router.post("/student/submissions/:id/receipt", requireStudentAuth, async (req: any, res) => {
   try {
     const submissionId = parseInt(req.params.id);

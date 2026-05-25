@@ -13,6 +13,9 @@ export const studentSubmissionsTable = pgTable("student_submissions", {
   adminNotes: text("admin_notes"),
   interviewZoomLink: text("interview_zoom_link"),
   interviewDateTime: text("interview_date_time"),
+  uniInterviewLink: text("uni_interview_link"),
+  uniInterviewDateTime: text("uni_interview_date_time"),
+  uniInterviewPlatform: text("uni_interview_platform"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

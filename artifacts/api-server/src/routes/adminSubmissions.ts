@@ -7,7 +7,7 @@ import {
 } from "@workspace/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
-import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail } from "../email";
+import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail } from "../email";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -16,6 +16,7 @@ const VALID_STATUSES = [
   "pending", "approved", "payment_pending", "payment_received",
   "acknowledged", "rejected", "docs_requested",
   "interview_arranged", "interview_completed",
+  "university_interview_arranged", "university_interview_completed",
 ];
 
 router.get("/admin/student-submissions", async (_req, res) => {
@@ -94,6 +95,28 @@ router.post("/admin/student-submissions/:id/send-interview-invite", async (req: 
 
     res.json(updated);
   } catch { res.status(500).json({ error: "Failed to send interview invite" }); }
+});
+
+// Send university interview invite + update status
+router.post("/admin/student-submissions/:id/send-university-interview-invite", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { link, platform, dateTime, notes } = req.body;
+    if (!link || !platform || !dateTime) return res.status(400).json({ error: "link, platform, and dateTime are required" });
+    if (!["zoom", "teams"].includes(platform)) return res.status(400).json({ error: "platform must be zoom or teams" });
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    if (!submission.email) return res.status(400).json({ error: "Student has no email on record" });
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({ status: "university_interview_arranged", uniInterviewLink: link, uniInterviewDateTime: dateTime, uniInterviewPlatform: platform })
+      .where(eq(studentSubmissionsTable.id, id)).returning();
+    const refCode = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
+    await sendUniversityInterviewInviteEmail({
+      name: submission.name, studentEmail: submission.email,
+      link, platform, dateTime, refCode, notes,
+    });
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to send university interview invite" }); }
 });
 
 // Admin marks interview as completed

@@ -22,9 +22,11 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   payment_pending:      { label: "Payment Pending",      color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
   payment_received:     { label: "Receipt Received",     color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
   acknowledged:         { label: "Acknowledged",         color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  interview_arranged:   { label: "Interview Arranged",   color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
-  interview_completed:  { label: "Interview Completed",  color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  rejected:             { label: "Rejected",             color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
+  interview_arranged:              { label: "Interview Arranged",    color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
+  interview_completed:             { label: "Interview Completed",   color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  university_interview_arranged:   { label: "Uni Interview Arranged", color: "#38bdf8",  bg: "rgba(56,189,248,0.12)" },
+  university_interview_completed:  { label: "Uni Interview Done",    color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  rejected:                        { label: "Rejected",              color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
 const nextActions: Record<string, { label: string; nextStatus: string; color: string; icon: string }[]> = {
@@ -47,7 +49,13 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
     { label: "Confirm Payment & Acknowledge", nextStatus: "acknowledged", color: GOLD,     icon: "✅" },
   ],
   interview_arranged: [],
+  interview_completed: [],
+  university_interview_arranged: [],
+
+  university_interview_completed: [],
 };
+
+
 
 function isImage(f: string, m?: string | null) { return m?.startsWith("image/") || /\.(jpe?g|png|gif|webp)$/i.test(f); }
 function isPdf(f: string, m?: string | null) { return m === "application/pdf" || /\.pdf$/i.test(f); }
@@ -77,6 +85,9 @@ export default function Submissions() {
   const [interviewForm, setInterviewForm] = useState<{ zoomLink: string; dateTime: string; notes: string } | null>(null);
   const [sendingInvite, setSendingInvite] = useState(false);
   const [inviteSent, setInviteSent] = useState<number | null>(null);
+  const [uniInterviewForm, setUniInterviewForm] = useState<{ platform: "zoom" | "teams"; link: string; dateTime: string; notes: string } | null>(null);
+  const [sendingUniInvite, setSendingUniInvite] = useState(false);
+  const [uniInviteSent, setUniInviteSent] = useState<number | null>(null);
 
   const { data: submissions = [], isLoading } = useQuery<Submission[]>({
     queryKey: ["admin-student-submissions"],
@@ -134,6 +145,24 @@ export default function Submissions() {
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
     } catch { alert("Failed to send interview invite. Please check the student has an email on file."); }
     finally { setSendingInvite(false); }
+  };
+
+  const handleSendUniInvite = async () => {
+    if (!selected || !uniInterviewForm) return;
+    setSendingUniInvite(true);
+    try {
+      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/send-university-interview-invite`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(uniInterviewForm),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const updated = await res.json();
+      setUniInviteSent(selected.id);
+      setUniInterviewForm(null);
+      setSelected(prev => prev ? { ...prev, status: updated.status, uniInterviewLink: updated.uniInterviewLink, uniInterviewDateTime: updated.uniInterviewDateTime, uniInterviewPlatform: updated.uniInterviewPlatform } : null);
+      qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
+    } catch { alert("Failed to send university interview invite."); }
+    finally { setSendingUniInvite(false); }
   };
 
   const handleCompleteInterview = async () => {
@@ -495,6 +524,113 @@ export default function Submissions() {
                         style={{ background: "rgba(74,222,128,0.08)", borderColor: "rgba(74,222,128,0.28)", color: "#4ade80" }}>
                         ✅ Confirm Interview Completed
                       </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* University Interview — Schedule (interview_completed only) */}
+                {selected.status === "interview_completed" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(56,189,248,0.2)" }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(56,189,248,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>🏫 University Interview</p>
+                      {uniInviteSent === selected.id && (
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>✓ Invite sent</span>
+                      )}
+                    </div>
+                    <div className="px-4 py-4">
+                      {!uniInterviewForm ? (
+                        <button onClick={() => setUniInterviewForm({ platform: "zoom", link: "", dateTime: "", notes: "" })}
+                          className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
+                          style={{ background: "rgba(56,189,248,0.06)", borderColor: "rgba(56,189,248,0.22)", color: "#38bdf8" }}>
+                          🏫 Schedule University Interview
+                        </button>
+                      ) : (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.6)" }}>Platform *</label>
+                            <div className="flex gap-2">
+                              {(["zoom", "teams"] as const).map(p => (
+                                <button key={p} onClick={() => setUniInterviewForm(f => f ? { ...f, platform: p } : f)}
+                                  className="flex-1 py-2 rounded-xl text-sm font-semibold border transition-all"
+                                  style={{
+                                    background: uniInterviewForm.platform === p ? "rgba(56,189,248,0.12)" : "rgba(56,189,248,0.03)",
+                                    borderColor: uniInterviewForm.platform === p ? "rgba(56,189,248,0.4)" : "rgba(56,189,248,0.12)",
+                                    color: "#38bdf8",
+                                  }}>
+                                  {p === "zoom" ? "🎥 Zoom" : "💼 Teams"}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.6)" }}>Meeting Link *</label>
+                            <input type="url" placeholder={uniInterviewForm.platform === "teams" ? "https://teams.microsoft.com/l/meetup-join/..." : "https://zoom.us/j/..."}
+                              value={uniInterviewForm.link}
+                              onChange={e => setUniInterviewForm(f => f ? { ...f, link: e.target.value } : f)}
+                              className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
+                              style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.2)", color: "#38bdf8" }} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.6)" }}>Date & Time *</label>
+                            <input type="text" placeholder="e.g. Monday, 2 June 2026 at 10:00 AM HKT"
+                              value={uniInterviewForm.dateTime}
+                              onChange={e => setUniInterviewForm(f => f ? { ...f, dateTime: e.target.value } : f)}
+                              className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
+                              style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.2)", color: "#38bdf8" }} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.6)" }}>Additional Notes (optional)</label>
+                            <textarea rows={2} placeholder="Any instructions for the student…"
+                              value={uniInterviewForm.notes}
+                              onChange={e => setUniInterviewForm(f => f ? { ...f, notes: e.target.value } : f)}
+                              className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
+                              style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.2)", color: "#38bdf8" }} />
+                          </div>
+                          <div className="flex gap-2">
+                            <button onClick={handleSendUniInvite} disabled={sendingUniInvite || !uniInterviewForm.link || !uniInterviewForm.dateTime}
+                              className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                              style={{ background: "rgba(56,189,248,0.1)", borderColor: "rgba(56,189,248,0.3)", color: "#38bdf8" }}>
+                              {sendingUniInvite ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#38bdf8", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Interview Invite"}
+                            </button>
+                            <button onClick={() => setUniInterviewForm(null)}
+                              className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
+                              style={{ borderColor: "rgba(162,137,89,0.15)", color: "rgba(162,137,89,0.4)" }}>
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* University Interview — Arranged (awaiting student) */}
+                {selected.status === "university_interview_arranged" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(56,189,248,0.2)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(56,189,248,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>🏫 University Interview — Arranged</p>
+                    </div>
+                    <div className="px-4 py-4 space-y-3">
+                      {selected.uniInterviewPlatform && (
+                        <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                          {selected.uniInterviewPlatform === "teams" ? "💼 Microsoft Teams" : "🎥 Zoom"}
+                        </div>
+                      )}
+                      {selected.uniInterviewDateTime && (
+                        <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                          📅 {selected.uniInterviewDateTime}
+                        </div>
+                      )}
+                      {selected.uniInterviewLink && (
+                        <a href={selected.uniInterviewLink} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm truncate hover:opacity-80 transition-opacity"
+                          style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                          🔗 {selected.uniInterviewLink}
+                        </a>
+                      )}
+                      <p className="text-xs text-center py-1" style={{ color: "rgba(56,189,248,0.45)" }}>
+                        Awaiting student to confirm completion
+                      </p>
                     </div>
                   </div>
                 )}
