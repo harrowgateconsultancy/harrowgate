@@ -13,6 +13,8 @@ type Submission = {
   passportNumber: string; status: string; adminNotes: string | null;
   createdAt: string; documents: Document[];
   interviewZoomLink?: string | null; interviewDateTime?: string | null;
+  uniInterviewLink?: string | null; uniInterviewDateTime?: string | null; uniInterviewPlatform?: string | null;
+  additionalDocsRequested?: boolean | null; additionalDocsRequestNote?: string | null;
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -29,6 +31,9 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   second_payment_confirmed:        { label: "2nd Payment Confirmed", color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   university_interview_arranged:   { label: "Uni Interview Arranged", color: "#38bdf8",  bg: "rgba(56,189,248,0.12)" },
   university_interview_completed:  { label: "Uni Interview Done",    color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  offer_letter_pending:            { label: "Offer Letter Sent",      color: "#f0abfc",   bg: "rgba(240,171,252,0.12)" },
+  final_payment_received:          { label: "Final Receipt Received", color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
+  final_payment_confirmed:         { label: "Final Payment Done",     color: "#4ade80",   bg: "rgba(74,222,128,0.12)"  },
   rejected:                        { label: "Rejected",              color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
@@ -62,6 +67,11 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
   second_payment_confirmed: [],
   university_interview_arranged: [],
   university_interview_completed: [],
+  offer_letter_pending: [],
+  final_payment_received: [
+    { label: "Confirm Final Payment", nextStatus: "final_payment_confirmed", color: "#4ade80", icon: "✅" },
+  ],
+  final_payment_confirmed: [],
 };
 
 
@@ -69,6 +79,15 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
 function isImage(f: string, m?: string | null) { return m?.startsWith("image/") || /\.(jpe?g|png|gif|webp)$/i.test(f); }
 function isPdf(f: string, m?: string | null) { return m === "application/pdf" || /\.pdf$/i.test(f); }
 function fileIcon(f: string, m?: string | null) { return isPdf(f, m) ? "📄" : isImage(f, m) ? "🖼️" : "📎"; }
+function getDocMeta(dt: string): { label: string; tagColor: string; tagText: string; tag: string } {
+  if (dt === "payment_receipt")       return { label: "Payment Receipt",       tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Receipt"       };
+  if (dt === "second_payment_receipt") return { label: "2nd Payment Receipt",  tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "2nd Receipt"   };
+  if (dt === "additional_doc")        return { label: "Additional Document",   tagColor: "rgba(251,146,60,0.18)",  tagText: "#fb923c", tag: "Additional"    };
+  if (dt === "offer_letter")          return { label: "Offer Letter",          tagColor: "rgba(240,171,252,0.18)", tagText: "#f0abfc", tag: "Offer Letter"  };
+  if (dt === "final_payment_receipt") return { label: "Final Payment Receipt", tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Final Receipt" };
+  if (dt.startsWith("admin_"))        return { label: dt === "admin_doc" ? "Admin Document" : dt.replace("admin_", "").replace("_", " "), tagColor: "rgba(74,222,128,0.15)", tagText: "#4ade80", tag: "Admin" };
+  return { label: dt.replace(/_/g, " ").toUpperCase(), tagColor: "rgba(162,137,89,0.18)", tagText: GOLD, tag: "Student" };
+}
 
 async function uploadToStorage(file: File): Promise<{ url: string }> {
   const res = await fetch(`${getApiBase()}/api/storage/uploads/request-url`, {
@@ -97,6 +116,12 @@ export default function Submissions() {
   const [uniInterviewForm, setUniInterviewForm] = useState<{ platform: "zoom" | "teams"; link: string; dateTime: string; notes: string } | null>(null);
   const [sendingUniInvite, setSendingUniInvite] = useState(false);
   const [uniInviteSent, setUniInviteSent] = useState<number | null>(null);
+  const [additionalDocsForm, setAdditionalDocsForm] = useState<{ note: string } | null>(null);
+  const [sendingAdditionalDocs, setSendingAdditionalDocs] = useState(false);
+  const [additionalDocsSent, setAdditionalDocsSent] = useState<number | null>(null);
+  const [offerLetterUploading, setOfferLetterUploading] = useState(false);
+  const [offerLetterSent, setOfferLetterSent] = useState<number | null>(null);
+  const offerLetterFileRef = useRef<HTMLInputElement | null>(null);
 
   const { data: submissions = [], isLoading } = useQuery<Submission[]>({
     queryKey: ["admin-student-submissions"],
@@ -187,6 +212,41 @@ export default function Submissions() {
     } catch { alert("Failed to mark interview as completed."); }
   };
 
+  const handleRequestAdditionalDocs = async () => {
+    if (!selected || !additionalDocsForm) return;
+    setSendingAdditionalDocs(true);
+    try {
+      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/request-additional-docs`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note: additionalDocsForm.note }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const updated = await res.json();
+      setAdditionalDocsSent(selected.id);
+      setAdditionalDocsForm(null);
+      setSelected(prev => prev ? { ...prev, additionalDocsRequested: updated.additionalDocsRequested, additionalDocsRequestNote: updated.additionalDocsRequestNote } : null);
+      qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
+    } catch { alert("Failed to send additional documents request."); }
+    finally { setSendingAdditionalDocs(false); }
+  };
+
+  const handleUploadOfferLetter = async (file: File) => {
+    if (!selected) return;
+    setOfferLetterUploading(true);
+    try {
+      const { url } = await uploadToStorage(file);
+      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/upload-offer-letter`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setOfferLetterSent(selected.id);
+      setSelected(prev => prev ? { ...prev, status: "offer_letter_pending" } : null);
+      qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
+    } catch { alert("Failed to upload offer letter."); }
+    finally { setOfferLetterUploading(false); if (offerLetterFileRef.current) offerLetterFileRef.current.value = ""; }
+  };
+
   const handleAdminUpload = async (file: File) => {
     if (!selected) return;
     setUploadingDoc(true);
@@ -205,7 +265,10 @@ export default function Submissions() {
   };
 
   const filtered = filter === "all" ? submissions : submissions.filter(s => s.status === filter);
-  const pendingCount = submissions.filter(s => ["pending", "payment_received"].includes(s.status)).length;
+  const pendingCount = submissions.filter(s =>
+    ["pending", "payment_received", "second_payment_received", "final_payment_received"].includes(s.status) ||
+    !!s.additionalDocsRequested
+  ).length;
 
   const viewUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/view`;
   const downloadUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/download`;
@@ -258,7 +321,7 @@ export default function Submissions() {
         <div className="space-y-3">
           {filtered.map(s => {
             const sc = statusConfig[s.status] || { label: s.status, color: GOLD, bg: "rgba(162,137,89,0.12)" };
-            const hasAction = (nextActions[s.status]?.length ?? 0) > 0;
+            const hasAction = (nextActions[s.status]?.length ?? 0) > 0 || !!s.additionalDocsRequested;
             const docCount = s.documents.filter(d => !d.documentType.startsWith("admin_") && d.documentType !== "payment_receipt").length;
             const receiptDoc = s.documents.find(d => d.documentType === "payment_receipt");
             const isDone = s.status === "university_interview_completed";
@@ -268,12 +331,13 @@ export default function Submissions() {
                   background: isDone ? "rgba(134,239,172,0.08)" : "rgba(0,0,0,0.2)",
                   borderColor: isDone ? "rgba(134,239,172,0.35)" : hasAction ? "rgba(251,146,60,0.28)" : "rgba(162,137,89,0.12)",
                 }}
-                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); }}>
+                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); }}>
                 <div className="px-6 py-5 flex items-center gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1">
                       <span className="text-base font-semibold" style={{ color: GOLD }}>{s.name}</span>
                       {hasAction && <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: "rgba(251,146,60,0.1)", color: "#fb923c" }}>Action needed</span>}
+                    {s.additionalDocsRequested && <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: "rgba(251,146,60,0.08)", color: "#fb923c" }}>📎 Docs Requested</span>}
                     </div>
                     <div className="flex items-center gap-4 text-xs flex-wrap" style={{ color: "rgba(162,137,89,0.45)" }}>
                       {s.email && <span>{s.email}</span>}
@@ -375,30 +439,17 @@ export default function Submissions() {
                     </div>
                   )}
                   <div className="space-y-2">
-                    {selected.documents.filter(d => !d.documentType.startsWith("admin_") && d.documentType !== "payment_receipt").map(doc => (
-                      <DocRow key={doc.id} doc={doc} label={doc.documentType.replace("_", " ").toUpperCase()}
-                        onPreview={() => setPreviewDoc(previewDoc?.id === doc.id ? null : doc)}
-                        onDownload={() => window.open(downloadUrl(doc), "_blank")}
-                        onDelete={() => { if (confirm(`Delete "${doc.fileName}"?`)) deleteDoc.mutate({ submissionId: selected.id, docId: doc.id }); }}
-                        isActive={previewDoc?.id === doc.id}
-                        tagColor="rgba(162,137,89,0.18)" tagTextColor={GOLD} tag="Student" />
-                    ))}
-                    {selected.documents.filter(d => d.documentType === "payment_receipt").map(doc => (
-                      <DocRow key={doc.id} doc={doc} label="Payment Receipt"
-                        onPreview={() => setPreviewDoc(previewDoc?.id === doc.id ? null : doc)}
-                        onDownload={() => window.open(downloadUrl(doc), "_blank")}
-                        onDelete={() => { if (confirm(`Delete "${doc.fileName}"?`)) deleteDoc.mutate({ submissionId: selected.id, docId: doc.id }); }}
-                        isActive={previewDoc?.id === doc.id}
-                        tagColor="rgba(96,165,250,0.18)" tagTextColor="#60a5fa" tag="Receipt" />
-                    ))}
-                    {selected.documents.filter(d => d.documentType.startsWith("admin_")).map(doc => (
-                      <DocRow key={doc.id} doc={doc} label={doc.documentType === "admin_doc" ? "Admin Document" : doc.documentType.replace("admin_", "").replace("_", " ")}
-                        onPreview={() => setPreviewDoc(previewDoc?.id === doc.id ? null : doc)}
-                        onDownload={() => window.open(downloadUrl(doc), "_blank")}
-                        onDelete={() => { if (confirm(`Delete "${doc.fileName}"?`)) deleteDoc.mutate({ submissionId: selected.id, docId: doc.id }); }}
-                        isActive={previewDoc?.id === doc.id}
-                        tagColor="rgba(74,222,128,0.15)" tagTextColor="#4ade80" tag="Admin" />
-                    ))}
+                    {selected.documents.map(doc => {
+                      const m = getDocMeta(doc.documentType);
+                      return (
+                        <DocRow key={doc.id} doc={doc} label={m.label}
+                          onPreview={() => setPreviewDoc(previewDoc?.id === doc.id ? null : doc)}
+                          onDownload={() => window.open(downloadUrl(doc), "_blank")}
+                          onDelete={() => { if (confirm(`Delete "${doc.fileName}"?`)) deleteDoc.mutate({ submissionId: selected.id, docId: doc.id }); }}
+                          isActive={previewDoc?.id === doc.id}
+                          tagColor={m.tagColor} tagTextColor={m.tagText} tag={m.tag} />
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -631,6 +682,74 @@ export default function Submissions() {
                   </div>
                 )}
 
+                {/* Offer Letter Upload — university_interview_completed */}
+                {selected.status === "university_interview_completed" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(240,171,252,0.2)" }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(240,171,252,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#f0abfc" }}>🎓 Upload Offer Letter</p>
+                      {offerLetterSent === selected.id && (
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>✓ Sent to student</span>
+                      )}
+                    </div>
+                    <div className="px-4 py-4 space-y-3">
+                      <p className="text-xs" style={{ color: "rgba(240,171,252,0.6)" }}>
+                        Once the university sends the offer letter, upload it here. The student will be notified and prompted to make the final payment before they can download it.
+                      </p>
+                      <button onClick={() => offerLetterFileRef.current?.click()} disabled={offerLetterUploading}
+                        className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-50 flex items-center justify-center gap-2"
+                        style={{ background: "rgba(240,171,252,0.06)", borderColor: "rgba(240,171,252,0.22)", color: "#f0abfc", borderStyle: "dashed" }}>
+                        {offerLetterUploading
+                          ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#f0abfc", borderTopColor: "transparent" }} /> Uploading…</>
+                          : <>📄 Choose Offer Letter File…</>}
+                      </button>
+                      <input ref={offerLetterFileRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleUploadOfferLetter(f); }} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Offer Letter Pending — info (offer_letter_pending) */}
+                {selected.status === "offer_letter_pending" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(240,171,252,0.2)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(240,171,252,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#f0abfc" }}>🎓 Offer Letter Sent</p>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-xs" style={{ color: "rgba(240,171,252,0.6)" }}>
+                        The offer letter has been sent to the student. They have been notified and will upload their final payment receipt once payment is made.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Final Payment — Receipt info (final_payment_received) */}
+                {selected.status === "final_payment_received" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(96,165,250,0.2)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#60a5fa" }}>💳 Final Payment Receipt Received</p>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-xs" style={{ color: "rgba(96,165,250,0.6)" }}>
+                        The student has uploaded their final payment receipt. Review it in the documents section above, then click <strong style={{ color: "#4ade80" }}>Confirm Final Payment</strong> below.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Final Payment Confirmed */}
+                {selected.status === "final_payment_confirmed" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(74,222,128,0.2)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>✅ Final Payment Confirmed</p>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-xs" style={{ color: "rgba(74,222,128,0.5)" }}>
+                        The student's final payment has been confirmed. They can now download the offer letter from their portal.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* University Interview — Arranged (awaiting student) */}
                 {selected.status === "university_interview_arranged" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(56,189,248,0.2)" }}>
@@ -658,6 +777,58 @@ export default function Submissions() {
                       <p className="text-xs text-center py-1" style={{ color: "rgba(56,189,248,0.45)" }}>
                         Awaiting student to confirm completion
                       </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Request Additional Documents — universal panel */}
+                {selected.status !== "rejected" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(251,146,60,0.15)" }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(251,146,60,0.1)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#fb923c" }}>📎 Additional Documents</p>
+                      {selected.additionalDocsRequested && (
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(251,146,60,0.1)", color: "#fb923c" }}>Pending student response</span>
+                      )}
+                      {additionalDocsSent === selected.id && !selected.additionalDocsRequested && (
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>✓ Request sent</span>
+                      )}
+                    </div>
+                    <div className="px-4 py-4">
+                      {selected.additionalDocsRequestNote && (
+                        <div className="mb-3 rounded-xl px-3 py-2 border text-xs" style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.15)", color: "rgba(251,146,60,0.7)" }}>
+                          <strong>Last request note:</strong> {selected.additionalDocsRequestNote}
+                        </div>
+                      )}
+                      {!additionalDocsForm ? (
+                        <button onClick={() => setAdditionalDocsForm({ note: "" })}
+                          className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
+                          style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.18)", color: "#fb923c" }}>
+                          📎 {selected.additionalDocsRequested ? "Send Another Request" : "Request Additional Documents"}
+                        </button>
+                      ) : (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(251,146,60,0.6)" }}>Note to student (optional)</label>
+                            <textarea rows={2} placeholder="Describe what documents are needed…"
+                              value={additionalDocsForm.note}
+                              onChange={e => setAdditionalDocsForm(f => f ? { ...f, note: e.target.value } : f)}
+                              className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
+                              style={{ background: "rgba(251,146,60,0.04)", borderColor: "rgba(251,146,60,0.18)", color: "#fb923c" }} />
+                          </div>
+                          <div className="flex gap-2">
+                            <button onClick={handleRequestAdditionalDocs} disabled={sendingAdditionalDocs}
+                              className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                              style={{ background: "rgba(251,146,60,0.1)", borderColor: "rgba(251,146,60,0.3)", color: "#fb923c" }}>
+                              {sendingAdditionalDocs ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#fb923c", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Request"}
+                            </button>
+                            <button onClick={() => setAdditionalDocsForm(null)}
+                              className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
+                              style={{ borderColor: "rgba(162,137,89,0.15)", color: "rgba(162,137,89,0.4)" }}>
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

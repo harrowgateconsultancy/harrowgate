@@ -17,7 +17,7 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
   return { url: objectPath };
 }
 
-type Props = { submission: Submission; onUpdated: () => void; paymentType?: "first" | "second" };
+type Props = { submission: Submission; onUpdated: () => void; paymentType?: "first" | "second" | "final" };
 
 export default function PaymentPage({ submission, onUpdated, paymentType = "first" }: Props) {
   const [uploading, setUploading] = useState(false);
@@ -25,12 +25,24 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const isSecond = paymentType === "second";
-  const docType = isSecond ? "second_payment_receipt" : "payment_receipt";
-  const endpoint = isSecond ? "receipt2" : "receipt";
+  const isFinal = paymentType === "final";
+
+  const docType = isFinal ? "final_payment_receipt" : isSecond ? "second_payment_receipt" : "payment_receipt";
+  const endpoint = isFinal ? "receipt3" : isSecond ? "receipt2" : "receipt";
+
   const existingReceipt = submission.documents.find(d => d.documentType === docType);
-  const alreadySubmitted = isSecond
+  const alreadySubmitted = isFinal
+    ? (submission.status === "final_payment_received" || submission.status === "final_payment_confirmed")
+    : isSecond
     ? (submission.status === "second_payment_received" || submission.status === "second_payment_confirmed")
     : (submission.status === "payment_received" || submission.status === "acknowledged");
+
+  const title = isFinal ? "Final Payment Required" : isSecond ? "2nd Payment Required" : "Payment Required";
+  const subtitle = isFinal
+    ? "A final payment is required to collect your official university offer letter"
+    : isSecond
+    ? "A second payment is required before proceeding to your university interview"
+    : "Your application has been approved — please complete payment to proceed";
 
   const handleReceiptUpload = async (file: File) => {
     setUploading(true); setError(null);
@@ -55,10 +67,8 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
         <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(251,146,60,0.12)" }}>
           <span className="text-xl">💳</span>
           <div>
-            <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>{isSecond ? "2nd Payment Required" : "Payment Required"}</h3>
-            <p className="text-xs" style={{ color: "rgba(251,146,60,0.55)" }}>
-              {isSecond ? "A second payment is required before proceeding to your university interview" : "Your application has been approved — please complete payment to proceed"}
-            </p>
+            <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>{title}</h3>
+            <p className="text-xs" style={{ color: "rgba(251,146,60,0.55)" }}>{subtitle}</p>
           </div>
         </div>
         <div className="px-6 py-6">

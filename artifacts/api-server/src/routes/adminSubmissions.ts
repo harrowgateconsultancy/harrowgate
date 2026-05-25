@@ -7,7 +7,7 @@ import {
 } from "@workspace/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
-import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail } from "../email";
+import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail } from "../email";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -18,6 +18,7 @@ const VALID_STATUSES = [
   "interview_arranged", "interview_completed",
   "second_payment_pending", "second_payment_received", "second_payment_confirmed",
   "university_interview_arranged", "university_interview_completed",
+  "offer_letter_pending", "final_payment_received", "final_payment_confirmed",
 ];
 
 router.get("/admin/student-submissions", async (_req, res) => {
@@ -192,6 +193,46 @@ router.post("/admin/student-submissions/:id/documents", async (req: any, res) =>
     const [doc] = await db.insert(studentDocumentsTable).values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType }).returning();
     res.status(201).json(doc);
   } catch { res.status(500).json({ error: "Failed to attach document" }); }
+});
+
+// Request additional documents from student
+router.post("/admin/student-submissions/:id/request-additional-docs", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { note } = req.body;
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({ additionalDocsRequested: true, additionalDocsRequestNote: note || null })
+      .where(eq(studentSubmissionsTable.id, id)).returning();
+    const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
+    if (submission.email) {
+      sendAdditionalDocsRequestEmail({ name: submission.name, studentEmail: submission.email, note: note || undefined, portalUrl }).catch(() => {});
+    }
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to request additional docs" }); }
+});
+
+// Upload offer letter — sets status to offer_letter_pending
+router.post("/admin/student-submissions/:id/upload-offer-letter", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { fileName, fileUrl, fileSize, mimeType } = req.body;
+    if (!fileName || !fileUrl) return res.status(400).json({ error: "fileName and fileUrl are required" });
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    await db.delete(studentDocumentsTable)
+      .where(and(eq(studentDocumentsTable.submissionId, id), eq(studentDocumentsTable.documentType, "offer_letter")));
+    await db.insert(studentDocumentsTable).values({ submissionId: id, documentType: "offer_letter", fileName, fileUrl, fileSize, mimeType });
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({ status: "offer_letter_pending" })
+      .where(eq(studentSubmissionsTable.id, id)).returning();
+    const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
+    if (submission.email) {
+      sendOfferLetterAvailableEmail({ name: submission.name, studentEmail: submission.email, portalUrl }).catch(() => {});
+    }
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to upload offer letter" }); }
 });
 
 // Admin deletes a document

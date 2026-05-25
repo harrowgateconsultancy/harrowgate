@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useUser, useClerk } from "@clerk/react";
 import ApplyForm from "./ApplyForm";
 import PaymentPage from "./PaymentPage";
@@ -15,6 +15,7 @@ export type Submission = {
   adminNotes: string | null; createdAt: string;
   interviewZoomLink?: string | null; interviewDateTime?: string | null;
   uniInterviewLink?: string | null; uniInterviewDateTime?: string | null; uniInterviewPlatform?: string | null;
+  additionalDocsRequested?: boolean | null; additionalDocsRequestNote?: string | null;
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };
 
@@ -32,6 +33,9 @@ const statusMap: Record<string, { label: string; color: string; bg: string }> = 
   second_payment_confirmed:        { label: "2nd Payment Received ✓",         color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   university_interview_arranged:   { label: "Uni Interview Arranged",         color: "#38bdf8",   bg: "rgba(56,189,248,0.12)" },
   university_interview_completed:  { label: "Uni Interview Completed",        color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  offer_letter_pending:            { label: "Final Payment Required",         color: "#fb923c",   bg: "rgba(251,146,60,0.12)"  },
+  final_payment_received:          { label: "Pending Payment Confirmation",   color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
+  final_payment_confirmed:         { label: "Offer Letter Ready ✓",           color: "#4ade80",   bg: "rgba(74,222,128,0.12)"  },
   rejected:                        { label: "Application Unsuccessful",       color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
@@ -42,12 +46,15 @@ function buildTimeline(submission: Submission): TimelineStep[] {
   const ref = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
   const submittedDate = new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
-  const postStatuses = ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed"];
+  const postStatuses = ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"];
   const afterPayment   = postStatuses.includes(s);
-  const afterMock      = ["interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed"].includes(s);
-  const after2ndPay    = ["second_payment_confirmed","university_interview_arranged","university_interview_completed"].includes(s);
+  const afterMock      = ["interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(s);
+  const after2ndPay    = ["second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(s);
   const in2ndPay       = ["second_payment_pending","second_payment_received"].includes(s);
-  const afterUniArr    = ["university_interview_arranged","university_interview_completed"].includes(s);
+  const afterUniArr    = ["university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(s);
+  const afterUniDone   = ["university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(s);
+  const afterFinalPay  = s === "final_payment_confirmed";
+  const inFinalPay     = ["offer_letter_pending","final_payment_received"].includes(s);
 
   return [
     { icon: "✅", label: "Application Submitted",      note: submittedDate,                                          done: true },
@@ -77,25 +84,42 @@ function buildTimeline(submission: Submission): TimelineStep[] {
       current: in2ndPay || s === "interview_completed",
     },
     {
-      icon: afterUniArr && s === "university_interview_completed" ? "✅" : (s === "university_interview_arranged" ? "🔄" : (after2ndPay ? "🔄" : "⬜")),
+      icon: afterUniDone ? "✅" : (s === "university_interview_arranged" ? "🔄" : (after2ndPay ? "🔄" : "⬜")),
       label: "University Interview",
       note: s === "second_payment_confirmed"
         ? "Our team is arranging your university interview"
         : s === "university_interview_arranged"
           ? (submission.uniInterviewDateTime || "Scheduled — check your email")
-          : (s === "university_interview_completed" ? "Completed" : "Upcoming"),
-      done: s === "university_interview_completed",
+          : (afterUniDone ? "Completed" : "Upcoming"),
+      done: afterUniDone,
       current: s === "university_interview_arranged" || s === "second_payment_confirmed",
     },
     {
-      icon: s === "university_interview_completed" ? "🔄" : "⬜",
-      label: "Waiting for University's Response",
-      note: s === "university_interview_completed" ? "Awaiting decision from the university" : "Upcoming",
-      done: false,
-      current: s === "university_interview_completed",
+      icon: afterFinalPay ? "✅" : (inFinalPay ? "🔄" : (afterUniDone ? "🔄" : "⬜")),
+      label: "Offer Letter & Final Payment",
+      note: afterFinalPay
+        ? "Final payment confirmed — offer letter available"
+        : inFinalPay
+          ? (s === "final_payment_received" ? "Receipt received — awaiting confirmation" : "Final payment required to collect your offer letter")
+          : afterUniDone ? "Awaiting your offer letter from the university" : "Upcoming",
+      done: afterFinalPay,
+      current: inFinalPay || (afterUniDone && !inFinalPay && !afterFinalPay),
     },
     { icon: "⬜", label: "Visa Application Submitted", note: "Final step", done: false },
   ];
+}
+
+async function uploadToStorage(file: File): Promise<{ url: string }> {
+  const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const apiBase = `${window.location.origin}${BASE}`;
+  const res = await fetch(`${apiBase}/api/storage/uploads/request-url`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+    body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+  });
+  if (!res.ok) throw new Error("Upload URL failed");
+  const { uploadURL, objectPath } = await res.json();
+  await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+  return { url: objectPath };
 }
 
 export default function Portal() {
@@ -105,6 +129,10 @@ export default function Portal() {
   const [loading, setLoading] = useState(true);
   const [showTimeline, setShowTimeline] = useState(false);
   const [completingUni, setCompletingUni] = useState(false);
+  const [additionalDocsNote, setAdditionalDocsNote] = useState("");
+  const [uploadingAdditionalDocs, setUploadingAdditionalDocs] = useState(false);
+  const [additionalDocsError, setAdditionalDocsError] = useState<string | null>(null);
+  const additionalDocsRef = useRef<HTMLInputElement | null>(null);
 
   const fetchSubmission = async () => {
     try {
@@ -127,9 +155,25 @@ export default function Portal() {
     } finally { setCompletingUni(false); }
   };
 
+  const handleAdditionalDocsSubmit = async (file: File) => {
+    if (!submission) return;
+    setUploadingAdditionalDocs(true); setAdditionalDocsError(null);
+    try {
+      const { url } = await uploadToStorage(file);
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/additional-docs`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type, note: additionalDocsNote }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setAdditionalDocsNote("");
+      fetchSubmission();
+    } catch { setAdditionalDocsError("Upload failed. Please try again."); }
+    finally { setUploadingAdditionalDocs(false); }
+  };
+
   // Auto-show timeline for post-acknowledged statuses
   useEffect(() => {
-    if (submission && ["interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed"].includes(submission.status)) {
+    if (submission && ["interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(submission.status)) {
       setShowTimeline(true);
     }
   }, [submission?.status]);
@@ -384,6 +428,96 @@ export default function Portal() {
               );
             })()}
 
+            {/* ── ADDITIONAL DOCUMENTS REQUESTED BANNER ── */}
+            {submission.additionalDocsRequested && (
+              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.25)" }}>
+                <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(251,146,60,0.18)" }}>
+                  <span className="text-xl">📎</span>
+                  <div>
+                    <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>Additional Documents Required</h3>
+                    <p className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.55)" }}>Your consultant has requested additional documents</p>
+                  </div>
+                </div>
+                <div className="px-6 py-5 space-y-4">
+                  {submission.additionalDocsRequestNote && (
+                    <div className="rounded-xl px-4 py-3 border text-sm" style={{ background: "rgba(251,146,60,0.04)", borderColor: "rgba(251,146,60,0.18)", color: "rgba(251,146,60,0.75)", lineHeight: 1.6 }}>
+                      <strong style={{ color: "#fb923c" }}>Note from consultant:</strong><br />{submission.additionalDocsRequestNote}
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-xs font-medium mb-2" style={{ color: "rgba(251,146,60,0.6)" }}>Add a note (optional)</label>
+                    <textarea rows={2} placeholder="e.g., 'Enclosed please find the requested transcript…'"
+                      value={additionalDocsNote}
+                      onChange={e => setAdditionalDocsNote(e.target.value)}
+                      className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
+                      style={{ background: "rgba(251,146,60,0.04)", borderColor: "rgba(251,146,60,0.15)", color: "#fb923c" }} />
+                  </div>
+                  <button onClick={() => additionalDocsRef.current?.click()} disabled={uploadingAdditionalDocs}
+                    className="w-full py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                    style={{ background: "rgba(251,146,60,0.08)", borderColor: "rgba(251,146,60,0.3)", color: "#fb923c" }}>
+                    {uploadingAdditionalDocs
+                      ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#fb923c", borderTopColor: "transparent" }} /> Uploading…</>
+                      : <><span>📁</span> Choose Document & Confirm</>}
+                  </button>
+                  <input ref={additionalDocsRef} type="file" className="hidden"
+                    onChange={e => { const f = e.target.files?.[0]; if (f) handleAdditionalDocsSubmit(f); }} />
+                  {additionalDocsError && <p className="text-xs" style={{ color: "#f87171" }}>{additionalDocsError}</p>}
+                </div>
+              </div>
+            )}
+
+            {/* ── OFFER LETTER PENDING — Final Payment ── */}
+            {submission.status === "offer_letter_pending" && (
+              <div className="mt-6">
+                <PaymentPage submission={submission} onUpdated={fetchSubmission} paymentType="final" />
+              </div>
+            )}
+
+            {/* ── FINAL PAYMENT RECEIVED — Awaiting confirmation ── */}
+            {submission.status === "final_payment_received" && (
+              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(96,165,250,0.2)" }}>
+                <div className="px-6 py-5 flex items-center gap-3 border-b" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
+                  <span className="text-xl">⏳</span>
+                  <div>
+                    <h3 className="text-base font-semibold" style={{ color: "#60a5fa" }}>Confirming Your Final Payment</h3>
+                    <p className="text-xs mt-0.5" style={{ color: "rgba(96,165,250,0.55)" }}>Our consultant will confirm your payment shortly</p>
+                  </div>
+                </div>
+                <div className="px-6 py-5">
+                  <div className="rounded-xl px-4 py-3 border text-sm" style={{ background: "rgba(96,165,250,0.04)", borderColor: "rgba(96,165,250,0.14)", color: "rgba(96,165,250,0.65)", lineHeight: 1.6 }}>
+                    Your payment receipt has been received and is being reviewed by our team. Once confirmed, your official offer letter will be available to download from this portal.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── FINAL PAYMENT CONFIRMED — Download Offer Letter ── */}
+            {submission.status === "final_payment_confirmed" && (() => {
+              const offerDoc = submission.documents.find(d => d.documentType === "offer_letter");
+              return (
+                <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(74,222,128,0.25)" }}>
+                  <div className="px-6 py-5 border-b text-center" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
+                    <div className="text-5xl mb-3">🎉</div>
+                    <h3 className="text-xl font-bold mb-1" style={{ color: "#4ade80" }}>Congratulations!</h3>
+                    <p className="text-sm" style={{ color: "rgba(74,222,128,0.6)" }}>Your final payment has been confirmed. Your offer letter is ready.</p>
+                  </div>
+                  <div className="px-6 py-5">
+                    {offerDoc ? (
+                      <a
+                        href={`${getApiBase()}/api/student/submissions/${submission.id}/documents/${offerDoc.id}/download`}
+                        download={offerDoc.fileName}
+                        className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
+                        style={{ background: "rgba(74,222,128,0.08)", borderColor: "rgba(74,222,128,0.3)", color: "#4ade80" }}>
+                        <span>📄</span> Download Offer Letter
+                      </a>
+                    ) : (
+                      <p className="text-center text-sm" style={{ color: "rgba(74,222,128,0.45)" }}>Offer letter not yet available. Please contact your consultant.</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* ── UNIVERSITY INTERVIEW COMPLETED ── */}
             {submission.status === "university_interview_completed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
@@ -418,7 +552,7 @@ export default function Portal() {
             )}
 
             {/* ── TIMELINE ── */}
-            {showTimeline && ["acknowledged","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed"].includes(submission.status) && (
+            {showTimeline && ["acknowledged","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(submission.status) && (
               <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.12)" }}>
                 <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                   <h3 className="text-base font-semibold" style={{ color: GOLD }}>Application Progress</h3>
@@ -455,7 +589,7 @@ export default function Portal() {
             )}
 
             {/* ── Details card (non-payment / non-doc / non-interview statuses) ── */}
-            {!["payment_pending","payment_received","acknowledged","docs_requested","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed"].includes(submission.status) && (
+            {!["payment_pending","payment_received","acknowledged","docs_requested","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(submission.status) && (
               <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.1)" }}>
                 <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                   <h3 className="text-sm font-semibold" style={{ color: GOLD }}>Application Details</h3>

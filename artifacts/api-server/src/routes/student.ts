@@ -4,7 +4,7 @@ import { getAuth } from "@clerk/express";
 import { db } from "@workspace/db";
 import { studentSubmissionsTable, studentDocumentsTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
-import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail } from "../email";
+import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail, sendAdditionalDocsSubmittedEmail, sendFinalReceiptEmail } from "../email";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 
 const router = Router();
@@ -172,6 +172,55 @@ router.post("/student/submissions/:id/receipt", requireStudentAuth, async (req: 
   } catch { res.status(500).json({ error: "Failed to upload receipt" }); }
 });
 
+// Student submits additional documents (when additionalDocsRequested is true)
+router.post("/student/submissions/:id/additional-docs", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+    if (!submission.additionalDocsRequested) return res.status(400).json({ error: "No additional documents have been requested" });
+    const { fileName, fileUrl, fileSize, mimeType, note } = req.body;
+    if (!fileName || !fileUrl) return res.status(400).json({ error: "fileName and fileUrl are required" });
+    const [doc] = await db.insert(studentDocumentsTable)
+      .values({ submissionId, documentType: "additional_doc", fileName, fileUrl, fileSize, mimeType }).returning();
+    await db.update(studentSubmissionsTable)
+      .set({ additionalDocsRequested: false, additionalDocsRequestNote: null })
+      .where(eq(studentSubmissionsTable.id, submissionId));
+    sendAdditionalDocsSubmittedEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, note: note || undefined, fileName, submissionId }).catch(() => {});
+    res.json(doc);
+  } catch { res.status(500).json({ error: "Failed to submit additional docs" }); }
+});
+
+// Student downloads a document (gated: offer_letter requires final_payment_confirmed)
+router.get("/student/submissions/:id/documents/:docId/download", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const docId = parseInt(req.params.docId);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+    if (!submission) return res.status(403).json({ error: "Forbidden" });
+    const [doc] = await db.select().from(studentDocumentsTable)
+      .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId))).limit(1);
+    if (!doc) return res.status(404).json({ error: "Document not found" });
+    if (doc.documentType === "offer_letter" && submission.status !== "final_payment_confirmed") {
+      return res.status(403).json({ error: "Final payment must be confirmed before downloading the offer letter" });
+    }
+    const { Readable } = await import("stream");
+    const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
+    const response = await objectStorageService.downloadObject(objectFile, 0);
+    res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(doc.fileName)}"`);
+    response.headers.forEach((value: string, key: string) => {
+      if (key.toLowerCase() !== "content-disposition") res.setHeader(key, value);
+    });
+    res.status(response.status);
+    if (response.body) { Readable.fromWeb(response.body as ReadableStream<Uint8Array>).pipe(res); } else { res.end(); }
+  } catch (err) {
+    if ((err as any)?.constructor?.name === "ObjectNotFoundError") return res.status(404).json({ error: "File not found" });
+    res.status(500).json({ error: "Failed to download document" });
+  }
+});
+
 router.post("/student/submissions/:id/receipt2", requireStudentAuth, async (req: any, res) => {
   try {
     const submissionId = parseInt(req.params.id);
@@ -188,6 +237,24 @@ router.post("/student/submissions/:id/receipt2", requireStudentAuth, async (req:
     sendSecondReceiptUploadEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, receiptFileName: fileName, submissionId }).catch(() => {});
     res.json(doc);
   } catch { res.status(500).json({ error: "Failed to upload 2nd receipt" }); }
+});
+
+router.post("/student/submissions/:id/receipt3", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+    if (submission.status !== "offer_letter_pending") return res.status(400).json({ error: "Submission is not awaiting final payment" });
+    const { fileName, fileUrl, fileSize, mimeType } = req.body;
+    await db.delete(studentDocumentsTable)
+      .where(and(eq(studentDocumentsTable.submissionId, submissionId), eq(studentDocumentsTable.documentType, "final_payment_receipt")));
+    const [doc] = await db.insert(studentDocumentsTable)
+      .values({ submissionId, documentType: "final_payment_receipt", fileName, fileUrl, fileSize, mimeType }).returning();
+    await db.update(studentSubmissionsTable).set({ status: "final_payment_received" }).where(eq(studentSubmissionsTable.id, submissionId));
+    sendFinalReceiptEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, receiptFileName: fileName, submissionId }).catch(() => {});
+    res.json(doc);
+  } catch { res.status(500).json({ error: "Failed to upload final payment receipt" }); }
 });
 
 export default router;

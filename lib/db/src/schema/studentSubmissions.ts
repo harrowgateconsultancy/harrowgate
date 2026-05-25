@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -16,6 +16,8 @@ export const studentSubmissionsTable = pgTable("student_submissions", {
   uniInterviewLink: text("uni_interview_link"),
   uniInterviewDateTime: text("uni_interview_date_time"),
   uniInterviewPlatform: text("uni_interview_platform"),
+  additionalDocsRequested: boolean("additional_docs_requested").default(false),
+  additionalDocsRequestNote: text("additional_docs_request_note"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
