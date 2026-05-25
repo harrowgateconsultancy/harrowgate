@@ -7,7 +7,7 @@ import {
 } from "@workspace/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
-import { sendApprovalEmail, sendDocsRequestedEmail } from "../email";
+import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail } from "../email";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -140,6 +140,28 @@ router.post("/admin/student-submissions/:id/documents", async (req: any, res) =>
     const [doc] = await db.insert(studentDocumentsTable).values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType }).returning();
     res.status(201).json(doc);
   } catch { res.status(500).json({ error: "Failed to attach document" }); }
+});
+
+// Send mock interview invite to student
+router.post("/admin/student-submissions/:id/send-interview-invite", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { zoomLink, dateTime, notes } = req.body;
+    if (!zoomLink || !dateTime) return res.status(400).json({ error: "zoomLink and dateTime are required" });
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    if (!submission.email) return res.status(400).json({ error: "Student has no email on record" });
+    const refCode = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
+    await sendInterviewInviteEmail({
+      name: submission.name,
+      studentEmail: submission.email,
+      zoomLink,
+      dateTime,
+      refCode,
+      notes,
+    });
+    res.json({ success: true });
+  } catch { res.status(500).json({ error: "Failed to send interview invite" }); }
 });
 
 // Admin deletes a document

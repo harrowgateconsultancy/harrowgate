@@ -31,6 +31,7 @@ export default function Portal() {
   const { signOut } = useClerk();
   const [submission, setSubmission] = useState<Submission | null | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const [showTimeline, setShowTimeline] = useState(false);
 
   const fetchSubmission = async () => {
     try {
@@ -157,19 +158,68 @@ export default function Portal() {
             )}
 
             {/* ── ACKNOWLEDGED ── */}
-            {submission.status === "acknowledged" && (
+            {submission.status === "acknowledged" && !showTimeline && (
               <div className="mt-6 rounded-2xl p-8 text-center border" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
                 <div className="text-5xl mb-4">✅</div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>Payment Received</h3>
                 <p className="text-sm mb-6" style={{ color: "rgba(74,222,128,0.65)" }}>
                   Your payment has been confirmed and your application is now being fully processed. Our team will be in touch shortly.
                 </p>
-                <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border" style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)" }}>
+                <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border mb-6" style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)" }}>
                   <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(74,222,128,0.5)" }}>Your Acknowledgement Code</p>
                   <p className="text-3xl font-bold tracking-widest font-mono" style={{ color: "#4ade80" }}>
                     STU{submission.passportNumber.slice(-4).toUpperCase()}
                   </p>
                   <p className="text-xs mt-1" style={{ color: "rgba(74,222,128,0.4)" }}>Keep this code for your records</p>
+                </div>
+                <button onClick={() => setShowTimeline(true)}
+                  className="px-8 py-3 rounded-full text-sm font-semibold border transition-all hover:opacity-80"
+                  style={{ borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
+                  Close
+                </button>
+              </div>
+            )}
+
+            {/* ── TIMELINE (after Close) ── */}
+            {submission.status === "acknowledged" && showTimeline && (
+              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.12)" }}>
+                <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+                  <h3 className="text-base font-semibold" style={{ color: GOLD }}>Application Progress</h3>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>
+                    Reference: <span className="font-mono font-semibold">STU{submission.passportNumber.slice(-4).toUpperCase()}</span>
+                  </p>
+                </div>
+                <div className="px-6 py-6">
+                  {[
+                    { icon: "✅", label: "Application Submitted",        done: true,    note: new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) },
+                    { icon: "✅", label: "Documents Reviewed",            done: true,    note: "Approved by HARROWGATE consultant" },
+                    { icon: "✅", label: "Payment Confirmed",             done: true,    note: `Acknowledgement code: STU${submission.passportNumber.slice(-4).toUpperCase()}` },
+                    { icon: "🔄", label: "Awaiting Interview Arrangement", done: false,   note: "Our team will contact you to schedule your mock interview", current: true },
+                    { icon: "⬜", label: "Mock Interview",                 done: false,   note: "To be scheduled" },
+                    { icon: "⬜", label: "Visa Application Submitted",     done: false,   note: "Final step" },
+                  ].map((step, i, arr) => (
+                    <div key={step.label} className="flex gap-4" style={{ marginBottom: i < arr.length - 1 ? "0" : "0" }}>
+                      <div className="flex flex-col items-center">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 font-bold"
+                          style={{
+                            background: step.done ? "rgba(74,222,128,0.12)" : step.current ? "rgba(162,137,89,0.1)" : "rgba(162,137,89,0.05)",
+                            border: `1.5px solid ${step.done ? "rgba(74,222,128,0.3)" : step.current ? "rgba(162,137,89,0.25)" : "rgba(162,137,89,0.1)"}`,
+                          }}>
+                          {step.icon}
+                        </div>
+                        {i < arr.length - 1 && (
+                          <div className="w-px flex-1 my-1" style={{ background: step.done ? "rgba(74,222,128,0.2)" : "rgba(162,137,89,0.08)", minHeight: 24 }} />
+                        )}
+                      </div>
+                      <div className="pb-5 flex-1 min-w-0">
+                        <p className="text-sm font-semibold leading-tight" style={{ color: step.done ? "#4ade80" : step.current ? GOLD : "rgba(162,137,89,0.35)" }}>
+                          {step.label}
+                          {step.current && <span className="ml-2 text-xs px-2 py-0.5 rounded-full font-medium align-middle" style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>Current</span>}
+                        </p>
+                        <p className="text-xs mt-0.5" style={{ color: step.done ? "rgba(74,222,128,0.5)" : "rgba(162,137,89,0.35)" }}>{step.note}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

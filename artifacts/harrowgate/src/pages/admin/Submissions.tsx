@@ -70,6 +70,9 @@ export default function Submissions() {
   const [uploadDocType, setUploadDocType] = useState("admin_doc");
   const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
   const adminFileRef = useRef<HTMLInputElement | null>(null);
+  const [interviewForm, setInterviewForm] = useState<{ zoomLink: string; dateTime: string; notes: string } | null>(null);
+  const [sendingInvite, setSendingInvite] = useState(false);
+  const [inviteSent, setInviteSent] = useState<number | null>(null);
 
   const { data: submissions = [], isLoading } = useQuery<Submission[]>({
     queryKey: ["admin-student-submissions"],
@@ -110,6 +113,21 @@ export default function Submissions() {
       });
     },
   });
+
+  const handleSendInvite = async () => {
+    if (!selected || !interviewForm) return;
+    setSendingInvite(true);
+    try {
+      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/send-interview-invite`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(interviewForm),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setInviteSent(selected.id);
+      setInterviewForm(null);
+    } catch { alert("Failed to send interview invite. Please check the student has an email on file."); }
+    finally { setSendingInvite(false); }
+  };
 
   const handleAdminUpload = async (file: File) => {
     if (!selected) return;
@@ -184,11 +202,11 @@ export default function Submissions() {
             const sc = statusConfig[s.status] || { label: s.status, color: GOLD, bg: "rgba(162,137,89,0.12)" };
             const hasAction = (nextActions[s.status]?.length ?? 0) > 0;
             const docCount = s.documents.filter(d => !d.documentType.startsWith("admin_") && d.documentType !== "payment_receipt").length;
-            const hasReceipt = s.documents.some(d => d.documentType === "payment_receipt");
+            const receiptDoc = s.documents.find(d => d.documentType === "payment_receipt");
             return (
               <div key={s.id} className="rounded-2xl border transition-all cursor-pointer"
                 style={{ background: "rgba(0,0,0,0.2)", borderColor: hasAction ? "rgba(251,146,60,0.28)" : "rgba(162,137,89,0.12)" }}
-                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setPreviewDoc(null); }}>
+                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); }}>
                 <div className="px-6 py-5 flex items-center gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1">
@@ -200,10 +218,19 @@ export default function Submissions() {
                       <span>DOB: {s.dateOfBirth}</span>
                       <span>Passport: {s.passportNumber}</span>
                       <span>{docCount} doc{docCount !== 1 ? "s" : ""}</span>
-                      {hasReceipt && <span style={{ color: "#60a5fa" }}>💳 Receipt</span>}
                       <span>{new Date(s.createdAt).toLocaleDateString("en-GB")}</span>
                     </div>
                   </div>
+                  {receiptDoc && (
+                    <a
+                      href={`${getApiBase()}/api/admin/student-submissions/${s.id}/documents/${receiptDoc.id}/view`}
+                      target="_blank" rel="noopener noreferrer"
+                      onClick={e => e.stopPropagation()}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shrink-0 transition-all hover:opacity-80"
+                      style={{ borderColor: "rgba(96,165,250,0.3)", color: "#60a5fa", background: "rgba(96,165,250,0.06)" }}>
+                      💳 Receipt ↗
+                    </a>
+                  )}
                   <span className="px-3 py-1 rounded-full text-xs font-semibold shrink-0" style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
                   <span style={{ color: "rgba(162,137,89,0.25)" }}>›</span>
                 </div>
@@ -361,6 +388,66 @@ export default function Submissions() {
                         {updateStatus.isPending ? "Updating…" : action.label}
                       </button>
                     ))}
+                  </div>
+                )}
+
+                {/* Mock Interview */}
+                {["payment_received", "acknowledged"].includes(selected.status) && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(96,165,250,0.18)" }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#60a5fa" }}>🎥 Mock Interview</p>
+                      {inviteSent === selected.id && (
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>✓ Invite sent</span>
+                      )}
+                    </div>
+                    <div className="px-4 py-4">
+                      {!interviewForm ? (
+                        <button onClick={() => setInterviewForm({ zoomLink: "", dateTime: "", notes: "" })}
+                          className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
+                          style={{ background: "rgba(96,165,250,0.06)", borderColor: "rgba(96,165,250,0.22)", color: "#60a5fa" }}>
+                          🎥 Schedule Mock Interview
+                        </button>
+                      ) : (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(96,165,250,0.6)" }}>Zoom Meeting Link *</label>
+                            <input type="url" placeholder="https://zoom.us/j/..."
+                              value={interviewForm.zoomLink}
+                              onChange={e => setInterviewForm(f => f ? { ...f, zoomLink: e.target.value } : f)}
+                              className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
+                              style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa" }} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(96,165,250,0.6)" }}>Date &amp; Time *</label>
+                            <input type="text" placeholder="e.g. Thursday, 29 May 2026 at 2:00 PM HKT"
+                              value={interviewForm.dateTime}
+                              onChange={e => setInterviewForm(f => f ? { ...f, dateTime: e.target.value } : f)}
+                              className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
+                              style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa" }} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(96,165,250,0.6)" }}>Additional Notes (optional)</label>
+                            <textarea rows={2} placeholder="Any instructions for the student…"
+                              value={interviewForm.notes}
+                              onChange={e => setInterviewForm(f => f ? { ...f, notes: e.target.value } : f)}
+                              className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
+                              style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa" }} />
+                          </div>
+                          <div className="flex gap-2">
+                            <button onClick={handleSendInvite} disabled={sendingInvite || !interviewForm.zoomLink || !interviewForm.dateTime}
+                              className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                              style={{ background: "rgba(96,165,250,0.1)", borderColor: "rgba(96,165,250,0.3)", color: "#60a5fa" }}>
+                              {sendingInvite ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin" style={{ borderColor: "#60a5fa", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Zoom Invite"}
+                            </button>
+                            <button onClick={() => setInterviewForm(null)}
+                              className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
+                              style={{ borderColor: "rgba(162,137,89,0.15)", color: "rgba(162,137,89,0.4)" }}>
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
