@@ -261,9 +261,13 @@ export default function Submissions() {
             const hasAction = (nextActions[s.status]?.length ?? 0) > 0;
             const docCount = s.documents.filter(d => !d.documentType.startsWith("admin_") && d.documentType !== "payment_receipt").length;
             const receiptDoc = s.documents.find(d => d.documentType === "payment_receipt");
+            const isDone = s.status === "university_interview_completed";
             return (
               <div key={s.id} className="rounded-2xl border transition-all cursor-pointer"
-                style={{ background: "rgba(0,0,0,0.2)", borderColor: hasAction ? "rgba(251,146,60,0.28)" : "rgba(162,137,89,0.12)" }}
+                style={{
+                  background: isDone ? "rgba(134,239,172,0.08)" : "rgba(0,0,0,0.2)",
+                  borderColor: isDone ? "rgba(134,239,172,0.35)" : hasAction ? "rgba(251,146,60,0.28)" : "rgba(162,137,89,0.12)",
+                }}
                 onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); }}>
                 <div className="px-6 py-5 flex items-center gap-4">
                   <div className="flex-1 min-w-0">
