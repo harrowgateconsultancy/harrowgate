@@ -28,7 +28,7 @@ export async function sendNewApplicationEmail(opts: {
     await transport.sendMail({
       from: `"HARROWGATE Portal" <${process.env.GMAIL_USER}>`,
       to: NOTIFY_TO,
-      subject: `New Student Application — ${opts.name}`,
+      subject: `Student Application Submission - Website — ${opts.name}`,
       html: `
         <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0f2d18;border-radius:12px;overflow:hidden">
           <div style="background:#0a2010;padding:24px 32px;text-align:center;border-bottom:1px solid rgba(162,137,89,0.2)">
@@ -80,7 +80,7 @@ export async function sendReceiptUploadEmail(opts: {
     await transport.sendMail({
       from: `"HARROWGATE Portal" <${process.env.GMAIL_USER}>`,
       to: NOTIFY_TO,
-      subject: `Payment Receipt Uploaded — ${opts.name}`,
+      subject: `Student Application Submission - Website (Payment Receipt) — ${opts.name}`,
       html: `
         <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0f2d18;border-radius:12px;overflow:hidden">
           <div style="background:#0a2010;padding:24px 32px;text-align:center;border-bottom:1px solid rgba(162,137,89,0.2)">
