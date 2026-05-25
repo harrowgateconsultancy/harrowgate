@@ -1,5 +1,5 @@
 import { useListApplications } from "@workspace/api-client-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
@@ -30,6 +30,7 @@ const APP_TYPE_LABELS: Record<string, string> = {
 
 export default function Applications() {
   const [statusFilter, setStatusFilter] = useState("");
+  const [, navigate] = useLocation();
   const { data: applications, isLoading } = useListApplications(
     statusFilter ? { status: statusFilter } : {},
     { query: { queryKey: ["/api/applications", statusFilter] } }
@@ -92,11 +93,14 @@ export default function Applications() {
             </thead>
             <tbody className="divide-y divide-border">
               {applications.map(app => (
-                <tr key={app.id} className="hover:bg-accent transition-colors cursor-pointer" data-testid={`row-application-${app.id}`}>
-                  <td className="px-5 py-3.5">
-                    <Link href={`/applications/${app.id}`} className="font-medium text-foreground hover:text-primary">
-                      {app.clientName ?? "Unknown"}
-                    </Link>
+                <tr
+                  key={app.id}
+                  className="hover:bg-accent transition-colors cursor-pointer"
+                  data-testid={`row-application-${app.id}`}
+                  onClick={() => navigate(`/applications/${app.id}`)}
+                >
+                  <td className="px-5 py-3.5 font-medium text-foreground">
+                    {app.clientName ?? "Unknown"}
                   </td>
                   <td className="px-5 py-3.5 text-muted-foreground hidden sm:table-cell">
                     {app.applicationType ? APP_TYPE_LABELS[app.applicationType] || app.applicationType : "—"}
