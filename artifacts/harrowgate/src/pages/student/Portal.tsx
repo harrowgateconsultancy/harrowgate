@@ -155,6 +155,31 @@ export default function Portal() {
     } finally { setCompletingUni(false); }
   };
 
+  const handleOfferLetterView = async (submissionId: number, docId: number) => {
+    try {
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/view`, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to load file");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch { alert("Could not open the file. Please try again."); }
+  };
+
+  const handleOfferLetterDownload = async (submissionId: number, docId: number, fileName: string) => {
+    try {
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/download`, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to download file");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = fileName;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch { alert("Could not download the file. Please try again."); }
+  };
+
   const handleAdditionalDocsSubmit = async (file: File) => {
     if (!submission) return;
     setUploadingAdditionalDocs(true); setAdditionalDocsError(null);
@@ -504,21 +529,18 @@ export default function Portal() {
                   <div className="px-6 py-5">
                     {offerDoc ? (
                       <div className="flex gap-3">
-                        <a
-                          href={`${getApiBase()}/api/student/submissions/${submission.id}/documents/${offerDoc.id}/view`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => handleOfferLetterView(submission.id, offerDoc.id)}
                           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                           style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)", color: "#4ade80" }}>
                           <span>👁</span> View
-                        </a>
-                        <a
-                          href={`${getApiBase()}/api/student/submissions/${submission.id}/documents/${offerDoc.id}/download`}
-                          download={offerDoc.fileName}
+                        </button>
+                        <button
+                          onClick={() => handleOfferLetterDownload(submission.id, offerDoc.id, offerDoc.fileName)}
                           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                           style={{ background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.35)", color: "#4ade80" }}>
                           <span>📄</span> Download
-                        </a>
+                        </button>
                       </div>
                     ) : (
                       <p className="text-center text-sm" style={{ color: "rgba(74,222,128,0.45)" }}>Offer letter not yet available. Please contact your consultant.</p>
