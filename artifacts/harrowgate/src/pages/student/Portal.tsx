@@ -134,6 +134,14 @@ export default function Portal() {
   const [uploadingAdditionalDocs, setUploadingAdditionalDocs] = useState(false);
   const [additionalDocsError, setAdditionalDocsError] = useState<string | null>(null);
   const additionalDocsRef = useRef<HTMLInputElement | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [showMessages, setShowMessages] = useState(false);
+  const [replyBody, setReplyBody] = useState("");
+  const [replyAttachments, setReplyAttachments] = useState<Array<{fileName: string; fileUrl: string; mimeType?: string}>>([]);
+  const [sendingReply, setSendingReply] = useState(false);
+  const [uploadingReplyAttachment, setUploadingReplyAttachment] = useState(false);
+  const [replyError, setReplyError] = useState<string | null>(null);
+  const replyAttachmentRef = useRef<HTMLInputElement | null>(null);
 
   const authHeaders = async (): Promise<HeadersInit> => {
     const token = await session?.getToken();
@@ -155,6 +163,51 @@ export default function Portal() {
   };
 
   useEffect(() => { if (isLoaded && session) fetchSubmission(); }, [isLoaded, session]);
+
+  const fetchMessages = async (id: number) => {
+    try {
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${id}/messages`, {
+        credentials: "include", headers: await authHeaders(),
+      });
+      if (res.ok) setMessages(await res.json());
+    } catch { /* silent */ }
+  };
+
+  useEffect(() => {
+    if (submission?.id) fetchMessages(submission.id);
+  }, [submission?.id]);
+
+  const handleReplyAttachment = async (file: File) => {
+    setUploadingReplyAttachment(true);
+    try {
+      const { url } = await uploadToStorage(file);
+      setReplyAttachments(a => [...a, { fileName: file.name, fileUrl: url, mimeType: file.type }]);
+    } catch { setReplyError("Attachment upload failed. Please try again."); }
+    finally { setUploadingReplyAttachment(false); if (replyAttachmentRef.current) replyAttachmentRef.current.value = ""; }
+  };
+
+  const handleSendReply = async () => {
+    if (!submission) return;
+    if (!replyBody.trim() && replyAttachments.length === 0) {
+      setReplyError("Please write a message or attach a file.");
+      return;
+    }
+    setSendingReply(true);
+    setReplyError(null);
+    try {
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/messages/reply`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+        body: JSON.stringify({ body: replyBody.trim(), attachments: replyAttachments }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setReplyBody("");
+      setReplyAttachments([]);
+      fetchMessages(submission.id);
+    } catch { setReplyError("Failed to send. Please try again."); }
+    finally { setSendingReply(false); }
+  };
 
   const handleCompleteUni = async () => {
     if (!submission) return;
@@ -232,7 +285,7 @@ export default function Portal() {
         <div className="flex items-center gap-4">
           <button onClick={() => signOut({ redirectUrl: BASE || "/" })}
             className="text-sm transition-opacity hover:opacity-70" style={{ color: "rgba(162,137,89,0.5)" }}>←</button>
-          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-10 object-contain" />
+          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-14 object-contain" />
         </div>
         <div className="flex items-center gap-4">
           <span className="text-xs hidden sm:block" style={{ color: "rgba(162,137,89,0.5)" }}>
@@ -664,6 +717,115 @@ export default function Portal() {
                     })}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* ── MESSAGES ── */}
+            {(messages.length > 0 || true) && (
+              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(96,165,250,0.18)" }}>
+                <button
+                  className="w-full px-6 py-4 flex items-center justify-between text-left"
+                  onClick={() => setShowMessages(v => !v)}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-base font-semibold" style={{ color: "#60a5fa" }}>✉️ Messages</span>
+                    {messages.filter(m => m.fromAdmin && !m.isRead).length > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "rgba(96,165,250,0.18)", color: "#60a5fa" }}>
+                        {messages.filter(m => m.fromAdmin && !m.isRead).length} new
+                      </span>
+                    )}
+                    {messages.length === 0 && (
+                      <span className="text-xs" style={{ color: "rgba(96,165,250,0.4)" }}>No messages yet</span>
+                    )}
+                  </div>
+                  <span style={{ color: "rgba(96,165,250,0.4)", fontSize: 18 }}>{showMessages ? "▲" : "▼"}</span>
+                </button>
+
+                {showMessages && (
+                  <div className="border-t" style={{ borderColor: "rgba(96,165,250,0.1)" }}>
+                    <div className="px-5 py-4 space-y-3">
+                      {messages.length === 0 && (
+                        <p className="text-sm text-center py-4" style={{ color: "rgba(96,165,250,0.4)" }}>
+                          No messages yet. Your consultant will contact you here.
+                        </p>
+                      )}
+
+                      {messages.map(msg => (
+                        <div key={msg.id}
+                          className={`rounded-xl px-4 py-3 border text-sm ${msg.fromAdmin ? "" : "ml-6"}`}
+                          style={{
+                            background: msg.fromAdmin ? "rgba(96,165,250,0.06)" : "rgba(74,222,128,0.06)",
+                            borderColor: msg.fromAdmin ? "rgba(96,165,250,0.2)" : "rgba(74,222,128,0.2)",
+                          }}>
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-semibold text-xs" style={{ color: msg.fromAdmin ? "#60a5fa" : "#4ade80" }}>
+                                {msg.fromAdmin ? "HARROWGATE Consultancy" : "You"}
+                              </span>
+                              {msg.fromAdmin && msg.subject && (
+                                <span className="text-xs font-medium opacity-70" style={{ color: "#60a5fa" }}>— {msg.subject}</span>
+                              )}
+                            </div>
+                            <span className="text-xs shrink-0 opacity-40" style={{ color: msg.fromAdmin ? "#60a5fa" : "#4ade80" }}>
+                              {new Date(msg.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} {new Date(msg.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                            </span>
+                          </div>
+                          {msg.body && (
+                            <p className="text-sm leading-relaxed" style={{ color: msg.fromAdmin ? "rgba(96,165,250,0.85)" : "rgba(74,222,128,0.85)", whiteSpace: "pre-wrap" }}>{msg.body}</p>
+                          )}
+                          {msg.attachments?.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              {msg.attachments.map((att: any, i: number) => (
+                                <a key={i} href={`${getApiBase()}/api/storage/objects/${att.fileUrl}`} target="_blank" rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium hover:opacity-80 transition-opacity"
+                                  style={{ borderColor: "rgba(96,165,250,0.25)", color: "#60a5fa", background: "rgba(96,165,250,0.05)" }}>
+                                  📎 {att.fileName}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+
+                      {/* Reply area */}
+                      <div className="pt-2 border-t space-y-2" style={{ borderColor: "rgba(96,165,250,0.1)" }}>
+                        <p className="text-xs font-medium" style={{ color: "rgba(96,165,250,0.55)" }}>Reply to your consultant</p>
+                        <textarea rows={3} placeholder="Type your reply…"
+                          value={replyBody}
+                          onChange={e => setReplyBody(e.target.value)}
+                          className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
+                          style={{ background: "rgba(96,165,250,0.04)", borderColor: "rgba(96,165,250,0.18)", color: "#60a5fa" }} />
+                        {replyAttachments.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {replyAttachments.map((att, i) => (
+                              <div key={i} className="flex items-center gap-1 px-2 py-1 rounded-lg border text-xs"
+                                style={{ borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa", background: "rgba(96,165,250,0.05)" }}>
+                                📎 {att.fileName}
+                                <button onClick={() => setReplyAttachments(a => a.filter((_, j) => j !== i))}
+                                  className="ml-1 hover:opacity-70" style={{ color: "#f87171" }}>✕</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {replyError && <p className="text-xs" style={{ color: "#f87171" }}>{replyError}</p>}
+                        <div className="flex gap-2">
+                          <button onClick={handleSendReply} disabled={sendingReply || (!replyBody.trim() && replyAttachments.length === 0)}
+                            className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                            style={{ background: "rgba(96,165,250,0.1)", borderColor: "rgba(96,165,250,0.3)", color: "#60a5fa" }}>
+                            {sendingReply ? <><span className="w-3 h-3 rounded-full border animate-spin inline-block" style={{ borderColor: "#60a5fa", borderTopColor: "transparent" }} /> Sending…</> : "Send Reply"}
+                          </button>
+                          <button onClick={() => replyAttachmentRef.current?.click()} disabled={uploadingReplyAttachment}
+                            className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70 disabled:opacity-40"
+                            style={{ borderColor: "rgba(96,165,250,0.18)", color: "#60a5fa" }}>
+                            {uploadingReplyAttachment ? "…" : "📎 Attach"}
+                          </button>
+                        </div>
+                        <input ref={replyAttachmentRef} type="file" className="hidden"
+                          onChange={e => { const f = e.target.files?.[0]; if (f) handleReplyAttachment(f); }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </>

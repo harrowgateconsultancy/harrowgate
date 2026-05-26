@@ -4,10 +4,11 @@ import { db } from "@workspace/db";
 import {
   studentSubmissionsTable,
   studentDocumentsTable,
+  studentMessagesTable,
 } from "@workspace/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
-import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail } from "../email";
+import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail } from "../email";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -261,6 +262,47 @@ router.delete("/admin/student-submissions/:id/documents/:docId", async (req: any
     await db.delete(studentDocumentsTable).where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId)));
     res.json({ success: true });
   } catch { res.status(500).json({ error: "Failed to delete document" }); }
+});
+
+// Admin sends a message to a student
+router.post("/admin/student-submissions/:id/messages", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const { subject, body, attachments } = req.body;
+    if (!body?.trim()) return res.status(400).json({ error: "Message body required" });
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, submissionId)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+    const [msg] = await db.insert(studentMessagesTable).values({
+      submissionId,
+      fromAdmin: true,
+      subject: subject?.trim() || "Message from HARROWGATE",
+      body: body.trim(),
+      attachments: attachments || [],
+      isRead: false,
+    }).returning();
+    const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
+    if (submission.email) {
+      sendCustomMessageToStudentEmail({
+        name: submission.name,
+        studentEmail: submission.email,
+        subject: msg.subject || "Message from HARROWGATE",
+        body: body.trim(),
+        portalUrl,
+      }).catch(() => {});
+    }
+    res.json(msg);
+  } catch { res.status(500).json({ error: "Failed to send message" }); }
+});
+
+// Admin lists messages for a submission
+router.get("/admin/student-submissions/:id/messages", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const messages = await db.select().from(studentMessagesTable)
+      .where(eq(studentMessagesTable.submissionId, submissionId))
+      .orderBy(studentMessagesTable.createdAt);
+    res.json(messages);
+  } catch { res.status(500).json({ error: "Failed to fetch messages" }); }
 });
 
 export default router;

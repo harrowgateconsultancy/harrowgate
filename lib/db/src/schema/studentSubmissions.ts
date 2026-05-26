@@ -42,7 +42,19 @@ export const id995aFormsTable = pgTable("id995a_forms", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
+export const studentMessagesTable = pgTable("student_messages", {
+  id: serial("id").primaryKey(),
+  submissionId: integer("submission_id").notNull().references(() => studentSubmissionsTable.id, { onDelete: "cascade" }),
+  fromAdmin: boolean("from_admin").notNull().default(true),
+  subject: text("subject"),
+  body: text("body").notNull(),
+  attachments: jsonb("attachments").$type<Array<{ fileName: string; fileUrl: string; mimeType?: string }>>().default([]),
+  isRead: boolean("is_read").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type Id995aForm = typeof id995aFormsTable.$inferSelect;
+export type StudentMessage = typeof studentMessagesTable.$inferSelect;
 
 export const insertStudentSubmissionSchema = createInsertSchema(studentSubmissionsTable).omit({
   id: true, createdAt: true, updatedAt: true, status: true, adminNotes: true,

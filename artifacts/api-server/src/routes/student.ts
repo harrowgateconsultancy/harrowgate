@@ -2,9 +2,9 @@ import { Router } from "express";
 import { Readable } from "stream";
 import { getAuth } from "@clerk/express";
 import { db } from "@workspace/db";
-import { studentSubmissionsTable, studentDocumentsTable } from "@workspace/db/schema";
+import { studentSubmissionsTable, studentDocumentsTable, studentMessagesTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
-import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail, sendAdditionalDocsSubmittedEmail, sendFinalReceiptEmail } from "../email";
+import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail, sendAdditionalDocsSubmittedEmail, sendFinalReceiptEmail, sendStudentReplyNotificationEmail } from "../email";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 
 const router = Router();
@@ -304,6 +304,54 @@ router.post("/student/submissions/:id/receipt3", requireStudentAuth, async (req:
     sendFinalReceiptEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, receiptFileName: fileName, submissionId }).catch(() => {});
     res.json(doc);
   } catch { res.status(500).json({ error: "Failed to upload final payment receipt" }); }
+});
+
+// Student: get messages for their submission
+router.get("/student/submissions/:id/messages", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    // Mark unread admin messages as read
+    await db.update(studentMessagesTable)
+      .set({ isRead: true })
+      .where(and(eq(studentMessagesTable.submissionId, submissionId), eq(studentMessagesTable.fromAdmin, true), eq(studentMessagesTable.isRead, false)));
+    const messages = await db.select().from(studentMessagesTable)
+      .where(eq(studentMessagesTable.submissionId, submissionId))
+      .orderBy(studentMessagesTable.createdAt);
+    res.json(messages);
+  } catch { res.status(500).json({ error: "Failed to fetch messages" }); }
+});
+
+// Student: reply to a message
+router.post("/student/submissions/:id/messages/reply", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    const { body, attachments, subject } = req.body;
+    if (!body?.trim() && (!attachments || attachments.length === 0)) {
+      return res.status(400).json({ error: "Message or attachment required" });
+    }
+    const [msg] = await db.insert(studentMessagesTable).values({
+      submissionId,
+      fromAdmin: false,
+      subject: subject || "Student Reply",
+      body: body?.trim() || "",
+      attachments: attachments || [],
+      isRead: false,
+    }).returning();
+    sendStudentReplyNotificationEmail({
+      name: submission.name,
+      email: submission.email,
+      subject: msg.subject || "Student Reply",
+      body: body?.trim() || "(see attachment)",
+      submissionId,
+    }).catch(() => {});
+    res.json(msg);
+  } catch { res.status(500).json({ error: "Failed to send reply" }); }
 });
 
 export default router;

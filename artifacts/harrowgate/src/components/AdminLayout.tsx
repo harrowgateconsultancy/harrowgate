@@ -23,14 +23,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border">
-          <div className="flex items-center justify-center w-8 h-8 rounded bg-sidebar-primary">
-            <span className="text-sidebar-primary-foreground font-bold text-sm">H</span>
-          </div>
-          <div>
-            <div className="text-sidebar-foreground font-bold tracking-widest text-sm uppercase">Harrowgate</div>
-            <div className="text-sidebar-foreground/50 text-[10px] tracking-wider uppercase">Admin Portal</div>
-          </div>
+        <div className="flex flex-col items-center gap-1 px-6 py-6 border-b border-sidebar-border">
+          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-20 w-full object-contain" />
+          <div className="text-sidebar-foreground/50 text-[10px] tracking-wider uppercase mt-1">Admin Portal</div>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">
