@@ -9,6 +9,7 @@ import studentRouter from "./student";
 import adminSubmissionsRouter from "./adminSubmissions";
 import id995aRouter from "./id995a";
 import immigrationLettersRouter from "./immigrationLetters";
+import studentExportRouter from "./studentExport";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(studentRouter);
 router.use(adminSubmissionsRouter);
 router.use(id995aRouter);
 router.use(immigrationLettersRouter);
+router.use(studentExportRouter);
 
 export default router;

@@ -507,6 +507,24 @@ export default function Submissions() {
                     {statusConfig[selected.status].label}
                   </span>
                 )}
+                <a
+                  href={`${getApiBase()}/api/admin/student-submissions/${selected.id}/print`}
+                  target="_blank" rel="noopener noreferrer"
+                  title="Print student profile"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all hover:opacity-80"
+                  style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}
+                >
+                  🖨 Print
+                </a>
+                <a
+                  href={`${getApiBase()}/api/admin/student-submissions/${selected.id}/export-zip`}
+                  download
+                  title="Download all documents as ZIP"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all hover:opacity-80"
+                  style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}
+                >
+                  📦 Export ZIP
+                </a>
                 <button onClick={() => { setSelected(null); setPreviewDoc(null); }} className="text-2xl leading-none" style={{ color: "rgba(162,137,89,0.35)" }}>×</button>
               </div>
             </div>
