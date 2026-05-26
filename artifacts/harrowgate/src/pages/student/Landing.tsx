@@ -7,15 +7,6 @@ const GOLD = "#a28959";
 const GOLD_DIM = "rgba(162,137,89,0.7)";
 const GOLD_FAINT = "rgba(162,137,89,0.12)";
 
-const SERVICES_DESC = [
-  "We complete the official ID995A immigration form on your behalf with expert precision, eliminating errors that cause delays.",
-  "Our consultants verify your education certificates and personal documents to ensure they meet all Immigration Department requirements.",
-  "We coach you for both mock and university interviews, giving you the confidence and preparation to succeed at every stage.",
-  "Your personal portal shows every step of your application in real time — from document review to final visa confirmation.",
-  "Direct access to your consultant via WhatsApp and your portal. We're with you every step, answering questions promptly.",
-  "We liaise directly with Hong Kong universities and guide you through the offer letter and final admission stages.",
-];
-
 const SERVICE_ICONS = [
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>,
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>,
@@ -26,14 +17,6 @@ const SERVICE_ICONS = [
 ];
 
 const STEP_ICONS = ["🔐", "📋", "🔍", "🎓", "🏆"];
-const STEP_DESCS = [
-  "Register with your email or Google account in under a minute. No lengthy forms upfront.",
-  "Fill in your personal details and upload your education documents through your secure portal.",
-  "Our consultants review your submission, prepare the official ID995A form, and guide your mock interview.",
-  "We arrange and prepare you for your university interview, then liaise with the institution on your behalf.",
-  "Once accepted, your official offer letter becomes available to download directly from your portal.",
-];
-
 const STATS_VALUES = ["500+", "98%", "5+", "24h"];
 
 function LangPicker({ lang, setLang, LANG_LIST }: any) {
@@ -75,8 +58,15 @@ export default function Landing() {
   const { lang, setLang, t, isRtl } = useLang();
 
   const serviceTitles = [t("services.s1"), t("services.s2"), t("services.s3"), t("services.s4"), t("services.s5"), t("services.s6")];
-  const stepTitles = [t("how.step1"), t("how.step2"), t("how.step3"), t("how.step4"), t("how.step5")];
-  const statsLabels = [t("stats.placed"), t("stats.approval"), t("stats.years"), t("stats.response")];
+  const serviceDescs  = [t("services.d1"), t("services.d2"), t("services.d3"), t("services.d4"), t("services.d5"), t("services.d6")];
+  const stepTitles    = [t("how.step1"), t("how.step2"), t("how.step3"), t("how.step4"), t("how.step5")];
+  const stepDescs     = [t("how.d1"), t("how.d2"), t("how.d3"), t("how.d4"), t("how.d5")];
+  const statsLabels   = [t("stats.placed"), t("stats.approval"), t("stats.years"), t("stats.response")];
+  const testimonials  = [
+    { q: t("testimonials.q1"), name: "Aisha M.",    school: "The University of Hong Kong" },
+    { q: t("testimonials.q2"), name: "Daniel K.",   school: "Hong Kong Polytechnic University" },
+    { q: t("testimonials.q3"), name: "Priya S.",    school: "City University of Hong Kong" },
+  ];
 
   return (
     <div className="min-h-screen overflow-x-hidden" dir={isRtl ? "rtl" : "ltr"} style={{ background: BG, fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
@@ -165,10 +155,10 @@ export default function Landing() {
               {t("services.title")}
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>
-              Everything you need, handled.
+              {t("services.heading")}
             </h2>
             <p className="text-center mb-14 text-base max-w-xl mx-auto" style={{ color: GOLD_DIM }}>
-              Our expert consultants manage every step of your student visa process with precision and care.
+              {t("services.sub")}
             </p>
             <div className="grid md:grid-cols-3 gap-5">
               {serviceTitles.map((title, i) => (
@@ -180,7 +170,7 @@ export default function Landing() {
                     {SERVICE_ICONS[i]}
                   </div>
                   <h3 className="text-base font-semibold mb-2" style={{ color: GOLD }}>{title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{SERVICES_DESC[i]}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{serviceDescs[i]}</p>
                 </div>
               ))}
             </div>
@@ -190,13 +180,13 @@ export default function Landing() {
         {/* How It Works */}
         <section id="how-it-works" className="py-24 max-w-5xl mx-auto px-6">
           <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
-            The Process
+            {t("how.label")}
           </p>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>
             {t("how.title")}
           </h2>
           <p className="text-center mb-16 text-base" style={{ color: GOLD_DIM }}>
-            Your entire visa journey in five straightforward steps.
+            {t("how.sub")}
           </p>
 
           <div className="relative">
@@ -218,7 +208,7 @@ export default function Landing() {
                       </span>
                       <h3 className="text-base font-semibold" style={{ color: GOLD }}>{title}</h3>
                     </div>
-                    <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{STEP_DESCS[i]}</p>
+                    <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{stepDescs[i]}</p>
                   </div>
                 </div>
               ))}
@@ -230,21 +220,17 @@ export default function Landing() {
         <section className="py-24 px-6" style={{ background: "rgba(0,0,0,0.2)", borderTop: `1px solid ${GOLD_FAINT}`, borderBottom: `1px solid ${GOLD_FAINT}` }}>
           <div className="max-w-5xl mx-auto">
             <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
-              Student Experiences
+              {t("testimonials.label")}
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-14" style={{ color: GOLD }}>
               {t("testimonials.title")}
             </h2>
             <div className="grid md:grid-cols-3 gap-5">
-              {[
-                { quote: "HARROWGATE made the entire process stress-free. From documents to my university interview, they guided me at every stage.", name: "Aisha M.", school: "The University of Hong Kong" },
-                { quote: "I was worried about the ID995A form but they handled everything. My portal always showed exactly where my application stood.", name: "Daniel K.", school: "Hong Kong Polytechnic University" },
-                { quote: "Professional, fast, and always reachable. My visa was approved on the first attempt. Highly recommend HARROWGATE.", name: "Priya S.", school: "City University of Hong Kong" },
-              ].map(item => (
+              {testimonials.map(item => (
                 <div key={item.name} className="rounded-2xl p-6 border flex flex-col gap-4"
                   style={{ background: "rgba(162,137,89,0.04)", borderColor: GOLD_FAINT }}>
                   <p className="text-xl leading-relaxed" style={{ color: "rgba(162,137,89,0.25)" }}>"</p>
-                  <p className="text-sm leading-relaxed flex-1" style={{ color: GOLD_DIM }}>{item.quote}</p>
+                  <p className="text-sm leading-relaxed flex-1" style={{ color: GOLD_DIM }}>{item.q}</p>
                   <div>
                     <p className="text-sm font-semibold" style={{ color: GOLD }}>{item.name}</p>
                     <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>{item.school}</p>
@@ -259,14 +245,13 @@ export default function Landing() {
         <section className="py-28 text-center px-6">
           <div className="max-w-2xl mx-auto">
             <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-6" style={{ color: "rgba(162,137,89,0.4)" }}>
-              Get Started Today
+              {t("cta.label")}
             </p>
             <h2 className="text-4xl md:text-5xl font-bold mb-5" style={{ color: GOLD }}>
-              Ready to begin your<br />journey to Hong Kong?
+              {t("cta.heading")}
             </h2>
             <p className="mb-10 text-base leading-relaxed" style={{ color: GOLD_DIM }}>
-              Create your free account and start your student visa application today.<br />
-              Our consultants are ready to guide you every step of the way.
+              {t("cta.sub")}
             </p>
             <Link href="/sign-up"
               className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-semibold transition-all hover:scale-105 hover:opacity-95"
@@ -274,7 +259,7 @@ export default function Landing() {
               {t("hero.cta1")}
             </Link>
             <p className="mt-5 text-xs" style={{ color: "rgba(162,137,89,0.35)" }}>
-              Already have an account?{" "}
+              {t("cta.hasAccount")}{" "}
               <Link href="/sign-in" className="underline hover:opacity-80 transition-opacity" style={{ color: "rgba(162,137,89,0.55)" }}>
                 {t("nav.signIn")}
               </Link>

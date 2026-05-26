@@ -21,29 +21,29 @@ export type Submission = {
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };
 
-const statusMap: Record<string, { label: string; color: string; bg: string }> = {
-  pending:              { label: "Under Review",              color: GOLD,        bg: "rgba(162,137,89,0.12)" },
-  approved:             { label: "Approved",                  color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  docs_requested:       { label: "Documents Requested",       color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
-  payment_pending:      { label: "Payment Required",          color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
-  payment_received:     { label: "Pending Payment Confirmation", color: "#60a5fa", bg: "rgba(96,165,250,0.12)" },
-  acknowledged:         { label: "Payment Received ✓",        color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  interview_arranged:              { label: "Interview Arranged",             color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
-  interview_completed:             { label: "Interview Completed",            color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  second_payment_pending:          { label: "2nd Payment Required",           color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
-  second_payment_received:         { label: "Pending Payment Confirmation",   color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
-  second_payment_confirmed:        { label: "2nd Payment Received ✓",         color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  university_interview_arranged:   { label: "Uni Interview Arranged",         color: "#38bdf8",   bg: "rgba(56,189,248,0.12)" },
-  university_interview_completed:  { label: "Uni Interview Completed",        color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  offer_letter_pending:            { label: "Final Payment Required",         color: "#fb923c",   bg: "rgba(251,146,60,0.12)"  },
-  final_payment_received:          { label: "Pending Payment Confirmation",   color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
-  final_payment_confirmed:         { label: "Offer Letter Ready ✓",           color: "#4ade80",   bg: "rgba(74,222,128,0.12)"  },
-  rejected:                        { label: "Application Unsuccessful",       color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
+const statusMap: Record<string, { color: string; bg: string }> = {
+  pending:                       { color: GOLD,        bg: "rgba(162,137,89,0.12)" },
+  approved:                      { color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  docs_requested:                { color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
+  payment_pending:               { color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
+  payment_received:              { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
+  acknowledged:                  { color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  interview_arranged:            { color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
+  interview_completed:           { color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  second_payment_pending:        { color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
+  second_payment_received:       { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
+  second_payment_confirmed:      { color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  university_interview_arranged: { color: "#38bdf8",   bg: "rgba(56,189,248,0.12)" },
+  university_interview_completed:{ color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  offer_letter_pending:          { color: "#fb923c",   bg: "rgba(251,146,60,0.12)"  },
+  final_payment_received:        { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
+  final_payment_confirmed:       { color: "#4ade80",   bg: "rgba(74,222,128,0.12)"  },
+  rejected:                      { color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
 type TimelineStep = { icon: string; label: string; note: string; done: boolean; current?: boolean };
 
-function buildTimeline(submission: Submission): TimelineStep[] {
+function buildTimeline(submission: Submission, t: (key: string) => string): TimelineStep[] {
   const s = submission.status;
   const ref = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
   const submittedDate = new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -58,61 +58,63 @@ function buildTimeline(submission: Submission): TimelineStep[] {
   const afterFinalPay  = s === "final_payment_confirmed";
   const inFinalPay     = ["offer_letter_pending","final_payment_received"].includes(s);
 
+  void afterUniArr;
+
   return [
-    { icon: "✅", label: "Application Submitted",      note: submittedDate,                                          done: true },
-    { icon: "✅", label: "Documents Reviewed",          note: "Approved by HARROWGATE consultant",                    done: true },
-    { icon: "✅", label: "Payment Confirmed",           note: `Acknowledgement code: ${ref}`,                         done: true },
+    { icon: "✅", label: t("tl.appSubmitted"),  note: submittedDate,                                                              done: true },
+    { icon: "✅", label: t("tl.docsReviewed"),  note: t("tl.docsApproved"),                                                      done: true },
+    { icon: "✅", label: t("tl.payConfirmed"),  note: `${t("tl.ackCode")}: ${ref}`,                                              done: true },
     {
       icon: afterPayment && s !== "acknowledged" ? "✅" : (s === "acknowledged" ? "🔄" : "⬜"),
-      label: "Awaiting Mock Interview Arrangement",
-      note: s === "acknowledged" ? "Our team will contact you to schedule your mock interview" : (afterPayment ? "Arranged" : "Upcoming"),
+      label: t("tl.mockArranging"),
+      note: s === "acknowledged" ? t("tl.mockArrangeNote") : (afterPayment ? t("tl.arranged") : t("tl.upcoming")),
       done: afterPayment && s !== "acknowledged",
       current: s === "acknowledged",
     },
     {
       icon: s === "interview_arranged" ? "🔄" : (afterMock ? "✅" : "⬜"),
-      label: "Mock Interview",
+      label: t("tl.mockInterview"),
       note: s === "interview_arranged"
-        ? (submission.interviewDateTime || "Scheduled — check your email")
-        : (afterMock ? "Completed" : "To be scheduled"),
+        ? (submission.interviewDateTime || t("tl.scheduledEmail"))
+        : (afterMock ? t("tl.completed") : t("tl.toBeScheduled")),
       done: afterMock,
       current: s === "interview_arranged",
     },
     {
       icon: after2ndPay ? "✅" : (in2ndPay || s === "interview_completed" ? "🔄" : "⬜"),
-      label: "2nd Payment",
-      note: after2ndPay ? "Confirmed" : (s === "second_payment_received" ? "Receipt received — awaiting confirmation" : (in2ndPay || s === "interview_completed" ? "Payment required" : "Upcoming")),
+      label: t("tl.payment2"),
+      note: after2ndPay ? t("tl.confirmed") : (s === "second_payment_received" ? t("tl.receiptAwait") : (in2ndPay || s === "interview_completed" ? t("tl.paymentRequired") : t("tl.upcoming"))),
       done: after2ndPay,
       current: in2ndPay || s === "interview_completed",
     },
     {
       icon: afterUniDone ? "✅" : (s === "university_interview_arranged" ? "🔄" : (after2ndPay ? "🔄" : "⬜")),
-      label: "University Interview",
+      label: t("tl.uniInterview"),
       note: s === "second_payment_confirmed"
-        ? "Our team is arranging your university interview"
+        ? t("tl.uniArranging")
         : s === "university_interview_arranged"
-          ? (submission.uniInterviewDateTime || "Scheduled — check your email")
-          : (afterUniDone ? "Completed" : "Upcoming"),
+          ? (submission.uniInterviewDateTime || t("tl.scheduledEmail"))
+          : (afterUniDone ? t("tl.completed") : t("tl.upcoming")),
       done: afterUniDone,
       current: s === "university_interview_arranged" || s === "second_payment_confirmed",
     },
     {
       icon: afterFinalPay ? "✅" : (inFinalPay ? "🔄" : (afterUniDone ? "🔄" : "⬜")),
-      label: "Offer Letter & Final Payment",
+      label: t("tl.offerFinalPay"),
       note: afterFinalPay
-        ? "Final payment confirmed — offer letter available"
+        ? t("tl.finalPayConfirmedNote")
         : inFinalPay
-          ? (s === "final_payment_received" ? "Receipt received — awaiting confirmation" : "Final payment required to collect your offer letter")
-          : afterUniDone ? "Awaiting your offer letter from the university" : "Upcoming",
+          ? (s === "final_payment_received" ? t("tl.receiptAwait") : t("tl.finalPayRequired"))
+          : afterUniDone ? t("tl.awaitingOfferLetter") : t("tl.upcoming"),
       done: afterFinalPay,
       current: inFinalPay || (afterUniDone && !inFinalPay && !afterFinalPay),
     },
     {
       icon: submission.immigrationRefNumber ? "✅" : (afterFinalPay ? "🔄" : "⬜"),
-      label: "Visa Application Submitted",
+      label: t("tl.visaSubmitted"),
       note: submission.immigrationRefNumber
-        ? `Ref: ${submission.immigrationRefNumber}`
-        : afterFinalPay ? "Being submitted to Hong Kong Immigration" : "Final step",
+        ? `${t("portal.ref")}: ${submission.immigrationRefNumber}`
+        : afterFinalPay ? t("tl.visaSubmittedNote") : t("tl.finalStep"),
       done: !!submission.immigrationRefNumber,
       current: afterFinalPay && !submission.immigrationRefNumber,
     },
@@ -216,7 +218,6 @@ export default function Portal() {
     if (submission?.id) fetchMessages(submission.id);
   }, [submission?.id]);
 
-  // Real-time background polling — no loading spinner, silent update on change
   useEffect(() => {
     if (!submission?.id || !session) return;
     const pollId = setInterval(() => {
@@ -309,7 +310,6 @@ export default function Portal() {
     finally { setUploadingAdditionalDocs(false); }
   };
 
-  // Auto-show timeline for post-acknowledged statuses
   useEffect(() => {
     if (submission && ["interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(submission.status)) {
       setShowTimeline(true);
@@ -328,8 +328,11 @@ export default function Portal() {
     );
   }
 
+  const statusStyle = submission ? statusMap[submission.status] : null;
+  const statusLabel = (s: string) => t(`status.${s}`);
+
   return (
-    <div className="min-h-screen" style={{ background: BG }}>
+    <div className="min-h-screen" dir={isRtl ? "rtl" : "ltr"} style={{ background: BG }}>
       {/* Nav */}
       <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.9)", position: "sticky", top: 0, zIndex: 50 }}>
         <div className="flex items-center justify-between px-6 py-3.5 max-w-5xl mx-auto">
@@ -382,7 +385,6 @@ export default function Portal() {
           <>
             {/* Status Banner */}
             <div className="mb-8 rounded-2xl overflow-hidden border" style={{ background: "rgba(0,0,0,0.3)", borderColor: "rgba(162,137,89,0.14)" }}>
-              {/* Top accent bar */}
               <div className="h-0.5 w-full" style={{ background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
               <div className="p-6">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -398,16 +400,16 @@ export default function Portal() {
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    {statusMap[submission.status] && (
+                    {statusStyle && (
                       <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold"
-                        style={{ color: statusMap[submission.status].color, background: statusMap[submission.status].bg }}>
-                        <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: statusMap[submission.status].color }} />
-                        {statusMap[submission.status].label}
+                        style={{ color: statusStyle.color, background: statusStyle.bg }}>
+                        <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: statusStyle.color }} />
+                        {statusLabel(submission.status)}
                       </span>
                     )}
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
                       style={{ borderColor: "rgba(162,137,89,0.18)", background: "rgba(162,137,89,0.05)" }}>
-                      <span className="text-xs" style={{ color: "rgba(162,137,89,0.4)" }}>Ref</span>
+                      <span className="text-xs" style={{ color: "rgba(162,137,89,0.4)" }}>{t("portal.ref")}</span>
                       <span className="text-sm font-bold tracking-widest font-mono" style={{ color: GOLD }}>
                         STU{submission.passportNumber.slice(-4).toUpperCase()}
                       </span>
@@ -421,7 +423,7 @@ export default function Portal() {
                       💬
                     </div>
                     <div>
-                      <p className="text-xs font-semibold mb-1" style={{ color: GOLD }}>Note from your consultant</p>
+                      <p className="text-xs font-semibold mb-1" style={{ color: GOLD }}>{t("portal.consultant")}</p>
                       <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.65)" }}>{submission.adminNotes}</p>
                     </div>
                   </div>
@@ -433,9 +435,9 @@ export default function Portal() {
             {submission.status === "pending" && (
               <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.12)" }}>
                 <div className="text-5xl mb-4">⏳</div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>Under Review</h3>
+                <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>{t("s.underReview")}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.6)" }}>
-                  Our consultants are carefully reviewing your submission.<br />You will be notified here and by email once a decision has been made.
+                  {t("s.underReviewSub")}
                 </p>
               </div>
             )}
@@ -444,12 +446,12 @@ export default function Portal() {
             {submission.status === "approved" && (
               <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
                 <div className="text-5xl mb-4">🎉</div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: "#4ade80" }}>Your Application Has Been Approved!</h3>
+                <h3 className="text-xl font-bold mb-3" style={{ color: "#4ade80" }}>{t("s.approvedTitle")}</h3>
                 <p className="text-base leading-relaxed mb-2" style={{ color: "rgba(74,222,128,0.75)" }}>
-                  Congratulations — your application has been reviewed and approved by our consultants.
+                  {t("s.approvedSub")}
                 </p>
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(74,222,128,0.55)" }}>
-                  Please <strong style={{ color: "#4ade80" }}>wait patiently for further instructions</strong>. Our team will contact you shortly with the next steps.
+                  {t("s.approvedNote")}
                 </p>
               </div>
             )}
@@ -473,21 +475,21 @@ export default function Portal() {
             {submission.status === "acknowledged" && !showTimeline && (
               <div className="mt-6 rounded-2xl p-8 text-center border" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
                 <div className="text-5xl mb-4">✅</div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>Payment Received</h3>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.payReceived")}</h3>
                 <p className="text-sm mb-6" style={{ color: "rgba(74,222,128,0.65)" }}>
-                  Your payment has been confirmed and your application is now being fully processed. Our team will be in touch shortly.
+                  {t("s.payReceivedSub")}
                 </p>
                 <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border mb-6" style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)" }}>
-                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(74,222,128,0.5)" }}>Your Acknowledgement Code</p>
+                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(74,222,128,0.5)" }}>{t("s.ackCodeLabel")}</p>
                   <p className="text-3xl font-bold tracking-widest font-mono" style={{ color: "#4ade80" }}>
                     STU{submission.passportNumber.slice(-4).toUpperCase()}
                   </p>
-                  <p className="text-xs mt-1" style={{ color: "rgba(74,222,128,0.4)" }}>Keep this code for your records</p>
+                  <p className="text-xs mt-1" style={{ color: "rgba(74,222,128,0.4)" }}>{t("s.ackCodeNote")}</p>
                 </div>
                 <button onClick={() => setShowTimeline(true)}
                   className="px-8 py-3 rounded-full text-sm font-semibold border transition-all hover:opacity-80"
                   style={{ borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
-                  Close
+                  {t("s.close")}
                 </button>
               </div>
             )}
@@ -496,20 +498,20 @@ export default function Portal() {
             {submission.status === "interview_arranged" && (
               <div className="mt-6 rounded-2xl p-8 border" style={{ background: "rgba(167,139,250,0.04)", borderColor: "rgba(167,139,250,0.2)" }}>
                 <div className="text-5xl mb-4 text-center">🎥</div>
-                <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#a78bfa" }}>Mock Interview Scheduled</h3>
+                <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#a78bfa" }}>{t("s.mockScheduled")}</h3>
                 <p className="text-sm text-center mb-6" style={{ color: "rgba(167,139,250,0.65)" }}>
-                  Your mock interview has been arranged. Please join on time and ensure your camera and microphone are working.
+                  {t("s.mockScheduledSub")}
                 </p>
                 <div className="rounded-2xl border p-5 mb-6" style={{ background: "rgba(167,139,250,0.06)", borderColor: "rgba(167,139,250,0.2)" }}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {submission.interviewDateTime && (
                       <div>
-                        <p className="text-xs font-medium mb-1" style={{ color: "rgba(167,139,250,0.5)" }}>Date & Time</p>
+                        <p className="text-xs font-medium mb-1" style={{ color: "rgba(167,139,250,0.5)" }}>{t("s.dateTime")}</p>
                         <p className="text-sm font-semibold" style={{ color: "#a78bfa" }}>{submission.interviewDateTime}</p>
                       </div>
                     )}
                     <div>
-                      <p className="text-xs font-medium mb-1" style={{ color: "rgba(167,139,250,0.5)" }}>Platform</p>
+                      <p className="text-xs font-medium mb-1" style={{ color: "rgba(167,139,250,0.5)" }}>{t("s.platform")}</p>
                       <p className="text-sm font-semibold" style={{ color: "#a78bfa" }}>Zoom</p>
                     </div>
                   </div>
@@ -518,25 +520,25 @@ export default function Portal() {
                   <a href={submission.interviewZoomLink} target="_blank" rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-base font-semibold transition-all hover:opacity-90"
                     style={{ background: "#a78bfa", color: "#0f2d18" }}>
-                    🎥 Join Zoom Meeting →
+                    🎥 {t("s.joinZoom")}
                   </a>
                 )}
               </div>
             )}
 
-            {/* ── INTERVIEW COMPLETED (waiting for admin to request 2nd payment) ── */}
+            {/* ── INTERVIEW COMPLETED ── */}
             {submission.status === "interview_completed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
                 <div className="text-5xl mb-4">🎓</div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>Mock Interview Completed</h3>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.mockCompleted")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>
-                  Well done — your mock interview is complete.
+                  {t("s.mockCompletedSub")}
                 </p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>
-                  ⏳ Awaiting Next Steps
+                  {t("s.awaitingNext")}
                 </p>
                 <p className="text-sm mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>
-                  Our team will be in touch shortly with further instructions.
+                  {t("s.teamInTouch")}
                 </p>
               </div>
             )}
@@ -550,15 +552,15 @@ export default function Portal() {
             {submission.status === "second_payment_confirmed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
                 <div className="text-5xl mb-4">✅</div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>2nd Payment Confirmed</h3>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.pay2Confirmed")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>
-                  Your second payment has been received and confirmed.
+                  {t("s.pay2ConfirmedSub")}
                 </p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>
-                  ⏳ Awaiting University Interview
+                  {t("s.awaitingUniInterview")}
                 </p>
                 <p className="text-sm mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>
-                  Our team is coordinating with the university. You will be notified as soon as your interview is scheduled.
+                  {t("s.uniCoordinating")}
                 </p>
               </div>
             )}
@@ -572,20 +574,20 @@ export default function Portal() {
               return (
                 <div className="mt-6 rounded-2xl p-8 border" style={{ background: "rgba(56,189,248,0.04)", borderColor: "rgba(56,189,248,0.2)" }}>
                   <div className="text-5xl mb-4 text-center">{platformEmoji}</div>
-                  <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#38bdf8" }}>University Interview Scheduled</h3>
+                  <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#38bdf8" }}>{t("s.uniScheduled")}</h3>
                   <p className="text-sm text-center mb-6" style={{ color: "rgba(56,189,248,0.65)" }}>
-                    Your university interview has been arranged. Please be on time and ensure your camera and microphone are working.
+                    {t("s.uniScheduledSub")}
                   </p>
                   <div className="rounded-2xl border p-5 mb-6" style={{ background: "rgba(56,189,248,0.06)", borderColor: "rgba(56,189,248,0.2)" }}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {submission.uniInterviewDateTime && (
                         <div>
-                          <p className="text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.5)" }}>Date & Time</p>
+                          <p className="text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.5)" }}>{t("s.dateTime")}</p>
                           <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>{submission.uniInterviewDateTime}</p>
                         </div>
                       )}
                       <div>
-                        <p className="text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.5)" }}>Platform</p>
+                        <p className="text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.5)" }}>{t("s.platform")}</p>
                         <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>{platformLabel}</p>
                       </div>
                     </div>
@@ -594,15 +596,15 @@ export default function Portal() {
                     <a href={submission.uniInterviewLink} target="_blank" rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-base font-semibold transition-all hover:opacity-90 mb-4"
                       style={{ background: platformColor, color: "#ffffff" }}>
-                      {platformEmoji} Join {platformLabel} →
+                      {platformEmoji} {t("s.joinMeeting")} {platformLabel} →
                     </a>
                   )}
                   <button onClick={handleCompleteUni} disabled={completingUni}
                     className="w-full py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
                     style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.25)", color: "#4ade80" }}>
                     {completingUni
-                      ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#4ade80", borderTopColor: "transparent" }} /> Updating…</>
-                      : "✅ University Interview Completed"}
+                      ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#4ade80", borderTopColor: "transparent" }} /> {t("s.updatingUni")}</>
+                      : t("s.uniCompletedBtn")}
                   </button>
                 </div>
               );
@@ -614,18 +616,18 @@ export default function Portal() {
                 <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(251,146,60,0.18)" }}>
                   <span className="text-xl">📎</span>
                   <div>
-                    <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>Additional Documents Required</h3>
-                    <p className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.55)" }}>Your consultant has requested additional documents</p>
+                    <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>{t("s.additionalDocs")}</h3>
+                    <p className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.55)" }}>{t("s.additionalDocsSub")}</p>
                   </div>
                 </div>
                 <div className="px-6 py-5 space-y-4">
                   {submission.additionalDocsRequestNote && (
                     <div className="rounded-xl px-4 py-3 border text-sm" style={{ background: "rgba(251,146,60,0.04)", borderColor: "rgba(251,146,60,0.18)", color: "rgba(251,146,60,0.75)", lineHeight: 1.6 }}>
-                      <strong style={{ color: "#fb923c" }}>Note from consultant:</strong><br />{submission.additionalDocsRequestNote}
+                      <strong style={{ color: "#fb923c" }}>{t("s.consultantNote")}</strong><br />{submission.additionalDocsRequestNote}
                     </div>
                   )}
                   <div>
-                    <label className="block text-xs font-medium mb-2" style={{ color: "rgba(251,146,60,0.6)" }}>Add a note (optional)</label>
+                    <label className="block text-xs font-medium mb-2" style={{ color: "rgba(251,146,60,0.6)" }}>{t("s.addNote")}</label>
                     <textarea rows={2} placeholder="e.g., 'Enclosed please find the requested transcript…'"
                       value={additionalDocsNote}
                       onChange={e => setAdditionalDocsNote(e.target.value)}
@@ -636,8 +638,8 @@ export default function Portal() {
                     className="w-full py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
                     style={{ background: "rgba(251,146,60,0.08)", borderColor: "rgba(251,146,60,0.3)", color: "#fb923c" }}>
                     {uploadingAdditionalDocs
-                      ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#fb923c", borderTopColor: "transparent" }} /> Uploading…</>
-                      : <><span>📁</span> Choose Document & Confirm</>}
+                      ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#fb923c", borderTopColor: "transparent" }} /> {t("s.uploading")}</>
+                      : <><span>📁</span> {t("s.chooseDocs")}</>}
                   </button>
                   <input ref={additionalDocsRef} type="file" className="hidden"
                     onChange={e => { const f = e.target.files?.[0]; if (f) handleAdditionalDocsSubmit(f); }} />
@@ -659,13 +661,13 @@ export default function Portal() {
                 <div className="px-6 py-5 flex items-center gap-3 border-b" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
                   <span className="text-xl">⏳</span>
                   <div>
-                    <h3 className="text-base font-semibold" style={{ color: "#60a5fa" }}>Confirming Your Final Payment</h3>
-                    <p className="text-xs mt-0.5" style={{ color: "rgba(96,165,250,0.55)" }}>Our consultant will confirm your payment shortly</p>
+                    <h3 className="text-base font-semibold" style={{ color: "#60a5fa" }}>{t("s.confirmingPayment")}</h3>
+                    <p className="text-xs mt-0.5" style={{ color: "rgba(96,165,250,0.55)" }}>{t("s.confirmingPaymentSub")}</p>
                   </div>
                 </div>
                 <div className="px-6 py-5">
                   <div className="rounded-xl px-4 py-3 border text-sm" style={{ background: "rgba(96,165,250,0.04)", borderColor: "rgba(96,165,250,0.14)", color: "rgba(96,165,250,0.65)", lineHeight: 1.6 }}>
-                    Your payment receipt has been received and is being reviewed by our team. Once confirmed, your official offer letter will be available to download from this portal.
+                    {t("s.confirmingPaymentNote")}
                   </div>
                 </div>
               </div>
@@ -678,8 +680,8 @@ export default function Portal() {
                 <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(74,222,128,0.25)" }}>
                   <div className="px-6 py-5 border-b text-center" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
                     <div className="text-5xl mb-3">🎉</div>
-                    <h3 className="text-xl font-bold mb-1" style={{ color: "#4ade80" }}>Congratulations!</h3>
-                    <p className="text-sm" style={{ color: "rgba(74,222,128,0.6)" }}>Your final payment has been confirmed. Your offer letter is ready.</p>
+                    <h3 className="text-xl font-bold mb-1" style={{ color: "#4ade80" }}>{t("s.congratulations")}</h3>
+                    <p className="text-sm" style={{ color: "rgba(74,222,128,0.6)" }}>{t("s.congratulationsSub")}</p>
                   </div>
                   <div className="px-6 py-5">
                     {offerDoc ? (
@@ -688,17 +690,17 @@ export default function Portal() {
                           onClick={() => handleOfferLetterView(submission.id, offerDoc.id)}
                           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                           style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)", color: "#4ade80" }}>
-                          <span>👁</span> View
+                          <span>👁</span> {t("s.viewLetter")}
                         </button>
                         <button
                           onClick={() => handleOfferLetterDownload(submission.id, offerDoc.id, offerDoc.fileName)}
                           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                           style={{ background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.35)", color: "#4ade80" }}>
-                          <span>📄</span> Download
+                          <span>📄</span> {t("s.downloadLetter")}
                         </button>
                       </div>
                     ) : (
-                      <p className="text-center text-sm" style={{ color: "rgba(74,222,128,0.45)" }}>Offer letter not yet available. Please contact your consultant.</p>
+                      <p className="text-center text-sm" style={{ color: "rgba(74,222,128,0.45)" }}>{t("s.offerNotAvailable")}</p>
                     )}
                   </div>
                 </div>
@@ -735,14 +737,13 @@ export default function Portal() {
             {submission.status === "university_interview_completed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
                 <div className="text-5xl mb-4">🎓</div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>University Interview Completed</h3>
+                <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>{t("s.uniInterviewCompleted")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>
-                  Congratulations on completing your university interview.
+                  {t("s.uniInterviewCompletedSub")}
                 </p>
                 <div className="mt-5 px-6 py-5 rounded-2xl border" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
-                  <p className="text-base font-semibold" style={{ color: GOLD }}>⏳ Waiting for University's Response</p>
-                  <p className="text-sm mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>
-                    The university is reviewing your application. Our team will keep you updated as soon as a decision is made.
+                  <p className="text-sm" style={{ color: "rgba(162,137,89,0.55)" }}>
+                    {t("s.teamInTouch")}
                   </p>
                 </div>
               </div>
@@ -750,44 +751,40 @@ export default function Portal() {
 
             {/* ── REJECTED ── */}
             {submission.status === "rejected" && (
-              <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(248,113,113,0.04)", borderColor: "rgba(248,113,113,0.18)" }}>
-                <div className="text-5xl mb-4">📋</div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: "#f87171" }}>Application Unsuccessful</h3>
+              <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(248,113,113,0.04)", borderColor: "rgba(248,113,113,0.2)" }}>
+                <div className="text-5xl mb-4">❌</div>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#f87171" }}>{statusLabel("rejected")}</h3>
                 {submission.adminNotes && (
-                  <p className="text-sm mb-4 px-4 py-3 rounded-xl border mx-auto max-w-md" style={{ color: "rgba(248,113,113,0.75)", borderColor: "rgba(248,113,113,0.15)", background: "rgba(248,113,113,0.05)" }}>
+                  <p className="text-sm leading-relaxed mt-2" style={{ color: "rgba(248,113,113,0.65)" }}>
                     {submission.adminNotes}
                   </p>
                 )}
-                <p className="text-sm" style={{ color: "rgba(248,113,113,0.5)" }}>
-                  Please contact HARROWGATE Consultancy if you have any questions.
-                </p>
               </div>
             )}
 
-            {/* ── TIMELINE ── */}
-            {showTimeline && ["acknowledged","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(submission.status) && (
-              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.12)" }}>
-                <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+            {/* ── APPLICATION PROGRESS TIMELINE ── */}
+            {showTimeline && (
+              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.1)" }}>
+                <div className="px-5 py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                   <div>
-                    <h3 className="text-sm font-semibold" style={{ color: GOLD }}>Application Progress</h3>
+                    <h3 className="text-sm font-semibold" style={{ color: GOLD }}>{t("portal.progress")}</h3>
                     <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>
-                      Reference <span className="font-mono font-semibold">STU{submission.passportNumber.slice(-4).toUpperCase()}</span>
+                      {t("portal.ref")} <span className="font-mono font-semibold">STU{submission.passportNumber.slice(-4).toUpperCase()}</span>
                     </p>
                   </div>
-                  {/* Count completed / total */}
                   {(() => {
-                    const tl = buildTimeline(submission);
-                    const done = tl.filter(t => t.done).length;
+                    const tl = buildTimeline(submission, t);
+                    const done = tl.filter(step => step.done).length;
                     return (
                       <span className="text-xs font-semibold px-3 py-1.5 rounded-full" style={{ background: "rgba(162,137,89,0.08)", color: GOLD }}>
-                        {done}/{tl.length} steps
+                        {done}/{tl.length} {t("portal.steps")}
                       </span>
                     );
                   })()}
                 </div>
                 <div className="px-5 py-5">
-                  {buildTimeline(submission).map((step, i, arr) => (
-                    <div key={step.label} className="flex gap-3 group">
+                  {buildTimeline(submission, t).map((step, i, arr) => (
+                    <div key={`${step.label}-${i}`} className="flex gap-3 group">
                       {/* Icon column */}
                       <div className="flex flex-col items-center" style={{ width: 32, flexShrink: 0 }}>
                         <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
@@ -830,7 +827,7 @@ export default function Portal() {
                           {step.current && (
                             <span className="text-xs px-2 py-0.5 rounded-full font-medium"
                               style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>
-                              In Progress
+                              {t("tl.inProgress")}
                             </span>
                           )}
                         </div>
@@ -849,10 +846,10 @@ export default function Portal() {
             {!["payment_pending","payment_received","acknowledged","docs_requested","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(submission.status) && (
               <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.1)" }}>
                 <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
-                  <h3 className="text-sm font-semibold" style={{ color: GOLD }}>Application Details</h3>
+                  <h3 className="text-sm font-semibold" style={{ color: GOLD }}>{t("portal.appDetails")}</h3>
                 </div>
                 <div className="px-6 py-5 grid grid-cols-1 sm:grid-cols-3 gap-5">
-                  {[["Full Name", submission.name], ["Date of Birth", submission.dateOfBirth], ["Passport", submission.passportNumber]].map(([l, v]) => (
+                  {([[t("portal.fullName"), submission.name], [t("portal.dob"), submission.dateOfBirth], [t("portal.passport"), submission.passportNumber]] as [string, string][]).map(([l, v]) => (
                     <div key={l}>
                       <p className="text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.45)" }}>{l}</p>
                       <p className="text-sm font-semibold" style={{ color: GOLD }}>{v}</p>
@@ -860,17 +857,17 @@ export default function Portal() {
                   ))}
                 </div>
                 <div className="px-6 py-4 border-t" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
-                  <p className="text-xs font-medium mb-3" style={{ color: "rgba(162,137,89,0.45)" }}>Uploaded Documents</p>
+                  <p className="text-xs font-medium mb-3" style={{ color: "rgba(162,137,89,0.45)" }}>{t("portal.uploadedDocs")}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                      { type: "passport_photo",        label: "Passport Photo",      icon: "🖼️" },
-                      { type: "passport_doc",          label: "Passport / Travel Doc",icon: "📘" },
-                      { type: "birth_certificate",     label: "Birth Cert / ID",     icon: "📋" },
-                      { type: "cv",                    label: "CV",                  icon: "📄" },
-                      { type: "edu_results",           label: "Edu. Results",        icon: "📄" },
-                      { type: "edu_transcript",        label: "Edu. Transcript",     icon: "📄" },
-                      { type: "higher_edu_results",    label: "Higher Edu. Result",  icon: "📄" },
-                      { type: "higher_edu_transcript", label: "Higher Edu. Transcript", icon: "📄" },
+                      { type: "passport_photo",        label: "Passport Photo",         icon: "🖼️" },
+                      { type: "passport_doc",          label: "Passport / Travel Doc",   icon: "📘" },
+                      { type: "birth_certificate",     label: "Birth Cert / ID",         icon: "📋" },
+                      { type: "cv",                    label: "CV",                      icon: "📄" },
+                      { type: "edu_results",           label: "Edu. Results",            icon: "📄" },
+                      { type: "edu_transcript",        label: "Edu. Transcript",         icon: "📄" },
+                      { type: "higher_edu_results",    label: "Higher Edu. Result",      icon: "📄" },
+                      { type: "higher_edu_transcript", label: "Higher Edu. Transcript",  icon: "📄" },
                     ].map(({ type, label, icon }) => {
                       const doc = submission.documents.find(d => d.documentType === type);
                       return (
@@ -906,14 +903,14 @@ export default function Portal() {
                       </svg>
                     </div>
                     <div>
-                      <span className="text-sm font-semibold" style={{ color: "#60a5fa" }}>Messages</span>
+                      <span className="text-sm font-semibold" style={{ color: "#60a5fa" }}>{t("portal.messages")}</span>
                       {messages.filter(m => m.fromAdmin && !m.isRead).length > 0 ? (
                         <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "rgba(96,165,250,0.18)", color: "#60a5fa" }}>
-                          {messages.filter(m => m.fromAdmin && !m.isRead).length} new
+                          {messages.filter(m => m.fromAdmin && !m.isRead).length} {t("portal.new")}
                         </span>
                       ) : (
                         <span className="ml-2 text-xs" style={{ color: "rgba(96,165,250,0.35)" }}>
-                          {messages.length > 0 ? `${messages.length} message${messages.length !== 1 ? "s" : ""}` : "No messages yet"}
+                          {messages.length > 0 ? `${messages.length} message${messages.length !== 1 ? "s" : ""}` : t("portal.noMessages")}
                         </span>
                       )}
                     </div>
@@ -925,7 +922,6 @@ export default function Portal() {
 
                 {showMessages && (
                   <div className="border-t" style={{ borderColor: "rgba(96,165,250,0.1)" }}>
-                    {/* Message thread */}
                     <div className="px-4 py-4 space-y-3 max-h-80 overflow-y-auto">
                       {messages.length === 0 && (
                         <div className="text-center py-8">
@@ -935,14 +931,13 @@ export default function Portal() {
                               <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
                             </svg>
                           </div>
-                          <p className="text-sm" style={{ color: "rgba(96,165,250,0.35)" }}>No messages yet</p>
-                          <p className="text-xs mt-1" style={{ color: "rgba(96,165,250,0.25)" }}>Your consultant will reach out here when needed.</p>
+                          <p className="text-sm" style={{ color: "rgba(96,165,250,0.35)" }}>{t("portal.noMessages")}</p>
+                          <p className="text-xs mt-1" style={{ color: "rgba(96,165,250,0.25)" }}>{t("portal.noMessagesSub")}</p>
                         </div>
                       )}
 
                       {messages.map(msg => (
                         <div key={msg.id} className={`flex gap-2.5 ${msg.fromAdmin ? "" : "flex-row-reverse"}`}>
-                          {/* Avatar */}
                           <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold mt-0.5"
                             style={{
                               background: msg.fromAdmin ? "rgba(96,165,250,0.15)" : "rgba(74,222,128,0.15)",
@@ -950,7 +945,6 @@ export default function Portal() {
                             }}>
                             {msg.fromAdmin ? "H" : (submission.name[0] || "Y")}
                           </div>
-                          {/* Bubble */}
                           <div className={`max-w-[78%] rounded-2xl px-4 py-3 ${msg.fromAdmin ? "rounded-tl-sm" : "rounded-tr-sm"}`}
                             style={{
                               background: msg.fromAdmin ? "rgba(96,165,250,0.08)" : "rgba(74,222,128,0.08)",
@@ -958,7 +952,7 @@ export default function Portal() {
                             }}>
                             <div className="flex items-center justify-between gap-3 mb-1.5">
                               <span className="text-xs font-semibold" style={{ color: msg.fromAdmin ? "#60a5fa" : "#4ade80" }}>
-                                {msg.fromAdmin ? "HARROWGATE" : "You"}
+                                {msg.fromAdmin ? "HARROWGATE" : t("s.you")}
                                 {msg.fromAdmin && msg.subject && <span className="ml-1 opacity-60"> · {msg.subject}</span>}
                               </span>
                               <span className="text-xs shrink-0" style={{ color: msg.fromAdmin ? "rgba(96,165,250,0.3)" : "rgba(74,222,128,0.3)" }}>
@@ -986,7 +980,6 @@ export default function Portal() {
                       ))}
                     </div>
 
-                    {/* Reply area */}
                     <div className="px-4 pb-4 border-t pt-3 space-y-2.5" style={{ borderColor: "rgba(96,165,250,0.1)" }}>
                       {replyAttachments.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
@@ -1002,7 +995,7 @@ export default function Portal() {
                       )}
                       {replyError && <p className="text-xs" style={{ color: "#f87171" }}>{replyError}</p>}
                       <div className="flex gap-2 items-end">
-                        <textarea rows={2} placeholder="Reply to your consultant…"
+                        <textarea rows={2} placeholder={t("portal.replyPlaceholder")}
                           value={replyBody}
                           onChange={e => setReplyBody(e.target.value)}
                           onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSendReply(); }}
@@ -1020,14 +1013,14 @@ export default function Portal() {
                           <button onClick={handleSendReply} disabled={sendingReply || (!replyBody.trim() && replyAttachments.length === 0)}
                             className="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:opacity-90 disabled:opacity-40"
                             style={{ background: "#60a5fa", color: "#0b2213" }}
-                            title="Send (Ctrl+Enter)">
+                            title={t("portal.ctrlEnter")}>
                             {sendingReply
                               ? <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#0b2213", borderTopColor: "transparent" }} />
                               : <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>}
                           </button>
                         </div>
                       </div>
-                      <p className="text-xs" style={{ color: "rgba(96,165,250,0.25)" }}>Ctrl+Enter to send</p>
+                      <p className="text-xs" style={{ color: "rgba(96,165,250,0.25)" }}>{t("portal.ctrlEnter")}</p>
                       <input ref={replyAttachmentRef} type="file" className="hidden"
                         onChange={e => { const f = e.target.files?.[0]; if (f) handleReplyAttachment(f); }} />
                     </div>
