@@ -107,7 +107,15 @@ function buildTimeline(submission: Submission): TimelineStep[] {
       done: afterFinalPay,
       current: inFinalPay || (afterUniDone && !inFinalPay && !afterFinalPay),
     },
-    { icon: "⬜", label: "Visa Application Submitted", note: "Final step", done: false },
+    {
+      icon: submission.immigrationRefNumber ? "✅" : (afterFinalPay ? "🔄" : "⬜"),
+      label: "Visa Application Submitted",
+      note: submission.immigrationRefNumber
+        ? `Ref: ${submission.immigrationRefNumber}`
+        : afterFinalPay ? "Being submitted to Hong Kong Immigration" : "Final step",
+      done: !!submission.immigrationRefNumber,
+      current: afterFinalPay && !submission.immigrationRefNumber,
+    },
   ];
 }
 
@@ -697,20 +705,26 @@ export default function Portal() {
               );
             })()}
 
-            {/* ── PROCESSING NOTICE + IMMIGRATION REF (final_payment_confirmed) ── */}
-            {submission.status === "final_payment_confirmed" && (
+            {/* ── PROCESSING NOTICE + IMMIGRATION REF ── */}
+            {(submission.status === "final_payment_confirmed" || submission.immigrationRefNumber) && (
               <div className="mt-4 space-y-3">
-                <div className="rounded-2xl border px-5 py-4 flex items-start gap-3" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
-                  <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.6)" }}>{t("portal.processing")}</p>
-                </div>
+                {!submission.immigrationRefNumber && (
+                  <div className="rounded-2xl border px-5 py-4 flex items-start gap-3" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
+                    <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.6)" }}>{t("portal.processing")}</p>
+                  </div>
+                )}
                 {submission.immigrationRefNumber && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(74,222,128,0.03)", borderColor: "rgba(74,222,128,0.2)" }}>
-                    <div className="px-5 py-3 border-b" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>{t("portal.immigRef")}</p>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(74,222,128,0.5)" }}>{t("portal.immigRefSub")}</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.3)" }}>
+                    <div className="px-5 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(74,222,128,0.15)" }}>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold" style={{ color: "#4ade80" }}>🇭🇰 {t("portal.immigRef")}</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(74,222,128,0.5)" }}>{t("portal.immigRefSub")}</p>
+                      </div>
+                      <span className="text-2xl">✅</span>
                     </div>
-                    <div className="px-5 py-4">
-                      <p className="font-mono text-2xl font-bold tracking-wider" style={{ color: "#4ade80" }}>{submission.immigrationRefNumber}</p>
+                    <div className="px-5 py-5">
+                      <p className="font-mono text-3xl font-bold tracking-widest" style={{ color: "#4ade80", letterSpacing: "0.12em" }}>{submission.immigrationRefNumber}</p>
+                      <p className="text-xs mt-2" style={{ color: "rgba(74,222,128,0.45)" }}>{t("portal.processing")}</p>
                     </div>
                   </div>
                 )}
