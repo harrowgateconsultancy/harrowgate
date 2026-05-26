@@ -42,6 +42,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
   const [preview, setPreview] = useState<Doc | null>(null);
   const [resubmitting, setResubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dragOverSlot, setDragOverSlot] = useState<string | null>(null);
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const authHeaders = async (): Promise<Record<string, string>> => {
@@ -123,8 +124,29 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
             const isUp = uploading === slot.type;
             return (
               <div key={slot.type}>
-                <div className="flex items-center gap-3 rounded-xl border p-3 transition-all"
-                  style={{ background: doc ? "rgba(162,137,89,0.06)" : "rgba(162,137,89,0.02)", borderColor: doc ? "rgba(162,137,89,0.22)" : "rgba(162,137,89,0.08)" }}>
+                <div
+                  className="flex items-center gap-3 rounded-xl border p-3 transition-all"
+                  onDragOver={e => { e.preventDefault(); if (!isUp) setDragOverSlot(slot.type); }}
+                  onDragEnter={e => { e.preventDefault(); if (!isUp) setDragOverSlot(slot.type); }}
+                  onDragLeave={e => { e.preventDefault(); setDragOverSlot(null); }}
+                  onDrop={e => {
+                    e.preventDefault();
+                    setDragOverSlot(null);
+                    if (isUp) return;
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) handleUpload(slot.type, file);
+                  }}
+                  style={{
+                    background: dragOverSlot === slot.type
+                      ? "rgba(162,137,89,0.12)"
+                      : doc ? "rgba(162,137,89,0.06)" : "rgba(162,137,89,0.02)",
+                    borderColor: dragOverSlot === slot.type
+                      ? GOLD
+                      : doc ? "rgba(162,137,89,0.22)" : "rgba(162,137,89,0.08)",
+                    borderStyle: !doc && dragOverSlot !== slot.type ? "dashed" : "solid",
+                    transform: dragOverSlot === slot.type ? "scale(1.005)" : "scale(1)",
+                    boxShadow: dragOverSlot === slot.type ? "0 0 12px rgba(162,137,89,0.1)" : "none",
+                  }}>
                   <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "rgba(162,137,89,0.12)", color: GOLD }}>
                     {DOC_SLOTS.indexOf(slot) + 1}
                   </div>
@@ -153,10 +175,21 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
                         </button>
                       </>
                     ) : (
-                      <button onClick={() => inputRefs.current[slot.type]?.click()} disabled={isUp}
+                      <button
+                        onClick={() => !isUp && inputRefs.current[slot.type]?.click()}
+                        disabled={isUp}
                         className="text-xs px-4 py-1.5 rounded-lg border transition-all hover:opacity-80 disabled:opacity-50 flex items-center gap-1.5"
-                        style={{ borderColor: "rgba(162,137,89,0.22)", color: "rgba(162,137,89,0.55)", borderStyle: "dashed" }}>
-                        {isUp ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin inline-block" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Uploading…</> : "＋ Upload"}
+                        style={{
+                          borderColor: dragOverSlot === slot.type ? GOLD : "rgba(162,137,89,0.22)",
+                          color: dragOverSlot === slot.type ? GOLD : "rgba(162,137,89,0.55)",
+                          borderStyle: "dashed",
+                          background: dragOverSlot === slot.type ? "rgba(162,137,89,0.1)" : "transparent",
+                        }}>
+                        {isUp
+                          ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin inline-block" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Uploading…</>
+                          : dragOverSlot === slot.type
+                          ? "Drop here"
+                          : "＋ Upload"}
                       </button>
                     )}
                   </div>

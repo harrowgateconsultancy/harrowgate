@@ -88,6 +88,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
   const [docs, setDocs] = useState<UploadState[]>(Array.from({ length: DOC_CONFIG.length }, emptyUpload));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const authHeaders = async (): Promise<Record<string, string>> => {
@@ -308,7 +309,9 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                     <p className="text-xs mb-2" style={{ color: "rgba(162,137,89,0.4)" }}>{cfg.hint}</p>
                     {doc.url ? (
                       <div className="flex items-center gap-3 rounded-xl px-4 py-2.5 border" style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
-                        <span className="text-sm">📄</span>
+                        <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0" style={{ color: GOLD }}>
+                          <path fillRule="evenodd" d="M14.5 13.5V6.5a1 1 0 00-1-1H2.5a1 1 0 00-1 1v7a1 1 0 001 1h11a1 1 0 001-1zm-11.5-7h9v6h-9v-6zm5.5-4a.75.75 0 00-1.5 0v2.5h1.5V2.5z" clipRule="evenodd" />
+                        </svg>
                         <span className="text-sm flex-1 truncate" style={{ color: GOLD }}>{doc.name}</span>
                         <button type="button" onClick={() => { setDocs(prev => { const n = [...prev]; n[i] = emptyUpload(); return n; }); }}
                           className="text-xs px-3 py-1 rounded-full border transition-all hover:opacity-80"
@@ -317,18 +320,38 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                         </button>
                       </div>
                     ) : (
-                      <button type="button" onClick={() => inputRefs.current[i]?.click()} disabled={doc.uploading}
-                        className="w-full rounded-xl px-4 py-2.5 border text-sm text-left transition-all hover:opacity-80 flex items-center gap-2"
+                      <div
+                        onClick={() => !doc.uploading && inputRefs.current[i]?.click()}
+                        onDragOver={e => { e.preventDefault(); if (!doc.uploading) setDragOverIndex(i); }}
+                        onDragEnter={e => { e.preventDefault(); if (!doc.uploading) setDragOverIndex(i); }}
+                        onDragLeave={e => { e.preventDefault(); setDragOverIndex(null); }}
+                        onDrop={e => {
+                          e.preventDefault();
+                          setDragOverIndex(null);
+                          if (doc.uploading) return;
+                          const file = e.dataTransfer.files?.[0];
+                          if (file) handleFileChange(i, file);
+                        }}
+                        className="w-full rounded-xl px-4 py-2.5 border text-sm text-left transition-all flex items-center gap-2 select-none"
                         style={{
-                          background: "rgba(162,137,89,0.03)",
-                          borderColor: cfg.required ? "rgba(162,137,89,0.18)" : "rgba(162,137,89,0.09)",
-                          color: "rgba(162,137,89,0.45)",
+                          background: dragOverIndex === i ? "rgba(162,137,89,0.1)" : "rgba(162,137,89,0.03)",
+                          borderColor: dragOverIndex === i
+                            ? GOLD
+                            : cfg.required ? "rgba(162,137,89,0.18)" : "rgba(162,137,89,0.09)",
+                          color: dragOverIndex === i ? GOLD : "rgba(162,137,89,0.45)",
                           borderStyle: "dashed",
+                          cursor: doc.uploading ? "not-allowed" : "pointer",
+                          transform: dragOverIndex === i ? "scale(1.01)" : "scale(1)",
+                          boxShadow: dragOverIndex === i ? `0 0 12px rgba(162,137,89,0.1)` : "none",
                         }}>
-                        {doc.uploading
-                          ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Uploading…</>
-                          : <><span>📎</span> Click to upload</>}
-                      </button>
+                        {doc.uploading ? (
+                          <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin shrink-0" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Uploading…</>
+                        ) : dragOverIndex === i ? (
+                          <><svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5 shrink-0" style={{ color: GOLD }}><path fillRule="evenodd" d="M8 1a.75.75 0 01.75.75v5.69l1.97-1.97a.75.75 0 111.06 1.06l-3.25 3.25a.75.75 0 01-1.06 0L4.22 6.53a.75.75 0 011.06-1.06L7.25 7.44V1.75A.75.75 0 018 1zM1.75 14a.75.75 0 000 1.5h12.5a.75.75 0 000-1.5H1.75z" clipRule="evenodd" /></svg> Drop file here</>
+                        ) : (
+                          <><svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5 shrink-0"><path fillRule="evenodd" d="M13.5 3.5a2 2 0 00-2-2h-8a2 2 0 00-2 2v8.5a2 2 0 002 2h8a2 2 0 002-2V3.5zm-2 0h-8v8.5h8V3.5z" clipRule="evenodd" /></svg> Drag & drop or click to upload</>
+                        )}
+                      </div>
                     )}
                     {doc.error && <p className="text-xs mt-1" style={{ color: "#f87171" }}>{doc.error}</p>}
                     <input ref={el => { inputRefs.current[i] = el; }} type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" className="hidden"

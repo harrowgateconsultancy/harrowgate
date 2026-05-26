@@ -24,6 +24,7 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
   const { session } = useSession();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const authHeaders = async (): Promise<Record<string, string>> => {
@@ -137,19 +138,44 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
             </p>
           </div>
 
-          {/* Upload */}
+          {/* Upload — drag & drop zone */}
           <div>
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              disabled={uploading}
-              className="w-full rounded-2xl py-5 border-2 text-sm font-semibold transition-all hover:opacity-85 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed flex flex-col items-center justify-center gap-2"
-              style={{ background: "rgba(251,146,60,0.04)", borderColor: "rgba(251,146,60,0.22)", borderStyle: "dashed", color: "#fb923c" }}
+            <div
+              onClick={() => !uploading && inputRef.current?.click()}
+              onDragOver={e => { e.preventDefault(); if (!uploading) setDragOver(true); }}
+              onDragEnter={e => { e.preventDefault(); if (!uploading) setDragOver(true); }}
+              onDragLeave={e => { e.preventDefault(); setDragOver(false); }}
+              onDrop={e => {
+                e.preventDefault();
+                setDragOver(false);
+                if (uploading) return;
+                const file = e.dataTransfer.files?.[0];
+                if (file) handleReceiptUpload(file);
+              }}
+              className="w-full rounded-2xl border-2 text-sm font-semibold transition-all flex flex-col items-center justify-center gap-2 select-none"
+              style={{
+                padding: dragOver ? "28px 20px" : "20px",
+                background: dragOver ? "rgba(251,146,60,0.1)" : "rgba(251,146,60,0.04)",
+                borderColor: dragOver ? "#fb923c" : "rgba(251,146,60,0.22)",
+                borderStyle: "dashed",
+                color: "#fb923c",
+                cursor: uploading ? "not-allowed" : "pointer",
+                opacity: uploading ? 0.5 : 1,
+                transform: dragOver ? "scale(1.01)" : "scale(1)",
+                boxShadow: dragOver ? "0 0 20px rgba(251,146,60,0.12)" : "none",
+              }}
             >
               {uploading ? (
                 <>
                   <span className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#fb923c", borderTopColor: "transparent" }} />
                   <span>Uploading receipt…</span>
+                </>
+              ) : dragOver ? (
+                <>
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-7 h-7">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="font-bold">Drop to upload</span>
                 </>
               ) : (
                 <>
@@ -157,10 +183,12 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                     <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
                   <span>Upload Payment Receipt Screenshot</span>
-                  <span className="text-xs font-normal" style={{ color: "rgba(251,146,60,0.45)" }}>PNG, JPG, or PDF accepted</span>
+                  <span className="text-xs font-normal" style={{ color: "rgba(251,146,60,0.45)" }}>
+                    Drag & drop here, or click to browse · PNG, JPG, PDF
+                  </span>
                 </>
               )}
-            </button>
+            </div>
             <input ref={inputRef} type="file" accept="image/*,.pdf" className="hidden"
               onChange={e => { const f = e.target.files?.[0]; if (f) handleReceiptUpload(f); }} />
             {error && (
