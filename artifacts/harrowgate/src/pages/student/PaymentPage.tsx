@@ -129,7 +129,7 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                   </p>
                 </div>
               </div>
-              {!isSecond && !isFinal && (
+              {!isSecond && !isFinal && submission.status === "acknowledged" && (
                 <a
                   href="https://wa.me/85260606457?text=Hi%2C%20I%20have%20submitted%20my%20payment%20receipt%20for%20my%20student%20visa%20application."
                   target="_blank"

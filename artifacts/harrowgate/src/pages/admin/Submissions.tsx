@@ -725,11 +725,19 @@ export default function Submissions() {
                     </div>
                     <div className="px-4 py-4">
                       {!interviewForm ? (
-                        <button onClick={() => setInterviewForm({ zoomLink: "", dateTime: "", notes: "" })}
-                          className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
-                          style={{ background: "rgba(96,165,250,0.06)", borderColor: "rgba(96,165,250,0.22)", color: "#60a5fa" }}>
-                          🎥 Schedule Mock Interview
-                        </button>
+                        <div className="space-y-2">
+                          <button onClick={() => setInterviewForm({ zoomLink: "", dateTime: "", notes: "" })}
+                            className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
+                            style={{ background: "rgba(96,165,250,0.06)", borderColor: "rgba(96,165,250,0.22)", color: "#60a5fa" }}>
+                            🎥 Schedule Mock Interview
+                          </button>
+                          <button onClick={() => { if (confirm("Skip the mock interview and proceed directly to 2nd payment?")) updateStatus.mutate({ id: selected.id, status: "interview_completed", adminNotes: notes }); }}
+                            disabled={updateStatus.isPending}
+                            className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                            style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.6)" }}>
+                            ⏭ Skip Mock Interview
+                          </button>
+                        </div>
                       ) : (
                         <div className="space-y-3">
                           <div>
@@ -798,6 +806,12 @@ export default function Submissions() {
                         style={{ background: "rgba(74,222,128,0.08)", borderColor: "rgba(74,222,128,0.28)", color: "#4ade80" }}>
                         ✅ Confirm Interview Completed
                       </button>
+                      <button onClick={() => { if (confirm("Skip the mock interview and proceed to 2nd payment stage?")) updateStatus.mutate({ id: selected.id, status: "interview_completed", adminNotes: notes }); }}
+                        disabled={updateStatus.isPending}
+                        className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                        style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.6)" }}>
+                        ⏭ Skip Mock Interview
+                      </button>
                     </div>
                   </div>
                 )}
@@ -827,11 +841,19 @@ export default function Submissions() {
                     </div>
                     <div className="px-4 py-4">
                       {!uniInterviewForm ? (
-                        <button onClick={() => setUniInterviewForm({ platform: "zoom", link: "", dateTime: "", notes: "" })}
-                          className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
-                          style={{ background: "rgba(56,189,248,0.06)", borderColor: "rgba(56,189,248,0.22)", color: "#38bdf8" }}>
-                          🏫 Schedule University Interview
-                        </button>
+                        <div className="space-y-2">
+                          <button onClick={() => setUniInterviewForm({ platform: "zoom", link: "", dateTime: "", notes: "" })}
+                            className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
+                            style={{ background: "rgba(56,189,248,0.06)", borderColor: "rgba(56,189,248,0.22)", color: "#38bdf8" }}>
+                            🏫 Schedule University Interview
+                          </button>
+                          <button onClick={() => { if (confirm("Skip the university interview and proceed directly to offer letter stage?")) updateStatus.mutate({ id: selected.id, status: "university_interview_completed", adminNotes: notes }); }}
+                            disabled={updateStatus.isPending}
+                            className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                            style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.6)" }}>
+                            ⏭ Skip University Interview
+                          </button>
+                        </div>
                       ) : (
                         <div className="space-y-3">
                           <div>

@@ -1,7 +1,5 @@
 import { Router } from "express";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const archiver = require("archiver") as typeof import("archiver").default;
+import JSZip from "jszip";
 import { db } from "@workspace/db";
 import {
   studentSubmissionsTable,
@@ -255,19 +253,11 @@ router.get("/admin/student-submissions/:id/export-zip", async (req: any, res) =>
     const messages = await db.select().from(studentMessagesTable)
       .where(eq(studentMessagesTable.submissionId, submissionId));
 
-    const safeName = submission.name.replace(/[^a-zA-Z0-9\s\-_]/g, "").trim().replace(/\s+/g, "_");
-    const zipName = `${safeName}_${submissionId}_export.zip`;
-
-    res.setHeader("Content-Type", "application/zip");
-    res.setHeader("Content-Disposition", `attachment; filename="${zipName}"`);
-
-    const archive = archiver("zip", { zlib: { level: 6 } });
-    archive.on("error", (err) => { console.error("[zip]", err); res.end(); });
-    archive.pipe(res);
+    const zip = new JSZip();
 
     // 1. Student profile HTML (printable)
     const profileHtml = buildPrintHtml({ submission, form: form || null, docs, letters: letters || null, messages });
-    archive.append(profileHtml, { name: "student_profile.html" });
+    zip.file("student_profile.html", profileHtml);
 
     // 2. Immigration letters as individual HTML files
     if (letters) {
@@ -283,15 +273,17 @@ router.get("/admin/student-submissions/:id/export-zip", async (req: any, res) =>
         "Reason for Choosing the University",
         "Future Plans After Graduation",
       ];
+      const lettersFolder = zip.folder("immigration_letters")!;
       for (let n = 1; n <= 4; n++) {
         const body = (letters as any)[`letter${n}`] as string | null;
         if (!body) continue;
-        const letterHtml = buildLetterHtml(submission.name, n, letterDisplayTitles[n-1], body, letters.courseName || "", letters.universityName || "");
-        archive.append(letterHtml, { name: `immigration_letters/letter${n}_${letterTitles[n-1]}.html` });
+        const lHtml = buildLetterHtml(submission.name, n, letterDisplayTitles[n - 1], body, letters.courseName || "", letters.universityName || "");
+        lettersFolder.file(`letter${n}_${letterTitles[n - 1]}.html`, lHtml);
       }
     }
 
     // 3. All uploaded documents
+    const docsFolder = zip.folder("documents")!;
     const docTypeCount: Record<string, number> = {};
     for (const doc of docs) {
       try {
@@ -299,22 +291,27 @@ router.get("/admin/student-submissions/:id/export-zip", async (req: any, res) =>
         const response = await objectStorageService.downloadObject(file, 0);
         const buffer = Buffer.from(await response.arrayBuffer());
 
-        // Build a clean filename: 01_passport_doc_originalname.pdf
         docTypeCount[doc.documentType] = (docTypeCount[doc.documentType] || 0) + 1;
         const count = docTypeCount[doc.documentType];
-        const docLabel = (DOC_LABELS[doc.documentType] || doc.documentType).replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_").toLowerCase();
+        const docLabel = (DOC_LABELS[doc.documentType] || doc.documentType)
+          .replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_").toLowerCase();
         const originalName = doc.fileName || `file_${doc.id}`;
         const ext = originalName.includes(".") ? originalName.split(".").pop()! : "bin";
         const paddedId = String(doc.id).padStart(2, "0");
-        const fileName = `documents/${paddedId}_${docLabel}${count > 1 ? `_${count}` : ""}.${ext}`;
-
-        archive.append(buffer, { name: fileName });
+        docsFolder.file(`${paddedId}_${docLabel}${count > 1 ? `_${count}` : ""}.${ext}`, buffer);
       } catch (err) {
         console.error(`[zip] Failed to fetch doc ${doc.id}:`, err);
       }
     }
 
-    await archive.finalize();
+    const safeName = submission.name.replace(/[^a-zA-Z0-9\s\-_]/g, "").trim().replace(/\s+/g, "_");
+    const zipName = `${safeName}_${submissionId}_export.zip`;
+    const zipBuffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE", compressionOptions: { level: 6 } });
+
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="${zipName}"`);
+    res.setHeader("Content-Length", String(zipBuffer.length));
+    res.send(zipBuffer);
   } catch (err) {
     console.error("[student-export] ZIP failed:", err);
     if (!res.headersSent) res.status(500).json({ error: "Failed to generate export" });
