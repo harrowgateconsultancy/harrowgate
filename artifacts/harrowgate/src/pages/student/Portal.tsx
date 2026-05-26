@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useUser, useClerk } from "@clerk/react";
+import { useUser, useClerk, useSession } from "@clerk/react";
 import ApplyForm from "./ApplyForm";
 import PaymentPage from "./PaymentPage";
 import StudentDocManager from "./StudentDocManager";
@@ -125,6 +125,7 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
 export default function Portal() {
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
+  const { session } = useSession();
   const [submission, setSubmission] = useState<Submission | null | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [showTimeline, setShowTimeline] = useState(false);
@@ -134,6 +135,11 @@ export default function Portal() {
   const [additionalDocsError, setAdditionalDocsError] = useState<string | null>(null);
   const additionalDocsRef = useRef<HTMLInputElement | null>(null);
 
+  const authHeaders = async (): Promise<HeadersInit> => {
+    const token = await session?.getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   const fetchSubmission = async () => {
     try {
       setLoading(true);
@@ -141,27 +147,27 @@ export default function Portal() {
       const url = email
         ? `${getApiBase()}/api/student/submissions/me?email=${encodeURIComponent(email)}`
         : `${getApiBase()}/api/student/submissions/me`;
-      const res = await fetch(url, { credentials: "include" });
+      const res = await fetch(url, { credentials: "include", headers: await authHeaders() });
       if (res.ok) setSubmission(await res.json());
       else if (res.status === 401) setSubmission(null);
     } catch { setSubmission(null); }
     finally { setLoading(false); }
   };
 
-  useEffect(() => { if (isLoaded) fetchSubmission(); }, [isLoaded]);
+  useEffect(() => { if (isLoaded && session) fetchSubmission(); }, [isLoaded, session]);
 
   const handleCompleteUni = async () => {
     if (!submission) return;
     setCompletingUni(true);
     try {
-      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/complete-university-interview`, { method: "POST", credentials: "include" });
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/complete-university-interview`, { method: "POST", credentials: "include", headers: await authHeaders() });
       if (res.ok) fetchSubmission();
     } finally { setCompletingUni(false); }
   };
 
   const handleOfferLetterView = async (submissionId: number, docId: number) => {
     try {
-      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/view`, { credentials: "include" });
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/view`, { credentials: "include", headers: await authHeaders() });
       if (!res.ok) throw new Error("Failed to load file");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -172,7 +178,7 @@ export default function Portal() {
 
   const handleOfferLetterDownload = async (submissionId: number, docId: number, fileName: string) => {
     try {
-      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/download`, { credentials: "include" });
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/download`, { credentials: "include", headers: await authHeaders() });
       if (!res.ok) throw new Error("Failed to download file");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -189,8 +195,9 @@ export default function Portal() {
     setUploadingAdditionalDocs(true); setAdditionalDocsError(null);
     try {
       const { url } = await uploadToStorage(file);
+      const hdrs = await authHeaders() as Record<string, string>;
       const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/additional-docs`, {
-        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        method: "POST", headers: { "Content-Type": "application/json", ...hdrs }, credentials: "include",
         body: JSON.stringify({ fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type, note: additionalDocsNote }),
       });
       if (!res.ok) throw new Error("Failed");

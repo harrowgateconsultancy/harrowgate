@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useLocation } from "wouter";
+import { useSession } from "@clerk/react";
 
 const BG = "#0f2d18";
 const GOLD = "#a28959";
@@ -35,6 +36,7 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
 }
 
 export default function ApplyForm({ user, onSubmitted }: Props) {
+  const { session } = useSession();
   const [, setLocation] = useLocation();
   const [name, setName] = useState(user?.fullName || "");
   const [dob, setDob] = useState("");
@@ -43,6 +45,11 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const authHeaders = async (): Promise<Record<string, string>> => {
+    const token = await session?.getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 
   const handleFileChange = async (index: number, file: File | null) => {
     if (!file) return;
@@ -63,9 +70,10 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
     if (docs.some(d => d.uploading)) { setError("Please wait for all uploads to finish."); return; }
     setSubmitting(true);
     try {
+      const hdrs = await authHeaders();
       const res = await fetch(`${getApiBase()}/api/student/submissions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...hdrs },
         credentials: "include",
         body: JSON.stringify({ name: name.trim(), dateOfBirth: dob, passportNumber: passport.trim(), email: user?.primaryEmailAddress?.emailAddress }),
       });
@@ -76,7 +84,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
         if (d.url && d.name) {
           await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/documents`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...hdrs },
             credentials: "include",
             body: JSON.stringify({ documentType: `edu_${i + 1}`, fileName: d.name, fileUrl: d.url, fileSize: d.file?.size, mimeType: d.file?.type }),
           });

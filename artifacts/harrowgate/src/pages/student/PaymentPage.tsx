@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useSession } from "@clerk/react";
 import type { Submission } from "./Portal";
 
 const BG = "#0f2d18";
@@ -20,9 +21,15 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
 type Props = { submission: Submission; onUpdated: () => void; paymentType?: "first" | "second" | "final" };
 
 export default function PaymentPage({ submission, onUpdated, paymentType = "first" }: Props) {
+  const { session } = useSession();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const authHeaders = async (): Promise<Record<string, string>> => {
+    const token = await session?.getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 
   const isSecond = paymentType === "second";
   const isFinal = paymentType === "final";
@@ -48,8 +55,9 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
     setUploading(true); setError(null);
     try {
       const { url } = await uploadToStorage(file);
+      const hdrs = await authHeaders();
       const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/${endpoint}`, {
-        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        method: "POST", headers: { "Content-Type": "application/json", ...hdrs }, credentials: "include",
         body: JSON.stringify({ fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type }),
       });
       if (!res.ok) throw new Error("Failed");

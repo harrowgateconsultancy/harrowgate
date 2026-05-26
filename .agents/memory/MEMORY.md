@@ -1,1 +1,2 @@
 - [IMMD ID995A PDF filling](id995a-pdf-filling.md) — official PDF is AES-encrypted; only pypdf+cryptography can parse/fill it; pdf-lib completely fails on this PDF.
+- [Clerk Bearer token for student routes](clerk-bearer-token.md) — Replit proxy drops session cookies; all student API calls must use `Authorization: Bearer` via `session.getToken()` from `useSession()`.
