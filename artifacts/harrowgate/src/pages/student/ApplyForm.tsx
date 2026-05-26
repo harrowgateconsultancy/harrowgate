@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useSession } from "@clerk/react";
 
-const BG = "#0f2d18";
+const BG = "#0b2213";
 const GOLD = "#a28959";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -163,22 +163,64 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
     }
   };
 
+  const requiredFilled = [surname.trim(), givenName.trim(), dob, passport.trim()].every(Boolean);
+  const requiredDocs = DOC_CONFIG.filter(c => c.required).length;
+  const uploadedRequired = DOC_CONFIG.filter((c, i) => c.required && docs[i].url).length;
+  const allRequiredUploaded = uploadedRequired === requiredDocs;
+
   return (
     <div>
       <button
         onClick={() => setLocation("/")}
-        className="flex items-center gap-2 text-sm mb-8 transition-opacity hover:opacity-70"
-        style={{ color: "rgba(162,137,89,0.55)" }}
+        className="inline-flex items-center gap-1.5 text-sm mb-8 transition-opacity hover:opacity-70"
+        style={{ color: "rgba(162,137,89,0.45)" }}
       >
-        ← Back to Home
+        <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+          <path fillRule="evenodd" d="M9.78 12.78a.75.75 0 01-1.06 0L4.47 8.53a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L6.06 8l3.72 3.72a.75.75 0 010 1.06z" clipRule="evenodd" />
+        </svg>
+        Back to Home
       </button>
 
+      {/* Header */}
       <div className="mb-8">
-        <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "rgba(162,137,89,0.45)" }}>Student Portal</p>
-        <h1 className="text-4xl font-bold mb-3" style={{ color: GOLD }}>Start Your Application</h1>
-        <p className="text-base" style={{ color: "rgba(162,137,89,0.6)" }}>
-          Complete the form below to submit your student visa application. Fields marked <span style={{ color: GOLD }}>*</span> are required.
+        <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-3" style={{ color: "rgba(162,137,89,0.4)" }}>
+          Student Portal
         </p>
+        <h1 className="text-3xl font-bold mb-3" style={{ color: GOLD }}>Start Your Application</h1>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.55)" }}>
+          Complete the form below to begin your Hong Kong student visa application.<br />
+          Fields marked <span style={{ color: GOLD }}>*</span> are required.
+        </p>
+      </div>
+
+      {/* Progress indicator */}
+      <div className="mb-6 grid grid-cols-2 gap-3">
+        <div className="rounded-2xl p-4 border" style={{ background: "rgba(0,0,0,0.2)", borderColor: requiredFilled ? "rgba(74,222,128,0.2)" : "rgba(162,137,89,0.1)" }}>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: requiredFilled ? "rgba(74,222,128,0.15)" : "rgba(162,137,89,0.08)" }}>
+              {requiredFilled
+                ? <svg viewBox="0 0 12 12" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" className="w-3 h-3"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
+                : <span className="w-1.5 h-1.5 rounded-full" style={{ background: "rgba(162,137,89,0.3)" }} />}
+            </div>
+            <p className="text-xs font-semibold" style={{ color: requiredFilled ? "#4ade80" : GOLD }}>Personal Details</p>
+          </div>
+          <p className="text-xs pl-7" style={{ color: "rgba(162,137,89,0.4)" }}>
+            {requiredFilled ? "Complete" : "Fill in your name, DOB & passport"}
+          </p>
+        </div>
+        <div className="rounded-2xl p-4 border" style={{ background: "rgba(0,0,0,0.2)", borderColor: allRequiredUploaded ? "rgba(74,222,128,0.2)" : "rgba(162,137,89,0.1)" }}>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: allRequiredUploaded ? "rgba(74,222,128,0.15)" : "rgba(162,137,89,0.08)" }}>
+              {allRequiredUploaded
+                ? <svg viewBox="0 0 12 12" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" className="w-3 h-3"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
+                : <span className="text-xs font-bold" style={{ color: GOLD, fontSize: 9 }}>{uploadedRequired}/{requiredDocs}</span>}
+            </div>
+            <p className="text-xs font-semibold" style={{ color: allRequiredUploaded ? "#4ade80" : GOLD }}>Documents</p>
+          </div>
+          <p className="text-xs pl-7" style={{ color: "rgba(162,137,89,0.4)" }}>
+            {allRequiredUploaded ? "All required docs uploaded" : `${uploadedRequired} of ${requiredDocs} required uploaded`}
+          </p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -305,9 +347,11 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
         )}
 
         <button type="submit" disabled={submitting || docs.some(d => d.uploading)}
-          className="w-full py-4 rounded-2xl text-base font-semibold transition-all hover:opacity-90 disabled:opacity-50"
-          style={{ background: GOLD, color: BG }}>
-          {submitting ? "Submitting…" : "Submit Application"}
+          className="w-full py-4 rounded-2xl text-base font-semibold transition-all hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          style={{ background: GOLD, color: BG, boxShadow: "0 8px 24px rgba(162,137,89,0.25)" }}>
+          {submitting
+            ? <><span className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: BG, borderTopColor: "transparent" }} /> Submitting…</>
+            : <>Submit Application →</>}
         </button>
       </form>
     </div>

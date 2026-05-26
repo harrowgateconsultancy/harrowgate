@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useSession } from "@clerk/react";
 
 const GOLD = "#a28959";
-const BG = "#0f2d18";
+const BG = "#0b2213";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
 

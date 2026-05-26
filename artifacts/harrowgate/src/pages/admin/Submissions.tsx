@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 
-const BG = "#0f2d18";
+const BG = "#0b2213";
 const GOLD = "#a28959";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
@@ -390,13 +390,35 @@ export default function Submissions() {
 
   return (
     <div className="min-h-screen" style={{ background: BG }}>
-      <nav className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
-        <div className="flex items-center gap-4">
-          <button onClick={() => setLocation("/admin")} className="text-sm transition-opacity hover:opacity-70" style={{ color: "rgba(162,137,89,0.5)" }}>← Back</button>
-          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-14 object-contain" />
-          <span className="text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full" style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>Admin Panel</span>
+      <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.9)", position: "sticky", top: 0, zIndex: 50 }}>
+        <div className="flex items-center justify-between px-6 py-3.5 max-w-6xl mx-auto">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setLocation("/admin")}
+              className="inline-flex items-center gap-1 text-xs transition-opacity hover:opacity-70"
+              style={{ color: "rgba(162,137,89,0.45)" }}>
+              <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+                <path fillRule="evenodd" d="M9.78 12.78a.75.75 0 01-1.06 0L4.47 8.53a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L6.06 8l3.72 3.72a.75.75 0 010 1.06z" clipRule="evenodd" />
+              </svg>
+              Back
+            </button>
+            <div className="w-px h-4" style={{ background: "rgba(162,137,89,0.15)" }} />
+            <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-11 object-contain" />
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase px-2.5 py-1 rounded-full"
+              style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>
+              Admin
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            {pendingCount > 0 && (
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
+                {pendingCount} pending
+              </span>
+            )}
+            <a href={`${BASE}/admin`} className="text-xs transition-opacity hover:opacity-70" style={{ color: "rgba(162,137,89,0.4)" }}>
+              Portal →
+            </a>
+          </div>
         </div>
-        <a href={`${BASE}/admin`} className="text-xs transition-opacity hover:opacity-70" style={{ color: "rgba(162,137,89,0.5)" }}>Consultant Portal →</a>
       </nav>
 
       <main className="max-w-6xl mx-auto px-6 py-10">
@@ -439,23 +461,41 @@ export default function Submissions() {
             const receiptDoc = s.documents.find(d => d.documentType === "payment_receipt");
             const isDone = s.status === "university_interview_completed";
             return (
-              <div key={s.id} className="rounded-2xl border transition-all cursor-pointer"
+              <div key={s.id}
+                className="rounded-2xl border transition-all cursor-pointer hover:scale-[1.005] hover:shadow-lg group"
                 style={{
-                  background: isDone ? "rgba(134,239,172,0.08)" : "rgba(0,0,0,0.2)",
-                  borderColor: isDone ? "rgba(134,239,172,0.35)" : hasAction ? "rgba(251,146,60,0.28)" : "rgba(162,137,89,0.12)",
+                  background: isDone ? "rgba(134,239,172,0.06)" : "rgba(0,0,0,0.18)",
+                  borderColor: isDone ? "rgba(134,239,172,0.3)" : hasAction ? "rgba(251,146,60,0.25)" : "rgba(162,137,89,0.1)",
+                  boxShadow: hasAction ? "0 0 0 1px rgba(251,146,60,0.08)" : "none",
                 }}
                 onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed"].includes(s.status)) loadLetters(s.id); }}>
-                <div className="px-6 py-5 flex items-center gap-4">
+                {/* Orange left accent for action-needed */}
+                {hasAction && <div className="h-0.5 w-full rounded-t-2xl" style={{ background: "linear-gradient(to right, transparent, rgba(251,146,60,0.5), transparent)" }} />}
+                <div className="px-5 py-4 flex items-center gap-4">
+                  {/* Avatar initial */}
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
+                    style={{ background: isDone ? "rgba(74,222,128,0.12)" : "rgba(162,137,89,0.1)", color: isDone ? "#4ade80" : GOLD }}>
+                    {(s.name[0] || "?").toUpperCase()}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="text-base font-semibold" style={{ color: GOLD }}>{s.name}</span>
-                      {hasAction && <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: "rgba(251,146,60,0.1)", color: "#fb923c" }}>Action needed</span>}
-                    {s.additionalDocsRequested && <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: "rgba(251,146,60,0.08)", color: "#fb923c" }}>📎 Docs Requested</span>}
+                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                      <span className="text-sm font-semibold" style={{ color: GOLD }}>{s.name}</span>
+                      {hasAction && (
+                        <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                          style={{ background: "rgba(251,146,60,0.1)", color: "#fb923c" }}>
+                          ⚡ Action needed
+                        </span>
+                      )}
+                      {s.additionalDocsRequested && (
+                        <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                          style={{ background: "rgba(251,146,60,0.08)", color: "#fb923c" }}>
+                          📎 Docs Requested
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-4 text-xs flex-wrap" style={{ color: "rgba(162,137,89,0.45)" }}>
-                      {s.email && <span>{s.email}</span>}
-                      <span>DOB: {s.dateOfBirth}</span>
-                      <span>Passport: {s.passportNumber}</span>
+                    <div className="flex items-center gap-3 text-xs flex-wrap" style={{ color: "rgba(162,137,89,0.4)" }}>
+                      {s.email && <span className="truncate max-w-[180px]">{s.email}</span>}
+                      <span className="font-mono">{s.passportNumber}</span>
                       <span>{docCount} doc{docCount !== 1 ? "s" : ""}</span>
                       <span>{new Date(s.createdAt).toLocaleDateString("en-GB")}</span>
                     </div>
@@ -466,12 +506,19 @@ export default function Submissions() {
                       target="_blank" rel="noopener noreferrer"
                       onClick={e => e.stopPropagation()}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shrink-0 transition-all hover:opacity-80"
-                      style={{ borderColor: "rgba(96,165,250,0.3)", color: "#60a5fa", background: "rgba(96,165,250,0.06)" }}>
+                      style={{ borderColor: "rgba(96,165,250,0.25)", color: "#60a5fa", background: "rgba(96,165,250,0.05)" }}>
                       💳 Receipt ↗
                     </a>
                   )}
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold shrink-0" style={{ color: sc.color, background: sc.bg }}>{sc.label}</span>
-                  <span style={{ color: "rgba(162,137,89,0.25)" }}>›</span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold shrink-0"
+                    style={{ color: sc.color, background: sc.bg }}>
+                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: sc.color }} />
+                    {sc.label}
+                  </span>
+                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5"
+                    style={{ color: "rgba(162,137,89,0.2)" }}>
+                    <path fillRule="evenodd" d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z" clipRule="evenodd" />
+                  </svg>
                 </div>
               </div>
             );
@@ -485,47 +532,74 @@ export default function Submissions() {
           onClick={e => { if (e.target === e.currentTarget) { setSelected(null); setPreviewDoc(null); } }}>
           <div className="w-full max-w-3xl rounded-3xl border flex flex-col" style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.18)", maxHeight: "92vh" }}>
 
-            <div className="px-6 py-5 border-b flex items-center justify-between shrink-0" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-              <div>
-                <h2 className="text-lg font-bold" style={{ color: GOLD }}>{selected.name}</h2>
-                <p className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>
-                  {selected.email} · {selected.passportNumber} · DOB {selected.dateOfBirth}
-                  {calcAge(selected.dateOfBirth) !== null && <span className="ml-1 font-semibold" style={{ color: GOLD }}>(Age {calcAge(selected.dateOfBirth)})</span>}
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                {["payment_received", "acknowledged"].includes(selected.status) && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border" style={{ borderColor: "rgba(74,222,128,0.25)", background: "rgba(74,222,128,0.07)" }}>
-                    <span className="text-xs font-medium" style={{ color: "rgba(74,222,128,0.55)" }}>Code</span>
-                    <span className="text-sm font-bold tracking-widest font-mono" style={{ color: "#4ade80" }}>
-                      STU{selected.passportNumber.slice(-4).toUpperCase()}
-                    </span>
+            {/* Modal top accent */}
+            <div className="h-0.5 rounded-t-3xl" style={{ background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
+
+            <div className="px-6 py-4 border-b flex items-start justify-between gap-4 shrink-0" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+              <div className="flex items-start gap-3 min-w-0">
+                {/* Avatar */}
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-base font-bold mt-0.5"
+                  style={{ background: "rgba(162,137,89,0.12)", color: GOLD }}>
+                  {(selected.name[0] || "?").toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-base font-bold" style={{ color: GOLD }}>{selected.name}</h2>
+                    {statusConfig[selected.status] && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                        style={{ color: statusConfig[selected.status].color, background: statusConfig[selected.status].bg }}>
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: statusConfig[selected.status].color }} />
+                        {statusConfig[selected.status].label}
+                      </span>
+                    )}
+                    {["payment_received", "acknowledged"].includes(selected.status) && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold font-mono"
+                        style={{ background: "rgba(74,222,128,0.08)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.2)" }}>
+                        STU{selected.passportNumber.slice(-4).toUpperCase()}
+                      </span>
+                    )}
                   </div>
-                )}
-                {statusConfig[selected.status] && (
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ color: statusConfig[selected.status].color, background: statusConfig[selected.status].bg }}>
-                    {statusConfig[selected.status].label}
-                  </span>
-                )}
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>
+                    {selected.email}
+                    {selected.email && " · "}
+                    <span className="font-mono">{selected.passportNumber}</span>
+                    {" · DOB "}
+                    {selected.dateOfBirth}
+                    {calcAge(selected.dateOfBirth) !== null && (
+                      <span className="ml-1" style={{ color: GOLD }}>
+                        (Age {calcAge(selected.dateOfBirth)})
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
                 <a
                   href={`${getApiBase()}/api/admin/student-submissions/${selected.id}/print`}
                   target="_blank" rel="noopener noreferrer"
                   title="Print student profile"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all hover:opacity-80"
-                  style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all hover:opacity-80"
+                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}
                 >
-                  🖨 Print
+                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h8a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a1 1 0 00-1-1H6a1 1 0 00-1 1zm2-1h2v3H7V3zm-1 9H5V9h1v3zm2 0H8V9h1v3zm2 0h-1V9h1v3z" clipRule="evenodd" /></svg>
+                  Print
                 </a>
                 <a
                   href={`${getApiBase()}/api/admin/student-submissions/${selected.id}/export-zip`}
                   download
                   title="Download all documents as ZIP"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all hover:opacity-80"
-                  style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all hover:opacity-80"
+                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}
                 >
-                  📦 Export ZIP
+                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M8 1a.75.75 0 01.75.75v7.69l2.72-2.72a.75.75 0 011.06 1.06l-4 4a.75.75 0 01-1.06 0l-4-4a.75.75 0 111.06-1.06L7.25 9.44V1.75A.75.75 0 018 1zM1.75 14a.75.75 0 000 1.5h12.5a.75.75 0 000-1.5H1.75z" clipRule="evenodd" /></svg>
+                  ZIP
                 </a>
-                <button onClick={() => { setSelected(null); setPreviewDoc(null); }} className="text-2xl leading-none" style={{ color: "rgba(162,137,89,0.35)" }}>×</button>
+                <button
+                  onClick={() => { setSelected(null); setPreviewDoc(null); }}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80"
+                  style={{ background: "rgba(162,137,89,0.07)", color: "rgba(162,137,89,0.45)" }}>
+                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z" /></svg>
+                </button>
               </div>
             </div>
 
