@@ -79,13 +79,33 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
 function isImage(f: string, m?: string | null) { return m?.startsWith("image/") || /\.(jpe?g|png|gif|webp)$/i.test(f); }
 function isPdf(f: string, m?: string | null) { return m === "application/pdf" || /\.pdf$/i.test(f); }
 function fileIcon(f: string, m?: string | null) { return isPdf(f, m) ? "📄" : isImage(f, m) ? "🖼️" : "📎"; }
+function calcAge(dob: string): number | null {
+  if (!dob) return null;
+  const born = new Date(dob);
+  if (isNaN(born.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - born.getFullYear();
+  const m = now.getMonth() - born.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < born.getDate())) age--;
+  return age;
+}
+
 function getDocMeta(dt: string): { label: string; tagColor: string; tagText: string; tag: string } {
-  if (dt === "payment_receipt")       return { label: "Payment Receipt",       tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Receipt"       };
-  if (dt === "second_payment_receipt") return { label: "2nd Payment Receipt",  tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "2nd Receipt"   };
-  if (dt === "additional_doc")        return { label: "Additional Document",   tagColor: "rgba(251,146,60,0.18)",  tagText: "#fb923c", tag: "Additional"    };
-  if (dt === "offer_letter")          return { label: "Offer Letter",          tagColor: "rgba(240,171,252,0.18)", tagText: "#f0abfc", tag: "Offer Letter"  };
-  if (dt === "final_payment_receipt") return { label: "Final Payment Receipt", tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Final Receipt" };
-  if (dt.startsWith("admin_"))        return { label: dt === "admin_doc" ? "Admin Document" : dt.replace("admin_", "").replace("_", " "), tagColor: "rgba(74,222,128,0.15)", tagText: "#4ade80", tag: "Admin" };
+  if (dt === "payment_receipt")        return { label: "Payment Receipt",            tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Receipt"       };
+  if (dt === "second_payment_receipt") return { label: "2nd Payment Receipt",        tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "2nd Receipt"   };
+  if (dt === "additional_doc")         return { label: "Additional Document",        tagColor: "rgba(251,146,60,0.18)",  tagText: "#fb923c", tag: "Additional"    };
+  if (dt === "offer_letter")           return { label: "Offer Letter",               tagColor: "rgba(240,171,252,0.18)", tagText: "#f0abfc", tag: "Offer Letter"  };
+  if (dt === "final_payment_receipt")  return { label: "Final Payment Receipt",      tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Final Receipt" };
+  if (dt === "passport_photo")         return { label: "Passport Size Photo",        tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "passport_doc")           return { label: "Passport / Travel Document", tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "birth_certificate")      return { label: "Birth Certificate / Nat. ID",tagColor: "rgba(162,137,89,0.18)", tagText: GOLD,      tag: "Student"       };
+  if (dt === "cv")                     return { label: "CV",                         tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "edu_results")            return { label: "Educational Results",        tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "edu_transcript")         return { label: "Educational Transcript",     tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "higher_edu_results")     return { label: "Higher Education Result",    tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "higher_edu_transcript")  return { label: "Higher Education Transcript",tagColor: "rgba(162,137,89,0.18)", tagText: GOLD,      tag: "Student"       };
+  if (dt.startsWith("edu_"))           return { label: `Education Document ${dt.replace("edu_", "")}`, tagColor: "rgba(162,137,89,0.18)", tagText: GOLD, tag: "Student" };
+  if (dt.startsWith("admin_"))         return { label: dt === "admin_doc" ? "Admin Document" : dt.replace("admin_", "").replace(/_/g, " "), tagColor: "rgba(74,222,128,0.15)", tagText: "#4ade80", tag: "Admin" };
   return { label: dt.replace(/_/g, " ").toUpperCase(), tagColor: "rgba(162,137,89,0.18)", tagText: GOLD, tag: "Student" };
 }
 
@@ -426,7 +446,10 @@ export default function Submissions() {
             <div className="px-6 py-5 border-b flex items-center justify-between shrink-0" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
               <div>
                 <h2 className="text-lg font-bold" style={{ color: GOLD }}>{selected.name}</h2>
-                <p className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>{selected.email} · {selected.passportNumber} · DOB {selected.dateOfBirth}</p>
+                <p className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>
+                  {selected.email} · {selected.passportNumber} · DOB {selected.dateOfBirth}
+                  {calcAge(selected.dateOfBirth) !== null && <span className="ml-1 font-semibold" style={{ color: GOLD }}>(Age {calcAge(selected.dateOfBirth)})</span>}
+                </p>
               </div>
               <div className="flex items-center gap-3">
                 {["payment_received", "acknowledged"].includes(selected.status) && (

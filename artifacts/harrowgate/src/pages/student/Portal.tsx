@@ -700,8 +700,17 @@ export default function Portal() {
                 </div>
                 <div className="px-6 py-4 border-t" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
                   <p className="text-xs font-medium mb-3" style={{ color: "rgba(162,137,89,0.45)" }}>Uploaded Documents</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                    {["edu_1","edu_2","edu_3","edu_4","edu_5"].map((type, i) => {
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {[
+                      { type: "passport_photo",        label: "Passport Photo",      icon: "🖼️" },
+                      { type: "passport_doc",          label: "Passport / Travel Doc",icon: "📘" },
+                      { type: "birth_certificate",     label: "Birth Cert / ID",     icon: "📋" },
+                      { type: "cv",                    label: "CV",                  icon: "📄" },
+                      { type: "edu_results",           label: "Edu. Results",        icon: "📄" },
+                      { type: "edu_transcript",        label: "Edu. Transcript",     icon: "📄" },
+                      { type: "higher_edu_results",    label: "Higher Edu. Result",  icon: "📄" },
+                      { type: "higher_edu_transcript", label: "Higher Edu. Transcript", icon: "📄" },
+                    ].map(({ type, label, icon }) => {
                       const doc = submission.documents.find(d => d.documentType === type);
                       return (
                         <div key={type} className="rounded-xl p-3 text-center border text-xs" style={{
@@ -709,9 +718,9 @@ export default function Portal() {
                           borderColor: doc ? "rgba(162,137,89,0.22)" : "rgba(162,137,89,0.07)",
                           color: doc ? GOLD : "rgba(162,137,89,0.3)",
                         }}>
-                          <div className="text-lg mb-1">{doc ? "📄" : "—"}</div>
-                          <div className="font-medium">Doc {i+1}</div>
-                          {doc && <div className="mt-1 opacity-50 truncate">{doc.fileName.slice(0,10)}…</div>}
+                          <div className="text-lg mb-1">{doc ? icon : "—"}</div>
+                          <div className="font-medium leading-tight">{label}</div>
+                          {doc && <div className="mt-1 opacity-50 truncate">{doc.fileName.slice(0, 12)}…</div>}
                         </div>
                       );
                     })}
