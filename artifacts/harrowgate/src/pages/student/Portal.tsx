@@ -3,6 +3,7 @@ import { useUser, useClerk, useSession } from "@clerk/react";
 import ApplyForm from "./ApplyForm";
 import PaymentPage from "./PaymentPage";
 import StudentDocManager from "./StudentDocManager";
+import { useLang, LANG_LIST } from "../../i18n";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -16,6 +17,7 @@ export type Submission = {
   interviewZoomLink?: string | null; interviewDateTime?: string | null;
   uniInterviewLink?: string | null; uniInterviewDateTime?: string | null; uniInterviewPlatform?: string | null;
   additionalDocsRequested?: boolean | null; additionalDocsRequestNote?: string | null;
+  immigrationRefNumber?: string | null;
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };
 
@@ -142,6 +144,9 @@ export default function Portal() {
   const [uploadingReplyAttachment, setUploadingReplyAttachment] = useState(false);
   const [replyError, setReplyError] = useState<string | null>(null);
   const replyAttachmentRef = useRef<HTMLInputElement | null>(null);
+  const { lang, setLang, t, isRtl } = useLang();
+  const [showLangPicker, setShowLangPicker] = useState(false);
+  const langPickerRef = useRef<HTMLDivElement | null>(null);
 
   const authHeaders = async (): Promise<HeadersInit> => {
     const token = await session?.getToken();
@@ -173,9 +178,45 @@ export default function Portal() {
     } catch { /* silent */ }
   };
 
+  const silentFetchSubmission = async () => {
+    try {
+      const email = user?.primaryEmailAddress?.emailAddress;
+      const url = email
+        ? `${getApiBase()}/api/student/submissions/me?email=${encodeURIComponent(email)}`
+        : `${getApiBase()}/api/student/submissions/me`;
+      const res = await fetch(url, { credentials: "include", headers: await authHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        setSubmission(prev => JSON.stringify(prev) !== JSON.stringify(data) ? data : prev);
+      }
+    } catch { /* silent */ }
+  };
+
+  const silentFetchMessages = async (id: number) => {
+    try {
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${id}/messages`, {
+        credentials: "include", headers: await authHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(prev => JSON.stringify(prev) !== JSON.stringify(data) ? data : prev);
+      }
+    } catch { /* silent */ }
+  };
+
   useEffect(() => {
     if (submission?.id) fetchMessages(submission.id);
   }, [submission?.id]);
+
+  // Real-time background polling — no loading spinner, silent update on change
+  useEffect(() => {
+    if (!submission?.id || !session) return;
+    const pollId = setInterval(() => {
+      silentFetchSubmission();
+      silentFetchMessages(submission.id);
+    }, 10000);
+    return () => clearInterval(pollId);
+  }, [submission?.id, session?.id]);
 
   const handleReplyAttachment = async (file: File) => {
     setUploadingReplyAttachment(true);
@@ -284,8 +325,8 @@ export default function Portal() {
       {/* Nav */}
       <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.9)", position: "sticky", top: 0, zIndex: 50 }}>
         <div className="flex items-center justify-between px-6 py-3.5 max-w-5xl mx-auto">
-          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-11 object-contain" />
-          <div className="flex items-center gap-3">
+          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-16 object-contain" />
+          <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border" style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(162,137,89,0.05)" }}>
               <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
                 style={{ background: "rgba(162,137,89,0.2)", color: GOLD }}>
@@ -295,10 +336,32 @@ export default function Portal() {
                 {user?.primaryEmailAddress?.emailAddress}
               </span>
             </div>
+            {/* Language picker */}
+            <div ref={langPickerRef} style={{ position: "relative" }}>
+              <button
+                onClick={() => setShowLangPicker(v => !v)}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-full border text-xs font-medium transition-all hover:opacity-80"
+                style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.6)", background: "rgba(162,137,89,0.05)" }}>
+                {LANG_LIST.find(l => l.code === lang)?.flag}
+                <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-2 h-2 ml-0.5"><path d="M1 1l4 4 4-4" /></svg>
+              </button>
+              {showLangPicker && (
+                <div className="absolute top-full right-0 mt-1.5 rounded-xl border shadow-2xl z-[100] overflow-hidden"
+                  style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.2)", minWidth: 152 }}>
+                  {LANG_LIST.map(l => (
+                    <button key={l.code} onClick={() => { setLang(l.code); setShowLangPicker(false); }}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 text-xs transition-all hover:opacity-90"
+                      style={{ background: l.code === lang ? "rgba(162,137,89,0.12)" : "transparent", color: l.code === lang ? GOLD : "rgba(162,137,89,0.55)" }}>
+                      <span className="text-sm">{l.flag}</span> {l.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button onClick={() => signOut({ redirectUrl: BASE || "/" })}
               className="text-xs px-4 py-1.5 rounded-full border transition-all hover:opacity-80"
               style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.6)" }}>
-              Sign out
+              {t("nav.signOut")}
             </button>
           </div>
         </div>
@@ -317,13 +380,13 @@ export default function Portal() {
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
                     <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-2" style={{ color: "rgba(162,137,89,0.4)" }}>
-                      Client Portal
+                      {t("portal.title")}
                     </p>
                     <h2 className="text-2xl font-bold mb-1" style={{ color: GOLD }}>
-                      Welcome back, {submission.name.split(" ")[0]}.
+                      {t("portal.welcomeBack")}, {submission.name.split(" ")[0]}.
                     </h2>
                     <p className="text-sm" style={{ color: "rgba(162,137,89,0.45)" }}>
-                      Applied {new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                      {t("portal.applied")} {new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
@@ -633,6 +696,26 @@ export default function Portal() {
                 </div>
               );
             })()}
+
+            {/* ── PROCESSING NOTICE + IMMIGRATION REF (final_payment_confirmed) ── */}
+            {submission.status === "final_payment_confirmed" && (
+              <div className="mt-4 space-y-3">
+                <div className="rounded-2xl border px-5 py-4 flex items-start gap-3" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.6)" }}>{t("portal.processing")}</p>
+                </div>
+                {submission.immigrationRefNumber && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(74,222,128,0.03)", borderColor: "rgba(74,222,128,0.2)" }}>
+                    <div className="px-5 py-3 border-b" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>{t("portal.immigRef")}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(74,222,128,0.5)" }}>{t("portal.immigRefSub")}</p>
+                    </div>
+                    <div className="px-5 py-4">
+                      <p className="font-mono text-2xl font-bold tracking-wider" style={{ color: "#4ade80" }}>{submission.immigrationRefNumber}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* ── UNIVERSITY INTERVIEW COMPLETED ── */}
             {submission.status === "university_interview_completed" && (

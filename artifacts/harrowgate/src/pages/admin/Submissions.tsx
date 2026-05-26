@@ -15,6 +15,7 @@ type Submission = {
   interviewZoomLink?: string | null; interviewDateTime?: string | null;
   uniInterviewLink?: string | null; uniInterviewDateTime?: string | null; uniInterviewPlatform?: string | null;
   additionalDocsRequested?: boolean | null; additionalDocsRequestNote?: string | null;
+  immigrationRefNumber?: string | null;
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -154,6 +155,28 @@ export default function Submissions() {
   const [adminMessages, setAdminMessages] = useState<any[]>([]);
   const [uploadingMsgAttachment, setUploadingMsgAttachment] = useState(false);
   const msgAttachmentRef = useRef<HTMLInputElement | null>(null);
+  const [refNumInput, setRefNumInput] = useState("");
+  const [settingRef, setSettingRef] = useState(false);
+  const [refSetSuccess, setRefSetSuccess] = useState(false);
+
+  const handleSetImmigrationRef = async () => {
+    if (!selected) return;
+    setSettingRef(true);
+    try {
+      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/immigration-ref`, {
+        method: "PATCH", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ immigrationRefNumber: refNumInput }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const updated = await res.json();
+      setSelected((prev: any) => prev ? { ...prev, immigrationRefNumber: updated.immigrationRefNumber } : prev);
+      setSubmissions(prev => prev.map(s => s.id === updated.id ? { ...s, immigrationRefNumber: updated.immigrationRefNumber } : s));
+      setRefSetSuccess(true);
+      setTimeout(() => setRefSetSuccess(false), 3000);
+    } catch { alert("Failed to save immigration reference number."); }
+    finally { setSettingRef(false); }
+  };
 
   const loadLetters = async (id: number) => {
     try {
@@ -468,7 +491,7 @@ export default function Submissions() {
                   borderColor: isDone ? "rgba(134,239,172,0.3)" : hasAction ? "rgba(251,146,60,0.25)" : "rgba(162,137,89,0.1)",
                   boxShadow: hasAction ? "0 0 0 1px rgba(251,146,60,0.08)" : "none",
                 }}
-                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed"].includes(s.status)) loadLetters(s.id); }}>
+                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setRefNumInput(s.immigrationRefNumber || ""); setRefSetSuccess(false); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed"].includes(s.status)) loadLetters(s.id); }}>
                 {/* Orange left accent for action-needed */}
                 {hasAction && <div className="h-0.5 w-full rounded-t-2xl" style={{ background: "linear-gradient(to right, transparent, rgba(251,146,60,0.5), transparent)" }} />}
                 <div className="px-5 py-4 flex items-center gap-4">
@@ -1053,6 +1076,38 @@ export default function Submissions() {
                         <p className="text-xs" style={{ color: "rgba(74,222,128,0.5)" }}>
                           The student's final payment has been confirmed. They can now download the offer letter from their portal.
                         </p>
+                      </div>
+                    </div>
+                    {/* Immigration Reference Number */}
+                    <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(74,222,128,0.2)" }}>
+                      <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(74,222,128,0.1)" }}>
+                        <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>🇭🇰 Immigration Reference Number</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(74,222,128,0.45)" }}>Assign the official EOEN-XXXXXXX-XX reference number visible to the student</p>
+                      </div>
+                      <div className="px-4 py-4 space-y-3">
+                        {selected.immigrationRefNumber && (
+                          <div className="rounded-xl px-3 py-2.5 border" style={{ background: "rgba(74,222,128,0.05)", borderColor: "rgba(74,222,128,0.15)" }}>
+                            <p className="text-xs font-medium mb-0.5" style={{ color: "rgba(74,222,128,0.5)" }}>Current reference:</p>
+                            <p className="font-mono text-sm font-bold" style={{ color: "#4ade80" }}>{selected.immigrationRefNumber}</p>
+                          </div>
+                        )}
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="EOEN-XXXXXXX-XX"
+                            value={refNumInput}
+                            onChange={e => setRefNumInput(e.target.value)}
+                            className="flex-1 rounded-xl px-3 py-2 text-sm border outline-none font-mono"
+                            style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.2)", color: GOLD }}
+                          />
+                          <button
+                            onClick={handleSetImmigrationRef}
+                            disabled={settingRef || !refNumInput.trim()}
+                            className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                            style={{ borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
+                            {settingRef ? "Saving…" : refSetSuccess ? "✓ Saved" : "Save"}
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.25)" }}>

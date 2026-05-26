@@ -18,6 +18,7 @@ export const studentSubmissionsTable = pgTable("student_submissions", {
   uniInterviewPlatform: text("uni_interview_platform"),
   additionalDocsRequested: boolean("additional_docs_requested").default(false),
   additionalDocsRequestNote: text("additional_docs_request_note"),
+  immigrationRefNumber: text("immigration_ref_number"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
