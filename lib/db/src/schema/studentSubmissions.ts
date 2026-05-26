@@ -53,6 +53,22 @@ export const studentMessagesTable = pgTable("student_messages", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const immigrationLettersTable = pgTable("immigration_letters", {
+  id: serial("id").primaryKey(),
+  submissionId: integer("submission_id").notNull().references(() => studentSubmissionsTable.id, { onDelete: "cascade" }).unique(),
+  courseName: text("course_name"),
+  universityName: text("university_name"),
+  courseWebsite: text("course_website"),
+  letter1: text("letter1"),
+  letter2: text("letter2"),
+  letter3: text("letter3"),
+  letter4: text("letter4"),
+  generatedAt: timestamp("generated_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+});
+
+export type ImmigrationLetters = typeof immigrationLettersTable.$inferSelect;
 export type Id995aForm = typeof id995aFormsTable.$inferSelect;
 export type StudentMessage = typeof studentMessagesTable.$inferSelect;
 

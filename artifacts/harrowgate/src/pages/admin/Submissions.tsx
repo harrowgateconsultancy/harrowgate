@@ -143,12 +143,54 @@ export default function Submissions() {
   const [offerLetterSent, setOfferLetterSent] = useState<number | null>(null);
   const offerLetterFileRef = useRef<HTMLInputElement | null>(null);
   const [id995aOpen, setId995aOpen] = useState(false);
+  const [lettersOpen, setLettersOpen] = useState(false);
+  const [lettersData, setLettersData] = useState<any | null>(null);
+  const [lettersCourseForm, setLettersCourseForm] = useState({ courseName: "", universityName: "", courseWebsite: "" });
+  const [generatingLetters, setGeneratingLetters] = useState(false);
+  const [lettersError, setLettersError] = useState<string | null>(null);
   const [messageForm, setMessageForm] = useState<{ subject: string; body: string; attachments: Array<{fileName: string; fileUrl: string; mimeType?: string}> } | null>(null);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [messageSent, setMessageSent] = useState<number | null>(null);
   const [adminMessages, setAdminMessages] = useState<any[]>([]);
   const [uploadingMsgAttachment, setUploadingMsgAttachment] = useState(false);
   const msgAttachmentRef = useRef<HTMLInputElement | null>(null);
+
+  const loadLetters = async (id: number) => {
+    try {
+      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${id}/immigration-letters`);
+      if (res.ok) {
+        const data = await res.json();
+        setLettersData(data);
+        if (data) {
+          setLettersCourseForm({ courseName: data.courseName || "", universityName: data.universityName || "", courseWebsite: data.courseWebsite || "" });
+        }
+      }
+    } catch { /* silent */ }
+  };
+
+  const handleGenerateLetters = async () => {
+    if (!selected) return;
+    if (!lettersCourseForm.courseName.trim() || !lettersCourseForm.universityName.trim()) {
+      setLettersError("Please enter both the course name and university name.");
+      return;
+    }
+    setGeneratingLetters(true);
+    setLettersError(null);
+    try {
+      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/immigration-letters/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(lettersCourseForm),
+      });
+      if (!res.ok) { const e = await res.json(); throw new Error(e.error || "Failed"); }
+      const data = await res.json();
+      setLettersData(data);
+    } catch (err: any) {
+      setLettersError(err.message || "Failed to generate letters. Please try again.");
+    } finally {
+      setGeneratingLetters(false);
+    }
+  };
 
   const loadAdminMessages = async (id: number) => {
     try {
@@ -402,7 +444,7 @@ export default function Submissions() {
                   background: isDone ? "rgba(134,239,172,0.08)" : "rgba(0,0,0,0.2)",
                   borderColor: isDone ? "rgba(134,239,172,0.35)" : hasAction ? "rgba(251,146,60,0.28)" : "rgba(162,137,89,0.12)",
                 }}
-                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setMessageForm(null); setMessageSent(null); loadAdminMessages(s.id); }}>
+                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed"].includes(s.status)) loadLetters(s.id); }}>
                 <div className="px-6 py-5 flex items-center gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1">
@@ -921,6 +963,120 @@ export default function Submissions() {
                       )}
                     </div>
                   </>
+                )}
+
+                {/* Immigration Letters Panel */}
+                {(selected.status === "final_payment_received" || selected.status === "final_payment_confirmed") && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.25)" }}>
+                    <button className="w-full px-4 py-3 flex items-center justify-between" onClick={() => setLettersOpen(v => !v)}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">✉️</span>
+                        <span className="text-sm font-semibold" style={{ color: GOLD }}>Immigration Letters</span>
+                        {lettersData?.generatedAt && (
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium ml-1" style={{ background: "rgba(74,222,128,0.12)", color: "#4ade80" }}>Generated</span>
+                        )}
+                      </div>
+                      <span style={{ color: "rgba(162,137,89,0.4)" }}>{lettersOpen ? "▲" : "▼"}</span>
+                    </button>
+
+                    {lettersOpen && (
+                      <div className="border-t px-4 py-4 space-y-4" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.55)" }}>
+                          Enter course details to generate 4 formal immigration letters. Letters are written in first person using the student's ID995A data.
+                        </p>
+
+                        {/* Course info inputs */}
+                        <div className="space-y-2">
+                          <div>
+                            <label className="text-xs font-medium mb-1 block" style={{ color: "rgba(162,137,89,0.7)" }}>Course Name *</label>
+                            <input
+                              className="w-full rounded-xl px-3 py-2 text-sm border outline-none"
+                              style={{ background: "rgba(0,0,0,0.3)", borderColor: "rgba(162,137,89,0.25)", color: "#e8d5b0" }}
+                              placeholder="e.g. MSc in Finance"
+                              value={lettersCourseForm.courseName}
+                              onChange={e => setLettersCourseForm(f => ({ ...f, courseName: e.target.value }))}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium mb-1 block" style={{ color: "rgba(162,137,89,0.7)" }}>University / Institution *</label>
+                            <input
+                              className="w-full rounded-xl px-3 py-2 text-sm border outline-none"
+                              style={{ background: "rgba(0,0,0,0.3)", borderColor: "rgba(162,137,89,0.25)", color: "#e8d5b0" }}
+                              placeholder="e.g. The University of Hong Kong"
+                              value={lettersCourseForm.universityName}
+                              onChange={e => setLettersCourseForm(f => ({ ...f, universityName: e.target.value }))}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium mb-1 block" style={{ color: "rgba(162,137,89,0.7)" }}>Course Website (optional)</label>
+                            <input
+                              className="w-full rounded-xl px-3 py-2 text-sm border outline-none"
+                              style={{ background: "rgba(0,0,0,0.3)", borderColor: "rgba(162,137,89,0.25)", color: "#e8d5b0" }}
+                              placeholder="https://..."
+                              value={lettersCourseForm.courseWebsite}
+                              onChange={e => setLettersCourseForm(f => ({ ...f, courseWebsite: e.target.value }))}
+                            />
+                          </div>
+                        </div>
+
+                        {lettersError && (
+                          <p className="text-xs rounded-xl px-3 py-2 border" style={{ background: "rgba(239,68,68,0.08)", borderColor: "rgba(239,68,68,0.2)", color: "#f87171" }}>
+                            {lettersError}
+                          </p>
+                        )}
+
+                        <button
+                          onClick={handleGenerateLetters}
+                          disabled={generatingLetters}
+                          className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-50"
+                          style={{ background: "rgba(162,137,89,0.15)", borderColor: "rgba(162,137,89,0.35)", color: GOLD }}
+                        >
+                          {generatingLetters ? "⏳ Generating letters via AI…" : lettersData ? "🔄 Regenerate All 4 Letters" : "✨ Generate All 4 Letters"}
+                        </button>
+
+                        {/* Generated letters */}
+                        {lettersData && [
+                          { num: 1, title: "Reason for Studying the Course" },
+                          { num: 2, title: "Reason for Studying in Hong Kong" },
+                          { num: 3, title: "Reason for Choosing the University" },
+                          { num: 4, title: "Future Plans After Graduation" },
+                        ].map(({ num, title }) => {
+                          const body: string | null = (lettersData as any)[`letter${num}`];
+                          if (!body) return null;
+                          return (
+                            <div key={num} className="rounded-xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.2)" }}>
+                              <div className="px-3 py-2.5 flex items-center justify-between border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                                <div>
+                                  <span className="text-xs font-bold mr-1.5" style={{ color: GOLD }}>Letter {num}</span>
+                                  <span className="text-xs" style={{ color: "rgba(162,137,89,0.65)" }}>{title}</span>
+                                </div>
+                                <a
+                                  href={`${getApiBase()}/api/admin/student-submissions/${selected.id}/immigration-letters/${num}/view`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs px-3 py-1 rounded-lg border font-medium transition-all hover:opacity-80"
+                                  style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD, background: "rgba(162,137,89,0.08)" }}
+                                >
+                                  ↗ View &amp; Print
+                                </a>
+                              </div>
+                              <div className="px-3 py-2.5">
+                                <p className="text-xs leading-relaxed line-clamp-3" style={{ color: "rgba(232,213,176,0.55)" }}>
+                                  {body.slice(0, 220)}{body.length > 220 ? "…" : ""}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {lettersData?.generatedAt && (
+                          <p className="text-xs text-center" style={{ color: "rgba(162,137,89,0.35)" }}>
+                            Last generated: {new Date(lettersData.generatedAt).toLocaleString("en-GB")}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 )}
 
                 {/* University Interview — Arranged (awaiting student) */}
