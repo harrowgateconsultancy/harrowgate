@@ -137,7 +137,11 @@ export default function Portal() {
   const fetchSubmission = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${getApiBase()}/api/student/submissions/me`, { credentials: "include" });
+      const email = user?.primaryEmailAddress?.emailAddress;
+      const url = email
+        ? `${getApiBase()}/api/student/submissions/me?email=${encodeURIComponent(email)}`
+        : `${getApiBase()}/api/student/submissions/me`;
+      const res = await fetch(url, { credentials: "include" });
       if (res.ok) setSubmission(await res.json());
       else if (res.status === 401) setSubmission(null);
     } catch { setSubmission(null); }

@@ -20,8 +20,28 @@ const requireStudentAuth = (req: any, res: any, next: any) => {
 
 router.get("/student/submissions/me", requireStudentAuth, async (req: any, res) => {
   try {
-    const [submission] = await db.select().from(studentSubmissionsTable)
+    // Primary lookup by Clerk user ID
+    let [submission] = await db.select().from(studentSubmissionsTable)
       .where(eq(studentSubmissionsTable.clerkUserId, req.clerkUserId)).limit(1);
+
+    // Fallback: if not found by clerkUserId, try matching by email
+    // (handles case where admin submitted on behalf of the student)
+    if (!submission) {
+      const email = req.query.email as string | undefined;
+      if (email) {
+        const [byEmail] = await db.select().from(studentSubmissionsTable)
+          .where(eq(studentSubmissionsTable.email, email)).limit(1);
+        if (byEmail) {
+          // Link this submission to the student's actual Clerk account
+          const [linked] = await db.update(studentSubmissionsTable)
+            .set({ clerkUserId: req.clerkUserId })
+            .where(eq(studentSubmissionsTable.id, byEmail.id))
+            .returning();
+          submission = linked;
+        }
+      }
+    }
+
     if (!submission) return res.json(null);
     const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, submission.id));
     res.json({ ...submission, documents });
