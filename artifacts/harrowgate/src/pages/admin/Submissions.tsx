@@ -35,6 +35,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   offer_letter_pending:            { label: "Offer Letter Sent",      color: "#f0abfc",   bg: "rgba(240,171,252,0.12)" },
   final_payment_received:          { label: "Final Receipt Received", color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
   final_payment_confirmed:         { label: "Final Payment Done",     color: "#4ade80",   bg: "rgba(74,222,128,0.12)"  },
+  visa_issued:                     { label: "e-Visa Issued 🎉",       color: "#34d399",   bg: "rgba(52,211,153,0.12)"  },
   rejected:                        { label: "Rejected",              color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
@@ -73,6 +74,7 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
     { label: "Confirm Final Payment", nextStatus: "final_payment_confirmed", color: "#4ade80", icon: "✅" },
   ],
   final_payment_confirmed: [],
+  visa_issued: [],
 };
 
 
@@ -106,6 +108,7 @@ function getDocMeta(dt: string): { label: string; tagColor: string; tagText: str
   if (dt === "higher_edu_results")     return { label: "Higher Education Result",    tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
   if (dt === "higher_edu_transcript")  return { label: "Higher Education Transcript",tagColor: "rgba(162,137,89,0.18)", tagText: GOLD,      tag: "Student"       };
   if (dt.startsWith("edu_"))           return { label: `Education Document ${dt.replace("edu_", "")}`, tagColor: "rgba(162,137,89,0.18)", tagText: GOLD, tag: "Student" };
+  if (dt === "evisa")                  return { label: "e-Visa (HK Immigration)", tagColor: "rgba(52,211,153,0.18)", tagText: "#34d399", tag: "e-Visa" };
   if (dt.startsWith("admin_"))         return { label: dt === "admin_doc" ? "Admin Document" : dt.replace("admin_", "").replace(/_/g, " "), tagColor: "rgba(74,222,128,0.15)", tagText: "#4ade80", tag: "Admin" };
   return { label: dt.replace(/_/g, " ").toUpperCase(), tagColor: "rgba(162,137,89,0.18)", tagText: GOLD, tag: "Student" };
 }
@@ -143,6 +146,9 @@ export default function Submissions() {
   const [offerLetterUploading, setOfferLetterUploading] = useState(false);
   const [offerLetterSent, setOfferLetterSent] = useState<number | null>(null);
   const offerLetterFileRef = useRef<HTMLInputElement | null>(null);
+  const [eVisaUploading, setEVisaUploading] = useState(false);
+  const [eVisaSent, setEVisaSent] = useState<number | null>(null);
+  const eVisaFileRef = useRef<HTMLInputElement | null>(null);
   const [id995aOpen, setId995aOpen] = useState(false);
   const [lettersOpen, setLettersOpen] = useState(false);
   const [lettersData, setLettersData] = useState<any | null>(null);
@@ -372,6 +378,23 @@ export default function Submissions() {
     finally { setOfferLetterUploading(false); if (offerLetterFileRef.current) offerLetterFileRef.current.value = ""; }
   };
 
+  const handleUploadEVisa = async (file: File) => {
+    if (!selected) return;
+    setEVisaUploading(true);
+    try {
+      const { url } = await uploadToStorage(file);
+      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/upload-evisa`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setEVisaSent(selected.id);
+      setSelected(prev => prev ? { ...prev, status: "visa_issued" } : null);
+      qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
+    } catch { alert("Failed to upload e-visa."); }
+    finally { setEVisaUploading(false); if (eVisaFileRef.current) eVisaFileRef.current.value = ""; }
+  };
+
   const handleAdminUpload = async (file: File) => {
     if (!selected) return;
     setUploadingDoc(true);
@@ -491,7 +514,7 @@ export default function Submissions() {
                   borderColor: isDone ? "rgba(134,239,172,0.3)" : hasAction ? "rgba(251,146,60,0.25)" : "rgba(162,137,89,0.1)",
                   boxShadow: hasAction ? "0 0 0 1px rgba(251,146,60,0.08)" : "none",
                 }}
-                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setRefNumInput(s.immigrationRefNumber || ""); setRefSetSuccess(false); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed"].includes(s.status)) loadLetters(s.id); }}>
+                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setRefNumInput(s.immigrationRefNumber || ""); setRefSetSuccess(false); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setEVisaSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed","visa_issued"].includes(s.status)) loadLetters(s.id); }}>
                 {/* Orange left accent for action-needed */}
                 {hasAction && <div className="h-0.5 w-full rounded-t-2xl" style={{ background: "linear-gradient(to right, transparent, rgba(251,146,60,0.5), transparent)" }} />}
                 <div className="px-5 py-4 flex items-center gap-4">
@@ -1065,8 +1088,8 @@ export default function Submissions() {
                   </div>
                 )}
 
-                {/* Final Payment Confirmed + ID995A */}
-                {selected.status === "final_payment_confirmed" && (
+                {/* Final Payment Confirmed + ID995A + e-Visa */}
+                {["final_payment_confirmed","visa_issued"].includes(selected.status) && (
                   <>
                     <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(74,222,128,0.2)" }}>
                       <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
@@ -1131,11 +1154,51 @@ export default function Submissions() {
                         </div>
                       )}
                     </div>
+
+                    {/* e-Visa Upload — final_payment_confirmed only */}
+                    {selected.status === "final_payment_confirmed" && (
+                      <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(52,211,153,0.25)" }}>
+                        <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(52,211,153,0.12)" }}>
+                          <p className="text-sm font-semibold" style={{ color: "#34d399" }}>🛂 Upload e-Visa (HK Immigration)</p>
+                          {eVisaSent === selected.id && (
+                            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(52,211,153,0.1)", color: "#34d399" }}>✓ Sent to student</span>
+                          )}
+                        </div>
+                        <div className="px-4 py-4 space-y-3">
+                          <p className="text-xs" style={{ color: "rgba(52,211,153,0.6)" }}>
+                            Once the Hong Kong Immigration Department issues the official e-Visa, upload it here. The student will be notified by email and can download it from their portal.
+                          </p>
+                          <button onClick={() => eVisaFileRef.current?.click()} disabled={eVisaUploading}
+                            className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-50 flex items-center justify-center gap-2"
+                            style={{ background: "rgba(52,211,153,0.06)", borderColor: "rgba(52,211,153,0.25)", color: "#34d399", borderStyle: "dashed" }}>
+                            {eVisaUploading
+                              ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#34d399", borderTopColor: "transparent" }} /> Uploading…</>
+                              : <>🛂 Choose e-Visa File…</>}
+                          </button>
+                          <input ref={eVisaFileRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={e => { const f = e.target.files?.[0]; if (f) handleUploadEVisa(f); }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* e-Visa Issued info — visa_issued only */}
+                    {selected.status === "visa_issued" && (
+                      <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(52,211,153,0.3)" }}>
+                        <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(52,211,153,0.12)" }}>
+                          <p className="text-sm font-semibold" style={{ color: "#34d399" }}>🎉 e-Visa Issued to Student</p>
+                        </div>
+                        <div className="px-4 py-3">
+                          <p className="text-xs" style={{ color: "rgba(52,211,153,0.6)" }}>
+                            The official Hong Kong Immigration e-Visa has been uploaded and the student has been notified by email. They can now download it from their portal.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
 
                 {/* Immigration Letters Panel */}
-                {(selected.status === "final_payment_received" || selected.status === "final_payment_confirmed") && (
+                {(selected.status === "final_payment_received" || selected.status === "final_payment_confirmed" || selected.status === "visa_issued") && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.25)" }}>
                     <button className="w-full px-4 py-3 flex items-center justify-between" onClick={() => setLettersOpen(v => !v)}>
                       <div className="flex items-center gap-2">

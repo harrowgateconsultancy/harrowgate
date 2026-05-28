@@ -8,7 +8,7 @@ import {
 } from "@workspace/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
-import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail } from "../email";
+import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail } from "../email";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -20,6 +20,7 @@ const VALID_STATUSES = [
   "second_payment_pending", "second_payment_received", "second_payment_confirmed",
   "university_interview_arranged", "university_interview_completed",
   "offer_letter_pending", "final_payment_received", "final_payment_confirmed",
+  "visa_issued",
 ];
 
 router.get("/admin/student-submissions", async (_req, res) => {
@@ -292,6 +293,28 @@ router.post("/admin/student-submissions/:id/messages", async (req: any, res) => 
     }
     res.json(msg);
   } catch { res.status(500).json({ error: "Failed to send message" }); }
+});
+
+// Upload e-visa — sets status to visa_issued and notifies student
+router.post("/admin/student-submissions/:id/upload-evisa", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { fileName, fileUrl, fileSize, mimeType } = req.body;
+    if (!fileName || !fileUrl) return res.status(400).json({ error: "fileName and fileUrl are required" });
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    await db.delete(studentDocumentsTable)
+      .where(and(eq(studentDocumentsTable.submissionId, id), eq(studentDocumentsTable.documentType, "evisa")));
+    await db.insert(studentDocumentsTable).values({ submissionId: id, documentType: "evisa", fileName, fileUrl, fileSize, mimeType });
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({ status: "visa_issued" })
+      .where(eq(studentSubmissionsTable.id, id)).returning();
+    const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
+    if (submission.email) {
+      sendEVisaReadyEmail({ name: submission.name, studentEmail: submission.email, portalUrl }).catch(() => {});
+    }
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to upload e-visa" }); }
 });
 
 // Admin sets immigration reference number

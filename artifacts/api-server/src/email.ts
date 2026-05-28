@@ -597,6 +597,52 @@ export async function sendStudentReplyNotificationEmail(opts: {
   } catch (err) { console.error("[email] Failed:", err); }
 }
 
+// ── Notify student: e-visa ready ───────────────────────────────────────────
+export async function sendEVisaReadyEmail(opts: {
+  name: string; studentEmail: string; portalUrl: string;
+}) {
+  if (!opts.studentEmail) { console.warn("[email] No student email — skipping e-visa email"); return; }
+  const transport = createTransport();
+  if (!transport) { console.warn("[email] credentials not set — skipping"); return; }
+  try {
+    await transport.sendMail({
+      from: `"HARROWGATE Consultancy" <${process.env.GMAIL_USER}>`,
+      to: opts.studentEmail,
+      subject: `Your Hong Kong Student e-Visa is Ready — HARROWGATE`,
+      html: `
+        <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0f2d18;border-radius:12px;overflow:hidden">
+          <div style="background:#0a2010;padding:24px 32px;text-align:center;border-bottom:1px solid rgba(162,137,89,0.2)">
+            <h1 style="margin:0;color:#a28959;font-size:20px;letter-spacing:2px">HARROWGATE</h1>
+            <p style="margin:4px 0 0;color:rgba(162,137,89,0.5);font-size:11px;letter-spacing:3px;text-transform:uppercase">Consultancy</p>
+          </div>
+          <div style="padding:32px">
+            <h2 style="margin:0 0 8px;color:#4ade80;font-size:22px">🎉 Your e-Visa is Ready!</h2>
+            <p style="margin:0 0 20px;color:rgba(162,137,89,0.7);font-size:15px;line-height:1.6">Dear ${opts.name},</p>
+            <p style="margin:0 0 20px;color:rgba(162,137,89,0.7);font-size:15px;line-height:1.6">
+              We are delighted to inform you that the <strong style="color:#4ade80">Hong Kong Immigration Department</strong> has officially issued your student e-Visa.
+            </p>
+            <p style="margin:0 0 20px;color:rgba(162,137,89,0.7);font-size:15px;line-height:1.6">
+              Your e-Visa is now available to <strong style="color:#a28959">view and download</strong> directly from your HARROWGATE portal. Please log in and navigate to your portal to access it.
+            </p>
+            <div style="background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.18);border-radius:10px;padding:16px 20px;margin:24px 0;font-size:14px;color:rgba(162,137,89,0.65);line-height:1.6">
+              Congratulations on successfully completing your Hong Kong student visa journey! We wish you all the best in your studies.
+            </div>
+            <div style="margin-top:24px;text-align:center">
+              <a href="${opts.portalUrl}" style="display:inline-block;background:#4ade80;color:#0f2d18;padding:12px 28px;border-radius:999px;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:0.5px">
+                Download Your e-Visa →
+              </a>
+            </div>
+          </div>
+          <div style="padding:16px 32px;text-align:center;border-top:1px solid rgba(162,137,89,0.1)">
+            <p style="margin:0;color:rgba(162,137,89,0.3);font-size:11px">HARROWGATE Consultancy · Hong Kong</p>
+          </div>
+        </div>
+      `,
+    });
+    console.log(`[email] e-Visa ready email sent to ${opts.studentEmail}`);
+  } catch (err) { console.error("[email] Failed to send e-visa email:", err); }
+}
+
 // ── Shared admin email template ──────────────────────────────────────────────
 function adminHtml(heading: string, intro: string, rows: [string, string][], cta: string) {
   return `

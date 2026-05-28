@@ -38,6 +38,7 @@ const statusMap: Record<string, { color: string; bg: string }> = {
   offer_letter_pending:          { color: "#fb923c",   bg: "rgba(251,146,60,0.12)"  },
   final_payment_received:        { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
   final_payment_confirmed:       { color: "#4ade80",   bg: "rgba(74,222,128,0.12)"  },
+  visa_issued:                   { color: "#34d399",   bg: "rgba(52,211,153,0.12)"  },
   rejected:                      { color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
@@ -48,15 +49,16 @@ function buildTimeline(submission: Submission, t: (key: string) => string): Time
   const ref = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
   const submittedDate = new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
-  const postStatuses = ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"];
+  const postStatuses = ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"];
   const afterPayment   = postStatuses.includes(s);
-  const afterMock      = ["interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(s);
-  const after2ndPay    = ["second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(s);
+  const afterMock      = ["interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(s);
+  const after2ndPay    = ["second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(s);
   const in2ndPay       = ["second_payment_pending","second_payment_received"].includes(s);
-  const afterUniArr    = ["university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(s);
-  const afterUniDone   = ["university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(s);
-  const afterFinalPay  = s === "final_payment_confirmed";
+  const afterUniArr    = ["university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(s);
+  const afterUniDone   = ["university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(s);
+  const afterFinalPay  = ["final_payment_confirmed","visa_issued"].includes(s);
   const inFinalPay     = ["offer_letter_pending","final_payment_received"].includes(s);
+  const eVisaDoc       = submission.documents.find(d => d.documentType === "evisa");
 
   void afterUniArr;
 
@@ -116,7 +118,16 @@ function buildTimeline(submission: Submission, t: (key: string) => string): Time
         ? `${t("portal.ref")}: ${submission.immigrationRefNumber}`
         : afterFinalPay ? t("tl.visaSubmittedNote") : t("tl.finalStep"),
       done: !!submission.immigrationRefNumber,
-      current: afterFinalPay && !submission.immigrationRefNumber,
+      current: afterFinalPay && !submission.immigrationRefNumber && !eVisaDoc,
+    },
+    {
+      icon: eVisaDoc ? "✅" : (submission.immigrationRefNumber ? "🔄" : "⬜"),
+      label: t("tl.eVisaIssued"),
+      note: eVisaDoc
+        ? t("tl.eVisaIssuedNote")
+        : submission.immigrationRefNumber ? t("tl.eVisaProcessing") : t("tl.finalStep"),
+      done: !!eVisaDoc,
+      current: !!submission.immigrationRefNumber && !eVisaDoc,
     },
   ];
 }
@@ -311,7 +322,7 @@ export default function Portal() {
   };
 
   useEffect(() => {
-    if (submission && ["interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(submission.status)) {
+    if (submission && ["interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(submission.status)) {
       setShowTimeline(true);
     }
   }, [submission?.status]);
@@ -673,8 +684,8 @@ export default function Portal() {
               </div>
             )}
 
-            {/* ── FINAL PAYMENT CONFIRMED — Download Offer Letter ── */}
-            {submission.status === "final_payment_confirmed" && (() => {
+            {/* ── FINAL PAYMENT CONFIRMED / VISA ISSUED — Download Offer Letter ── */}
+            {(submission.status === "final_payment_confirmed" || submission.status === "visa_issued") && (() => {
               const offerDoc = submission.documents.find(d => d.documentType === "offer_letter");
               return (
                 <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(74,222,128,0.25)" }}>
@@ -708,7 +719,7 @@ export default function Portal() {
             })()}
 
             {/* ── PROCESSING NOTICE + IMMIGRATION REF ── */}
-            {(submission.status === "final_payment_confirmed" || submission.immigrationRefNumber) && (
+            {(submission.status === "final_payment_confirmed" || submission.status === "visa_issued" || submission.immigrationRefNumber) && (
               <div className="mt-4 space-y-3">
                 {!submission.immigrationRefNumber && (
                   <div className="rounded-2xl border px-5 py-4 flex items-start gap-3" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
@@ -732,6 +743,37 @@ export default function Portal() {
                 )}
               </div>
             )}
+
+            {/* ── e-VISA ISSUED — Download ── */}
+            {(() => {
+              const eVisaDownloadDoc = submission.documents.find(d => d.documentType === "evisa");
+              if (!eVisaDownloadDoc) return null;
+              return (
+                <div className="mt-4 rounded-2xl border overflow-hidden" style={{ background: "rgba(52,211,153,0.04)", borderColor: "rgba(52,211,153,0.3)" }}>
+                  <div className="px-6 py-5 border-b text-center" style={{ borderColor: "rgba(52,211,153,0.12)" }}>
+                    <div className="text-5xl mb-3">🛂</div>
+                    <h3 className="text-xl font-bold mb-1" style={{ color: "#34d399" }}>{t("s.eVisaTitle")}</h3>
+                    <p className="text-sm" style={{ color: "rgba(52,211,153,0.6)" }}>{t("s.eVisaSub")}</p>
+                  </div>
+                  <div className="px-6 py-5">
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleOfferLetterView(submission.id, eVisaDownloadDoc.id)}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
+                        style={{ background: "rgba(52,211,153,0.06)", borderColor: "rgba(52,211,153,0.22)", color: "#34d399" }}>
+                        <span>👁</span> {t("s.eVisaView")}
+                      </button>
+                      <button
+                        onClick={() => handleOfferLetterDownload(submission.id, eVisaDownloadDoc.id, eVisaDownloadDoc.fileName)}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
+                        style={{ background: "rgba(52,211,153,0.1)", borderColor: "rgba(52,211,153,0.35)", color: "#34d399" }}>
+                        <span>🛂</span> {t("s.eVisaDownload")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* ── UNIVERSITY INTERVIEW COMPLETED ── */}
             {submission.status === "university_interview_completed" && (
@@ -843,7 +885,7 @@ export default function Portal() {
             )}
 
             {/* ── Details card (non-payment / non-doc / non-interview statuses) ── */}
-            {!["payment_pending","payment_received","acknowledged","docs_requested","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed"].includes(submission.status) && (
+            {!["payment_pending","payment_received","acknowledged","docs_requested","interview_arranged","interview_completed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(submission.status) && (
               <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.1)" }}>
                 <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                   <h3 className="text-sm font-semibold" style={{ color: GOLD }}>{t("portal.appDetails")}</h3>
