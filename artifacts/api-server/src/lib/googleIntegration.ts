@@ -10,22 +10,33 @@ const SHEET_HEADERS = [
   "Immigration Ref #", "Drive Folder URL", "Created At", "Updated At",
 ];
 
+function parseServiceAccountJson(raw: string): Record<string, any> | null {
+  // Try direct parse first
+  try { return JSON.parse(raw); } catch {}
+  // Try unescaping once (double-stringified)
+  try { return JSON.parse(JSON.parse(raw)); } catch {}
+  // Try trimming surrounding quotes
+  try { return JSON.parse(raw.trim().replace(/^"|"$/g, "")); } catch {}
+  // Try replacing escaped newlines in private_key (common Replit quirk)
+  try { return JSON.parse(raw.replace(/\\n/g, "\n")); } catch {}
+  return null;
+}
+
 function getAuth() {
   const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
   if (!raw) return null;
-  try {
-    const credentials = JSON.parse(raw);
-    return new google.auth.GoogleAuth({
-      credentials,
-      scopes: [
-        "https://www.googleapis.com/auth/drive",
-        "https://www.googleapis.com/auth/spreadsheets",
-      ],
-    });
-  } catch {
-    console.error("[Google] Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON");
+  const credentials = parseServiceAccountJson(raw);
+  if (!credentials) {
+    console.error("[Google] Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON — check the secret value is the raw JSON file contents");
     return null;
   }
+  return new google.auth.GoogleAuth({
+    credentials,
+    scopes: [
+      "https://www.googleapis.com/auth/drive",
+      "https://www.googleapis.com/auth/spreadsheets",
+    ],
+  });
 }
 
 function isConfigured(): boolean {
