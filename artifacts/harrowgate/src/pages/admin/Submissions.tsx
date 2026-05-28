@@ -167,6 +167,8 @@ export default function Submissions() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [deletingSelected, setDeletingSelected] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [googleSyncing, setGoogleSyncing] = useState(false);
+  const [googleSyncResult, setGoogleSyncResult] = useState<string | null>(null);
 
   const handleSetImmigrationRef = async () => {
     if (!selected) return;
@@ -474,6 +476,17 @@ export default function Submissions() {
     finally { setDeletingSelected(false); }
   };
 
+  const handleGoogleSync = async () => {
+    setGoogleSyncing(true);
+    setGoogleSyncResult(null);
+    try {
+      const res = await fetch(`${getApiBase()}/api/admin/google-sync`, { method: "POST" });
+      const data = await res.json();
+      setGoogleSyncResult(data.success ? `✓ Synced ${data.synced} student${data.synced !== 1 ? "s" : ""} to Google` : "Sync failed");
+    } catch { setGoogleSyncResult("Sync failed"); }
+    finally { setGoogleSyncing(false); setTimeout(() => setGoogleSyncResult(null), 5000); }
+  };
+
   const viewUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/view`;
   const downloadUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/download`;
 
@@ -518,11 +531,22 @@ export default function Submissions() {
             <h1 className="text-3xl font-bold mb-1" style={{ color: GOLD }}>Student Submissions</h1>
             <p className="text-sm" style={{ color: "rgba(162,137,89,0.55)" }}>{submissions.length} total · {pendingCount} requiring action</p>
           </div>
-          {pendingCount > 0 && (
-            <div className="px-4 py-2 rounded-full text-sm font-semibold" style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
-              ⚡ {pendingCount} need{pendingCount === 1 ? "s" : ""} your attention
-            </div>
-          )}
+          <div className="flex items-center gap-3 flex-wrap">
+            {pendingCount > 0 && (
+              <div className="px-4 py-2 rounded-full text-sm font-semibold" style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
+                ⚡ {pendingCount} need{pendingCount !== 1 ? "" : "s"} your attention
+              </div>
+            )}
+            <button onClick={handleGoogleSync} disabled={googleSyncing}
+              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80 disabled:opacity-50"
+              style={{ borderColor: "rgba(162,137,89,0.2)", color: googleSyncResult?.startsWith("✓") ? "#4ade80" : GOLD, background: "rgba(162,137,89,0.05)" }}>
+              {googleSyncing
+                ? <><span className="w-3 h-3 rounded-full border animate-spin shrink-0" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Syncing…</>
+                : googleSyncResult
+                  ? googleSyncResult
+                  : <><svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M14 8A6 6 0 1 1 8 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M14 2v3.5H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Sync to Google</>}
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-2 mb-6 flex-wrap">
