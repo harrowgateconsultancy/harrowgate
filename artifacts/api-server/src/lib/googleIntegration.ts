@@ -39,8 +39,30 @@ function getAuth() {
   });
 }
 
+function extractId(raw: string): string {
+  // Strip full Drive/Sheets URLs down to bare ID
+  // Drive: https://drive.google.com/drive/folders/FOLDER_ID?usp=sharing
+  const driveMatch = raw.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (driveMatch) return driveMatch[1];
+  // Sheets: https://docs.google.com/spreadsheets/d/SHEET_ID/edit
+  const sheetsMatch = raw.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (sheetsMatch) return sheetsMatch[1];
+  // Already a bare ID
+  return raw.trim();
+}
+
+function getDriveFolderId(): string | null {
+  const v = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID;
+  return v ? extractId(v) : null;
+}
+
+function getSheetsId(): string | null {
+  const v = process.env.GOOGLE_SHEETS_ID;
+  return v ? extractId(v) : null;
+}
+
 function isConfigured(): boolean {
-  return !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON && !!process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID;
+  return !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON && !!getDriveFolderId();
 }
 
 // ── Drive helpers ──────────────────────────────────────────────────────────────
@@ -64,7 +86,7 @@ export async function ensureStudentFolder(submissionId: number, studentName: str
   if (!auth) return null;
   try {
     const drive = google.drive({ version: "v3", auth });
-    const rootId = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID!;
+    const rootId = getDriveFolderId()!;
     const folderName = `[${submissionId}] ${studentName}`;
     const folderId = await getOrCreateFolder(drive, folderName, rootId);
     return `https://drive.google.com/drive/folders/${folderId}`;
@@ -87,7 +109,7 @@ export async function uploadDocumentToDrive(opts: {
   if (!auth) return;
   try {
     const drive = google.drive({ version: "v3", auth });
-    const rootId = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID!;
+    const rootId = getDriveFolderId()!;
     const folderName = `[${opts.submissionId}] ${opts.studentName}`;
     const folderId = await getOrCreateFolder(drive, folderName, rootId);
 
@@ -166,7 +188,7 @@ export async function upsertStudentRow(opts: {
   updatedAt?: Date | string | null;
 }): Promise<void> {
   if (!isConfigured()) return;
-  const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+  const spreadsheetId = getSheetsId();
   if (!spreadsheetId) return;
   const auth = getAuth();
   if (!auth) return;
@@ -214,7 +236,7 @@ export async function upsertStudentRow(opts: {
 
 export async function deleteStudentRow(submissionId: number): Promise<void> {
   if (!isConfigured()) return;
-  const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+  const spreadsheetId = getSheetsId();
   if (!spreadsheetId) return;
   const auth = getAuth();
   if (!auth) return;
