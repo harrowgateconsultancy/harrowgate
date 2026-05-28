@@ -9,6 +9,7 @@ import {
 import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail } from "../email";
+import { ensureStudentFolder, upsertStudentRow, uploadDocumentToDrive, deleteStudentRow } from "../lib/googleIntegration";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -84,6 +85,15 @@ router.patch("/admin/student-submissions/:id/status", async (req, res) => {
         } catch (err) { console.error("[email] Failed to send offer letter with attachment:", err); }
       })();
     }
+
+    // Sync status change to Sheets (fire-and-forget)
+    upsertStudentRow({
+      submissionId: updated.id, name: updated.name, email: updated.email,
+      passportNumber: updated.passportNumber, dateOfBirth: updated.dateOfBirth,
+      nationality: (updated as any).nationality, status: updated.status,
+      immigrationRefNumber: updated.immigrationRefNumber,
+      createdAt: updated.createdAt,
+    }).catch(err => console.error("[Google Sheets] status sync failed:", err));
 
     res.json(updated);
   } catch { res.status(500).json({ error: "Failed to update status" }); }
@@ -262,8 +272,33 @@ router.delete("/admin/student-submissions/:id", async (req: any, res) => {
     await db.delete(studentMessagesTable).where(eq(studentMessagesTable.submissionId, id));
     await db.delete(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, id));
     await db.delete(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id));
+    // Remove from Sheets (fire-and-forget)
+    deleteStudentRow(id).catch(err => console.error("[Google Sheets] delete row failed:", err));
     res.json({ success: true });
   } catch { res.status(500).json({ error: "Failed to delete submission" }); }
+});
+
+// Admin: bulk sync all existing students to Google Sheets
+router.post("/admin/google-sync", async (_req, res) => {
+  try {
+    const submissions = await db.select().from(studentSubmissionsTable);
+    let synced = 0;
+    for (const s of submissions) {
+      const driveFolderUrl = await ensureStudentFolder(s.id, s.name);
+      await upsertStudentRow({
+        submissionId: s.id, name: s.name, email: s.email,
+        passportNumber: s.passportNumber, dateOfBirth: s.dateOfBirth,
+        nationality: (s as any).nationality, status: s.status,
+        immigrationRefNumber: s.immigrationRefNumber,
+        driveFolderUrl, createdAt: s.createdAt,
+      });
+      synced++;
+    }
+    res.json({ success: true, synced });
+  } catch (err) {
+    console.error("[Google] bulk sync failed:", err);
+    res.status(500).json({ error: "Sync failed" });
+  }
 });
 
 // Admin deletes a document

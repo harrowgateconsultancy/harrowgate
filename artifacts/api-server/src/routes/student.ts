@@ -6,6 +6,7 @@ import { studentSubmissionsTable, studentDocumentsTable, studentMessagesTable } 
 import { eq, and } from "drizzle-orm";
 import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail, sendAdditionalDocsSubmittedEmail, sendFinalReceiptEmail, sendStudentReplyNotificationEmail } from "../email";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
+import { ensureStudentFolder, upsertStudentRow, uploadDocumentToDrive } from "../lib/googleIntegration";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -62,6 +63,13 @@ router.post("/student/submissions", requireStudentAuth, async (req: any, res) =>
     const [created] = await db.insert(studentSubmissionsTable)
       .values({ clerkUserId: req.clerkUserId, name, dateOfBirth, passportNumber, email }).returning();
     sendNewApplicationEmail({ name, email: email || null, passportNumber, dateOfBirth, docCount: 0 }).catch(() => {});
+    // Fire-and-forget: create Drive folder + add Sheets row
+    (async () => {
+      try {
+        const driveFolderUrl = await ensureStudentFolder(created.id, created.name);
+        await upsertStudentRow({ ...created, driveFolderUrl });
+      } catch (err) { console.error("[Google] sync on create failed:", err); }
+    })();
     res.status(201).json(created);
   } catch { res.status(500).json({ error: "Failed to create submission" }); }
 });
@@ -85,6 +93,15 @@ router.post("/student/submissions/:id/documents", requireStudentAuth, async (req
       const allDocs = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, submissionId));
       sendNewApplicationEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, dateOfBirth: submission.dateOfBirth, docCount: allDocs.length }).catch(() => {});
     }
+    // Fire-and-forget: upload doc to Drive folder
+    uploadDocumentToDrive({
+      submissionId,
+      studentName: submission.name,
+      documentType,
+      fileName,
+      fileUrl,
+      mimeType,
+    }).catch(err => console.error("[Google Drive] doc upload failed:", err));
     res.status(201).json(doc);
   } catch { res.status(500).json({ error: "Failed to save document" }); }
 });
