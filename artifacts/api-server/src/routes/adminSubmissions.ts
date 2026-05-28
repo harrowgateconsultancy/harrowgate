@@ -255,6 +255,17 @@ router.post("/admin/student-submissions/:id/upload-offer-letter", async (req: an
   } catch { res.status(500).json({ error: "Failed to upload offer letter" }); }
 });
 
+// Admin deletes an entire student submission (all docs + messages + record)
+router.delete("/admin/student-submissions/:id", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    await db.delete(studentMessagesTable).where(eq(studentMessagesTable.submissionId, id));
+    await db.delete(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, id));
+    await db.delete(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id));
+    res.json({ success: true });
+  } catch { res.status(500).json({ error: "Failed to delete submission" }); }
+});
+
 // Admin deletes a document
 router.delete("/admin/student-submissions/:id/documents/:docId", async (req: any, res) => {
   try {

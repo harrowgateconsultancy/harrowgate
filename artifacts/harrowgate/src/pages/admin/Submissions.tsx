@@ -164,6 +164,9 @@ export default function Submissions() {
   const [refNumInput, setRefNumInput] = useState("");
   const [settingRef, setSettingRef] = useState(false);
   const [refSetSuccess, setRefSetSuccess] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [deletingSelected, setDeletingSelected] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const handleSetImmigrationRef = async () => {
     if (!selected) return;
@@ -429,6 +432,48 @@ export default function Submissions() {
     !!s.additionalDocsRequested
   ).length;
 
+  const toggleSelect = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filtered.length && filtered.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map(s => s.id)));
+    }
+  };
+
+  const handleBulkExport = () => {
+    const data = filtered.filter(s => selectedIds.has(s.id)).map(s => ({
+      id: s.id, name: s.name, email: s.email, passportNumber: s.passportNumber,
+      dateOfBirth: s.dateOfBirth, nationality: s.nationality, status: s.status,
+      immigrationRefNumber: s.immigrationRefNumber,
+      documents: s.documents.map(d => ({ type: d.documentType, file: d.fileName, url: d.fileUrl })),
+      createdAt: s.createdAt,
+    }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = `harrowgate-students-${new Date().toISOString().split("T")[0]}.json`;
+    a.click(); URL.revokeObjectURL(url);
+  };
+
+  const handleBulkDelete = async () => {
+    setDeletingSelected(true);
+    try {
+      await Promise.all(Array.from(selectedIds).map(id =>
+        fetch(`${getApiBase()}/api/admin/student-submissions/${id}`, { method: "DELETE" })
+      ));
+      if (selected && selectedIds.has(selected.id)) setSelected(null);
+      setSelectedIds(new Set());
+      setDeleteConfirmOpen(false);
+      qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
+    } catch { alert("Failed to delete some profiles."); }
+    finally { setDeletingSelected(false); }
+  };
+
   const viewUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/view`;
   const downloadUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/download`;
 
@@ -448,7 +493,7 @@ export default function Submissions() {
               Back
             </button>
             <div className="w-px h-4" style={{ background: "rgba(162,137,89,0.15)" }} />
-            <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-11 object-contain" />
+            <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-11 object-contain" style={{ filter: "drop-shadow(0 0 12px rgba(162,137,89,0.7)) drop-shadow(0 0 4px rgba(162,137,89,0.45))" }} />
             <span className="text-xs font-semibold tracking-[0.2em] uppercase px-2.5 py-1 rounded-full"
               style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>
               Admin
@@ -491,6 +536,43 @@ export default function Submissions() {
           ))}
         </div>
 
+        {/* Select All + Actions bar */}
+        {!isLoading && filtered.length > 0 && (
+          <div className="flex items-center justify-between mb-4 px-1">
+            <button onClick={toggleSelectAll}
+              className="flex items-center gap-2 text-xs font-medium transition-opacity hover:opacity-70"
+              style={{ color: "rgba(162,137,89,0.55)" }}>
+              <div className="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
+                style={{
+                  borderColor: selectedIds.size === filtered.length && filtered.length > 0 ? GOLD : "rgba(162,137,89,0.3)",
+                  background: selectedIds.size === filtered.length && filtered.length > 0 ? GOLD : "transparent",
+                }}>
+                {selectedIds.size === filtered.length && filtered.length > 0 && (
+                  <svg viewBox="0 0 10 10" fill="none" className="w-2.5 h-2.5"><path d="M2 5l2 2 4-4" stroke="#0b2213" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                )}
+              </div>
+              {selectedIds.size === filtered.length && filtered.length > 0 ? "Deselect All" : `Select All (${filtered.length})`}
+            </button>
+            {selectedIds.size > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.08)", color: "rgba(162,137,89,0.6)" }}>
+                  {selectedIds.size} selected
+                </span>
+                <button onClick={handleBulkExport}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all hover:opacity-80"
+                  style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: GOLD }}>
+                  ↓ Export
+                </button>
+                <button onClick={() => setDeleteConfirmOpen(true)}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all hover:opacity-80"
+                  style={{ background: "rgba(248,113,113,0.06)", borderColor: "rgba(248,113,113,0.22)", color: "#f87171" }}>
+                  🗑 Delete
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {isLoading && <div className="text-center py-20"><div className="w-8 h-8 rounded-full border-2 animate-spin mx-auto mb-3" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /></div>}
         {!isLoading && filtered.length === 0 && (
           <div className="text-center py-20 rounded-2xl border" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
@@ -511,13 +593,26 @@ export default function Submissions() {
                 className="rounded-2xl border transition-all cursor-pointer hover:scale-[1.005] hover:shadow-lg group"
                 style={{
                   background: isDone ? "rgba(134,239,172,0.06)" : "rgba(0,0,0,0.18)",
-                  borderColor: isDone ? "rgba(134,239,172,0.3)" : hasAction ? "rgba(251,146,60,0.25)" : "rgba(162,137,89,0.1)",
+                  borderColor: selectedIds.has(s.id) ? GOLD : isDone ? "rgba(134,239,172,0.3)" : hasAction ? "rgba(251,146,60,0.25)" : "rgba(162,137,89,0.1)",
                   boxShadow: hasAction ? "0 0 0 1px rgba(251,146,60,0.08)" : "none",
                 }}
                 onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setRefNumInput(s.immigrationRefNumber || ""); setRefSetSuccess(false); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setEVisaSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed","visa_issued"].includes(s.status)) loadLetters(s.id); }}>
                 {/* Orange left accent for action-needed */}
                 {hasAction && <div className="h-0.5 w-full rounded-t-2xl" style={{ background: "linear-gradient(to right, transparent, rgba(251,146,60,0.5), transparent)" }} />}
                 <div className="px-5 py-4 flex items-center gap-4">
+                  {/* Selection checkbox */}
+                  <button onClick={e => toggleSelect(s.id, e)}
+                    className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all hover:scale-110"
+                    style={{
+                      borderColor: selectedIds.has(s.id) ? GOLD : "rgba(162,137,89,0.25)",
+                      background: selectedIds.has(s.id) ? GOLD : "transparent",
+                    }}>
+                    {selectedIds.has(s.id) && (
+                      <svg viewBox="0 0 10 10" fill="none" className="w-2.5 h-2.5">
+                        <path d="M2 5l2 2 4-4" stroke="#0b2213" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </button>
                   {/* Avatar initial */}
                   <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
                     style={{ background: isDone ? "rgba(74,222,128,0.12)" : "rgba(162,137,89,0.1)", color: isDone ? "#4ade80" : GOLD }}>
@@ -1502,6 +1597,36 @@ export default function Submissions() {
                   className="w-full py-2.5 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-50"
                   style={{ borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.55)" }}>
                   Save Notes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}>
+          <div className="rounded-2xl border overflow-hidden max-w-sm w-full mx-4" style={{ background: "#0b2213", borderColor: "rgba(248,113,113,0.3)" }}>
+            <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(248,113,113,0.12)" }}>
+              <p className="text-base font-bold" style={{ color: "#f87171" }}>🗑 Delete {selectedIds.size} Profile{selectedIds.size !== 1 ? "s" : ""}?</p>
+            </div>
+            <div className="px-6 py-5">
+              <p className="text-sm mb-6 leading-relaxed" style={{ color: "rgba(162,137,89,0.6)" }}>
+                This will permanently remove {selectedIds.size === 1 ? "this student profile" : `these ${selectedIds.size} student profiles`} — including all uploaded documents and messages. This cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => setDeleteConfirmOpen(false)} disabled={deletingSelected}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                  style={{ borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.55)" }}>
+                  Cancel
+                </button>
+                <button onClick={handleBulkDelete} disabled={deletingSelected}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
+                  style={{ background: "rgba(248,113,113,0.08)", borderColor: "rgba(248,113,113,0.3)", color: "#f87171" }}>
+                  {deletingSelected
+                    ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#f87171", borderTopColor: "transparent" }} /> Deleting…</>
+                    : `🗑 Delete ${selectedIds.size}`}
                 </button>
               </div>
             </div>

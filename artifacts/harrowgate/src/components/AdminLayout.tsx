@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         )}
       >
         <div className="flex flex-col items-center gap-1 px-6 py-6 border-b border-sidebar-border">
-          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-20 w-full object-contain" />
+          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-20 w-full object-contain" style={{ filter: "drop-shadow(0 0 14px rgba(162,137,89,0.7)) drop-shadow(0 0 5px rgba(162,137,89,0.45))" }} />
           <div className="text-sidebar-foreground/50 text-[10px] tracking-wider uppercase mt-1">Admin Portal</div>
         </div>
 
