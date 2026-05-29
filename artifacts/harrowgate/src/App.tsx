@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import Landing from "@/pages/student/Landing";
 import Portal from "@/pages/student/Portal";
+import Packages from "@/pages/student/Packages";
 import Submissions from "@/pages/admin/Submissions";
 
 import AdminLayout from "@/components/AdminLayout";
@@ -236,6 +237,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/portal" component={PortalPage} />
+            <Route path="/packages" component={Packages} />
 
             {/* Admin / Consultant portal */}
             <Route path="/admin/submissions" component={Submissions} />

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -169,6 +170,9 @@ export default function Submissions() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [googleSyncing, setGoogleSyncing] = useState(false);
   const [googleSyncResult, setGoogleSyncResult] = useState<string | null>(null);
+  const [showCourses, setShowCourses] = useState(false);
+  const [coursesLevel, setCoursesLevel] = useState<DegreeLevel>("masters");
+  const [coursesSearch, setCoursesSearch] = useState("");
 
   const handleSetImmigrationRef = async () => {
     if (!selected) return;
@@ -537,6 +541,12 @@ export default function Submissions() {
                 ⚡ {pendingCount} need{pendingCount !== 1 ? "" : "s"} your attention
               </div>
             )}
+            <button onClick={() => setShowCourses(true)}
+              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
+              style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>
+              <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 4h12M2 8h12M2 12h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              Courses
+            </button>
             <button onClick={handleGoogleSync} disabled={googleSyncing}
               className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80 disabled:opacity-50"
               style={{ borderColor: "rgba(162,137,89,0.2)", color: googleSyncResult?.startsWith("✓") ? "#4ade80" : GOLD, background: "rgba(162,137,89,0.05)" }}>
@@ -1653,6 +1663,83 @@ export default function Submissions() {
                     : `🗑 Delete ${selectedIds.size}`}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Courses Modal — Admin Full View */}
+      {showCourses && (
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
+          onClick={e => { if (e.target === e.currentTarget) setShowCourses(false); }}>
+          <div className="rounded-2xl border overflow-hidden w-full max-w-3xl mx-4 flex flex-col" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.2)", maxHeight: "88vh" }}>
+            <div className="px-6 py-4 border-b flex items-center justify-between gap-3 flex-wrap shrink-0" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+              <div>
+                <p className="text-base font-bold" style={{ color: GOLD }}>Course Catalogue</p>
+                <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>{COURSES.length} programmes · institution & fees visible to admin only</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "rgba(162,137,89,0.05)", border: "1px solid rgba(162,137,89,0.1)" }}>
+                  {(["masters","bachelors","associate"] as DegreeLevel[]).map(l => (
+                    <button key={l} onClick={() => { setCoursesLevel(l); setCoursesSearch(""); }}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                      style={{ background: coursesLevel === l ? "rgba(162,137,89,0.18)" : "transparent", color: coursesLevel === l ? GOLD : "rgba(162,137,89,0.4)" }}>
+                      {l === "masters" ? "Master's" : l === "bachelors" ? "Bachelor's" : "Associate"}
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => setShowCourses(false)} className="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:opacity-70"
+                  style={{ background: "rgba(162,137,89,0.06)", color: "rgba(162,137,89,0.5)", border: "1px solid rgba(162,137,89,0.1)" }}>✕</button>
+              </div>
+            </div>
+            <div className="px-5 pt-4 pb-2 shrink-0">
+              <input value={coursesSearch} onChange={e => setCoursesSearch(e.target.value)}
+                placeholder="Search by programme or institution…"
+                className="w-full text-sm px-4 py-2.5 rounded-xl border bg-transparent outline-none"
+                style={{ borderColor: "rgba(162,137,89,0.18)", color: GOLD, background: "rgba(162,137,89,0.04)" }}
+              />
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-3">
+              {(() => {
+                const filtered = COURSES.filter(c => c.level === coursesLevel && (
+                  coursesSearch.trim() === "" ||
+                  c.programme.toLowerCase().includes(coursesSearch.toLowerCase()) ||
+                  c.institution.toLowerCase().includes(coursesSearch.toLowerCase())
+                ));
+                if (filtered.length === 0) return (
+                  <p className="text-sm text-center py-8" style={{ color: "rgba(162,137,89,0.35)" }}>No results for "{coursesSearch}"</p>
+                );
+                let lastInst = "";
+                return filtered.map(c => {
+                  const showInst = c.institution !== lastInst;
+                  lastInst = c.institution;
+                  return (
+                    <div key={c.id}>
+                      {showInst && (
+                        <p className="text-xs font-bold tracking-wider uppercase mt-4 mb-1.5 first:mt-0" style={{ color: "rgba(162,137,89,0.45)" }}>
+                          {c.institution}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 mb-1.5 border"
+                        style={{ background: "rgba(162,137,89,0.03)", borderColor: "rgba(162,137,89,0.08)" }}>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: GOLD }} />
+                          <span className="text-sm leading-snug truncate" style={{ color: "rgba(162,137,89,0.8)" }}>{c.programme}</span>
+                        </div>
+                        <span className="text-xs font-semibold shrink-0 px-2.5 py-1 rounded-full"
+                          style={{ background: "rgba(162,137,89,0.08)", color: GOLD }}>
+                          {typeof c.annualFeeHKD === "number" ? `HKD ${c.annualFeeHKD.toLocaleString()}` : `HKD ${c.annualFeeHKD}`}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+            <div className="px-5 py-3 border-t shrink-0" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
+              <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>
+                {LEVEL_LABELS[coursesLevel]} · Annual fees shown · Institution names & fees are hidden from students
+              </p>
             </div>
           </div>
         </div>

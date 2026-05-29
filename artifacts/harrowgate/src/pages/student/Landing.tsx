@@ -84,6 +84,11 @@ export default function Landing() {
             <img src="/harrowgate-logo.png" alt="HARROWGATE Consultancy" className="h-20 object-contain" style={{ filter: "drop-shadow(0 0 18px rgba(162,137,89,0.75)) drop-shadow(0 0 6px rgba(162,137,89,0.5))" }} />
             <div className="flex items-center gap-2">
               <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
+              <Link href="/packages"
+                className="text-sm font-medium px-4 py-2 rounded-full border transition-all hover:opacity-80 hidden sm:inline-flex items-center gap-1.5"
+                style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>
+                Packages
+              </Link>
               <Link href="/sign-in"
                 className="text-sm font-medium px-4 py-2 rounded-full transition-all hover:opacity-80"
                 style={{ color: GOLD }}>
@@ -213,6 +218,68 @@ export default function Landing() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Packages CTA */}
+        <section className="py-16 px-6" style={{ background: "rgba(162,137,89,0.03)", borderTop: `1px solid ${GOLD_FAINT}`, borderBottom: `1px solid ${GOLD_FAINT}` }}>
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>Transparent Pricing</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: GOLD }}>Start for Just HKD$ 3,000</h2>
+            <p className="text-base max-w-xl mx-auto mb-8" style={{ color: GOLD_DIM }}>
+              We offer three service packages — for Master's, Bachelor's, and Associate Degree students. One expert advisor. Full support from start to visa.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+              {[
+                { label: "Master's Degree", cost: "HKD$ 130,000" },
+                { label: "Bachelor's Degree", cost: "HKD$ 120,000" },
+                { label: "Associate Degree", cost: "HKD$ 90,000" },
+              ].map(p => (
+                <div key={p.label} className="rounded-2xl px-6 py-4 border text-center min-w-[160px]"
+                  style={{ background: "rgba(162,137,89,0.05)", borderColor: GOLD_FAINT }}>
+                  <p className="text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.5)" }}>{p.label}</p>
+                  <p className="text-base font-bold" style={{ color: GOLD }}>{p.cost}</p>
+                </div>
+              ))}
+            </div>
+            <Link href="/packages"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold border transition-all hover:opacity-80"
+              style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD }}>
+              View All Package Details →
+            </Link>
+          </div>
+        </section>
+
+        {/* Tutorial Video */}
+        <section className="py-24 px-6">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
+              Step-by-Step Guide
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>
+              How to Apply — Video Tutorial
+            </h2>
+            <p className="text-center mb-10 text-base max-w-xl mx-auto" style={{ color: GOLD_DIM }}>
+              Watch our complete walkthrough from registration to final visa approval. English narration.
+            </p>
+            <div className="rounded-3xl overflow-hidden border" style={{ borderColor: "rgba(162,137,89,0.2)", background: "rgba(0,0,0,0.25)" }}>
+              <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
+                <iframe
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  title="HARROWGATE — How to Apply: Full Tutorial"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+                />
+              </div>
+            </div>
+            <p className="text-xs text-center mt-4" style={{ color: "rgba(162,137,89,0.3)" }}>
+              Need help? Contact us on{" "}
+              <a href="https://wa.me/85260606457" target="_blank" rel="noopener noreferrer"
+                className="underline hover:opacity-80 transition-opacity" style={{ color: "rgba(162,137,89,0.5)" }}>
+                WhatsApp +852 6060 6457
+              </a>
+            </p>
           </div>
         </section>
 

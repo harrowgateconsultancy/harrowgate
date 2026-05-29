@@ -4,8 +4,61 @@ import ApplyForm from "./ApplyForm";
 import PaymentPage from "./PaymentPage";
 import StudentDocManager from "./StudentDocManager";
 import { useLang, LANG_LIST } from "../../i18n";
+import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
 
 const BG = "#0b2213";
+const _GOLD = "#a28959";
+
+function CoursesPanel() {
+  const levels: DegreeLevel[] = ["masters", "bachelors", "associate"];
+  const [activeLevel, setActiveLevel] = useState<DegreeLevel>("masters");
+  const [search, setSearch] = useState("");
+  const courses = COURSES.filter(c => c.level === activeLevel && (
+    search.trim() === "" || c.programme.toLowerCase().includes(search.toLowerCase())
+  ));
+  return (
+    <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.1)" }}>
+      <div className="px-5 py-4 border-b flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+        <div>
+          <h3 className="text-sm font-semibold" style={{ color: _GOLD }}>Available Courses</h3>
+          <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>Hong Kong universities & programmes — {COURSES.length} courses total</p>
+        </div>
+        <div className="flex items-center gap-1.5 rounded-xl p-1" style={{ background: "rgba(0,0,0,0.2)" }}>
+          {levels.map(l => (
+            <button key={l} onClick={() => { setActiveLevel(l); setSearch(""); }}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+              style={{ background: activeLevel === l ? "rgba(162,137,89,0.18)" : "transparent", color: activeLevel === l ? _GOLD : "rgba(162,137,89,0.4)" }}>
+              {l === "masters" ? "Master's" : l === "bachelors" ? "Bachelor's" : "Associate"}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="px-5 pt-4 pb-2">
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search programmes…"
+          className="w-full text-sm px-4 py-2.5 rounded-xl border bg-transparent outline-none transition-colors"
+          style={{ borderColor: "rgba(162,137,89,0.18)", color: _GOLD, background: "rgba(162,137,89,0.04)" }}
+        />
+      </div>
+      <div className="px-5 py-3 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
+        {courses.length === 0 ? (
+          <p className="text-sm col-span-2 text-center py-4" style={{ color: "rgba(162,137,89,0.35)" }}>No courses match "{search}"</p>
+        ) : courses.map(c => (
+          <div key={c.id} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 border"
+            style={{ background: "rgba(162,137,89,0.03)", borderColor: "rgba(162,137,89,0.08)" }}>
+            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: _GOLD }} />
+            <span className="text-sm leading-snug" style={{ color: "rgba(162,137,89,0.75)" }}>{c.programme}</span>
+          </div>
+        ))}
+      </div>
+      <div className="px-5 py-3 border-t" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
+        <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>
+          Showing {courses.length} {LEVEL_LABELS[activeLevel].toLowerCase()} programmes in Hong Kong for 2026. Your advisor will help you choose.
+        </p>
+      </div>
+    </div>
+  );
+}
 const GOLD = "#a28959";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
@@ -928,6 +981,9 @@ export default function Portal() {
                 </div>
               </div>
             )}
+
+            {/* ── AVAILABLE COURSES (visible after first payment confirmed) ── */}
+            {afterPayment && <CoursesPanel />}
 
             {/* ── MESSAGES ── */}
             {(messages.length > 0 || true) && (
