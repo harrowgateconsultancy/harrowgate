@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "LXvBocSkpBuIPvftINQco"
+uri = "file://api-server-source.zip"
+type = "unspecified"
+title = "HARROWGATE API Server — Source Code"
