@@ -19,12 +19,9 @@ const PACKAGES = [
     border: "rgba(162,137,89,0.25)",
     highlight: true,
     features: [
-      "Full student visa application support",
-      "Expert document preparation & review",
-      "Mock interview coaching session",
-      "University placement assistance",
-      "Dedicated case officer assigned",
-      "WhatsApp support throughout",
+      "1st semester tuition fees included (6 months)",
+      "Consultation charges included",
+      "Documentation charges included",
     ],
   },
   {
@@ -38,12 +35,9 @@ const PACKAGES = [
     border: "rgba(96,165,250,0.18)",
     highlight: false,
     features: [
-      "Full student visa application support",
-      "Expert document preparation & review",
-      "Mock interview coaching session",
-      "University placement assistance",
-      "Dedicated case officer assigned",
-      "WhatsApp support throughout",
+      "1st semester tuition fees included (6 months)",
+      "Consultation charges included",
+      "Documentation charges included",
     ],
   },
   {
@@ -57,12 +51,9 @@ const PACKAGES = [
     border: "rgba(74,222,128,0.18)",
     highlight: false,
     features: [
-      "Full student visa application support",
-      "Expert document preparation & review",
-      "Mock interview coaching session",
-      "University placement assistance",
-      "Dedicated case officer assigned",
-      "WhatsApp support throughout",
+      "1st semester tuition fees included (6 months)",
+      "Consultation charges included",
+      "Documentation charges included",
     ],
   },
 ];
@@ -133,7 +124,7 @@ export default function Packages() {
                 )}
 
                 <div className="text-4xl mb-4">{pkg.icon}</div>
-                <h2 className="text-xl font-bold mb-1" style={{ color: pkg.color }}>{pkg.tier}</h2>
+                <h2 className="text-3xl font-bold mb-1" style={{ color: pkg.color }}>{pkg.tier}</h2>
                 <p className="text-xs font-semibold tracking-widest uppercase mb-6" style={{ color: "rgba(162,137,89,0.4)" }}>
                   Full Service Package
                 </p>
