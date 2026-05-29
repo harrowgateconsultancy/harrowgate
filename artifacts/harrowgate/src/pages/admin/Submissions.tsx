@@ -7,6 +7,13 @@ const BG = "#0b2213";
 const GOLD = "#a28959";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
+function getAdminToken() { return localStorage.getItem("admin_token") || ""; }
+function adminFetch(url: string, options: RequestInit = {}) {
+  return fetch(url, {
+    ...options,
+    headers: { ...(options.headers as Record<string, string> || {}), Authorization: `Bearer ${getAdminToken()}` },
+  });
+}
 
 type Document = { id: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null };
 type Submission = {
@@ -116,7 +123,7 @@ function getDocMeta(dt: string): { label: string; tagColor: string; tagText: str
 
 async function uploadToStorage(file: File): Promise<{ url: string }> {
   const res = await fetch(`${getApiBase()}/api/storage/uploads/request-url`, {
-    method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+    method: "POST", headers: { "Content-Type": "application/json" }, 
     body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
   });
   if (!res.ok) throw new Error("Upload URL failed");
@@ -178,8 +185,8 @@ export default function Submissions() {
     if (!selected) return;
     setSettingRef(true);
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/immigration-ref`, {
-        method: "PATCH", credentials: "include",
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/immigration-ref`, {
+        method: "PATCH", 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ immigrationRefNumber: refNumInput }),
       });
@@ -195,7 +202,7 @@ export default function Submissions() {
 
   const loadLetters = async (id: number) => {
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${id}/immigration-letters`);
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${id}/immigration-letters`);
       if (res.ok) {
         const data = await res.json();
         setLettersData(data);
@@ -215,7 +222,7 @@ export default function Submissions() {
     setGeneratingLetters(true);
     setLettersError(null);
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/immigration-letters/generate`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/immigration-letters/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(lettersCourseForm),
@@ -232,7 +239,7 @@ export default function Submissions() {
 
   const loadAdminMessages = async (id: number) => {
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${id}/messages`);
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${id}/messages`);
       if (res.ok) setAdminMessages(await res.json());
       else setAdminMessages([]);
     } catch { setAdminMessages([]); }
@@ -242,7 +249,7 @@ export default function Submissions() {
     if (!selected || !messageForm) return;
     setSendingMessage(true);
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/messages`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/messages`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(messageForm),
       });
@@ -266,7 +273,7 @@ export default function Submissions() {
   const { data: submissions = [], isLoading } = useQuery<Submission[]>({
     queryKey: ["admin-student-submissions"],
     queryFn: async () => {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions`);
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions`);
       if (!res.ok) throw new Error("Failed");
       return res.json();
     },
@@ -275,7 +282,7 @@ export default function Submissions() {
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status, adminNotes }: { id: number; status: string; adminNotes?: string }) => {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${id}/status`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${id}/status`, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status, adminNotes }),
       });
@@ -290,12 +297,12 @@ export default function Submissions() {
 
   const deleteDoc = useMutation({
     mutationFn: async ({ submissionId, docId }: { submissionId: number; docId: number }) => {
-      await fetch(`${getApiBase()}/api/admin/student-submissions/${submissionId}/documents/${docId}`, { method: "DELETE" });
+      await adminFetch(`${getApiBase()}/api/admin/student-submissions/${submissionId}/documents/${docId}`, { method: "DELETE" });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
       qc.fetchQuery({ queryKey: ["admin-student-submissions"], queryFn: async () => {
-        const res = await fetch(`${getApiBase()}/api/admin/student-submissions`);
+        const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions`);
         return res.json();
       }}).then((all: Submission[]) => {
         if (selected) { const fresh = all.find(s => s.id === selected.id); if (fresh) setSelected(fresh); }
@@ -307,7 +314,7 @@ export default function Submissions() {
     if (!selected || !interviewForm) return;
     setSendingInvite(true);
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/send-interview-invite`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/send-interview-invite`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(interviewForm),
       });
@@ -325,7 +332,7 @@ export default function Submissions() {
     if (!selected || !uniInterviewForm) return;
     setSendingUniInvite(true);
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/send-university-interview-invite`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/send-university-interview-invite`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(uniInterviewForm),
       });
@@ -342,7 +349,7 @@ export default function Submissions() {
   const handleCompleteInterview = async () => {
     if (!selected) return;
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/complete-interview`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/complete-interview`, {
         method: "POST",
       });
       if (!res.ok) throw new Error("Failed");
@@ -356,7 +363,7 @@ export default function Submissions() {
     if (!selected || !additionalDocsForm) return;
     setSendingAdditionalDocs(true);
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/request-additional-docs`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/request-additional-docs`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ note: additionalDocsForm.note }),
       });
@@ -375,7 +382,7 @@ export default function Submissions() {
     setOfferLetterUploading(true);
     try {
       const { url } = await uploadToStorage(file);
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/upload-offer-letter`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/upload-offer-letter`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type }),
       });
@@ -392,7 +399,7 @@ export default function Submissions() {
     setEVisaUploading(true);
     try {
       const { url } = await uploadToStorage(file);
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/upload-evisa`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/upload-evisa`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type }),
       });
@@ -409,7 +416,7 @@ export default function Submissions() {
     setUploadingDoc(true);
     try {
       const { url } = await uploadToStorage(file);
-      const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/documents`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/documents`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ documentType: uploadDocType, fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type }),
       });
@@ -423,7 +430,7 @@ export default function Submissions() {
 
   const handleId995aDownload = async () => {
     if (!selected) return;
-    const res = await fetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/id995a/download`, { credentials: "include" });
+    const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/id995a/download`, { credentials: "include" });
     if (!res.ok) { alert("Failed to download PDF"); return; }
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
@@ -470,7 +477,7 @@ export default function Submissions() {
     setDeletingSelected(true);
     try {
       await Promise.all(Array.from(selectedIds).map(id =>
-        fetch(`${getApiBase()}/api/admin/student-submissions/${id}`, { method: "DELETE" })
+        adminFetch(`${getApiBase()}/api/admin/student-submissions/${id}`, { method: "DELETE" })
       ));
       if (selected && selectedIds.has(selected.id)) setSelected(null);
       setSelectedIds(new Set());
@@ -484,9 +491,9 @@ export default function Submissions() {
     setGoogleSyncing(true);
     setGoogleSyncResult(null);
     try {
-      const res = await fetch(`${getApiBase()}/api/admin/google-sync`, { method: "POST" });
+      const res = await adminFetch(`${getApiBase()}/api/admin/google-sync`, { method: "POST" });
       const data = await res.json();
-      setGoogleSyncResult(data.success ? `✓ Synced ${data.synced} student${data.synced !== 1 ? "s" : ""} to Google` : "Sync failed");
+      setGoogleSyncResult(data.success ? `✓ ${data.synced} students · ${data.docsUploaded ?? 0} docs → Drive` : "Sync failed");
     } catch { setGoogleSyncResult("Sync failed"); }
     finally { setGoogleSyncing(false); setTimeout(() => setGoogleSyncResult(null), 5000); }
   };
@@ -546,6 +553,12 @@ export default function Submissions() {
               style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>
               <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 4h12M2 8h12M2 12h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
               Courses
+            </button>
+            <button onClick={() => { localStorage.removeItem("admin_token"); window.location.href = "/admin/login"; }}
+              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
+              style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}>
+              <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Sign Out
             </button>
             <button onClick={handleGoogleSync} disabled={googleSyncing}
               className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80 disabled:opacity-50"
@@ -1825,7 +1838,7 @@ function Id995aPanel({ submissionId, apiBase }: { submissionId: number; apiBase:
 
   const load = async () => {
     try {
-      const res = await fetch(`${apiBase}/api/admin/student-submissions/${submissionId}/id995a`, { credentials: "include" });
+      const res = await adminFetch(`${apiBase}/api/admin/student-submissions/${submissionId}/id995a`, { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
         setFormData((data.formData as Record<string, string>) || {});
@@ -1839,8 +1852,8 @@ function Id995aPanel({ submissionId, apiBase }: { submissionId: number; apiBase:
   const handleGenerate = async () => {
     setGenerating(true); setSaved(false);
     try {
-      const res = await fetch(`${apiBase}/api/admin/student-submissions/${submissionId}/id995a/generate`, {
-        method: "POST", credentials: "include",
+      const res = await adminFetch(`${apiBase}/api/admin/student-submissions/${submissionId}/id995a/generate`, {
+        method: "POST", 
       });
       if (!res.ok) throw new Error("Failed");
       const data = await res.json();
@@ -1853,8 +1866,8 @@ function Id995aPanel({ submissionId, apiBase }: { submissionId: number; apiBase:
   const handleSave = async () => {
     setSaving(true); setSaved(false);
     try {
-      const res = await fetch(`${apiBase}/api/admin/student-submissions/${submissionId}/id995a`, {
-        method: "PATCH", credentials: "include",
+      const res = await adminFetch(`${apiBase}/api/admin/student-submissions/${submissionId}/id995a`, {
+        method: "PATCH", 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ formData }),
       });

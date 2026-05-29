@@ -10,6 +10,7 @@ import adminSubmissionsRouter from "./adminSubmissions";
 import id995aRouter from "./id995a";
 import immigrationLettersRouter from "./immigrationLetters";
 import studentExportRouter from "./studentExport";
+import adminAuthRouter, { requireAdminAuth } from "./adminAuth";
 
 const router: IRouter = Router();
 
@@ -20,6 +21,12 @@ router.use(applicationsRouter);
 router.use(documentsRouter);
 router.use(statsRouter);
 router.use(studentRouter);
+
+// Admin login (public — no auth required)
+router.use(adminAuthRouter);
+
+// All /admin/* routes below require a valid admin token
+router.use("/admin", requireAdminAuth);
 router.use(adminSubmissionsRouter);
 router.use(id995aRouter);
 router.use(immigrationLettersRouter);

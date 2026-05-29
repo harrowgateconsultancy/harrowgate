@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { shadcn } from "@clerk/themes";
@@ -11,6 +11,7 @@ import Landing from "@/pages/student/Landing";
 import Portal from "@/pages/student/Portal";
 import Packages from "@/pages/student/Packages";
 import Submissions from "@/pages/admin/Submissions";
+import AdminLogin from "@/pages/admin/AdminLogin";
 
 import AdminLayout from "@/components/AdminLayout";
 import Dashboard from "@/pages/dashboard";
@@ -157,6 +158,18 @@ function SignUpPage() {
   );
 }
 
+function AdminGuard({ children }: { children: React.ReactNode }) {
+  const [, setLocation] = useLocation();
+  const [authed, setAuthed] = useState<boolean | null>(null);
+  useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+    setAuthed(!!token);
+    if (!token) setLocation("/admin/login");
+  }, []);
+  if (!authed) return null;
+  return <>{children}</>;
+}
+
 function HomeRedirect() {
   return (
     <>
@@ -239,22 +252,29 @@ function ClerkProviderWithRoutes() {
             <Route path="/portal" component={PortalPage} />
             <Route path="/packages" component={Packages} />
 
-            {/* Admin / Consultant portal */}
-            <Route path="/admin/submissions" component={Submissions} />
+            {/* Admin login (public) */}
+            <Route path="/admin/login" component={AdminLogin} />
+
+            {/* Admin / Consultant portal — protected */}
+            <Route path="/admin/submissions">
+              <AdminGuard><Submissions /></AdminGuard>
+            </Route>
             <Route path="/print/:applicationId" component={PrintView} />
             <Route>
-              <AdminLayout>
-                <Switch>
-                  <Route path="/admin" component={Dashboard} />
-                  <Route path="/admin/clients/new" component={ClientNew} />
-                  <Route path="/admin/clients/:clientId" component={ClientDetail} />
-                  <Route path="/admin/clients" component={Clients} />
-                  <Route path="/admin/applications/new" component={ApplicationNew} />
-                  <Route path="/admin/applications/:applicationId" component={ApplicationDetail} />
-                  <Route path="/admin/applications" component={Applications} />
-                  <Route component={NotFound} />
-                </Switch>
-              </AdminLayout>
+              <AdminGuard>
+                <AdminLayout>
+                  <Switch>
+                    <Route path="/admin" component={Dashboard} />
+                    <Route path="/admin/clients/new" component={ClientNew} />
+                    <Route path="/admin/clients/:clientId" component={ClientDetail} />
+                    <Route path="/admin/clients" component={Clients} />
+                    <Route path="/admin/applications/new" component={ApplicationNew} />
+                    <Route path="/admin/applications/:applicationId" component={ApplicationDetail} />
+                    <Route path="/admin/applications" component={Applications} />
+                    <Route component={NotFound} />
+                  </Switch>
+                </AdminLayout>
+              </AdminGuard>
             </Route>
           </Switch>
           <Toaster />

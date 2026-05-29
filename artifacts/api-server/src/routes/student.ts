@@ -86,6 +86,8 @@ router.post("/student/submissions/:id/documents", requireStudentAuth, async (req
     if (existing.length > 0) {
       const [updated] = await db.update(studentDocumentsTable).set({ fileName, fileUrl, fileSize, mimeType })
         .where(and(eq(studentDocumentsTable.submissionId, submissionId), eq(studentDocumentsTable.documentType, documentType))).returning();
+      uploadDocumentToDrive({ submissionId, studentName: submission.name, documentType, fileName, fileUrl, mimeType })
+        .catch(err => console.error("[Google Drive] doc update upload failed:", err));
       return res.json(updated);
     }
     const [doc] = await db.insert(studentDocumentsTable).values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType }).returning();
