@@ -9,7 +9,7 @@ import {
 import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail } from "../email";
-import { ensureStudentFolder, upsertStudentRow, uploadDocumentToDrive, deleteStudentRow } from "../lib/googleIntegration";
+import { upsertStudentRow, deleteStudentRow } from "../lib/googleIntegration";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -283,37 +283,17 @@ router.post("/admin/google-sync", async (_req, res) => {
   try {
     const submissions = await db.select().from(studentSubmissionsTable);
     let synced = 0;
-    let docsUploaded = 0;
     for (const s of submissions) {
-      const driveFolderUrl = await ensureStudentFolder(s.id, s.name);
       await upsertStudentRow({
         submissionId: s.id, name: s.name, email: s.email,
         passportNumber: s.passportNumber, dateOfBirth: s.dateOfBirth,
         nationality: (s as any).nationality, status: s.status,
         immigrationRefNumber: s.immigrationRefNumber,
-        driveFolderUrl, createdAt: s.createdAt,
+        createdAt: s.createdAt,
       });
-      // Upload all documents to Drive
-      const docs = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, s.id));
-      for (const doc of docs) {
-        if (!doc.fileUrl) continue;
-        try {
-          await uploadDocumentToDrive({
-            submissionId: s.id,
-            studentName: s.name,
-            documentType: doc.documentType,
-            fileName: doc.fileName,
-            fileUrl: doc.fileUrl,
-            mimeType: doc.mimeType,
-          });
-          docsUploaded++;
-        } catch (docErr) {
-          console.error(`[Google Drive] failed to upload doc ${doc.id} during sync:`, docErr);
-        }
-      }
       synced++;
     }
-    res.json({ success: true, synced, docsUploaded });
+    res.json({ success: true, synced });
   } catch (err) {
     console.error("[Google] bulk sync failed:", err);
     res.status(500).json({ error: "Sync failed" });
