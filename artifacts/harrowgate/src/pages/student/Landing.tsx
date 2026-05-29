@@ -250,39 +250,6 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Tutorial Video */}
-        <section className="py-24 px-6">
-          <div className="max-w-4xl mx-auto">
-            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
-              Step-by-Step Guide
-            </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>
-              How to Apply — Video Tutorial
-            </h2>
-            <p className="text-center mb-10 text-base max-w-xl mx-auto" style={{ color: GOLD_DIM }}>
-              Watch our complete walkthrough from registration to final visa approval. English narration.
-            </p>
-            <div className="rounded-3xl overflow-hidden border" style={{ borderColor: "rgba(162,137,89,0.2)", background: "rgba(0,0,0,0.25)" }}>
-              <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
-                <iframe
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                  title="HARROWGATE — How to Apply: Full Tutorial"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
-                />
-              </div>
-            </div>
-            <p className="text-xs text-center mt-4" style={{ color: "rgba(162,137,89,0.3)" }}>
-              Need help? Contact us on{" "}
-              <a href="https://wa.me/85260606457" target="_blank" rel="noopener noreferrer"
-                className="underline hover:opacity-80 transition-opacity" style={{ color: "rgba(162,137,89,0.5)" }}>
-                WhatsApp +852 6060 6457
-              </a>
-            </p>
-          </div>
-        </section>
-
         {/* Testimonials */}
         <section className="py-24 px-6" style={{ background: "rgba(0,0,0,0.2)", borderTop: `1px solid ${GOLD_FAINT}`, borderBottom: `1px solid ${GOLD_FAINT}` }}>
           <div className="max-w-5xl mx-auto">
