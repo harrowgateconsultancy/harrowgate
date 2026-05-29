@@ -69,13 +69,17 @@ function isConfigured(): boolean {
 
 async function getOrCreateFolder(drive: any, name: string, parentId: string): Promise<string> {
   const q = `name='${name.replace(/'/g, "\\'")}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`;
-  const existing = await drive.files.list({ q, fields: "files(id,name)", spaces: "drive" });
+  const existing = await drive.files.list({
+    q, fields: "files(id,name)", spaces: "drive",
+    supportsAllDrives: true, includeItemsFromAllDrives: true,
+  });
   if (existing.data.files && existing.data.files.length > 0) {
     return existing.data.files[0].id as string;
   }
   const created = await drive.files.create({
     requestBody: { name, mimeType: "application/vnd.google-apps.folder", parents: [parentId] },
     fields: "id",
+    supportsAllDrives: true,
   });
   return created.data.id as string;
 }
@@ -127,10 +131,13 @@ export async function uploadDocumentToDrive(opts: {
 
     // Check if a file with this docType prefix already exists (replace on re-upload)
     const q = `name contains '${opts.documentType}__' and '${folderId}' in parents and trashed=false`;
-    const existing = await drive.files.list({ q, fields: "files(id)", spaces: "drive" });
+    const existing = await drive.files.list({
+      q, fields: "files(id)", spaces: "drive",
+      supportsAllDrives: true, includeItemsFromAllDrives: true,
+    });
     if (existing.data.files && existing.data.files.length > 0) {
       for (const f of existing.data.files) {
-        await drive.files.delete({ fileId: f.id as string }).catch(() => {});
+        await drive.files.delete({ fileId: f.id as string, supportsAllDrives: true }).catch(() => {});
       }
     }
 
@@ -138,6 +145,7 @@ export async function uploadDocumentToDrive(opts: {
       requestBody: { name: uploadName, parents: [folderId] },
       media: { mimeType: opts.mimeType || "application/octet-stream", body: stream },
       fields: "id",
+      supportsAllDrives: true,
     });
   } catch (err) {
     console.error("[Google Drive] uploadDocumentToDrive failed:", err);
