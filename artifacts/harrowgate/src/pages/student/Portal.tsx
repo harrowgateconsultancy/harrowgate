@@ -983,7 +983,7 @@ export default function Portal() {
             )}
 
             {/* ── AVAILABLE COURSES (visible after first payment confirmed) ── */}
-            {afterPayment && <CoursesPanel />}
+            {submission && ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(submission.status) && <CoursesPanel />}
 
             {/* ── MESSAGES ── */}
             {(messages.length > 0 || true) && (
