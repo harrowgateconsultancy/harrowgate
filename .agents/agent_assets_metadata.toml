@@ -6,3 +6,9 @@ id = "LXvBocSkpBuIPvftINQco"
 uri = "file://api-server-source.zip"
 type = "unspecified"
 title = "HARROWGATE API Server — Source Code"
+
+[[outputs]]
+id = "r3jxo44EsaWoLlyEq-eFX"
+uri = "file://harrowgate-complete.zip"
+type = "unspecified"
+title = "HARROWGATE — Complete Codebase"
