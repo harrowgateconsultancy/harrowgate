@@ -6,6 +6,9 @@ import {
 } from "@workspace/api-zod";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { ObjectPermission } from "../lib/objectAcl";
+import { isLocalStorageMode, LocalStorageService } from "../lib/localStorageService";
+
+const localStorageService = new LocalStorageService();
 
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
@@ -27,7 +30,8 @@ router.post("/storage/uploads/request-url", async (req: Request, res: Response) 
   try {
     const { name, size, contentType } = parsed.data;
 
-    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+    const host = req.get("host") || "localhost";
+    const uploadURL = await objectStorageService.getObjectEntityUploadURL(host);
     const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
 
     res.json(
@@ -125,6 +129,38 @@ router.get("/storage/objects/*path", async (req: Request, res: Response) => {
     }
     req.log.error({ err: error }, "Error serving object");
     res.status(500).json({ error: "Failed to serve object" });
+  }
+});
+
+/**
+ * PUT /storage/uploads/direct/:id
+ *
+ * Direct upload endpoint used in local-storage mode (Railway / non-Replit).
+ * The frontend PUTs the raw file body to the URL returned by /request-url.
+ */
+router.put("/storage/uploads/direct/:id", async (req: Request, res: Response) => {
+  if (!isLocalStorageMode()) {
+    res.status(404).json({ error: "Not available in this environment" });
+    return;
+  }
+
+  const { id } = req.params;
+  if (!id || id.includes("/") || id.includes("..")) {
+    res.status(400).json({ error: "Invalid upload id" });
+    return;
+  }
+
+  try {
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    }
+    const data = Buffer.concat(chunks);
+    await localStorageService.saveFile(id, data);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    req.log.error({ err: error }, "Error saving uploaded file");
+    res.status(500).json({ error: "Failed to save file" });
   }
 });
 

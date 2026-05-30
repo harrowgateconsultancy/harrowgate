@@ -8,6 +8,9 @@ import {
   getObjectAclPolicy,
   setObjectAclPolicy,
 } from "./objectAcl";
+import { LocalStorageFile, LocalStorageService, isLocalStorageMode } from "./localStorageService";
+
+const localStorageService = new LocalStorageService();
 
 const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 
@@ -87,7 +90,10 @@ export class ObjectStorageService {
     return null;
   }
 
-  async downloadObject(file: File, cacheTtlSec: number = 3600): Promise<Response> {
+  async downloadObject(file: File | LocalStorageFile, cacheTtlSec: number = 3600): Promise<Response> {
+    if (file instanceof LocalStorageFile) {
+      return localStorageService.downloadFile(file, cacheTtlSec);
+    }
     const [metadata] = await file.getMetadata();
     const aclPolicy = await getObjectAclPolicy(file);
     const isPublic = aclPolicy?.visibility === "public";
@@ -106,7 +112,11 @@ export class ObjectStorageService {
     return new Response(webStream, { headers });
   }
 
-  async getObjectEntityUploadURL(): Promise<string> {
+  async getObjectEntityUploadURL(host?: string): Promise<string> {
+    if (isLocalStorageMode()) {
+      const info = await localStorageService.getUploadInfo(host || "localhost");
+      return info.uploadURL;
+    }
     const privateObjectDir = this.getPrivateObjectDir();
     if (!privateObjectDir) {
       throw new Error(
@@ -128,7 +138,24 @@ export class ObjectStorageService {
     });
   }
 
-  async getObjectEntityFile(objectPath: string): Promise<File> {
+  normalizeObjectEntityPath(rawPath: string): string {
+    if (isLocalStorageMode()) {
+      const url = rawPath.includes("/api/storage/uploads/direct/")
+        ? rawPath.split("/api/storage/uploads/direct/")[1]
+        : null;
+      return url ? `/objects/uploads/${url}` : rawPath;
+    }
+    return this._normalizeGcsPath(rawPath);
+  }
+
+  async getObjectEntityFile(objectPath: string): Promise<File | LocalStorageFile> {
+    if (isLocalStorageMode()) {
+      return localStorageService.getFile(objectPath);
+    }
+    return this._getGcsEntityFile(objectPath);
+  }
+
+  private async _getGcsEntityFile(objectPath: string): Promise<File> {
     if (!objectPath.startsWith("/objects/")) {
       throw new ObjectNotFoundError();
     }
@@ -154,7 +181,7 @@ export class ObjectStorageService {
     return objectFile;
   }
 
-  normalizeObjectEntityPath(rawPath: string): string {
+  private _normalizeGcsPath(rawPath: string): string {
     if (!rawPath.startsWith("https://storage.googleapis.com/")) {
       return rawPath;
     }

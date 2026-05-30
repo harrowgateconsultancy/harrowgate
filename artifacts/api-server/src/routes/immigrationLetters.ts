@@ -191,7 +191,8 @@ Return only a JSON object: { "letter1": "...", "letter2": "...", "letter3": "...
     const passportDoc = studentDocs.find(d => d.documentType === "passport_doc");
     if (passportDoc && passportDoc.mimeType?.startsWith("image/")) {
       try {
-        const response = await objectStorageService.downloadObject(passportDoc.fileUrl, 0);
+        const passportFile = await objectStorageService.getObjectEntityFile(passportDoc.fileUrl);
+        const response = await objectStorageService.downloadObject(passportFile, 0);
         const b64 = Buffer.from(await response.arrayBuffer()).toString("base64");
         imageParts.push({
           type: "image_url",
