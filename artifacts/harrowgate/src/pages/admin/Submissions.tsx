@@ -274,10 +274,16 @@ export default function Submissions() {
     queryKey: ["admin-student-submissions"],
     queryFn: async () => {
       const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions`);
-      if (!res.ok) throw new Error("Failed");
+      if (res.status === 401) {
+        localStorage.removeItem("admin_token");
+        setLocation("/admin/login");
+        throw new Error("Session expired — please log in again");
+      }
+      if (!res.ok) throw new Error("Failed to load submissions");
       return res.json();
     },
     refetchInterval: 15000,
+    retry: false,
   });
 
   const updateStatus = useMutation({

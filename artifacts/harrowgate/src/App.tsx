@@ -161,11 +161,23 @@ function SignUpPage() {
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const [, setLocation] = useLocation();
   const [authed, setAuthed] = useState<boolean | null>(null);
+  const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
-    setAuthed(!!token);
-    if (!token) setLocation("/admin/login");
+    if (!token) { setAuthed(false); setLocation("/admin/login"); return; }
+    fetch(`${window.location.origin}${BASE}/api/admin/student-submissions`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(r => {
+      if (r.status === 401) {
+        localStorage.removeItem("admin_token");
+        setAuthed(false);
+        setLocation("/admin/login");
+      } else {
+        setAuthed(true);
+      }
+    }).catch(() => setAuthed(true));
   }, []);
+  if (authed === null) return null;
   if (!authed) return null;
   return <>{children}</>;
 }
