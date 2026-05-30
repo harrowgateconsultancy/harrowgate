@@ -10,6 +10,7 @@ import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail } from "../email";
 import { upsertStudentRow, deleteStudentRow } from "../lib/googleIntegration";
+import { uploadToMega } from "../lib/megaService";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -221,6 +222,7 @@ router.post("/admin/student-submissions/:id/documents", async (req: any, res) =>
     const { documentType, fileName, fileUrl, fileSize, mimeType } = req.body;
     if (!documentType || !fileName || !fileUrl) return res.status(400).json({ error: "documentType, fileName, and fileUrl are required" });
     const [doc] = await db.insert(studentDocumentsTable).values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType }).returning();
+    uploadToMega({ submissionId, studentName: submission.name, fileName, fileUrl, documentType }).catch(() => {});
     res.status(201).json(doc);
   } catch { res.status(500).json({ error: "Failed to attach document" }); }
 });
@@ -257,6 +259,7 @@ router.post("/admin/student-submissions/:id/upload-offer-letter", async (req: an
     const [updated] = await db.update(studentSubmissionsTable)
       .set({ status: "offer_letter_pending" })
       .where(eq(studentSubmissionsTable.id, id)).returning();
+    uploadToMega({ submissionId: id, studentName: submission.name, fileName, fileUrl, documentType: "offer_letter" }).catch(() => {});
     const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
     if (submission.email) {
       sendOfferLetterAvailableEmail({ name: submission.name, studentEmail: submission.email, portalUrl }).catch(() => {});
@@ -354,6 +357,7 @@ router.post("/admin/student-submissions/:id/upload-evisa", async (req: any, res)
     const [updated] = await db.update(studentSubmissionsTable)
       .set({ status: "visa_issued" })
       .where(eq(studentSubmissionsTable.id, id)).returning();
+    uploadToMega({ submissionId: id, studentName: submission.name, fileName, fileUrl, documentType: "evisa" }).catch(() => {});
     const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
     if (submission.email) {
       sendEVisaReadyEmail({ name: submission.name, studentEmail: submission.email, portalUrl }).catch(() => {});

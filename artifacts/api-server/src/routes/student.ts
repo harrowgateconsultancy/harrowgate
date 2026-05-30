@@ -7,6 +7,7 @@ import { eq, and } from "drizzle-orm";
 import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail, sendAdditionalDocsSubmittedEmail, sendFinalReceiptEmail, sendStudentReplyNotificationEmail } from "../email";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { ensureStudentFolder, upsertStudentRow } from "../lib/googleIntegration";
+import { uploadToMega } from "../lib/megaService";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -93,6 +94,7 @@ router.post("/student/submissions/:id/documents", requireStudentAuth, async (req
       const allDocs = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, submissionId));
       sendNewApplicationEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, dateOfBirth: submission.dateOfBirth, docCount: allDocs.length }).catch(() => {});
     }
+    uploadToMega({ submissionId, studentName: submission.name, fileName, fileUrl, documentType }).catch(() => {});
     res.status(201).json(doc);
   } catch { res.status(500).json({ error: "Failed to save document" }); }
 });
@@ -196,6 +198,7 @@ router.post("/student/submissions/:id/receipt", requireStudentAuth, async (req: 
       .values({ submissionId, documentType: "payment_receipt", fileName, fileUrl, fileSize, mimeType }).returning();
     await db.update(studentSubmissionsTable).set({ status: "payment_received" }).where(eq(studentSubmissionsTable.id, submissionId));
     sendReceiptUploadEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, receiptFileName: fileName, submissionId }).catch(() => {});
+    uploadToMega({ submissionId, studentName: submission.name, fileName, fileUrl, documentType: "payment_receipt" }).catch(() => {});
     res.json(doc);
   } catch { res.status(500).json({ error: "Failed to upload receipt" }); }
 });
@@ -216,6 +219,7 @@ router.post("/student/submissions/:id/additional-docs", requireStudentAuth, asyn
       .set({ additionalDocsRequested: false, additionalDocsRequestNote: null })
       .where(eq(studentSubmissionsTable.id, submissionId));
     sendAdditionalDocsSubmittedEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, note: note || undefined, fileName, submissionId }).catch(() => {});
+    uploadToMega({ submissionId, studentName: submission.name, fileName, fileUrl, documentType: "additional_doc" }).catch(() => {});
     res.json(doc);
   } catch { res.status(500).json({ error: "Failed to submit additional docs" }); }
 });
@@ -292,6 +296,7 @@ router.post("/student/submissions/:id/receipt2", requireStudentAuth, async (req:
       .values({ submissionId, documentType: "second_payment_receipt", fileName, fileUrl, fileSize, mimeType }).returning();
     await db.update(studentSubmissionsTable).set({ status: "second_payment_received" }).where(eq(studentSubmissionsTable.id, submissionId));
     sendSecondReceiptUploadEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, receiptFileName: fileName, submissionId }).catch(() => {});
+    uploadToMega({ submissionId, studentName: submission.name, fileName, fileUrl, documentType: "second_payment_receipt" }).catch(() => {});
     res.json(doc);
   } catch { res.status(500).json({ error: "Failed to upload 2nd receipt" }); }
 });
@@ -310,6 +315,7 @@ router.post("/student/submissions/:id/receipt3", requireStudentAuth, async (req:
       .values({ submissionId, documentType: "final_payment_receipt", fileName, fileUrl, fileSize, mimeType }).returning();
     await db.update(studentSubmissionsTable).set({ status: "final_payment_received" }).where(eq(studentSubmissionsTable.id, submissionId));
     sendFinalReceiptEmail({ name: submission.name, email: submission.email, passportNumber: submission.passportNumber, receiptFileName: fileName, submissionId }).catch(() => {});
+    uploadToMega({ submissionId, studentName: submission.name, fileName, fileUrl, documentType: "final_payment_receipt" }).catch(() => {});
     res.json(doc);
   } catch { res.status(500).json({ error: "Failed to upload final payment receipt" }); }
 });
