@@ -37,6 +37,68 @@ async function getOrCreateSubfolder(parent: any, name: string): Promise<any> {
   return await parent.mkdir(name);
 }
 
+export async function syncStudentToMega(submission: {
+  id: number; name: string; email: string | null; dateOfBirth: string;
+  passportNumber: string; status: string; adminNotes: string | null;
+  createdAt: Date | string; immigrationRefNumber?: string | null;
+  nationality?: string | null; interviewDateTime?: string | null;
+  uniInterviewDateTime?: string | null;
+}, documents: { fileName: string; fileUrl: string; documentType: string }[]): Promise<{ synced: number; failed: number }> {
+  const storage = await getMegaStorage();
+  const rootFolder = await getOrCreateFolder(storage, MEGA_FOLDER);
+  const safeName = submission.name.replace(/[^a-zA-Z0-9 _-]/g, "_").trim() || "Unknown";
+  const subfolderName = `Student_${submission.id}_${safeName}`;
+  const subfolder = await getOrCreateSubfolder(rootFolder, subfolderName);
+
+  const profileLines = [
+    "HARROWGATE Consultancy — Student Profile",
+    "========================================",
+    `Name:              ${submission.name}`,
+    `Passport No:       ${submission.passportNumber}`,
+    `Date of Birth:     ${submission.dateOfBirth}`,
+    `Nationality:       ${submission.nationality || "—"}`,
+    `Email:             ${submission.email || "—"}`,
+    `Status:            ${submission.status}`,
+    `Immigration Ref:   ${submission.immigrationRefNumber || "—"}`,
+    `Mock Interview:    ${submission.interviewDateTime || "—"}`,
+    `Uni Interview:     ${submission.uniInterviewDateTime || "—"}`,
+    `Submitted:         ${new Date(submission.createdAt).toISOString()}`,
+    `Admin Notes:       ${submission.adminNotes || "—"}`,
+    "",
+    `Documents (${documents.length} total):`,
+    ...documents.map((d, i) => `  ${i + 1}. [${d.documentType}] ${d.fileName}`),
+  ];
+  const profileBuffer = Buffer.from(profileLines.join("\n"), "utf-8");
+  await subfolder.upload({ name: "Student_Profile.txt", size: profileBuffer.length }, profileBuffer).complete;
+
+  let synced = 0;
+  let failed = 0;
+  const objectStorageService = new ObjectStorageService();
+  for (const doc of documents) {
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(doc.fileUrl);
+      const response = await objectStorageService.downloadObject(objectFile, 0);
+      if (!response.body) throw new Error("Empty body");
+      const chunks: Buffer[] = [];
+      const reader = (response.body as ReadableStream<Uint8Array>).getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(Buffer.from(value));
+      }
+      const buf = Buffer.concat(chunks);
+      const uploadName = `[${doc.documentType}] ${doc.fileName}`;
+      await subfolder.upload({ name: uploadName, size: buf.length }, buf).complete;
+      console.log(`[MEGA] Synced ${uploadName}`);
+      synced++;
+    } catch (err) {
+      console.error(`[MEGA] Failed to sync ${doc.fileName}:`, err);
+      failed++;
+    }
+  }
+  return { synced, failed };
+}
+
 export async function uploadToMega({
   submissionId,
   studentName,

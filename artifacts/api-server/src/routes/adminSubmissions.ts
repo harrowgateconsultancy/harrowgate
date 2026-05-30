@@ -10,7 +10,7 @@ import { eq, desc, and } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail } from "../email";
 import { upsertStudentRow, deleteStudentRow } from "../lib/googleIntegration";
-import { uploadToMega } from "../lib/megaService";
+import { uploadToMega, syncStudentToMega } from "../lib/megaService";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -300,6 +300,21 @@ router.post("/admin/google-sync", async (_req, res) => {
   } catch (err) {
     console.error("[Google] bulk sync failed:", err);
     res.status(500).json({ error: "Sync failed" });
+  }
+});
+
+// Admin: sync a single student (all docs + profile) to MEGA
+router.post("/admin/student-submissions/:id/mega-sync", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, id));
+    const { synced, failed } = await syncStudentToMega(submission as any, documents);
+    res.json({ success: true, synced, failed });
+  } catch (err) {
+    console.error("[MEGA] mega-sync failed:", err);
+    res.status(500).json({ error: "MEGA sync failed" });
   }
 });
 

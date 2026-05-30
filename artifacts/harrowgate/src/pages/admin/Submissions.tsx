@@ -175,8 +175,8 @@ export default function Submissions() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [deletingSelected, setDeletingSelected] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [googleSyncing, setGoogleSyncing] = useState(false);
-  const [googleSyncResult, setGoogleSyncResult] = useState<string | null>(null);
+  const [megaSyncing, setMegaSyncing] = useState(false);
+  const [megaSyncResult, setMegaSyncResult] = useState<string | null>(null);
   const [showCourses, setShowCourses] = useState(false);
   const [coursesLevel, setCoursesLevel] = useState<DegreeLevel>("masters");
   const [coursesSearch, setCoursesSearch] = useState("");
@@ -493,15 +493,20 @@ export default function Submissions() {
     finally { setDeletingSelected(false); }
   };
 
-  const handleGoogleSync = async () => {
-    setGoogleSyncing(true);
-    setGoogleSyncResult(null);
+  const handleMegaSync = async () => {
+    if (!selected) return;
+    setMegaSyncing(true);
+    setMegaSyncResult(null);
     try {
-      const res = await adminFetch(`${getApiBase()}/api/admin/google-sync`, { method: "POST" });
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/mega-sync`, { method: "POST" });
       const data = await res.json();
-      setGoogleSyncResult(data.success ? `✓ ${data.synced} students · ${data.docsUploaded ?? 0} docs → Drive` : "Sync failed");
-    } catch { setGoogleSyncResult("Sync failed"); }
-    finally { setGoogleSyncing(false); setTimeout(() => setGoogleSyncResult(null), 5000); }
+      if (data.success) {
+        setMegaSyncResult(`✓ ${data.synced} file${data.synced !== 1 ? "s" : ""} synced${data.failed ? ` · ${data.failed} failed` : ""}`);
+      } else {
+        setMegaSyncResult("Sync failed");
+      }
+    } catch { setMegaSyncResult("Sync failed"); }
+    finally { setMegaSyncing(false); setTimeout(() => setMegaSyncResult(null), 6000); }
   };
 
   const viewUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/view`;
@@ -566,14 +571,15 @@ export default function Submissions() {
               <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               Sign Out
             </button>
-            <button onClick={handleGoogleSync} disabled={googleSyncing}
-              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80 disabled:opacity-50"
-              style={{ borderColor: "rgba(162,137,89,0.2)", color: googleSyncResult?.startsWith("✓") ? "#4ade80" : GOLD, background: "rgba(162,137,89,0.05)" }}>
-              {googleSyncing
+            <button onClick={handleMegaSync} disabled={megaSyncing || !selected}
+              title={!selected ? "Select a student first" : `Sync ${selected.name} to MEGA`}
+              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ borderColor: "rgba(162,137,89,0.2)", color: megaSyncResult?.startsWith("✓") ? "#4ade80" : GOLD, background: "rgba(162,137,89,0.05)" }}>
+              {megaSyncing
                 ? <><span className="w-3 h-3 rounded-full border animate-spin shrink-0" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Syncing…</>
-                : googleSyncResult
-                  ? googleSyncResult
-                  : <><svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M14 8A6 6 0 1 1 8 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M14 2v3.5H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Sync to Google</>}
+                : megaSyncResult
+                  ? megaSyncResult
+                  : <><svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 8c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Sync to MEGA{selected ? ` — ${selected.name.split(" ")[0]}` : ""}</>}
             </button>
           </div>
         </div>
