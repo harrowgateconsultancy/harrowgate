@@ -19,6 +19,8 @@ export const studentSubmissionsTable = pgTable("student_submissions", {
   additionalDocsRequested: boolean("additional_docs_requested").default(false),
   additionalDocsRequestNote: text("additional_docs_request_note"),
   immigrationRefNumber: text("immigration_ref_number"),
+  termsAcceptedAt: timestamp("terms_accepted_at", { withTimezone: true }),
+  termsSignatureUrl: text("terms_signature_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

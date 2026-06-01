@@ -184,6 +184,25 @@ router.post("/student/submissions/:id/complete-university-interview", requireStu
   } catch { res.status(500).json({ error: "Failed to complete university interview" }); }
 });
 
+router.post("/student/submissions/:id/accept-terms", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+    if (submission.termsAcceptedAt) return res.status(400).json({ error: "Terms already accepted" });
+    const { signatureData } = req.body;
+    if (!signatureData || typeof signatureData !== "string" || !signatureData.startsWith("data:image/")) {
+      return res.status(400).json({ error: "Valid signature image required" });
+    }
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({ termsAcceptedAt: new Date(), termsSignatureUrl: signatureData })
+      .where(eq(studentSubmissionsTable.id, submissionId))
+      .returning();
+    res.json({ termsAcceptedAt: updated.termsAcceptedAt });
+  } catch { res.status(500).json({ error: "Failed to accept terms" }); }
+});
+
 router.post("/student/submissions/:id/receipt", requireStudentAuth, async (req: any, res) => {
   try {
     const submissionId = parseInt(req.params.id);

@@ -71,6 +71,7 @@ export type Submission = {
   uniInterviewLink?: string | null; uniInterviewDateTime?: string | null; uniInterviewPlatform?: string | null;
   additionalDocsRequested?: boolean | null; additionalDocsRequestNote?: string | null;
   immigrationRefNumber?: string | null;
+  termsAcceptedAt?: string | null;
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };
 

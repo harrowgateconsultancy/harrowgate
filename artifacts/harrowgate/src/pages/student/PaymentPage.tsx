@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useSession } from "@clerk/react";
 import type { Submission } from "./Portal";
+import TermsModal from "./TermsModal";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -26,6 +27,8 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const needsTerms = paymentType === "first" && !submission.termsAcceptedAt;
 
   const authHeaders = async (): Promise<Record<string, string>> => {
     const token = await session?.getToken();
@@ -71,6 +74,17 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
       setUploading(false);
     }
   };
+
+  if (needsTerms) {
+    return (
+      <TermsModal
+        submissionId={submission.id}
+        studentName={submission.name}
+        authHeaders={authHeaders}
+        onAccepted={onUpdated}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4">
