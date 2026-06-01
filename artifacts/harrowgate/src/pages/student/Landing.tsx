@@ -132,7 +132,7 @@ export default function Landing() {
             style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
             <span className="text-base">🏛️</span>
             <p className="text-sm font-medium" style={{ color: GOLD }}>
-              Pathway to Becoming a Permanent Resident in Hong Kong
+              {t("hero.pr")}
             </p>
           </div>
 
@@ -232,26 +232,26 @@ export default function Landing() {
         {/* Payment Journey */}
         <section className="py-24 max-w-4xl mx-auto px-6">
           <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
-            YOUR JOURNEY
+            {t("journey.label")}
           </p>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>
-            From Application to Visa Success
+            {t("journey.heading")}
           </h2>
           <p className="text-center mb-14 text-base max-w-xl mx-auto" style={{ color: GOLD_DIM }}>
-            A clear, step-by-step pathway — full transparency on every payment at every stage.
+            {t("journey.sub")}
           </p>
           <div className="relative">
             <div className="absolute left-[18px] top-5 bottom-5 w-px hidden sm:block" style={{ background: `linear-gradient(to bottom, transparent, ${GOLD_FAINT} 8%, ${GOLD_FAINT} 92%, transparent)` }} />
             <div className="space-y-3">
               {[
-                { num: 1, label: "Submit Documents", amount: null, note: null },
-                { num: 2, label: "Deposit Payment", amount: "HKD$ 3,000", note: "Non-Refundable" },
-                { num: 3, label: "Interview Arrangement", amount: null, note: null },
-                { num: 4, label: "Second Payment", amount: "HKD$ 12,000", note: null },
-                { num: 5, label: "Pending Offer Letter", amount: null, note: null },
-                { num: 6, label: "Last Payment & Collection of Offer Letter", amount: null, note: null, tiers: true },
-                { num: 7, label: "Additional Documents & Visa Processing (3 Months)", amount: null, note: null },
-                { num: 8, label: "Visa Success", amount: null, note: null, final: true },
+                { num: 1, lk: "journey.s1", amount: null as string|null, nk: null as string|null, final: false, tiers: false },
+                { num: 2, lk: "journey.s2", amount: "HKD$ 3,000",        nk: "journey.nonRefundable", final: false, tiers: false },
+                { num: 3, lk: "journey.s3", amount: null,                nk: null, final: false, tiers: false },
+                { num: 4, lk: "journey.s4", amount: "HKD$ 12,000",       nk: null, final: false, tiers: false },
+                { num: 5, lk: "journey.s5", amount: null,                nk: null, final: false, tiers: false },
+                { num: 6, lk: "journey.s6", amount: null,                nk: null, final: false, tiers: true },
+                { num: 7, lk: "journey.s7", amount: null,                nk: null, final: false, tiers: false },
+                { num: 8, lk: "journey.s8", amount: null,                nk: null, final: true,  tiers: false },
               ].map((step) => (
                 <div key={step.num} className="flex gap-4 items-start">
                   <div className="shrink-0" style={{ minWidth: 36 }}>
@@ -273,13 +273,13 @@ export default function Landing() {
                     }}>
                     <div className="flex items-center justify-between gap-3 flex-wrap">
                       <p className="text-sm font-semibold" style={{ color: step.final ? "#4ade80" : GOLD }}>
-                        {step.label}
+                        {t(step.lk)}
                       </p>
                       {step.amount && (
                         <span className="text-sm font-bold px-4 py-1.5 rounded-xl border shrink-0"
                           style={{ background: "rgba(162,137,89,0.1)", borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>
                           {step.amount}
-                          {step.note && <span className="ml-1.5 text-xs font-normal opacity-60">({step.note})</span>}
+                          {step.nk && <span className="ml-1.5 text-xs font-normal opacity-60">({t(step.nk)})</span>}
                         </span>
                       )}
                     </div>
@@ -287,18 +287,18 @@ export default function Landing() {
                       <div className="mt-3">
                         <div className="flex flex-wrap gap-2 mb-2">
                           {[
-                            { label: "Master's Degree", amount: "HKD$ 125,000" },
-                            { label: "Bachelor's Degree", amount: "HKD$ 115,000" },
-                            { label: "Associate Degree", amount: "HKD$ 75,000" },
+                            { lk: "pkg.tier1", amount: "HKD$ 125,000" },
+                            { lk: "pkg.tier2", amount: "HKD$ 115,000" },
+                            { lk: "pkg.tier3", amount: "HKD$ 75,000" },
                           ].map(tier => (
-                            <div key={tier.label} className="flex flex-col items-center px-4 py-2.5 rounded-xl border text-center"
+                            <div key={tier.lk} className="flex flex-col items-center px-4 py-2.5 rounded-xl border text-center"
                               style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.2)" }}>
                               <p className="text-sm font-bold" style={{ color: GOLD }}>{tier.amount}</p>
-                              <p className="text-xs mt-0.5" style={{ color: GOLD_DIM }}>{tier.label}</p>
+                              <p className="text-xs mt-0.5" style={{ color: GOLD_DIM }}>{t(tier.lk)}</p>
                             </div>
                           ))}
                         </div>
-                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.4)" }}>* First Semester Tuition Fees Included</p>
+                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.4)" }}>* {t("journey.tierNote")}</p>
                       </div>
                     )}
                   </div>
@@ -311,20 +311,20 @@ export default function Landing() {
         {/* Packages CTA */}
         <section className="py-16 px-6" style={{ background: "rgba(162,137,89,0.03)", borderTop: `1px solid ${GOLD_FAINT}`, borderBottom: `1px solid ${GOLD_FAINT}` }}>
           <div className="max-w-4xl mx-auto text-center">
-            <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>Transparent Pricing</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: GOLD }}>Start for Just HKD$ 3,000</h2>
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.badge")}</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: GOLD }}>{t("pricing.startJust")}</h2>
             <p className="text-base max-w-xl mx-auto mb-8" style={{ color: GOLD_DIM }}>
-              We offer three service packages — for Master's, Bachelor's, and Associate Degree students. One expert advisor. Full support from start to visa.
+              {t("pricing.desc")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
               {[
-                { label: "Master's Degree", cost: "HKD$ 130,000" },
-                { label: "Bachelor's Degree", cost: "HKD$ 120,000" },
-                { label: "Associate Degree", cost: "HKD$ 90,000" },
+                { lk: "pkg.tier1", cost: "HKD$ 130,000" },
+                { lk: "pkg.tier2", cost: "HKD$ 120,000" },
+                { lk: "pkg.tier3", cost: "HKD$ 90,000" },
               ].map(p => (
-                <div key={p.label} className="rounded-2xl px-6 py-4 border text-center min-w-[160px]"
+                <div key={p.lk} className="rounded-2xl px-6 py-4 border text-center min-w-[160px]"
                   style={{ background: "rgba(162,137,89,0.05)", borderColor: GOLD_FAINT }}>
-                  <p className="text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.5)" }}>{p.label}</p>
+                  <p className="text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.5)" }}>{t(p.lk)}</p>
                   <p className="text-base font-bold" style={{ color: GOLD }}>{p.cost}</p>
                 </div>
               ))}
@@ -332,7 +332,7 @@ export default function Landing() {
             <Link href="/packages"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold border transition-all hover:opacity-80"
               style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD }}>
-              View All Package Details →
+              {t("pricing.viewAll")}
             </Link>
           </div>
         </section>
