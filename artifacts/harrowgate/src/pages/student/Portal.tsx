@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useUser, useClerk, useSession } from "@clerk/react";
 import ApplyForm from "./ApplyForm";
 import PaymentPage from "./PaymentPage";
+import TermsModal from "./TermsModal";
 import StudentDocManager from "./StudentDocManager";
 import { useLang, LANG_LIST } from "../../i18n";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
@@ -448,6 +449,16 @@ export default function Portal() {
 
         {submission && (
           <>
+            {/* ── TERMS & CONDITIONS GATE — blocks entire portal until signed ── */}
+            {!submission.termsAcceptedAt && submission.status !== "pending" && submission.status !== "rejected" && (
+              <TermsModal
+                submissionId={submission.id}
+                studentName={submission.name}
+                authHeaders={authHeaders as () => Promise<Record<string, string>>}
+                onAccepted={fetchSubmission}
+              />
+            )}
+
             {/* Status Banner */}
             <div className="mb-8 rounded-2xl overflow-hidden border" style={{ background: "rgba(0,0,0,0.3)", borderColor: "rgba(162,137,89,0.14)" }}>
               <div className="h-0.5 w-full" style={{ background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
