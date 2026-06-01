@@ -11,6 +11,7 @@ import id995aRouter from "./id995a";
 import immigrationLettersRouter from "./immigrationLetters";
 import studentExportRouter from "./studentExport";
 import adminAuthRouter, { requireAdminAuth } from "./adminAuth";
+import settingsRouter from "./settings";
 
 const router: IRouter = Router();
 
@@ -22,6 +23,9 @@ router.use(documentsRouter);
 router.use(statsRouter);
 router.use(studentRouter);
 
+// Public settings (pricing)
+router.use(settingsRouter);
+
 // Admin login (public — no auth required)
 router.use(adminAuthRouter);
 
@@ -31,5 +35,6 @@ router.use(adminSubmissionsRouter);
 router.use(id995aRouter);
 router.use(immigrationLettersRouter);
 router.use(studentExportRouter);
+router.use(settingsRouter);
 
 export default router;

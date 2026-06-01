@@ -179,6 +179,18 @@ export default function Submissions() {
   const [megaSyncResult, setMegaSyncResult] = useState<string | null>(null);
   const [showCourses, setShowCourses] = useState(false);
   const [showTrash, setShowTrash] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
+  const [pricingForm, setPricingForm] = useState({
+    mastersTotal: 140000,
+    bachelorTotal: 130000,
+    associateTotal: 90000,
+    mastersLastPayment: 125000,
+    bachelorLastPayment: 115000,
+    associateLastPayment: 75000,
+  });
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [pricingSaving, setPricingSaving] = useState(false);
+  const [pricingSaved, setPricingSaved] = useState(false);
   const [trashItems, setTrashItems] = useState<Submission[]>([]);
   const [trashLoading, setTrashLoading] = useState(false);
   const [permDeleteConfirmId, setPermDeleteConfirmId] = useState<number | null>(null);
@@ -498,6 +510,29 @@ export default function Submissions() {
     finally { setDeletingSelected(false); }
   };
 
+  const loadPricing = async () => {
+    setPricingLoading(true);
+    try {
+      const res = await fetch(`${getApiBase()}/api/settings/pricing`);
+      if (res.ok) setPricingForm(await res.json());
+    } catch { /* silent */ }
+    finally { setPricingLoading(false); }
+  };
+
+  const savePricing = async () => {
+    setPricingSaving(true);
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/settings/pricing`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pricingForm),
+      });
+      if (res.ok) { setPricingSaved(true); setTimeout(() => setPricingSaved(false), 3000); }
+      else alert("Failed to save pricing.");
+    } catch { alert("Failed to save pricing."); }
+    finally { setPricingSaving(false); }
+  };
+
   const loadTrash = async () => {
     setTrashLoading(true);
     try {
@@ -525,6 +560,7 @@ export default function Submissions() {
   };
 
   useEffect(() => { if (showTrash) loadTrash(); }, [showTrash]);
+  useEffect(() => { if (showPricing) loadPricing(); }, [showPricing]);
 
   const megaSyncTarget: Submission | null =
     selected ??
@@ -604,6 +640,11 @@ export default function Submissions() {
               <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 4h12M2 8h12M2 12h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
               Courses
             </button>
+            <button onClick={() => setShowPricing(v => !v)}
+              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
+              style={{ borderColor: showPricing ? "rgba(162,137,89,0.45)" : "rgba(162,137,89,0.2)", color: GOLD, background: showPricing ? "rgba(162,137,89,0.12)" : "rgba(162,137,89,0.05)" }}>
+              💰 Pricing
+            </button>
             <button onClick={() => setShowTrash(v => !v)}
               className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
               style={{ borderColor: showTrash ? "rgba(248,113,113,0.35)" : "rgba(162,137,89,0.2)", color: showTrash ? "#f87171" : "rgba(162,137,89,0.55)", background: showTrash ? "rgba(248,113,113,0.08)" : "rgba(162,137,89,0.05)" }}>
@@ -627,6 +668,104 @@ export default function Submissions() {
             </button>
           </div>
         </div>
+
+        {/* ── PRICING PANEL ── */}
+        {showPricing && (
+          <div className="mb-8 rounded-2xl border overflow-hidden" style={{ background: "rgba(162,137,89,0.03)", borderColor: "rgba(162,137,89,0.18)" }}>
+            <div className="px-6 py-4 border-b flex items-center justify-between gap-3" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
+                  style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>💰</div>
+                <div>
+                  <p className="text-sm font-bold" style={{ color: GOLD }}>Package Pricing</p>
+                  <p className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>
+                    Changes apply instantly to the landing page, packages page, and student portal
+                  </p>
+                </div>
+              </div>
+              {pricingLoading && (
+                <span className="text-xs" style={{ color: "rgba(162,137,89,0.4)" }}>Loading…</span>
+              )}
+            </div>
+
+            <div className="px-6 py-5 grid sm:grid-cols-2 gap-6">
+              {/* Total Package Costs */}
+              <div>
+                <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
+                  Total Package Costs
+                </p>
+                <p className="text-xs mb-4" style={{ color: "rgba(162,137,89,0.35)" }}>
+                  Shown on the Packages page and landing page pricing section.
+                </p>
+                {([
+                  { label: "Master's Degree", field: "mastersTotal" as const },
+                  { label: "Bachelor's Degree", field: "bachelorTotal" as const },
+                  { label: "Associate Degree", field: "associateTotal" as const },
+                ] as const).map(({ label, field }) => (
+                  <div key={field} className="flex items-center gap-3 mb-3">
+                    <label className="text-xs w-36 shrink-0 text-right" style={{ color: "rgba(162,137,89,0.55)" }}>{label}</label>
+                    <div className="flex items-center rounded-xl border overflow-hidden flex-1"
+                      style={{ borderColor: "rgba(162,137,89,0.2)", background: "rgba(162,137,89,0.05)" }}>
+                      <span className="px-3 text-xs font-semibold border-r" style={{ color: "rgba(162,137,89,0.5)", borderColor: "rgba(162,137,89,0.15)", whiteSpace: "nowrap" }}>HKD$</span>
+                      <input
+                        type="number"
+                        value={pricingForm[field]}
+                        onChange={e => setPricingForm(f => ({ ...f, [field]: parseInt(e.target.value) || 0 }))}
+                        className="flex-1 px-3 py-2 text-sm font-bold bg-transparent outline-none"
+                        style={{ color: GOLD }}
+                        min={0}
+                        step={1000}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Final Payment (Step 6) */}
+              <div>
+                <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
+                  Final Payment — Step 6
+                </p>
+                <p className="text-xs mb-4" style={{ color: "rgba(162,137,89,0.35)" }}>
+                  The last instalment shown in the journey timeline (includes tuition fees).
+                </p>
+                {([
+                  { label: "Master's Degree", field: "mastersLastPayment" as const },
+                  { label: "Bachelor's Degree", field: "bachelorLastPayment" as const },
+                  { label: "Associate Degree", field: "associateLastPayment" as const },
+                ] as const).map(({ label, field }) => (
+                  <div key={field} className="flex items-center gap-3 mb-3">
+                    <label className="text-xs w-36 shrink-0 text-right" style={{ color: "rgba(162,137,89,0.55)" }}>{label}</label>
+                    <div className="flex items-center rounded-xl border overflow-hidden flex-1"
+                      style={{ borderColor: "rgba(162,137,89,0.2)", background: "rgba(162,137,89,0.05)" }}>
+                      <span className="px-3 text-xs font-semibold border-r" style={{ color: "rgba(162,137,89,0.5)", borderColor: "rgba(162,137,89,0.15)", whiteSpace: "nowrap" }}>HKD$</span>
+                      <input
+                        type="number"
+                        value={pricingForm[field]}
+                        onChange={e => setPricingForm(f => ({ ...f, [field]: parseInt(e.target.value) || 0 }))}
+                        className="flex-1 px-3 py-2 text-sm font-bold bg-transparent outline-none"
+                        style={{ color: GOLD }}
+                        min={0}
+                        step={1000}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="px-6 pb-5 flex items-center justify-between gap-4">
+              <p className="text-xs" style={{ color: "rgba(162,137,89,0.35)" }}>
+                Enter values as plain numbers (e.g. 140000 for HKD$ 140,000)
+              </p>
+              <button onClick={savePricing} disabled={pricingSaving}
+                className="flex items-center gap-2 text-xs font-bold px-5 py-2.5 rounded-xl border transition-all hover:opacity-80 disabled:opacity-40"
+                style={{ borderColor: pricingSaved ? "rgba(74,222,128,0.4)" : "rgba(162,137,89,0.35)", color: pricingSaved ? "#4ade80" : GOLD, background: pricingSaved ? "rgba(74,222,128,0.08)" : "rgba(162,137,89,0.08)" }}>
+                {pricingSaving ? "Saving…" : pricingSaved ? "✓ Saved" : "💾 Save Pricing"}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ── TRASH VIEW ── */}
         {showTrash && (

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { useLang, LANG_LIST } from "../../i18n";
+import { usePricing } from "../../hooks/usePricing";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -56,6 +57,7 @@ function LangPicker({ lang, setLang, LANG_LIST }: any) {
 
 export default function Landing() {
   const { lang, setLang, t, isRtl } = useLang();
+  const pricing = usePricing();
 
   const serviceTitles = [t("services.s1"), t("services.s2"), t("services.s3"), t("services.s4"), t("services.s5"), t("services.s6")];
   const serviceDescs  = [t("services.d1"), t("services.d2"), t("services.d3"), t("services.d4"), t("services.d5"), t("services.d6")];
@@ -287,9 +289,9 @@ export default function Landing() {
                       <div className="mt-3">
                         <div className="flex flex-wrap gap-2 mb-2">
                           {[
-                            { lk: "pkg.tier1", amount: "HKD$ 125,000" },
-                            { lk: "pkg.tier2", amount: "HKD$ 115,000" },
-                            { lk: "pkg.tier3", amount: "HKD$ 75,000" },
+                            { lk: "pkg.tier1", amount: pricing.mastersLastPayment },
+                            { lk: "pkg.tier2", amount: pricing.bachelorLastPayment },
+                            { lk: "pkg.tier3", amount: pricing.associateLastPayment },
                           ].map(tier => (
                             <div key={tier.lk} className="flex flex-col items-center px-4 py-2.5 rounded-xl border text-center"
                               style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.2)" }}>
@@ -318,9 +320,9 @@ export default function Landing() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
               {[
-                { lk: "pkg.tier1", cost: "HKD$ 130,000" },
-                { lk: "pkg.tier2", cost: "HKD$ 120,000" },
-                { lk: "pkg.tier3", cost: "HKD$ 90,000" },
+                { lk: "pkg.tier1", cost: pricing.mastersTotal },
+                { lk: "pkg.tier2", cost: pricing.bachelorTotal },
+                { lk: "pkg.tier3", cost: pricing.associateTotal },
               ].map(p => (
                 <div key={p.lk} className="rounded-2xl px-6 py-4 border text-center min-w-[160px]"
                   style={{ background: "rgba(162,137,89,0.05)", borderColor: GOLD_FAINT }}>

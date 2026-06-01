@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { useLang, LANG_LIST } from "../../i18n";
+import { usePricing } from "../../hooks/usePricing";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -9,10 +10,10 @@ const GOLD_DIM = "rgba(162,137,89,0.7)";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-const PACKAGE_DATA = [
-  { key: "tier1", icon: "🎓", badge: true,  total: "HKD$ 140,000", firstPayment: "HKD$ 3,000", color: "#a28959", bg: "rgba(162,137,89,0.07)",  border: "rgba(162,137,89,0.25)", highlight: true  },
-  { key: "tier2", icon: "📚", badge: false, total: "HKD$ 130,000", firstPayment: "HKD$ 3,000", color: "#60a5fa", bg: "rgba(96,165,250,0.05)",  border: "rgba(96,165,250,0.18)",  highlight: false },
-  { key: "tier3", icon: "🏫", badge: false, total: "HKD$ 90,000",  firstPayment: "HKD$ 3,000", color: "#4ade80", bg: "rgba(74,222,128,0.05)", border: "rgba(74,222,128,0.18)",  highlight: false },
+const PACKAGE_BASE = [
+  { key: "tier1", icon: "🎓", badge: true,  firstPayment: "HKD$ 3,000", color: "#a28959", bg: "rgba(162,137,89,0.07)",  border: "rgba(162,137,89,0.25)", highlight: true  },
+  { key: "tier2", icon: "📚", badge: false, firstPayment: "HKD$ 3,000", color: "#60a5fa", bg: "rgba(96,165,250,0.05)",  border: "rgba(96,165,250,0.18)",  highlight: false },
+  { key: "tier3", icon: "🏫", badge: false, firstPayment: "HKD$ 3,000", color: "#4ade80", bg: "rgba(74,222,128,0.05)", border: "rgba(74,222,128,0.18)",  highlight: false },
 ];
 
 function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void }) {
@@ -51,6 +52,7 @@ function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void
 
 export default function Packages() {
   const { lang, setLang, t, isRtl } = useLang();
+  const pricing = usePricing();
 
   return (
     <div className="min-h-screen overflow-x-hidden" dir={isRtl ? "rtl" : "ltr"} style={{ background: BG, fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
@@ -99,64 +101,68 @@ export default function Packages() {
         {/* Packages Grid */}
         <section className="max-w-6xl mx-auto px-6 pb-20">
           <div className="grid md:grid-cols-3 gap-6 items-stretch">
-            {PACKAGE_DATA.map((pkg) => (
-              <div key={pkg.key}
-                className="relative flex flex-col rounded-3xl p-8 border transition-all hover:scale-[1.02]"
-                style={{
-                  background: pkg.bg,
-                  borderColor: pkg.border,
-                  boxShadow: pkg.highlight ? `0 0 40px rgba(162,137,89,0.12)` : "none",
-                }}>
-                {pkg.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
-                      style={{ background: GOLD, color: BG }}>
-                      {t("pkg.popular")}
-                    </span>
-                  </div>
-                )}
+            {PACKAGE_BASE.map((pkg, i) => {
+              const totals = [pricing.mastersTotal, pricing.bachelorTotal, pricing.associateTotal];
+              const total = totals[i];
+              return (
+                <div key={pkg.key}
+                  className="relative flex flex-col rounded-3xl p-8 border transition-all hover:scale-[1.02]"
+                  style={{
+                    background: pkg.bg,
+                    borderColor: pkg.border,
+                    boxShadow: pkg.highlight ? `0 0 40px rgba(162,137,89,0.12)` : "none",
+                  }}>
+                  {pkg.badge && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                      <span className="px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+                        style={{ background: GOLD, color: BG }}>
+                        {t("pkg.popular")}
+                      </span>
+                    </div>
+                  )}
 
-                <div className="text-4xl mb-4">{pkg.icon}</div>
-                <h2 className="text-3xl font-bold mb-1" style={{ color: pkg.color }}>{t(`pkg.${pkg.key}`)}</h2>
-                <p className="text-xs font-semibold tracking-widest uppercase mb-6" style={{ color: "rgba(162,137,89,0.4)" }}>
-                  {t("pkg.fullService")}
-                </p>
-
-                <div className="rounded-2xl p-5 mb-6 border" style={{ background: "rgba(0,0,0,0.15)", borderColor: "rgba(162,137,89,0.1)" }}>
-                  <p className="text-xs font-semibold tracking-widest uppercase mb-1" style={{ color: "rgba(162,137,89,0.45)" }}>
-                    {t("pkg.totalCost")}
+                  <div className="text-4xl mb-4">{pkg.icon}</div>
+                  <h2 className="text-3xl font-bold mb-1" style={{ color: pkg.color }}>{t(`pkg.${pkg.key}`)}</h2>
+                  <p className="text-xs font-semibold tracking-widest uppercase mb-6" style={{ color: "rgba(162,137,89,0.4)" }}>
+                    {t("pkg.fullService")}
                   </p>
-                  <p className="text-3xl font-bold mb-4" style={{ color: pkg.color }}>{pkg.total}</p>
 
-                  <div className="border-t pt-4" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+                  <div className="rounded-2xl p-5 mb-6 border" style={{ background: "rgba(0,0,0,0.15)", borderColor: "rgba(162,137,89,0.1)" }}>
                     <p className="text-xs font-semibold tracking-widest uppercase mb-1" style={{ color: "rgba(162,137,89,0.45)" }}>
-                      {t("pkg.firstPayment")}
+                      {t("pkg.totalCost")}
                     </p>
-                    <p className="text-xl font-bold" style={{ color: GOLD }}>{pkg.firstPayment}</p>
-                    <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.4)" }}>
-                      {t("pkg.balance")}
-                    </p>
+                    <p className="text-3xl font-bold mb-4" style={{ color: pkg.color }}>{total}</p>
+
+                    <div className="border-t pt-4" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+                      <p className="text-xs font-semibold tracking-widest uppercase mb-1" style={{ color: "rgba(162,137,89,0.45)" }}>
+                        {t("pkg.firstPayment")}
+                      </p>
+                      <p className="text-xl font-bold" style={{ color: GOLD }}>{pkg.firstPayment}</p>
+                      <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.4)" }}>
+                        {t("pkg.balance")}
+                      </p>
+                    </div>
                   </div>
+
+                  <ul className="flex-1 space-y-3 mb-8">
+                    {(["pkg.f1", "pkg.f2", "pkg.f3"] as const).map((fKey) => (
+                      <li key={fKey} className="flex items-start gap-2.5 text-sm" style={{ color: GOLD_DIM }}>
+                        <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: pkg.color }}>
+                          <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        {t(fKey)}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link href="/sign-up"
+                    className="w-full text-center py-4 rounded-2xl text-sm font-bold transition-all hover:opacity-90"
+                    style={{ background: pkg.highlight ? GOLD : "transparent", color: pkg.highlight ? BG : pkg.color, border: pkg.highlight ? "none" : `1.5px solid ${pkg.border}` }}>
+                    {t("pkg.startFor")} {pkg.firstPayment} →
+                  </Link>
                 </div>
-
-                <ul className="flex-1 space-y-3 mb-8">
-                  {(["pkg.f1", "pkg.f2", "pkg.f3"] as const).map((fKey) => (
-                    <li key={fKey} className="flex items-start gap-2.5 text-sm" style={{ color: GOLD_DIM }}>
-                      <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: pkg.color }}>
-                        <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      {t(fKey)}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link href="/sign-up"
-                  className="w-full text-center py-4 rounded-2xl text-sm font-bold transition-all hover:opacity-90"
-                  style={{ background: pkg.highlight ? GOLD : "transparent", color: pkg.highlight ? BG : pkg.color, border: pkg.highlight ? "none" : `1.5px solid ${pkg.border}` }}>
-                  {t("pkg.startFor")} {pkg.firstPayment} →
-                </Link>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Note */}

@@ -5,6 +5,7 @@ import PaymentPage from "./PaymentPage";
 import TermsModal from "./TermsModal";
 import StudentDocManager from "./StudentDocManager";
 import { useLang, LANG_LIST } from "../../i18n";
+import { usePricing } from "../../hooks/usePricing";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
 
 const BG = "#0b2213";
@@ -254,6 +255,7 @@ export default function Portal() {
   const [replyError, setReplyError] = useState<string | null>(null);
   const replyAttachmentRef = useRef<HTMLInputElement | null>(null);
   const { lang, setLang, t, isRtl } = useLang();
+  const pricing = usePricing();
   const [showLangPicker, setShowLangPicker] = useState(false);
   const langPickerRef = useRef<HTMLDivElement | null>(null);
 
@@ -611,16 +613,24 @@ export default function Portal() {
                                 {hasTiers && (
                                   <div className="mt-2.5 space-y-1.5">
                                     <div className="flex flex-wrap gap-2">
-                                      {(step as any).tiers.map((tier: { labelKey: string; amount: string }) => (
+                                      {(step as any).tiers.map((tier: { labelKey: string; amount: string }) => {
+                                        const tierAmountMap: Record<string, string> = {
+                                          "pkg.tier1": pricing.mastersLastPayment,
+                                          "pkg.tier2": pricing.bachelorLastPayment,
+                                          "pkg.tier3": pricing.associateLastPayment,
+                                        };
+                                        const displayAmount = tierAmountMap[tier.labelKey] ?? tier.amount;
+                                        return (
                                         <div key={tier.labelKey} className="flex flex-col items-center px-3 py-2 rounded-lg border text-center"
                                           style={{
                                             background: isUpcoming ? "rgba(162,137,89,0.03)" : isCurrent ? "rgba(162,137,89,0.1)" : "rgba(74,222,128,0.06)",
                                             borderColor: isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.25)" : "rgba(74,222,128,0.2)",
                                           }}>
-                                          <p className="text-sm font-bold" style={{ color: isUpcoming ? "rgba(162,137,89,0.28)" : isCurrent ? GOLD : "#4ade80" }}>{tier.amount}</p>
+                                          <p className="text-sm font-bold" style={{ color: isUpcoming ? "rgba(162,137,89,0.28)" : isCurrent ? GOLD : "#4ade80" }}>{displayAmount}</p>
                                           <p className="text-xs mt-0.5" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>{t(tier.labelKey)}</p>
                                         </div>
-                                      ))}
+                                        );
+                                      })}
                                     </div>
                                     <p className="text-xs" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>
                                       * {t((step as any).tierNoteKey)}
