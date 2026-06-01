@@ -111,9 +111,9 @@ function getDocMeta(dt: string): { label: string; tagColor: string; tagText: str
   if (dt === "passport_doc")           return { label: "Passport / Travel Document", tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
   if (dt === "birth_certificate")      return { label: "Birth Certificate / Nat. ID",tagColor: "rgba(162,137,89,0.18)", tagText: GOLD,      tag: "Student"       };
   if (dt === "cv")                     return { label: "CV",                         tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
-  if (dt === "edu_results")            return { label: "Educational Results",        tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
-  if (dt === "edu_transcript")         return { label: "Educational Transcript",     tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
-  if (dt === "higher_edu_results")     return { label: "Higher Education Result",    tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "edu_results")            return { label: "Completion Certificate",        tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "edu_transcript")         return { label: "Educational Transcript",        tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "higher_edu_results")     return { label: "Higher Education Certificate",  tagColor: "rgba(162,137,89,0.18)",  tagText: GOLD,      tag: "Student"       };
   if (dt === "higher_edu_transcript")  return { label: "Higher Education Transcript",tagColor: "rgba(162,137,89,0.18)", tagText: GOLD,      tag: "Student"       };
   if (dt.startsWith("edu_"))           return { label: `Education Document ${dt.replace("edu_", "")}`, tagColor: "rgba(162,137,89,0.18)", tagText: GOLD, tag: "Student" };
   if (dt === "evisa")                  return { label: "e-Visa (HK Immigration)", tagColor: "rgba(52,211,153,0.18)", tagText: "#34d399", tag: "e-Visa" };

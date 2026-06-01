@@ -960,9 +960,9 @@ export default function Portal() {
                       { type: "passport_doc",          label: "Passport / Travel Doc",   icon: "📘" },
                       { type: "birth_certificate",     label: "Birth Cert / ID",         icon: "📋" },
                       { type: "cv",                    label: "CV",                      icon: "📄" },
-                      { type: "edu_results",           label: "Edu. Results",            icon: "📄" },
+                      { type: "edu_results",           label: "Completion Cert.",        icon: "📄" },
                       { type: "edu_transcript",        label: "Edu. Transcript",         icon: "📄" },
-                      { type: "higher_edu_results",    label: "Higher Edu. Result",      icon: "📄" },
+                      { type: "higher_edu_results",    label: "Higher Edu. Cert.",       icon: "📄" },
                       { type: "higher_edu_transcript", label: "Higher Edu. Transcript",  icon: "📄" },
                     ].map(({ type, label, icon }) => {
                       const doc = submission.documents.find(d => d.documentType === type);

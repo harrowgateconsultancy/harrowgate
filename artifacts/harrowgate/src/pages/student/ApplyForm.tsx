@@ -41,8 +41,8 @@ const DOC_CONFIG: { type: string; label: string; hint: string; required: boolean
   },
   {
     type: "edu_results",
-    label: "Educational Results",
-    hint: "Most recent educational results / certificate",
+    label: "Completion Certificate",
+    hint: "Most recent completion certificate",
     required: true,
   },
   {
@@ -53,8 +53,8 @@ const DOC_CONFIG: { type: string; label: string; hint: string; required: boolean
   },
   {
     type: "higher_edu_results",
-    label: "Higher Education Result",
-    hint: "Higher education qualification result (if any)",
+    label: "Higher Education Certificate",
+    hint: "Higher education certificate (if any)",
     required: false,
   },
   {
