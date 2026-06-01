@@ -21,6 +21,7 @@ export const studentSubmissionsTable = pgTable("student_submissions", {
   immigrationRefNumber: text("immigration_ref_number"),
   termsAcceptedAt: timestamp("terms_accepted_at", { withTimezone: true }),
   termsSignatureUrl: text("terms_signature_url"),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

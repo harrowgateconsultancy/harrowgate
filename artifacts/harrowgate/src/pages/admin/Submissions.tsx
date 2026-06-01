@@ -178,6 +178,11 @@ export default function Submissions() {
   const [megaSyncing, setMegaSyncing] = useState(false);
   const [megaSyncResult, setMegaSyncResult] = useState<string | null>(null);
   const [showCourses, setShowCourses] = useState(false);
+  const [showTrash, setShowTrash] = useState(false);
+  const [trashItems, setTrashItems] = useState<Submission[]>([]);
+  const [trashLoading, setTrashLoading] = useState(false);
+  const [permDeleteConfirmId, setPermDeleteConfirmId] = useState<number | null>(null);
+  const [permDeleting, setPermDeleting] = useState(false);
   const [coursesLevel, setCoursesLevel] = useState<DegreeLevel>("masters");
   const [coursesSearch, setCoursesSearch] = useState("");
 
@@ -493,6 +498,34 @@ export default function Submissions() {
     finally { setDeletingSelected(false); }
   };
 
+  const loadTrash = async () => {
+    setTrashLoading(true);
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/trash`);
+      if (res.ok) setTrashItems(await res.json());
+    } catch { /* silent */ } finally { setTrashLoading(false); }
+  };
+
+  const restoreFromTrash = async (id: number) => {
+    try {
+      await adminFetch(`${getApiBase()}/api/admin/trash/${id}/restore`, { method: "POST" });
+      setTrashItems(prev => prev.filter(s => s.id !== id));
+      qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
+    } catch { alert("Failed to restore."); }
+  };
+
+  const permanentDelete = async (id: number) => {
+    setPermDeleting(true);
+    try {
+      await adminFetch(`${getApiBase()}/api/admin/trash/${id}`, { method: "DELETE" });
+      setTrashItems(prev => prev.filter(s => s.id !== id));
+      setPermDeleteConfirmId(null);
+    } catch { alert("Failed to permanently delete."); }
+    finally { setPermDeleting(false); }
+  };
+
+  useEffect(() => { if (showTrash) loadTrash(); }, [showTrash]);
+
   const megaSyncTarget: Submission | null =
     selected ??
     (selectedIds.size === 1
@@ -571,6 +604,11 @@ export default function Submissions() {
               <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 4h12M2 8h12M2 12h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
               Courses
             </button>
+            <button onClick={() => setShowTrash(v => !v)}
+              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
+              style={{ borderColor: showTrash ? "rgba(248,113,113,0.35)" : "rgba(162,137,89,0.2)", color: showTrash ? "#f87171" : "rgba(162,137,89,0.55)", background: showTrash ? "rgba(248,113,113,0.08)" : "rgba(162,137,89,0.05)" }}>
+              🗑 Trash
+            </button>
             <button onClick={() => { localStorage.removeItem("admin_token"); window.location.href = "/admin/login"; }}
               className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
               style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}>
@@ -589,6 +627,74 @@ export default function Submissions() {
             </button>
           </div>
         </div>
+
+        {/* ── TRASH VIEW ── */}
+        {showTrash && (
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: "rgba(248,113,113,0.1)", color: "#f87171" }}>🗑</div>
+              <div>
+                <p className="text-sm font-bold" style={{ color: "#f87171" }}>Trash</p>
+                <p className="text-xs" style={{ color: "rgba(248,113,113,0.5)" }}>
+                  {trashItems.length} deleted profile{trashItems.length !== 1 ? "s" : ""} — restore or permanently delete
+                </p>
+              </div>
+              <button onClick={loadTrash} disabled={trashLoading}
+                className="ml-auto text-xs font-medium px-3 py-1.5 rounded-full border transition-all hover:opacity-80 disabled:opacity-40"
+                style={{ borderColor: "rgba(248,113,113,0.2)", color: "rgba(248,113,113,0.6)" }}>
+                {trashLoading ? "Loading…" : "↻ Refresh"}
+              </button>
+            </div>
+
+            {trashLoading && (
+              <div className="text-center py-12"><div className="w-6 h-6 rounded-full border-2 animate-spin mx-auto" style={{ borderColor: "#f87171", borderTopColor: "transparent" }} /></div>
+            )}
+
+            {!trashLoading && trashItems.length === 0 && (
+              <div className="text-center py-16 rounded-2xl border" style={{ borderColor: "rgba(248,113,113,0.1)", background: "rgba(248,113,113,0.02)" }}>
+                <p className="text-3xl mb-3">🗑</p>
+                <p className="text-sm font-semibold" style={{ color: "rgba(248,113,113,0.5)" }}>Trash is empty</p>
+              </div>
+            )}
+
+            {!trashLoading && trashItems.map(item => (
+              <div key={item.id} className="rounded-2xl border mb-3 overflow-hidden"
+                style={{ background: "rgba(248,113,113,0.03)", borderColor: "rgba(248,113,113,0.15)" }}>
+                <div className="px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
+                      style={{ background: "rgba(248,113,113,0.1)", color: "#f87171" }}>
+                      {item.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate" style={{ color: "rgba(162,137,89,0.8)" }}>{item.name}</p>
+                      <p className="text-xs" style={{ color: "rgba(162,137,89,0.4)" }}>
+                        {item.email || "No email"} · {item.documents.length} doc{item.documents.length !== 1 ? "s" : ""}
+                        {item.deletedAt && <span className="ml-2">· Deleted {new Date(item.deletedAt).toLocaleDateString()}</span>}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button onClick={() => restoreFromTrash(item.id)}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all hover:opacity-80"
+                      style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.25)", color: "#4ade80" }}>
+                      ↩ Restore
+                    </button>
+                    <button onClick={() => setPermDeleteConfirmId(item.id)}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all hover:opacity-80"
+                      style={{ background: "rgba(248,113,113,0.06)", borderColor: "rgba(248,113,113,0.3)", color: "#f87171" }}>
+                      Delete Forever
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── NORMAL LIST (hidden when trash is open) ── */}
+        {!showTrash && (<>
 
         <div className="flex gap-2 mb-6 flex-wrap">
           {filterKeys.map(f => (
@@ -631,7 +737,7 @@ export default function Submissions() {
                 <button onClick={() => setDeleteConfirmOpen(true)}
                   className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all hover:opacity-80"
                   style={{ background: "rgba(248,113,113,0.06)", borderColor: "rgba(248,113,113,0.22)", color: "#f87171" }}>
-                  🗑 Delete
+                  🗑 Move to Trash
                 </button>
               </div>
             )}
@@ -730,6 +836,8 @@ export default function Submissions() {
             );
           })}
         </div>
+
+        </>)}
       </main>
 
       {/* Detail Modal */}
@@ -1669,16 +1777,16 @@ export default function Submissions() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Move to Trash Confirmation Modal */}
       {deleteConfirmOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}>
           <div className="rounded-2xl border overflow-hidden max-w-sm w-full mx-4" style={{ background: "#0b2213", borderColor: "rgba(248,113,113,0.3)" }}>
             <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(248,113,113,0.12)" }}>
-              <p className="text-base font-bold" style={{ color: "#f87171" }}>🗑 Delete {selectedIds.size} Profile{selectedIds.size !== 1 ? "s" : ""}?</p>
+              <p className="text-base font-bold" style={{ color: "#f87171" }}>🗑 Move {selectedIds.size} Profile{selectedIds.size !== 1 ? "s" : ""} to Trash?</p>
             </div>
             <div className="px-6 py-5">
               <p className="text-sm mb-6 leading-relaxed" style={{ color: "rgba(162,137,89,0.6)" }}>
-                This will permanently remove {selectedIds.size === 1 ? "this student profile" : `these ${selectedIds.size} student profiles`} — including all uploaded documents and messages. This cannot be undone.
+                {selectedIds.size === 1 ? "This profile" : `These ${selectedIds.size} profiles`} will be moved to the Trash folder. You can restore or permanently delete them from there.
               </p>
               <div className="flex gap-3">
                 <button onClick={() => setDeleteConfirmOpen(false)} disabled={deletingSelected}
@@ -1690,8 +1798,38 @@ export default function Submissions() {
                   className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
                   style={{ background: "rgba(248,113,113,0.08)", borderColor: "rgba(248,113,113,0.3)", color: "#f87171" }}>
                   {deletingSelected
+                    ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#f87171", borderTopColor: "transparent" }} /> Moving…</>
+                    : `🗑 Move to Trash`}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Permanent Delete Confirmation Modal */}
+      {permDeleteConfirmId !== null && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(6px)" }}>
+          <div className="rounded-2xl border overflow-hidden max-w-sm w-full mx-4" style={{ background: "#0b2213", borderColor: "rgba(248,113,113,0.5)" }}>
+            <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(248,113,113,0.18)" }}>
+              <p className="text-base font-bold" style={{ color: "#f87171" }}>⚠️ Permanently Delete?</p>
+            </div>
+            <div className="px-6 py-5">
+              <p className="text-sm mb-6 leading-relaxed" style={{ color: "rgba(162,137,89,0.6)" }}>
+                This will <strong style={{ color: "#f87171" }}>permanently remove</strong> this student profile, all uploaded documents and messages. <strong style={{ color: "#f87171" }}>This cannot be undone.</strong>
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => setPermDeleteConfirmId(null)} disabled={permDeleting}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                  style={{ borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.55)" }}>
+                  Cancel
+                </button>
+                <button onClick={() => permanentDelete(permDeleteConfirmId)} disabled={permDeleting}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
+                  style={{ background: "rgba(248,113,113,0.12)", borderColor: "rgba(248,113,113,0.5)", color: "#f87171" }}>
+                  {permDeleting
                     ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#f87171", borderTopColor: "transparent" }} /> Deleting…</>
-                    : `🗑 Delete ${selectedIds.size}`}
+                    : "Delete Forever"}
                 </button>
               </div>
             </div>

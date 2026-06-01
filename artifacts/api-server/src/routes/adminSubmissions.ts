@@ -6,7 +6,7 @@ import {
   studentDocumentsTable,
   studentMessagesTable,
 } from "@workspace/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, isNull, isNotNull } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail } from "../email";
 import { upsertStudentRow, deleteStudentRow } from "../lib/googleIntegration";
@@ -27,7 +27,9 @@ const VALID_STATUSES = [
 
 router.get("/admin/student-submissions", async (_req, res) => {
   try {
-    const submissions = await db.select().from(studentSubmissionsTable).orderBy(desc(studentSubmissionsTable.createdAt));
+    const submissions = await db.select().from(studentSubmissionsTable)
+      .where(isNull(studentSubmissionsTable.deletedAt))
+      .orderBy(desc(studentSubmissionsTable.createdAt));
     const withDocs = await Promise.all(submissions.map(async (s) => {
       const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, s.id));
       return { ...s, documents };
@@ -268,17 +270,52 @@ router.post("/admin/student-submissions/:id/upload-offer-letter", async (req: an
   } catch { res.status(500).json({ error: "Failed to upload offer letter" }); }
 });
 
-// Admin deletes an entire student submission (all docs + messages + record)
+// Admin soft-deletes a student submission (moves to trash)
 router.delete("/admin/student-submissions/:id", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    await db.update(studentSubmissionsTable)
+      .set({ deletedAt: new Date() })
+      .where(eq(studentSubmissionsTable.id, id));
+    res.json({ success: true });
+  } catch { res.status(500).json({ error: "Failed to move submission to trash" }); }
+});
+
+// Admin: list trashed submissions
+router.get("/admin/trash", async (_req, res) => {
+  try {
+    const submissions = await db.select().from(studentSubmissionsTable)
+      .where(isNotNull(studentSubmissionsTable.deletedAt))
+      .orderBy(desc(studentSubmissionsTable.deletedAt));
+    const withDocs = await Promise.all(submissions.map(async (s) => {
+      const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, s.id));
+      return { ...s, documents };
+    }));
+    res.json(withDocs);
+  } catch { res.status(500).json({ error: "Failed to fetch trash" }); }
+});
+
+// Admin: restore a trashed submission
+router.post("/admin/trash/:id/restore", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    await db.update(studentSubmissionsTable)
+      .set({ deletedAt: null })
+      .where(eq(studentSubmissionsTable.id, id));
+    res.json({ success: true });
+  } catch { res.status(500).json({ error: "Failed to restore submission" }); }
+});
+
+// Admin: permanently delete a trashed submission
+router.delete("/admin/trash/:id", async (req: any, res) => {
   try {
     const id = parseInt(req.params.id);
     await db.delete(studentMessagesTable).where(eq(studentMessagesTable.submissionId, id));
     await db.delete(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, id));
     await db.delete(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id));
-    // Remove from Sheets (fire-and-forget)
     deleteStudentRow(id).catch(err => console.error("[Google Sheets] delete row failed:", err));
     res.json({ success: true });
-  } catch { res.status(500).json({ error: "Failed to delete submission" }); }
+  } catch { res.status(500).json({ error: "Failed to permanently delete submission" }); }
 });
 
 // Admin: bulk sync all existing students to Google Sheets
