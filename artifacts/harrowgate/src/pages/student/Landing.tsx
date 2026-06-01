@@ -124,9 +124,17 @@ export default function Landing() {
             {t("hero.h1")}<br />
             <span style={{ color: "rgba(162,137,89,0.5)" }}>{t("hero.h2")}</span>
           </h1>
-          <p className="text-lg md:text-xl leading-relaxed mb-10 max-w-2xl" style={{ color: GOLD_DIM }}>
+          <p className="text-lg md:text-xl leading-relaxed mb-6 max-w-2xl" style={{ color: GOLD_DIM }}>
             {t("hero.sub")}
           </p>
+
+          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border mb-10"
+            style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
+            <span className="text-base">🏛️</span>
+            <p className="text-sm font-medium" style={{ color: GOLD }}>
+              Pathway to Becoming a Permanent Resident in Hong Kong
+            </p>
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-4 items-center mb-16">
             <Link href="/sign-up"
@@ -214,6 +222,85 @@ export default function Landing() {
                       <h3 className="text-base font-semibold" style={{ color: GOLD }}>{title}</h3>
                     </div>
                     <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{stepDescs[i]}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Payment Journey */}
+        <section className="py-24 max-w-4xl mx-auto px-6">
+          <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
+            YOUR JOURNEY
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>
+            From Application to Visa Success
+          </h2>
+          <p className="text-center mb-14 text-base max-w-xl mx-auto" style={{ color: GOLD_DIM }}>
+            A clear, step-by-step pathway — full transparency on every payment at every stage.
+          </p>
+          <div className="relative">
+            <div className="absolute left-[18px] top-5 bottom-5 w-px hidden sm:block" style={{ background: `linear-gradient(to bottom, transparent, ${GOLD_FAINT} 8%, ${GOLD_FAINT} 92%, transparent)` }} />
+            <div className="space-y-3">
+              {[
+                { num: 1, label: "Submit Documents", amount: null, note: null },
+                { num: 2, label: "Deposit Payment", amount: "HKD$ 3,000", note: "Non-Refundable" },
+                { num: 3, label: "Interview Arrangement", amount: null, note: null },
+                { num: 4, label: "Second Payment", amount: "HKD$ 12,000", note: null },
+                { num: 5, label: "Pending Offer Letter", amount: null, note: null },
+                { num: 6, label: "Last Payment & Collection of Offer Letter", amount: null, note: null, tiers: true },
+                { num: 7, label: "Additional Documents & Visa Processing (3 Months)", amount: null, note: null },
+                { num: 8, label: "Visa Success", amount: null, note: null, final: true },
+              ].map((step) => (
+                <div key={step.num} className="flex gap-4 items-start">
+                  <div className="shrink-0" style={{ minWidth: 36 }}>
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border"
+                      style={{
+                        background: step.final ? "rgba(74,222,128,0.12)" : "rgba(162,137,89,0.08)",
+                        borderColor: step.final ? "rgba(74,222,128,0.35)" : GOLD_FAINT,
+                        color: step.final ? "#4ade80" : GOLD,
+                      }}>
+                      {step.num}
+                    </div>
+                  </div>
+                  <div
+                    className="flex-1 rounded-2xl px-5 py-4 border"
+                    style={{
+                      background: step.final ? "rgba(74,222,128,0.04)" : "rgba(162,137,89,0.03)",
+                      borderColor: step.final ? "rgba(74,222,128,0.18)" : GOLD_FAINT,
+                    }}>
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <p className="text-sm font-semibold" style={{ color: step.final ? "#4ade80" : GOLD }}>
+                        {step.label}
+                      </p>
+                      {step.amount && (
+                        <span className="text-sm font-bold px-4 py-1.5 rounded-xl border shrink-0"
+                          style={{ background: "rgba(162,137,89,0.1)", borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>
+                          {step.amount}
+                          {step.note && <span className="ml-1.5 text-xs font-normal opacity-60">({step.note})</span>}
+                        </span>
+                      )}
+                    </div>
+                    {step.tiers && (
+                      <div className="mt-3">
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {[
+                            { label: "Master's Degree", amount: "HKD$ 125,000" },
+                            { label: "Bachelor's Degree", amount: "HKD$ 115,000" },
+                            { label: "Associate Degree", amount: "HKD$ 75,000" },
+                          ].map(tier => (
+                            <div key={tier.label} className="flex flex-col items-center px-4 py-2.5 rounded-xl border text-center"
+                              style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.2)" }}>
+                              <p className="text-sm font-bold" style={{ color: GOLD }}>{tier.amount}</p>
+                              <p className="text-xs mt-0.5" style={{ color: GOLD_DIM }}>{tier.label}</p>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.4)" }}>* First Semester Tuition Fees Included</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

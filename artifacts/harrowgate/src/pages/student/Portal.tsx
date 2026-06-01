@@ -98,6 +98,38 @@ const statusMap: Record<string, { color: string; bg: string }> = {
   rejected:                      { color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
+function getPaymentStep(status: string): number {
+  if (status === "visa_issued") return 8;
+  if (["final_payment_confirmed", "final_payment_received"].includes(status)) return 6;
+  if (["offer_letter_pending", "university_interview_completed", "university_interview_arranged", "second_payment_confirmed"].includes(status)) return 5;
+  if (["second_payment_received", "second_payment_pending", "interview_completed"].includes(status)) return 4;
+  if (["interview_arranged"].includes(status)) return 3;
+  if (["acknowledged", "payment_received", "payment_pending"].includes(status)) return 2;
+  return 1;
+}
+
+const PAYMENT_JOURNEY = [
+  { num: 1, label: "Submit Documents", amount: null, note: null },
+  { num: 2, label: "Deposit Payment", amount: "HKD$ 3,000", note: "Non-Refundable" },
+  { num: 3, label: "Interview Arrangement", amount: null, note: null },
+  { num: 4, label: "Second Payment", amount: "HKD$ 12,000", note: null },
+  { num: 5, label: "Pending Offer Letter", amount: null, note: null },
+  {
+    num: 6,
+    label: "Last Payment & Collection of Offer Letter",
+    amount: null,
+    note: null,
+    tiers: [
+      { label: "Master's Degree", amount: "HKD$ 125,000" },
+      { label: "Bachelor's Degree", amount: "HKD$ 115,000" },
+      { label: "Associate Degree", amount: "HKD$ 75,000" },
+    ],
+    tierNote: "First Semester Tuition Fees Included",
+  },
+  { num: 7, label: "Additional Documents & Visa Processing (3 Months)", amount: null, note: null },
+  { num: 8, label: "Visa Success", amount: null, note: null },
+];
+
 type TimelineStep = { icon: string; label: string; note: string; done: boolean; current?: boolean };
 
 function buildTimeline(submission: Submission, t: (key: string) => string): TimelineStep[] {
@@ -507,6 +539,118 @@ export default function Portal() {
                 )}
               </div>
             </div>
+
+            {/* ── PAYMENT JOURNEY ── */}
+            {submission.status !== "rejected" && (() => {
+              const currentStep = getPaymentStep(submission.status);
+              return (
+                <div className="mb-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.1)" }}>
+                  <div className="h-px w-full" style={{ background: "linear-gradient(to right, transparent, rgba(162,137,89,0.45), transparent)" }} />
+                  <div className="px-5 py-4 border-b flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
+                    <div>
+                      <h3 className="text-sm font-semibold" style={{ color: GOLD }}>Your Payment Journey</h3>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>Step-by-step overview of your application &amp; payments</p>
+                    </div>
+                    <span className="text-xs font-semibold px-3 py-1.5 rounded-full shrink-0" style={{ background: "rgba(162,137,89,0.08)", color: GOLD }}>
+                      Step {currentStep} of 8
+                    </span>
+                  </div>
+                  <div className="px-5 py-5">
+                    <div className="relative">
+                      <div className="absolute left-[18px] top-5 bottom-5 w-px hidden sm:block" style={{ background: "linear-gradient(to bottom, transparent, rgba(162,137,89,0.18) 8%, rgba(162,137,89,0.18) 92%, transparent)" }} />
+                      <div className="space-y-2.5">
+                        {PAYMENT_JOURNEY.map((step) => {
+                          const isDone = step.num < currentStep;
+                          const isCurrent = step.num === currentStep;
+                          const isUpcoming = step.num > currentStep;
+                          const hasTiers = "tiers" in step && step.tiers;
+                          return (
+                            <div key={step.num} className="flex gap-4 items-start">
+                              {/* Step number bubble */}
+                              <div className="shrink-0 flex flex-col items-center" style={{ minWidth: 36 }}>
+                                <div
+                                  className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+                                  style={{
+                                    background: isDone
+                                      ? "rgba(74,222,128,0.15)"
+                                      : isCurrent
+                                      ? "rgba(162,137,89,0.18)"
+                                      : "rgba(162,137,89,0.04)",
+                                    border: `1.5px solid ${isDone ? "rgba(74,222,128,0.45)" : isCurrent ? GOLD : "rgba(162,137,89,0.12)"}`,
+                                    color: isDone ? "#4ade80" : isCurrent ? GOLD : "rgba(162,137,89,0.25)",
+                                    boxShadow: isCurrent ? `0 0 14px rgba(162,137,89,0.2)` : "none",
+                                  }}>
+                                  {isDone ? (
+                                    <svg viewBox="0 0 14 14" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                                      <polyline points="2,7 5.5,10.5 12,3.5" />
+                                    </svg>
+                                  ) : step.num}
+                                </div>
+                              </div>
+                              {/* Content row */}
+                              <div
+                                className="flex-1 rounded-xl px-4 py-3 border transition-all"
+                                style={{
+                                  background: isCurrent
+                                    ? "rgba(162,137,89,0.07)"
+                                    : isDone
+                                    ? "rgba(74,222,128,0.04)"
+                                    : "rgba(162,137,89,0.02)",
+                                  borderColor: isCurrent
+                                    ? "rgba(162,137,89,0.28)"
+                                    : isDone
+                                    ? "rgba(74,222,128,0.18)"
+                                    : "rgba(162,137,89,0.07)",
+                                  boxShadow: isCurrent ? "0 2px 16px rgba(162,137,89,0.08)" : "none",
+                                }}>
+                                <div className="flex items-center justify-between gap-3 flex-wrap">
+                                  <p className="text-sm font-semibold" style={{
+                                    color: isCurrent ? GOLD : isDone ? "#4ade80" : "rgba(162,137,89,0.28)",
+                                  }}>
+                                    {step.label}
+                                    {isCurrent && <span className="ml-2 text-xs font-normal px-2 py-0.5 rounded-full" style={{ background: "rgba(162,137,89,0.12)", color: GOLD }}>Current</span>}
+                                  </p>
+                                  {step.amount && (
+                                    <span className="text-sm font-bold px-3 py-1 rounded-lg shrink-0"
+                                      style={{
+                                        background: isUpcoming ? "rgba(162,137,89,0.05)" : isCurrent ? "rgba(162,137,89,0.15)" : "rgba(74,222,128,0.08)",
+                                        color: isUpcoming ? "rgba(162,137,89,0.3)" : isCurrent ? GOLD : "#4ade80",
+                                        border: `1px solid ${isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.3)" : "rgba(74,222,128,0.2)"}`,
+                                      }}>
+                                      {step.amount}
+                                      {step.note && <span className="ml-1 text-xs font-normal opacity-70">({step.note})</span>}
+                                    </span>
+                                  )}
+                                </div>
+                                {hasTiers && (
+                                  <div className="mt-2.5 space-y-1.5">
+                                    <div className="flex flex-wrap gap-2">
+                                      {(step as any).tiers.map((tier: { label: string; amount: string }) => (
+                                        <div key={tier.label} className="flex flex-col items-center px-3 py-2 rounded-lg border text-center"
+                                          style={{
+                                            background: isUpcoming ? "rgba(162,137,89,0.03)" : isCurrent ? "rgba(162,137,89,0.1)" : "rgba(74,222,128,0.06)",
+                                            borderColor: isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.25)" : "rgba(74,222,128,0.2)",
+                                          }}>
+                                          <p className="text-sm font-bold" style={{ color: isUpcoming ? "rgba(162,137,89,0.28)" : isCurrent ? GOLD : "#4ade80" }}>{tier.amount}</p>
+                                          <p className="text-xs mt-0.5" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>{tier.label}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <p className="text-xs" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>
+                                      * {(step as any).tierNote}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* ── UNDER REVIEW ── */}
             {submission.status === "pending" && (
