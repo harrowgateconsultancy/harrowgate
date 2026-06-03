@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { db, documentsTable, applicationsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { CreateDocumentBody, ListDocumentsQueryParams, DeleteDocumentParams } from "@workspace/api-zod";
 
 const router: IRouter = Router();
@@ -71,6 +71,33 @@ router.post("/documents", async (req: Request, res: Response) => {
   } catch (err) {
     req.log.error({ err }, "Error creating document");
     res.status(500).json({ error: "Failed to create document" });
+  }
+});
+
+router.get("/clients/:clientId/documents", async (req: Request, res: Response) => {
+  const clientId = parseInt(req.params.clientId);
+  if (!clientId) { res.status(400).json({ error: "Invalid clientId" }); return; }
+  try {
+    const apps = await db.select({ id: applicationsTable.id }).from(applicationsTable)
+      .where(eq(applicationsTable.clientId, clientId));
+    if (!apps.length) { res.json([]); return; }
+    const appIds = apps.map(a => a.id);
+    const docs = await db.select().from(documentsTable)
+      .where(inArray(documentsTable.applicationId, appIds))
+      .orderBy(documentsTable.uploadedAt);
+    res.json(docs.map(d => ({
+      id: d.id,
+      applicationId: d.applicationId,
+      documentType: d.documentType,
+      fileName: d.fileName,
+      fileUrl: d.fileUrl,
+      fileSize: d.fileSize,
+      mimeType: d.mimeType,
+      uploadedAt: d.uploadedAt.toISOString(),
+    })));
+  } catch (err) {
+    req.log.error({ err }, "Error listing client documents");
+    res.status(500).json({ error: "Failed to list documents" });
   }
 });
 

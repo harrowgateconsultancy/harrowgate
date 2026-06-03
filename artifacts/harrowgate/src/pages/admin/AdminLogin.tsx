@@ -6,7 +6,7 @@ function getApiBase() { return `${window.location.origin}${BASE}`; }
 
 const GOLD = "#a28959";
 const GOLD_DIM = "rgba(162,137,89,0.55)";
-const BG = "#0b2213";
+const BG = "#0d1a3a";
 
 export default function AdminLogin() {
   const [, setLocation] = useLocation();

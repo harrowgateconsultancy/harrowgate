@@ -21,6 +21,7 @@ import ClientDetail from "@/pages/client-detail";
 import Applications from "@/pages/applications";
 import ApplicationNew from "@/pages/application-new";
 import ApplicationDetail from "@/pages/application-detail";
+import Finance from "@/pages/admin/Finance";
 import PrintView from "@/pages/print";
 import NotFound from "@/pages/not-found";
 
@@ -283,6 +284,7 @@ function ClerkProviderWithRoutes() {
                     <Route path="/admin/applications/new" component={ApplicationNew} />
                     <Route path="/admin/applications/:applicationId" component={ApplicationDetail} />
                     <Route path="/admin/applications" component={Applications} />
+                    <Route path="/admin/finance" component={Finance} />
                     <Route component={NotFound} />
                   </Switch>
                 </AdminLayout>

@@ -12,6 +12,7 @@ import immigrationLettersRouter from "./immigrationLetters";
 import studentExportRouter from "./studentExport";
 import adminAuthRouter, { requireAdminAuth } from "./adminAuth";
 import settingsRouter from "./settings";
+import financeRouter from "./finance";
 
 const router: IRouter = Router();
 
@@ -36,5 +37,6 @@ router.use(id995aRouter);
 router.use(immigrationLettersRouter);
 router.use(studentExportRouter);
 router.use(settingsRouter);
+router.use(financeRouter);
 
 export default router;

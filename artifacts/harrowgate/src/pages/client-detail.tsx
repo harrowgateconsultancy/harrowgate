@@ -1,7 +1,10 @@
-import { useGetClient, useListApplications, getListClientsQueryKey, getGetClientQueryKey, getListApplicationsQueryKey } from "@workspace/api-client-react";
+import { useGetClient, useListApplications, getGetClientQueryKey, getListApplicationsQueryKey } from "@workspace/api-client-react";
 import { useParams, Link } from "wouter";
-import { ArrowLeft, Plus, FileText } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Plus, FileText, Paperclip, ExternalLink } from "lucide-react";
+
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+function getApiBase() { return `${window.location.origin}${BASE}`; }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   draft: { label: "Draft", color: "bg-muted text-muted-foreground" },
@@ -18,6 +21,48 @@ const APP_TYPE_LABELS: Record<string, string> = {
   university_admission: "University Admission",
 };
 
+const DOC_TYPE_LABELS: Record<string, string> = {
+  passport: "Passport",
+  academic_transcript: "Academic Transcript",
+  degree_certificate: "Degree Certificate",
+  language_certificate: "Language Certificate",
+  bank_statement: "Bank Statement",
+  recommendation_letter: "Recommendation Letter",
+  personal_statement: "Personal Statement",
+  photo: "Passport Photo",
+  other: "Other Document",
+};
+
+interface ClientDoc {
+  id: number;
+  applicationId: number;
+  documentType: string;
+  fileName: string;
+  fileUrl: string;
+  fileSize: number | null;
+  mimeType: string | null;
+  uploadedAt: string;
+}
+
+function useClientDocuments(clientId: number) {
+  return useQuery<ClientDoc[]>({
+    queryKey: ["client-documents", clientId],
+    queryFn: async () => {
+      const res = await fetch(`${getApiBase()}/api/clients/${clientId}/documents`);
+      if (!res.ok) throw new Error("Failed to fetch documents");
+      return res.json();
+    },
+    enabled: !!clientId,
+  });
+}
+
+function formatBytes(b: number | null) {
+  if (!b) return "";
+  if (b < 1024) return `${b} B`;
+  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
+  return `${(b / 1024 / 1024).toFixed(1)} MB`;
+}
+
 export default function ClientDetail() {
   const params = useParams<{ clientId: string }>();
   const clientId = Number(params.clientId);
@@ -29,6 +74,7 @@ export default function ClientDetail() {
     { clientId },
     { query: { enabled: !!clientId, queryKey: getListApplicationsQueryKey({ clientId }) } }
   );
+  const { data: documents, isLoading: docsLoading } = useClientDocuments(clientId);
 
   if (clientLoading) {
     return (
@@ -94,9 +140,11 @@ export default function ClientDetail() {
       </div>
 
       {/* Applications */}
-      <div className="bg-card border border-card-border rounded-lg">
+      <div className="bg-card border border-card-border rounded-lg mb-6">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Applications</h2>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+            <FileText size={13} /> Applications
+          </h2>
           <span className="text-xs text-muted-foreground">{applications?.length ?? 0} total</span>
         </div>
         {appsLoading ? (
@@ -136,6 +184,63 @@ export default function ClientDetail() {
                 </div>
               </Link>
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* Documents */}
+      <div className="bg-card border border-card-border rounded-lg">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+            <Paperclip size={13} /> All Documents
+          </h2>
+          <span className="text-xs text-muted-foreground">{documents?.length ?? 0} files</span>
+        </div>
+        {docsLoading ? (
+          <div className="p-5 space-y-3">
+            {[...Array(3)].map((_, i) => <div key={i} className="h-10 bg-muted animate-pulse rounded" />)}
+          </div>
+        ) : !documents?.length ? (
+          <div className="py-10 text-center text-muted-foreground text-sm">
+            No documents uploaded yet. Documents appear here once added to an application.
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {documents.map(doc => {
+              const app = applications?.find(a => a.id === doc.applicationId);
+              return (
+                <div key={doc.id} className="flex items-center justify-between px-5 py-3 hover:bg-accent/40 transition-colors">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Paperclip size={13} className="text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{doc.fileName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {DOC_TYPE_LABELS[doc.documentType] ?? doc.documentType}
+                        {doc.fileSize ? ` · ${formatBytes(doc.fileSize)}` : ""}
+                        {app ? ` · ${app.applicationType ? APP_TYPE_LABELS[app.applicationType] || app.applicationType : "Application"}` : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0 ml-4">
+                    <span className="text-xs text-muted-foreground hidden sm:block">
+                      {new Date(doc.uploadedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                    </span>
+                    <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer"
+                      className="p-1.5 rounded hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+                      <ExternalLink size={13} />
+                    </a>
+                    {app && (
+                      <Link href={`/applications/${app.id}`}
+                        className="text-xs text-primary hover:underline hidden sm:block">
+                        View App
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
