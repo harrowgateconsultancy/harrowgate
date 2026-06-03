@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
 
-const BG = "#0d1a3a";
+const BG = "#0b2213";
 const GOLD = "#a28959";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
