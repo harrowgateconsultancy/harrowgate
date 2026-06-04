@@ -14,8 +14,9 @@ import {
 import { useParams, Link } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Printer, Sparkles, Trash2, Upload, CheckCircle, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowLeft, Printer, Sparkles, Trash2, CheckCircle, ChevronDown, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import DropZone from "@/components/DropZone";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   draft: { label: "Draft", color: "bg-muted text-muted-foreground" },
@@ -442,21 +443,16 @@ export default function ApplicationDetail() {
               const isUploading = uploading === value;
               return (
                 <div key={value} className="border border-border rounded p-2.5">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs font-medium">{label}</span>
-                    <button
-                      onClick={() => fileInputRefs.current[value]?.click()}
-                      disabled={isUploading}
-                      className="flex items-center gap-1 px-2 py-0.5 border border-border rounded text-xs hover:bg-accent disabled:opacity-50"
-                    >
-                      <Upload size={10} /> {isUploading ? "…" : "Upload"}
-                    </button>
-                    <input
-                      ref={el => { fileInputRefs.current[value] = el; }}
-                      type="file"
-                      className="hidden"
+                    <DropZone
+                      onFile={f => handleFileUpload(value, f)}
+                      loading={isUploading}
+                      compact
                       accept="image/*,.pdf,.doc,.docx"
-                      onChange={e => { const f = e.target.files?.[0]; if (f) handleFileUpload(value, f); e.target.value = ""; }}
+                      accentColor="#a28959"
+                      accentBg="rgba(162,137,89,0.05)"
+                      accentBorder="rgba(162,137,89,0.2)"
                     />
                   </div>
                   {uploaded.map(doc => (

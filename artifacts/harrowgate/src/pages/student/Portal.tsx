@@ -4,6 +4,7 @@ import ApplyForm from "./ApplyForm";
 import PaymentPage from "./PaymentPage";
 import TermsModal from "./TermsModal";
 import StudentDocManager from "./StudentDocManager";
+import DropZone from "../../components/DropZone";
 import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
@@ -851,15 +852,15 @@ export default function Portal() {
                       className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
                       style={{ background: "rgba(251,146,60,0.04)", borderColor: "rgba(251,146,60,0.15)", color: "#fb923c" }} />
                   </div>
-                  <button onClick={() => additionalDocsRef.current?.click()} disabled={uploadingAdditionalDocs}
-                    className="w-full py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
-                    style={{ background: "rgba(251,146,60,0.08)", borderColor: "rgba(251,146,60,0.3)", color: "#fb923c" }}>
-                    {uploadingAdditionalDocs
-                      ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#fb923c", borderTopColor: "transparent" }} /> {t("s.uploading")}</>
-                      : <><span>📁</span> {t("s.chooseDocs")}</>}
-                  </button>
-                  <input ref={additionalDocsRef} type="file" className="hidden"
-                    onChange={e => { const f = e.target.files?.[0]; if (f) handleAdditionalDocsSubmit(f); }} />
+                  <DropZone
+                    onFile={handleAdditionalDocsSubmit}
+                    loading={uploadingAdditionalDocs}
+                    label={t("s.chooseDocs")}
+                    sublabel="PDF, images, or documents accepted"
+                    accentColor="#fb923c"
+                    accentBg="rgba(251,146,60,0.06)"
+                    accentBorder="rgba(251,146,60,0.25)"
+                  />
                   {additionalDocsError && <p className="text-xs" style={{ color: "#f87171" }}>{additionalDocsError}</p>}
                 </div>
               </div>
@@ -1253,14 +1254,16 @@ export default function Portal() {
                           className="flex-1 rounded-xl px-3 py-2.5 text-sm outline-none border resize-none"
                           style={{ background: "rgba(96,165,250,0.04)", borderColor: "rgba(96,165,250,0.15)", color: "#60a5fa", minHeight: 60 }} />
                         <div className="flex flex-col gap-1.5 shrink-0">
-                          <button onClick={() => replyAttachmentRef.current?.click()} disabled={uploadingReplyAttachment}
-                            className="w-9 h-9 rounded-xl flex items-center justify-center border transition-all hover:opacity-70 disabled:opacity-40"
-                            style={{ borderColor: "rgba(96,165,250,0.15)", background: "rgba(96,165,250,0.05)", color: "#60a5fa" }}
-                            title="Attach file">
-                            {uploadingReplyAttachment
-                              ? <span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#60a5fa", borderTopColor: "transparent" }} />
-                              : <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clipRule="evenodd" /></svg>}
-                          </button>
+                          <DropZone
+                            onFile={handleReplyAttachment}
+                            loading={uploadingReplyAttachment}
+                            compact
+                            label="Attach"
+                            accept="image/*,.pdf,.doc,.docx"
+                            accentColor="#60a5fa"
+                            accentBg="rgba(96,165,250,0.05)"
+                            accentBorder="rgba(96,165,250,0.15)"
+                          />
                           <button onClick={handleSendReply} disabled={sendingReply || (!replyBody.trim() && replyAttachments.length === 0)}
                             className="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:opacity-90 disabled:opacity-40"
                             style={{ background: "#60a5fa", color: "#0b2213" }}
@@ -1272,8 +1275,6 @@ export default function Portal() {
                         </div>
                       </div>
                       <p className="text-xs" style={{ color: "rgba(96,165,250,0.25)" }}>{t("portal.ctrlEnter")}</p>
-                      <input ref={replyAttachmentRef} type="file" className="hidden"
-                        onChange={e => { const f = e.target.files?.[0]; if (f) handleReplyAttachment(f); }} />
                     </div>
                   </div>
                 )}
