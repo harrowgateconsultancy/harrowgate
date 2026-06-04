@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
+import { usePageSEO } from "../../hooks/usePageSEO";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -58,6 +59,11 @@ function LangPicker({ lang, setLang, LANG_LIST }: any) {
 export default function Landing() {
   const { lang, setLang, t, isRtl } = useLang();
   const pricing = usePricing();
+
+  usePageSEO({
+    title: "Harrowgate Consultancy — Hong Kong Student Visa Service",
+    description: "Harrowgate Consultancy simplifies Hong Kong student visa applications. Expert guidance, document management, and end-to-end support for international students. 98% approval rate.",
+  });
 
   const serviceTitles = [t("services.s1"), t("services.s2"), t("services.s3"), t("services.s4"), t("services.s5"), t("services.s6")];
   const serviceDescs  = [t("services.d1"), t("services.d2"), t("services.d3"), t("services.d4"), t("services.d5"), t("services.d6")];

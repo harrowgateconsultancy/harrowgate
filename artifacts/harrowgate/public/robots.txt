@@ -1,2 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /portal
+Disallow: /sign-in
+Disallow: /sign-up
+
+# Sitemap location — update YOUR-DOMAIN.com before launch
+Sitemap: https://YOUR-DOMAIN.com/sitemap.xml

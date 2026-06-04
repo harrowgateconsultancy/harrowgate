@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
+import { usePageSEO } from "../../hooks/usePageSEO";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -53,6 +54,11 @@ function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void
 export default function Packages() {
   const { lang, setLang, t, isRtl } = useLang();
   const pricing = usePricing();
+
+  usePageSEO({
+    title: "Service Packages & Pricing — Harrowgate Consultancy Hong Kong",
+    description: "View Harrowgate's Hong Kong student visa packages. Transparent pricing, full document support, and dedicated case management. Start your application from HKD 3,000.",
+  });
 
   return (
     <div className="min-h-screen overflow-x-hidden" dir={isRtl ? "rtl" : "ltr"} style={{ background: BG, fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
