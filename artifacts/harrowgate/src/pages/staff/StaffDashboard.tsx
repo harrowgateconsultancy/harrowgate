@@ -26,7 +26,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 };
 
 interface ChecklistItem { id: number; text: string; completed: boolean; }
-interface Attachment { id: number; fileName: string; fileUrl: string; mimeType?: string | null; }
+interface Attachment { id: number; fileName: string; fileUrl: string; mimeType?: string | null; uploadedBy?: string; }
 interface Task {
   id: number; title: string; notes?: string | null; deadline?: string | null;
   priority: string; status: string; checklist: ChecklistItem[]; attachments: Attachment[];
@@ -103,6 +103,14 @@ export default function StaffDashboard() {
       method: "PATCH", body: JSON.stringify({ status }),
     });
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status } : t));
+  }
+
+  function handleAttachmentAdded(taskId: number, att: Attachment) {
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, attachments: [...t.attachments, att] } : t));
+  }
+
+  function handleAttachmentDeleted(taskId: number, attId: number) {
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, attachments: t.attachments.filter(a => a.id !== attId) } : t));
   }
 
   function handleLogout() {
@@ -183,7 +191,7 @@ export default function StaffDashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {filtered.map(task => (
-              <TaskCard key={task.id} task={task} onToggleChecklist={toggleChecklist} onStatusChange={updateStatus} />
+              <TaskCard key={task.id} task={task} onToggleChecklist={toggleChecklist} onStatusChange={updateStatus} onAttachmentAdded={handleAttachmentAdded} onAttachmentDeleted={handleAttachmentDeleted} />
             ))}
           </div>
         )}
@@ -192,17 +200,61 @@ export default function StaffDashboard() {
   );
 }
 
-function TaskCard({ task, onToggleChecklist, onStatusChange }: {
+function TaskCard({ task, onToggleChecklist, onStatusChange, onAttachmentAdded, onAttachmentDeleted }: {
   task: Task;
   onToggleChecklist: (taskId: number, itemId: number, completed: boolean) => void;
   onStatusChange: (taskId: number, status: string) => void;
+  onAttachmentAdded: (taskId: number, att: Attachment) => void;
+  onAttachmentDeleted: (taskId: number, attId: number) => void;
 }) {
   const [statusOpen, setStatusOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadErr, setUploadErr] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const overdue = isOverdue(task.deadline, task.status);
   const pri = PRIORITIES[task.priority] ?? PRIORITIES.medium;
   const statusCfg = STATUS_CONFIG[task.status] ?? STATUS_CONFIG.pending;
   const done = task.checklist.filter(c => c.completed).length;
   const total = task.checklist.length;
+  const adminAttachments = task.attachments.filter(a => a.uploadedBy !== "staff");
+  const staffAttachments = task.attachments.filter(a => a.uploadedBy === "staff");
+
+  async function handleUpload(file: File) {
+    setUploading(true);
+    setUploadErr(null);
+    try {
+      const urlRes = await fetch(`${getApiBase()}/api/storage/uploads/request-url`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+      });
+      if (!urlRes.ok) throw new Error("Could not get upload URL");
+      const { uploadURL, objectPath } = await urlRes.json();
+      await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      const fileUrl = `${getApiBase()}/api/storage/objects/${objectPath}`;
+      const token = localStorage.getItem("staff_token");
+      const attRes = await fetch(`${getApiBase()}/api/staff/tasks/${task.id}/attachments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ fileName: file.name, fileUrl, fileSize: file.size, mimeType: file.type }),
+      });
+      if (!attRes.ok) throw new Error("Failed to save attachment");
+      const att: Attachment = await attRes.json();
+      onAttachmentAdded(task.id, att);
+    } catch (e: any) {
+      setUploadErr(e.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleDelete(attId: number) {
+    const token = localStorage.getItem("staff_token");
+    await fetch(`${getApiBase()}/api/staff/tasks/${task.id}/attachments/${attId}`, {
+      method: "DELETE",
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    });
+    onAttachmentDeleted(task.id, attId);
+  }
 
   return (
     <div className="rounded-2xl border p-5 flex flex-col gap-4 transition-all"
@@ -284,12 +336,12 @@ function TaskCard({ task, onToggleChecklist, onStatusChange }: {
         </div>
       )}
 
-      {/* Attachments */}
-      {task.attachments.length > 0 && (
+      {/* Admin attachments (read-only) */}
+      {adminAttachments.length > 0 && (
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(162,137,89,0.5)" }}>Attachments</p>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(162,137,89,0.5)" }}>Files from Admin</p>
           <div className="space-y-1.5">
-            {task.attachments.map(att => (
+            {adminAttachments.map(att => (
               <a key={att.id} href={att.fileUrl} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition-all hover:opacity-80"
                 style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(162,137,89,0.06)", color: GOLD }}>
@@ -300,6 +352,44 @@ function TaskCard({ task, onToggleChecklist, onStatusChange }: {
           </div>
         </div>
       )}
+
+      {/* Staff uploads */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(74,222,128,0.6)" }}>
+            Your Uploads {staffAttachments.length > 0 && `(${staffAttachments.length})`}
+          </p>
+          <input ref={fileRef} type="file" className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) { handleUpload(f); e.target.value = ""; } }} />
+          <button onClick={() => fileRef.current?.click()} disabled={uploading}
+            className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all disabled:opacity-50 hover:opacity-80"
+            style={{ borderColor: "rgba(74,222,128,0.25)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
+            <Paperclip size={10} /> {uploading ? "Uploading…" : "Attach & Send"}
+          </button>
+        </div>
+        {uploadErr && <p className="text-[11px] mb-2" style={{ color: "#f87171" }}>{uploadErr}</p>}
+        {staffAttachments.length > 0 ? (
+          <div className="space-y-1.5">
+            {staffAttachments.map(att => (
+              <div key={att.id} className="flex items-center gap-2 px-3 py-2 rounded-lg border"
+                style={{ borderColor: "rgba(74,222,128,0.2)", background: "rgba(74,222,128,0.05)" }}>
+                <Paperclip size={11} style={{ color: "#4ade80", flexShrink: 0 }} />
+                <a href={att.fileUrl} target="_blank" rel="noopener noreferrer"
+                  className="flex-1 text-xs truncate hover:underline" style={{ color: "#4ade80" }}>
+                  {att.fileName}
+                </a>
+                <button onClick={() => handleDelete(att.id)}
+                  className="p-0.5 rounded hover:bg-red-500/10 transition-all shrink-0"
+                  style={{ color: "rgba(248,113,113,0.5)" }} title="Remove">
+                  <svg viewBox="0 0 12 12" className="w-3 h-3" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.2)" }}>No files sent yet. Use the button above to attach and send files back to admin.</p>
+        )}
+      </div>
     </div>
   );
 }

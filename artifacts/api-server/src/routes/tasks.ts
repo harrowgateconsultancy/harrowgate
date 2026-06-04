@@ -141,6 +141,34 @@ router.patch("/staff/tasks/:taskId/status", requireStaffAuth, async (req: any, r
   } catch { res.status(500).json({ error: "Failed to update status" }); }
 });
 
+// Staff: add attachment to a task assigned to them
+router.post("/staff/tasks/:taskId/attachments", requireStaffAuth, async (req: any, res) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    const { fileName, fileUrl, fileSize, mimeType } = req.body || {};
+    if (!fileName || !fileUrl) return res.status(400).json({ error: "fileName and fileUrl are required" });
+    // Verify task belongs to this staff member
+    const [task] = await db.select().from(tasksTable).where(eq(tasksTable.id, taskId)).limit(1);
+    if (!task || task.assignedTo !== req.staffId) return res.status(403).json({ error: "Not authorised" });
+    const [att] = await db.insert(taskAttachmentsTable)
+      .values({ taskId, fileName, fileUrl, fileSize: fileSize || null, mimeType: mimeType || null, uploadedBy: "staff" })
+      .returning();
+    res.status(201).json(att);
+  } catch { res.status(500).json({ error: "Failed to add attachment" }); }
+});
+
+// Staff: delete their own attachment
+router.delete("/staff/tasks/:taskId/attachments/:attachmentId", requireStaffAuth, async (req: any, res) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    const attachmentId = parseInt(req.params.attachmentId);
+    const [task] = await db.select().from(tasksTable).where(eq(tasksTable.id, taskId)).limit(1);
+    if (!task || task.assignedTo !== req.staffId) return res.status(403).json({ error: "Not authorised" });
+    await db.delete(taskAttachmentsTable).where(eq(taskAttachmentsTable.id, attachmentId));
+    res.json({ ok: true });
+  } catch { res.status(500).json({ error: "Failed to delete attachment" }); }
+});
+
 // Staff: get self info
 router.get("/staff/me", requireStaffAuth, async (req: any, res) => {
   try {

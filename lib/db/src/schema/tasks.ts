@@ -27,5 +27,6 @@ export const taskAttachmentsTable = pgTable("task_attachments", {
   fileUrl: text("file_url").notNull(),
   fileSize: integer("file_size"),
   mimeType: text("mime_type"),
+  uploadedBy: text("uploaded_by").notNull().default("admin"),
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
 });

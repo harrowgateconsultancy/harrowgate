@@ -25,7 +25,7 @@ const STATUSES = [
 
 interface StaffMember { id: number; name: string; username: string; email?: string | null; role: string; createdAt: string; }
 interface ChecklistItem { id?: number; text: string; completed: boolean; }
-interface Attachment { id?: number; fileName: string; fileUrl: string; fileSize?: number | null; mimeType?: string | null; }
+interface Attachment { id?: number; fileName: string; fileUrl: string; fileSize?: number | null; mimeType?: string | null; uploadedBy?: string; }
 interface Task {
   id: number; title: string; notes?: string | null; deadline?: string | null;
   priority: string; status: string; assignedTo?: number | null;
@@ -553,9 +553,23 @@ function TaskCard({ task, onEdit, onDelete }: { task: Task; onEdit: (t: Task) =>
       )}
 
       {task.attachments.length > 0 && (
-        <div className="flex items-center gap-1.5">
-          <Paperclip size={11} style={{ color: "rgba(13,26,58,0.35)" }} />
-          <span className="text-[11px]" style={{ color: "rgba(13,26,58,0.4)" }}>{task.attachments.length} attachment{task.attachments.length !== 1 ? "s" : ""}</span>
+        <div className="space-y-1">
+          {task.attachments.filter(a => a.uploadedBy === "staff").length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(74,222,128,0.12)", color: "#4ade80" }}>Staff</span>
+              <span className="text-[11px]" style={{ color: "#4ade80" }}>
+                {task.attachments.filter(a => a.uploadedBy === "staff").length} file{task.attachments.filter(a => a.uploadedBy === "staff").length !== 1 ? "s" : ""} sent back
+              </span>
+            </div>
+          )}
+          {task.attachments.filter(a => a.uploadedBy !== "staff").length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <Paperclip size={11} style={{ color: "rgba(13,26,58,0.35)" }} />
+              <span className="text-[11px]" style={{ color: "rgba(13,26,58,0.4)" }}>
+                {task.attachments.filter(a => a.uploadedBy !== "staff").length} admin attachment{task.attachments.filter(a => a.uploadedBy !== "staff").length !== 1 ? "s" : ""}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
