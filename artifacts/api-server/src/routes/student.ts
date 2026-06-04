@@ -68,7 +68,7 @@ router.post("/student/submissions", requireStudentAuth, async (req: any, res) =>
     const waKey = process.env.CALLMEBOT_API_KEY;
     if (waKey) {
       const waText = encodeURIComponent(`🔔 New Harrowgate Application!\nStudent: ${name}\nPassport: ${passportNumber}\nEmail: ${email || "N/A"}\n\nLogin to admin panel to review.`);
-      fetch(`https://api.callmebot.com/whatsapp.php?phone=85260606457&text=${waText}&apikey=${waKey}`)
+      fetch(`https://api.callmebot.com/whatsapp.php?phone=85261590422&text=${waText}&apikey=${waKey}`)
         .catch(() => {});
     }
     // Fire-and-forget: create Drive folder + add Sheets row
