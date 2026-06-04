@@ -13,6 +13,8 @@ import studentExportRouter from "./studentExport";
 import adminAuthRouter, { requireAdminAuth } from "./adminAuth";
 import settingsRouter from "./settings";
 import financeRouter from "./finance";
+import staffAuthRouter from "./staffAuth";
+import tasksRouter from "./tasks";
 
 const router: IRouter = Router();
 
@@ -30,6 +32,10 @@ router.use(settingsRouter);
 // Admin login (public — no auth required)
 router.use(adminAuthRouter);
 
+// Staff login + staff task routes (staff auth handled per-route)
+router.use(staffAuthRouter);
+router.use(tasksRouter);
+
 // All /admin/* routes below require a valid admin token
 router.use("/admin", requireAdminAuth);
 router.use(adminSubmissionsRouter);
@@ -38,5 +44,7 @@ router.use(immigrationLettersRouter);
 router.use(studentExportRouter);
 router.use(settingsRouter);
 router.use(financeRouter);
+router.use(staffAuthRouter);
+router.use(tasksRouter);
 
 export default router;

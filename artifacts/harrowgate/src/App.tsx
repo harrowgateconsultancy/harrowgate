@@ -22,6 +22,9 @@ import Applications from "@/pages/applications";
 import ApplicationNew from "@/pages/application-new";
 import ApplicationDetail from "@/pages/application-detail";
 import Finance from "@/pages/admin/Finance";
+import Staff from "@/pages/admin/Staff";
+import StaffLogin from "@/pages/staff/StaffLogin";
+import StaffDashboard from "@/pages/staff/StaffDashboard";
 import PrintView from "@/pages/print";
 import NotFound from "@/pages/not-found";
 
@@ -265,6 +268,10 @@ function ClerkProviderWithRoutes() {
             <Route path="/portal" component={PortalPage} />
             <Route path="/packages" component={Packages} />
 
+            {/* Staff portal (public login, protected dashboard) */}
+            <Route path="/staff/login" component={StaffLogin} />
+            <Route path="/staff" component={StaffDashboard} />
+
             {/* Admin login (public) */}
             <Route path="/admin/login" component={AdminLogin} />
 
@@ -285,6 +292,7 @@ function ClerkProviderWithRoutes() {
                     <Route path="/admin/applications/:applicationId" component={ApplicationDetail} />
                     <Route path="/admin/applications" component={Applications} />
                     <Route path="/admin/finance" component={Finance} />
+                    <Route path="/admin/staff" component={Staff} />
                     <Route component={NotFound} />
                   </Switch>
                 </AdminLayout>

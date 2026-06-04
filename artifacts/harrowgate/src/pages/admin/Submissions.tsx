@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { playAlertSound, unlockAudio } from "../../lib/notificationSound";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
@@ -142,6 +143,8 @@ export default function Submissions() {
   const [uploadDocType, setUploadDocType] = useState("admin_doc");
   const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
   const adminFileRef = useRef<HTMLInputElement | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const prevCountRef = useRef<number | null>(null);
   const [interviewForm, setInterviewForm] = useState<{ zoomLink: string; dateTime: string; notes: string } | null>(null);
   const [sendingInvite, setSendingInvite] = useState(false);
   const [inviteSent, setInviteSent] = useState<number | null>(null);
@@ -302,6 +305,13 @@ export default function Submissions() {
     refetchInterval: 15000,
     retry: false,
   });
+
+  useEffect(() => {
+    if (prevCountRef.current !== null && submissions.length > prevCountRef.current && soundEnabled) {
+      playAlertSound();
+    }
+    prevCountRef.current = submissions.length;
+  }, [submissions.length, soundEnabled]);
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status, adminNotes }: { id: number; status: string; adminNotes?: string }) => {
@@ -632,6 +642,18 @@ export default function Submissions() {
             {pendingCount > 0 && (
               <div className="px-4 py-2 rounded-full text-sm font-semibold" style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
                 ⚡ {pendingCount} need{pendingCount !== 1 ? "" : "s"} your attention
+              </div>
+            )}
+            {!soundEnabled ? (
+              <button onClick={() => { unlockAudio(); setSoundEnabled(true); }}
+                className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
+                style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.6)", background: "rgba(162,137,89,0.05)" }}>
+                🔔 Enable Sound Alerts
+              </button>
+            ) : (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+                style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>
+                🔔 Sound alerts on
               </div>
             )}
             <button onClick={() => setShowCourses(true)}

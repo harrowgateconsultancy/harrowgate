@@ -64,6 +64,13 @@ router.post("/student/submissions", requireStudentAuth, async (req: any, res) =>
     const [created] = await db.insert(studentSubmissionsTable)
       .values({ clerkUserId: req.clerkUserId, name, dateOfBirth, passportNumber, email }).returning();
     sendNewApplicationEmail({ name, email: email || null, passportNumber, dateOfBirth, docCount: 0 }).catch(() => {});
+    // WhatsApp notification via CallMeBot (set CALLMEBOT_API_KEY secret to enable)
+    const waKey = process.env.CALLMEBOT_API_KEY;
+    if (waKey) {
+      const waText = encodeURIComponent(`🔔 New Harrowgate Application!\nStudent: ${name}\nPassport: ${passportNumber}\nEmail: ${email || "N/A"}\n\nLogin to admin panel to review.`);
+      fetch(`https://api.callmebot.com/whatsapp.php?phone=85260606457&text=${waText}&apikey=${waKey}`)
+        .catch(() => {});
+    }
     // Fire-and-forget: create Drive folder + add Sheets row
     (async () => {
       try {

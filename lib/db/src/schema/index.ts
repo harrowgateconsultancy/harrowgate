@@ -4,3 +4,5 @@ export * from "./documents";
 export * from "./studentSubmissions";
 export * from "./settings";
 export * from "./finance";
+export * from "./staff";
+export * from "./tasks";
