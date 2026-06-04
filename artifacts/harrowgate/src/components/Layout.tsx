@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
           <div>
             <div className="text-sidebar-foreground font-bold tracking-widest text-sm uppercase">Harrowgate</div>
-            <div className="text-sidebar-foreground/50 text-[10px] tracking-wider uppercase">Visa Consultancy</div>
+            <div className="text-sidebar-foreground/50 text-[10px] tracking-wider uppercase">Education Consultancy</div>
           </div>
         </div>
 

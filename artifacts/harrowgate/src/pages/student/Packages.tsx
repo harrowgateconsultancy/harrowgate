@@ -56,8 +56,8 @@ export default function Packages() {
   const pricing = usePricing();
 
   usePageSEO({
-    title: "Service Packages & Pricing — Harrowgate Consultancy Hong Kong",
-    description: "View Harrowgate's Hong Kong student visa packages. Transparent pricing, full document support, and dedicated case management. Start your application from HKD 3,000.",
+    title: "Service Packages & Pricing — Harrowgate Education Consultancy Hong Kong",
+    description: "View Harrowgate's Hong Kong university application packages. Transparent pricing, full document preparation support, and dedicated advisor management. Start from HKD 3,000.",
   });
 
   return (
@@ -180,9 +180,17 @@ export default function Packages() {
 
         {/* Footer */}
         <footer className="py-10 px-6 border-t" style={{ borderColor: GOLD_FAINT }}>
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-12 object-contain opacity-50" />
-            <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-5">
+              <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-12 object-contain opacity-50" />
+              <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
+            </div>
+            <div className="rounded-xl border px-5 py-4 text-center" style={{ borderColor: "rgba(162,137,89,0.12)", background: "rgba(162,137,89,0.04)" }}>
+              <p className="text-[11px] leading-relaxed" style={{ color: "rgba(162,137,89,0.4)" }}>
+                <span className="font-semibold" style={{ color: "rgba(162,137,89,0.6)" }}>Legal Notice:</span> HARROWGATE Consultancy is an education consultancy only. We are <span className="font-semibold">not</span> a licensed immigration service provider under the Immigration Service Providers (Regulation) Ordinance (Cap. 658). We do not provide immigration advice or legal advice. For immigration matters, please consult a provider registered with the{" "}
+                <a href="https://www.ispb.gov.hk" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-70" style={{ color: "rgba(162,137,89,0.55)" }}>Immigration Service Providers Board</a>.
+              </p>
+            </div>
           </div>
         </footer>
       </div>

@@ -61,8 +61,8 @@ export default function Landing() {
   const pricing = usePricing();
 
   usePageSEO({
-    title: "Harrowgate Consultancy — Hong Kong Student Visa Service",
-    description: "Harrowgate Consultancy simplifies Hong Kong student visa applications. Expert guidance, document management, and end-to-end support for international students. 98% approval rate.",
+    title: "Harrowgate Consultancy — Hong Kong Education & University Placement",
+    description: "Harrowgate Consultancy supports international students with Hong Kong university applications. Expert document preparation, application management, and dedicated advisor support.",
   });
 
   const serviceTitles = [t("services.s1"), t("services.s2"), t("services.s3"), t("services.s4"), t("services.s5"), t("services.s6")];
@@ -399,10 +399,16 @@ export default function Landing() {
         {/* Footer */}
         <footer className="py-12 px-6 border-t" style={{ borderColor: GOLD_FAINT }}>
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
               <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-14 object-contain opacity-50" />
               <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>
                 © {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.
+              </p>
+            </div>
+            <div className="rounded-xl border px-5 py-4 text-center" style={{ borderColor: "rgba(162,137,89,0.12)", background: "rgba(162,137,89,0.04)" }}>
+              <p className="text-[11px] leading-relaxed" style={{ color: "rgba(162,137,89,0.4)" }}>
+                <span className="font-semibold" style={{ color: "rgba(162,137,89,0.6)" }}>Legal Notice:</span> HARROWGATE Consultancy is an education consultancy only. We are <span className="font-semibold">not</span> a licensed immigration service provider under the Immigration Service Providers (Regulation) Ordinance (Cap. 658). We do not provide immigration advice or legal advice. For immigration matters, please consult a provider registered with the{" "}
+                <a href="https://www.ispb.gov.hk" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-70" style={{ color: "rgba(162,137,89,0.55)" }}>Immigration Service Providers Board</a>.
               </p>
             </div>
           </div>

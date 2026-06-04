@@ -3,7 +3,15 @@ import { useRef, useState, useEffect, useCallback } from "react";
 const BG = "#0b2213";
 const GOLD = "#a28959";
 
-const TERMS_TEXT = `1. DEFINITIONS
+const TERMS_TEXT = `IMPORTANT DISCLAIMER
+
+Harrowgate Consultancy is an EDUCATION CONSULTANCY ONLY. We are NOT a licensed immigration service provider under the Immigration Service Providers (Regulation) Ordinance (Cap. 658) of Hong Kong. We do NOT provide immigration advice, immigration services, or act as a representative in any immigration matter. Nothing in these Terms or our services constitutes immigration advice.
+
+If you require immigration advice or wish to engage a licensed immigration service provider, please consult a provider registered with the Immigration Service Providers Board (www.ispb.gov.hk).
+
+────────────────────────────────────────
+
+1. DEFINITIONS
 
 "Harrowgate" / "We" / "Us" means Harrowgate Consultancy Limited, a company incorporated in Hong Kong.
 "Student" / "You" / "User" means the individual engaging our services for overseas education placement.
@@ -12,12 +20,17 @@ const TERMS_TEXT = `1. DEFINITIONS
 
 2. SCOPE OF SERVICES
 
-Harrowgate provides education consultancy services including, but not limited to:
+Harrowgate provides education consultancy and administrative support services including, but not limited to:
 • University and course selection guidance
-• Application processing and submission assistance
+• Application processing and document preparation assistance
 • Career guidance and counselling for students
-• Visa application support (advisory only)
-• Pre-departure briefing
+• General information about student administrative requirements (NOT immigration advice)
+• Pre-departure briefing and orientation support
+
+We do NOT provide:
+• Immigration advice of any kind
+• Legal advice
+• Representation before any immigration authority
 
 Exclusions: Our Service Fee does NOT include:
 • Airfare or flight tickets
