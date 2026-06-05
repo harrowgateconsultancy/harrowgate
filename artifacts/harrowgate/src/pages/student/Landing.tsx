@@ -199,7 +199,7 @@ export default function Landing() {
         </section>
 
         {/* How It Works */}
-        <section id="how-it-works" className="py-24 max-w-5xl mx-auto px-6">
+        <section id="how-it-works" className="py-24 max-w-6xl mx-auto px-6">
           <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
             {t("how.label")}
           </p>
@@ -210,30 +210,76 @@ export default function Landing() {
             {t("how.sub")}
           </p>
 
-          <div className="relative">
-            <div className="absolute left-8 top-5 bottom-5 w-px hidden md:block" style={{ background: `linear-gradient(to bottom, transparent, ${GOLD_FAINT} 10%, ${GOLD_FAINT} 90%, transparent)` }} />
-            <div className="space-y-4">
-              {stepTitles.map((title, i) => (
-                <div key={i} className="flex gap-6 items-start group">
-                  <div className="relative shrink-0">
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl transition-all group-hover:scale-105"
-                      style={{ background: "rgba(162,137,89,0.08)", border: `1px solid ${GOLD_FAINT}` }}>
-                      {STEP_ICONS[i]}
-                    </div>
-                  </div>
-                  <div className="flex-1 rounded-2xl p-5 border transition-all hover:border-opacity-40"
-                    style={{ background: "rgba(162,137,89,0.03)", borderColor: GOLD_FAINT }}>
-                    <div className="flex items-center gap-3 mb-1.5">
-                      <span className="text-xs font-bold tracking-widest" style={{ color: "rgba(162,137,89,0.3)" }}>
-                        0{i + 1}
-                      </span>
-                      <h3 className="text-base font-semibold" style={{ color: GOLD }}>{title}</h3>
-                    </div>
-                    <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{stepDescs[i]}</p>
-                  </div>
+          {/* Row 1 — 3 cards */}
+          <div className="grid md:grid-cols-3 gap-5 mb-5">
+            {[
+              {
+                num: "01", title: "Create Your Account",
+                desc: "Register with your email or Google account in under a minute. No lengthy forms upfront.",
+                note: "📌 Your data is handled in accordance with the Personal Data (Privacy) Ordinance (Cap. 486).",
+                noteColor: "rgba(162,137,89,0.55)",
+                noteBorder: "rgba(162,137,89,0.25)",
+                noteBg: "rgba(162,137,89,0.05)",
+              },
+              {
+                num: "02", title: "Submit Your Information",
+                desc: "Provide your personal details and upload your educational documents through our secure client portal.",
+                note: "📌 We review your documents for completeness. You remain responsible for the accuracy of all information submitted.",
+                noteColor: "rgba(162,137,89,0.55)",
+                noteBorder: "rgba(162,137,89,0.25)",
+                noteBg: "rgba(162,137,89,0.05)",
+              },
+              {
+                num: "03", title: "Expert Review & Preparation",
+                desc: "Our consultants review your submission, prepare a draft of the ID995A form, and provide mock interview guidance.",
+                note: "⚠️ Important: The final ID995A form must be reviewed, signed, and submitted by you personally. We do not sign any government forms on your behalf.",
+                noteColor: "rgba(251,191,36,0.65)",
+                noteBorder: "rgba(251,191,36,0.3)",
+                noteBg: "rgba(251,191,36,0.05)",
+              },
+            ].map(step => (
+              <div key={step.num} className="flex flex-col rounded-2xl p-6 border" style={{ background: "rgba(162,137,89,0.03)", borderColor: GOLD_FAINT }}>
+                <p className="text-4xl font-black mb-4" style={{ color: "rgba(162,137,89,0.25)", letterSpacing: "-0.02em" }}>{step.num}</p>
+                <h3 className="text-lg font-bold mb-2" style={{ color: GOLD }}>{step.title}</h3>
+                <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: GOLD_DIM }}>{step.desc}</p>
+                <div className="rounded-xl px-4 py-3 border-l-4 text-xs leading-relaxed"
+                  style={{ background: step.noteBg, borderLeftColor: step.noteBorder, color: step.noteColor }}>
+                  {step.note}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Row 2 — 2 cards centred */}
+          <div className="grid md:grid-cols-2 gap-5 md:max-w-[66%] mx-auto">
+            {[
+              {
+                num: "04", title: "University Interview Support",
+                desc: "We help you prepare for your university interview through mock sessions and provide checklists for post-interview follow-up.",
+                note: "📌 We guide you on how to communicate with the university. Direct communication remains your responsibility unless you provide signed written authorization that the university expressly accepts.",
+                noteColor: "rgba(162,137,89,0.55)",
+                noteBorder: "rgba(162,137,89,0.25)",
+                noteBg: "rgba(162,137,89,0.05)",
+              },
+              {
+                num: "05", title: "Receive Your Offer Letter",
+                desc: "Once accepted, you receive the official offer letter directly from the university (email or university portal). We help you understand the next steps.",
+                note: "✅ We do not issue offer letters. The official offer comes solely from the university.",
+                noteColor: "rgba(74,222,128,0.65)",
+                noteBorder: "rgba(74,222,128,0.3)",
+                noteBg: "rgba(74,222,128,0.05)",
+              },
+            ].map(step => (
+              <div key={step.num} className="flex flex-col rounded-2xl p-6 border" style={{ background: "rgba(162,137,89,0.03)", borderColor: GOLD_FAINT }}>
+                <p className="text-4xl font-black mb-4" style={{ color: "rgba(162,137,89,0.25)", letterSpacing: "-0.02em" }}>{step.num}</p>
+                <h3 className="text-lg font-bold mb-2" style={{ color: GOLD }}>{step.title}</h3>
+                <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: GOLD_DIM }}>{step.desc}</p>
+                <div className="rounded-xl px-4 py-3 border-l-4 text-xs leading-relaxed"
+                  style={{ background: step.noteBg, borderLeftColor: step.noteBorder, color: step.noteColor }}>
+                  {step.note}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
