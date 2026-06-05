@@ -28,8 +28,7 @@ const TIERS = [
     id: "associate",
     label: "Associate Degree",
     color: "#4ade80",
-    bg: "rgba(74,222,128,0.06)",
-    border: "rgba(74,222,128,0.2)",
+    accentBg: "rgba(74,222,128,0.12)",
     badge: false,
     totalKey: "associateTotal" as keyof PricingConfig,
     stage2Key: "associateStage2" as keyof PricingConfig,
@@ -47,8 +46,7 @@ const TIERS = [
     id: "bachelor",
     label: "Bachelor's Degree",
     color: "#a28959",
-    bg: "rgba(162,137,89,0.07)",
-    border: "rgba(162,137,89,0.28)",
+    accentBg: "rgba(162,137,89,0.15)",
     badge: true,
     totalKey: "bachelorTotal" as keyof PricingConfig,
     stage2Key: "bachelorStage2" as keyof PricingConfig,
@@ -66,8 +64,7 @@ const TIERS = [
     id: "master",
     label: "Master's Degree",
     color: "#60a5fa",
-    bg: "rgba(96,165,250,0.06)",
-    border: "rgba(96,165,250,0.2)",
+    accentBg: "rgba(96,165,250,0.12)",
     badge: false,
     totalKey: "mastersTotal" as keyof PricingConfig,
     stage2Key: "mastersStage2" as keyof PricingConfig,
@@ -114,7 +111,7 @@ export default function Pricing() {
         const d: Record<string, TierDraft> = {};
         TIERS.forEach(tier => {
           d[tier.id] = {
-            total:  String(p[tier.totalKey] ?? DEFAULT_PRICING[tier.totalKey]),
+            total:  String(p[tier.totalKey]  ?? DEFAULT_PRICING[tier.totalKey]),
             stage2: String(p[tier.stage2Key] ?? DEFAULT_PRICING[tier.stage2Key]),
             stage3: String(p[tier.stage3Key] ?? DEFAULT_PRICING[tier.stage3Key]),
           };
@@ -152,7 +149,7 @@ export default function Pricing() {
     if (!sumOk(d)) {
       setError(prev => ({
         ...prev,
-        [tier.id]: `Amounts don't balance: HK$3,000 + HK$${fmtNum(stage2)} + HK$${fmtNum(stage3)} = HK$${fmtNum(FIRST_PAYMENT + stage2 + stage3)}, but total is HK$${fmtNum(total)}.`,
+        [tier.id]: `Must balance: HK$3,000 + HK$${fmtNum(stage2)} + HK$${fmtNum(stage3)} = HK$${fmtNum(FIRST_PAYMENT + stage2 + stage3)}, but total is HK$${fmtNum(total)}.`,
       }));
       return;
     }
@@ -172,8 +169,8 @@ export default function Pricing() {
         body: JSON.stringify(updated),
       });
       if (!res.ok) throw new Error("Server error");
-      const saved = await res.json();
-      setPricing(saved);
+      const result = await res.json();
+      setPricing(result);
       qc.invalidateQueries({ queryKey: ["pricing"] });
       setSaved(prev => ({ ...prev, [tier.id]: true }));
       setError(prev => ({ ...prev, [tier.id]: "" }));
@@ -193,11 +190,10 @@ export default function Pricing() {
     );
   }
 
-  const GOLD = "#a28959";
-  const GOLD_DIM = "rgba(162,137,89,0.65)";
-
   return (
     <div className="p-6 max-w-7xl mx-auto">
+
+      {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground mb-1">Package Pricing</h1>
         <p className="text-sm text-muted-foreground">
@@ -205,43 +201,52 @@ export default function Pricing() {
         </p>
       </div>
 
+      {/* Cards */}
       <div className="grid md:grid-cols-3 gap-6 items-stretch">
         {TIERS.map(tier => {
           const d = drafts[tier.id] ?? { total: "", stage2: "", stage3: "" };
           const ok = sumOk(d);
           const isSaving = saving[tier.id];
-          const isSaved = saved[tier.id];
-          const errMsg = error[tier.id];
+          const isSaved  = saved[tier.id];
+          const errMsg   = error[tier.id];
 
-          const totalNum  = parseDraft(d.total);
-          const stage2Num = parseDraft(d.stage2);
-          const stage3Num = parseDraft(d.stage3);
+          const stage2Num   = parseDraft(d.stage2);
+          const stage3Num   = parseDraft(d.stage3);
           const computedSum = FIRST_PAYMENT + stage2Num + stage3Num;
 
           return (
             <div
               key={tier.id}
-              className="relative flex flex-col rounded-2xl border"
-              style={{ background: tier.bg, borderColor: tier.border }}
+              className="relative flex flex-col rounded-2xl bg-card border border-border overflow-hidden"
             >
+              {/* Coloured top bar */}
+              <div className="h-1.5 w-full" style={{ background: tier.color }} />
+
+              {/* Most Popular badge */}
               {tier.badge && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                  <span className="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase"
-                    style={{ background: GOLD, color: "#0b2213" }}>
+                <div className="absolute top-5 left-1/2 -translate-x-1/2">
+                  <span
+                    className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase"
+                    style={{ background: tier.color, color: "#0d1a3a" }}
+                  >
                     ⭐ Most Popular
                   </span>
                 </div>
               )}
 
-              <div className="p-6 flex-1 flex flex-col">
-                <h2 className="text-xl font-bold mb-0.5" style={{ color: tier.color }}>{tier.label}</h2>
-                <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-5" style={{ color: "rgba(162,137,89,0.4)" }}>
-                  Full Service Package
-                </p>
+              <div className={`p-6 flex-1 flex flex-col ${tier.badge ? "pt-10" : ""}`}>
+
+                {/* Tier header */}
+                <div className="mb-5">
+                  <h2 className="text-lg font-bold text-foreground">{tier.label}</h2>
+                  <p className="text-[10px] font-semibold tracking-widest uppercase text-muted-foreground mt-0.5">
+                    Full Service Package
+                  </p>
+                </div>
 
                 {/* Total price input */}
-                <div className="mb-4">
-                  <label className="block text-[10px] font-bold tracking-widest uppercase mb-1.5 text-muted-foreground">
+                <div className="mb-5">
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wider">
                     Total Package Price (HKD$)
                   </label>
                   <div className="relative">
@@ -250,8 +255,10 @@ export default function Pricing() {
                       type="number"
                       value={d.total}
                       onChange={e => updateDraft(tier.id, "total", e.target.value)}
-                      className="w-full pl-10 pr-3 py-2.5 rounded-xl text-lg font-extrabold border outline-none transition-all bg-background text-foreground"
-                      style={{ borderColor: ok ? tier.border : "rgba(248,113,113,0.5)" }}
+                      className="w-full pl-10 pr-3 py-2.5 rounded-xl text-xl font-extrabold border-2 outline-none transition-all bg-muted text-foreground focus:ring-2"
+                      style={{
+                        borderColor: ok ? tier.color + "60" : "#f87171",
+                      }}
                     />
                   </div>
                 </div>
@@ -259,8 +266,8 @@ export default function Pricing() {
                 {/* Features */}
                 <ul className="space-y-2 mb-5">
                   {tier.features.map((f, fi) => (
-                    <li key={fi} className="flex items-start gap-2 text-xs" style={{ color: GOLD_DIM }}>
-                      <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: tier.color }}>
+                    <li key={fi} className="flex items-start gap-2.5 text-sm text-foreground">
+                      <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: tier.color }}>
                         <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                       {f}
@@ -268,78 +275,76 @@ export default function Pricing() {
                   ))}
                 </ul>
 
-                {/* Payment schedule editor */}
-                <div className="rounded-xl p-4 mb-4 border" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(251,100,48,0.22)" }}>
-                  <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: "rgba(251,100,48,0.8)" }}>
-                    ⭐ Balance Payment Schedule (Binding)
+                {/* Payment schedule */}
+                <div className="rounded-xl bg-muted border border-border p-4 mb-4">
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-foreground mb-3 flex items-center gap-1.5">
+                    <span style={{ color: tier.color }}>★</span> Balance Payment Schedule
                   </p>
 
                   {/* First payment — fixed */}
-                  <div className="flex items-center justify-between mb-3 pb-3 border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+                  <div className="flex items-center justify-between mb-3 pb-3 border-b border-border">
                     <div>
-                      <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>First Payment</p>
-                      <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>non-refundable consultancy fee</p>
+                      <p className="text-xs font-semibold text-foreground">First Payment</p>
+                      <p className="text-[11px] text-muted-foreground">non-refundable consultancy fee</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-bold" style={{ color: tier.color }}>HK$3,000</p>
-                      <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.35)" }}>fixed</p>
+                      <p className="text-[10px] text-muted-foreground">fixed</p>
                     </div>
                   </div>
 
                   {/* Stage 2 */}
                   <div className="mb-3">
-                    <p className="text-xs font-semibold text-foreground mb-0.5">Stage 2 — Application</p>
-                    <p className="text-[10px] text-muted-foreground mb-1.5">due before first submission</p>
+                    <p className="text-xs font-semibold text-foreground">Stage 2 — Application</p>
+                    <p className="text-[11px] text-muted-foreground mb-1.5">due before first submission</p>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">HK$</span>
                       <input
                         type="number"
                         value={d.stage2}
                         onChange={e => updateDraft(tier.id, "stage2", e.target.value)}
-                        className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-bold border outline-none transition-all bg-background text-foreground"
-                        style={{ borderColor: "hsl(var(--border))" }}
+                        className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-bold border border-border outline-none transition-all bg-background text-foreground focus:border-current"
                       />
                     </div>
                   </div>
 
                   {/* Stage 3 */}
                   <div>
-                    <p className="text-xs font-semibold text-foreground mb-0.5">Stage 3 — Success Fee</p>
-                    <p className="text-[10px] text-muted-foreground mb-1.5">within 7 days of offer letter</p>
+                    <p className="text-xs font-semibold text-foreground">Stage 3 — Success Fee</p>
+                    <p className="text-[11px] text-muted-foreground mb-1.5">within 7 days of offer letter</p>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">HK$</span>
                       <input
                         type="number"
                         value={d.stage3}
                         onChange={e => updateDraft(tier.id, "stage3", e.target.value)}
-                        className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-bold border outline-none transition-all bg-background text-foreground"
-                        style={{ borderColor: "hsl(var(--border))" }}
+                        className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-bold border border-border outline-none transition-all bg-background text-foreground focus:border-current"
                       />
                     </div>
                   </div>
 
-                  {/* Sum check */}
-                  <div className={`mt-3 pt-3 border-t flex items-center justify-between text-[11px] font-semibold ${ok ? "" : "opacity-80"}`}
-                    style={{ borderColor: "rgba(162,137,89,0.1)", color: ok ? "#4ade80" : "#f87171" }}>
-                    <span>{ok ? "✓ Amounts balance" : "⚠ Amounts don't balance"}</span>
-                    <span>
-                      3,000 + {fmtNum(stage2Num)} + {fmtNum(stage3Num)} = {fmtNum(computedSum)}
+                  {/* Balance indicator */}
+                  <div className={`mt-3 pt-3 border-t border-border flex items-center justify-between gap-2 text-[11px] font-semibold`}
+                    style={{ color: ok ? "#4ade80" : "#f87171" }}>
+                    <span>{ok ? "✓ Amounts balance" : "⚠ Don't balance"}</span>
+                    <span className="font-mono">
+                      3k + {fmtNum(stage2Num)} + {fmtNum(stage3Num)} = {fmtNum(computedSum)}
                     </span>
                   </div>
                 </div>
 
                 {/* Per-card note */}
-                <div className="rounded-xl px-3 py-2.5 mb-5 border" style={{ background: "rgba(251,191,36,0.04)", borderColor: "rgba(251,191,36,0.12)" }}>
-                  <p className="text-[10px] leading-relaxed" style={{ color: "rgba(251,191,36,0.5)" }}>
+                <div className="rounded-xl bg-muted border border-border px-3.5 py-3 mb-5">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
                     💡 {tier.note}
                   </p>
                 </div>
 
                 {/* Error */}
                 {errMsg && (
-                  <div className="flex items-start gap-2 rounded-xl px-3 py-2.5 mb-4 border border-red-500/20 bg-red-500/05">
-                    <AlertCircle size={14} className="text-red-400 mt-0.5 shrink-0" />
-                    <p className="text-[11px] text-red-400 leading-relaxed">{errMsg}</p>
+                  <div className="flex items-start gap-2 rounded-xl px-3 py-2.5 mb-4 bg-destructive/10 border border-destructive/30">
+                    <AlertCircle size={14} className="text-destructive mt-0.5 shrink-0" />
+                    <p className="text-[11px] text-destructive leading-relaxed">{errMsg}</p>
                   </div>
                 )}
 
@@ -347,11 +352,11 @@ export default function Pricing() {
                 <button
                   onClick={() => saveCard(tier)}
                   disabled={isSaving || !ok}
-                  className="mt-auto w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
+                  className="mt-auto w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 border"
                   style={{
-                    background: isSaved ? "rgba(74,222,128,0.15)" : tier.id === "bachelor" ? GOLD : "transparent",
-                    color: isSaved ? "#4ade80" : tier.id === "bachelor" ? "#0b2213" : tier.color,
-                    border: tier.id === "bachelor" && !isSaved ? "none" : `1.5px solid ${isSaved ? "rgba(74,222,128,0.3)" : tier.border}`,
+                    background: isSaved ? "rgba(74,222,128,0.15)" : tier.accentBg,
+                    color: isSaved ? "#4ade80" : tier.color,
+                    borderColor: isSaved ? "rgba(74,222,128,0.4)" : tier.color + "50",
                   }}
                 >
                   {isSaving ? (
@@ -362,15 +367,21 @@ export default function Pricing() {
                     <><Save size={14} /> Save Changes</>
                   )}
                 </button>
+
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="mt-8 rounded-xl border px-5 py-4" style={{ borderColor: "rgba(162,137,89,0.12)", background: "rgba(162,137,89,0.04)" }}>
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          <span className="font-semibold text-foreground">Note:</span> Amounts must balance — Total must equal HK$3,000 (first payment) + Stage 2 + Stage 3. Changes take effect immediately on the public packages page. Each card saves independently.
+      {/* Footer note */}
+      <div className="mt-6 rounded-xl bg-muted border border-border px-5 py-4">
+        <p className="text-sm text-foreground">
+          <span className="font-semibold">Note:</span>{" "}
+          <span className="text-muted-foreground">
+            Amounts must balance — Total must equal HK$3,000 (first payment) + Stage 2 + Stage 3.
+            Changes take effect immediately on the public packages page. Each card saves independently.
+          </span>
         </p>
       </div>
     </div>
