@@ -241,21 +241,17 @@ export default function Pricing() {
 
                 {/* Total price input */}
                 <div className="mb-4">
-                  <label className="block text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: "rgba(162,137,89,0.45)" }}>
+                  <label className="block text-[10px] font-bold tracking-widest uppercase mb-1.5 text-muted-foreground">
                     Total Package Price (HKD$)
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold" style={{ color: GOLD_DIM }}>HK$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">HK$</span>
                     <input
                       type="number"
                       value={d.total}
                       onChange={e => updateDraft(tier.id, "total", e.target.value)}
-                      className="w-full pl-10 pr-3 py-2.5 rounded-xl text-lg font-extrabold border outline-none transition-all"
-                      style={{
-                        background: "rgba(0,0,0,0.25)",
-                        borderColor: ok ? tier.border : "rgba(248,113,113,0.4)",
-                        color: tier.color,
-                      }}
+                      className="w-full pl-10 pr-3 py-2.5 rounded-xl text-lg font-extrabold border outline-none transition-all bg-background text-foreground"
+                      style={{ borderColor: ok ? tier.border : "rgba(248,113,113,0.5)" }}
                     />
                   </div>
                 </div>
@@ -292,48 +288,32 @@ export default function Pricing() {
 
                   {/* Stage 2 */}
                   <div className="mb-3">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div>
-                        <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>Stage 2 — Application</p>
-                        <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>due before first submission</p>
-                      </div>
-                    </div>
+                    <p className="text-xs font-semibold text-foreground mb-0.5">Stage 2 — Application</p>
+                    <p className="text-[10px] text-muted-foreground mb-1.5">due before first submission</p>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold" style={{ color: GOLD_DIM }}>HK$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">HK$</span>
                       <input
                         type="number"
                         value={d.stage2}
                         onChange={e => updateDraft(tier.id, "stage2", e.target.value)}
-                        className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-bold border outline-none transition-all"
-                        style={{
-                          background: "rgba(0,0,0,0.2)",
-                          borderColor: "rgba(162,137,89,0.15)",
-                          color: tier.color,
-                        }}
+                        className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-bold border outline-none transition-all bg-background text-foreground"
+                        style={{ borderColor: "hsl(var(--border))" }}
                       />
                     </div>
                   </div>
 
                   {/* Stage 3 */}
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div>
-                        <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>Stage 3 — Success Fee</p>
-                        <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>within 7 days of offer letter</p>
-                      </div>
-                    </div>
+                    <p className="text-xs font-semibold text-foreground mb-0.5">Stage 3 — Success Fee</p>
+                    <p className="text-[10px] text-muted-foreground mb-1.5">within 7 days of offer letter</p>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold" style={{ color: GOLD_DIM }}>HK$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">HK$</span>
                       <input
                         type="number"
                         value={d.stage3}
                         onChange={e => updateDraft(tier.id, "stage3", e.target.value)}
-                        className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-bold border outline-none transition-all"
-                        style={{
-                          background: "rgba(0,0,0,0.2)",
-                          borderColor: "rgba(162,137,89,0.15)",
-                          color: tier.color,
-                        }}
+                        className="w-full pl-9 pr-3 py-2 rounded-lg text-sm font-bold border outline-none transition-all bg-background text-foreground"
+                        style={{ borderColor: "hsl(var(--border))" }}
                       />
                     </div>
                   </div>

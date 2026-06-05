@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FileText, Menu, X, Bell, TrendingUp, UserCog, Tag } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Menu, X, Bell, TrendingUp, UserCog } from "lucide-react";
 import { useState } from "react";
 
 const navItems = [
@@ -10,7 +10,6 @@ const navItems = [
   { href: "/admin/submissions", label: "Submissions", icon: Bell, exact: false },
   { href: "/admin/finance", label: "Finance", icon: TrendingUp, exact: false },
   { href: "/admin/staff", label: "Staff & Tasks", icon: UserCog, exact: false },
-  { href: "/admin/pricing", label: "Pricing", icon: Tag, exact: false },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
