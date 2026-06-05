@@ -11,10 +11,64 @@ const GOLD_DIM = "rgba(162,137,89,0.7)";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-const PACKAGE_BASE = [
-  { key: "tier1", icon: "🎓", badge: true,  firstPayment: "HKD$ 3,000", color: "#a28959", bg: "rgba(162,137,89,0.07)",  border: "rgba(162,137,89,0.25)", highlight: true  },
-  { key: "tier2", icon: "📚", badge: false, firstPayment: "HKD$ 3,000", color: "#60a5fa", bg: "rgba(96,165,250,0.05)",  border: "rgba(96,165,250,0.18)",  highlight: false },
-  { key: "tier3", icon: "🏫", badge: false, firstPayment: "HKD$ 3,000", color: "#4ade80", bg: "rgba(74,222,128,0.05)", border: "rgba(74,222,128,0.18)",  highlight: false },
+const PACKAGES = [
+  {
+    tierKey:   "tier3",
+    badge:     false,
+    color:     "#4ade80",
+    bg:        "rgba(74,222,128,0.05)",
+    border:    "rgba(74,222,128,0.18)",
+    highlight: false,
+    features: [
+      "1st semester tuition support (6 months up to cap*)",
+      "Admission strategy & document planning",
+      "Full application & form filling",
+      "Immigration / visa letter assistance",
+      "All-time WhatsApp & email support",
+    ],
+    stage2Amount: "HK$30,000",
+    stage2Note:   "due before first submission",
+    stage3Note:   "within 7 days of offer letter",
+    cardNote: "HK$3,000 initial fee is for consultancy services only (eligibility, strategy, planning). Non-refundable once paid — separate from tuition. Remaining stages become binding upon deposit.",
+  },
+  {
+    tierKey:   "tier2",
+    badge:     true,
+    color:     "#a28959",
+    bg:        "rgba(162,137,89,0.07)",
+    border:    "rgba(162,137,89,0.25)",
+    highlight: true,
+    features: [
+      "1st semester tuition support (6 months up to cap*)",
+      "Full consulting & mock interviews",
+      "Application & document processing",
+      "CAS / immigration letter support",
+      "Priority WhatsApp & checklist tracking",
+    ],
+    stage2Amount: "HK$40,000",
+    stage2Note:   "due before first submission",
+    stage3Note:   "within 7 days of offer letter",
+    cardNote: "Initial HK$3,000 covers professional consultancy (non-refundable). Not a deposit toward tuition. Once paid, the full payment schedule is contractually binding per HK law.",
+  },
+  {
+    tierKey:   "tier1",
+    badge:     false,
+    color:     "#60a5fa",
+    bg:        "rgba(96,165,250,0.05)",
+    border:    "rgba(96,165,250,0.18)",
+    highlight: false,
+    features: [
+      "1st semester tuition support (6 months up to cap*)",
+      "Premium consulting & interview prep",
+      "Full application, forms & follow-up",
+      "Immigration & visa letter guidance",
+      "Dedicated senior consultant + unlimited WhatsApp",
+    ],
+    stage2Amount: "HK$45,000",
+    stage2Note:   "due before first submission",
+    stage3Note:   "within 7 days of offer letter",
+    cardNote: "The HK$3,000 initial fee is solely for consultancy services (non-refundable). It is earned upon delivery of strategy & eligibility work. Balance stages are binding after this payment.",
+  },
 ];
 
 function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void }) {
@@ -107,71 +161,134 @@ export default function Packages() {
         {/* Packages Grid */}
         <section className="max-w-6xl mx-auto px-6 pb-20">
           <div className="grid md:grid-cols-3 gap-6 items-stretch">
-            {PACKAGE_BASE.map((pkg, i) => {
-              const totals = [pricing.mastersTotal, pricing.bachelorTotal, pricing.associateTotal];
-              const total = totals[i];
+            {PACKAGES.map((pkg) => {
+              const totalMap: Record<string, string> = {
+                tier1: pricing.mastersTotal,
+                tier2: pricing.bachelorTotal,
+                tier3: pricing.associateTotal,
+              };
+              const stage3Map: Record<string, string> = {
+                tier1: pricing.mastersLastPayment,
+                tier2: pricing.bachelorLastPayment,
+                tier3: pricing.associateLastPayment,
+              };
+              const total   = totalMap[pkg.tierKey];
+              const stage3Amount = stage3Map[pkg.tierKey];
+
               return (
-                <div key={pkg.key}
-                  className="relative flex flex-col rounded-3xl p-8 border transition-all hover:scale-[1.02]"
+                <div key={pkg.tierKey}
+                  className="relative flex flex-col rounded-3xl border transition-all hover:scale-[1.01]"
                   style={{
                     background: pkg.bg,
                     borderColor: pkg.border,
-                    boxShadow: pkg.highlight ? `0 0 40px rgba(162,137,89,0.12)` : "none",
+                    boxShadow: pkg.highlight ? "0 0 50px rgba(162,137,89,0.15)" : "none",
                   }}>
+
+                  {/* Most Popular badge */}
                   {pkg.badge && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                      <span className="px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
-                        style={{ background: GOLD, color: BG }}>
-                        {t("pkg.popular")}
-                      </span>
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+                      style={{ background: GOLD, color: BG }}>
+                      <span>⭐</span> {t("pkg.popular")}
                     </div>
                   )}
 
-                  <div className="text-4xl mb-4">{pkg.icon}</div>
-                  <h2 className="text-3xl font-bold mb-1" style={{ color: pkg.color }}>{t(`pkg.${pkg.key}`)}</h2>
-                  <p className="text-xs font-semibold tracking-widest uppercase mb-6" style={{ color: "rgba(162,137,89,0.4)" }}>
-                    {t("pkg.fullService")}
-                  </p>
-
-                  <div className="rounded-2xl p-5 mb-6 border" style={{ background: "rgba(0,0,0,0.15)", borderColor: "rgba(162,137,89,0.1)" }}>
-                    <p className="text-xs font-semibold tracking-widest uppercase mb-1" style={{ color: "rgba(162,137,89,0.45)" }}>
-                      {t("pkg.totalCost")}
+                  <div className="p-7 pb-5">
+                    {/* Title */}
+                    <h2 className="text-2xl font-bold mb-0.5" style={{ color: pkg.color }}>{t(`pkg.${pkg.tierKey}`)}</h2>
+                    <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-5" style={{ color: "rgba(162,137,89,0.4)" }}>
+                      {t("pkg.fullService")}
                     </p>
-                    <p className="text-3xl font-bold mb-4" style={{ color: pkg.color }}>{total}</p>
 
-                    <div className="border-t pt-4" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
-                      <p className="text-xs font-semibold tracking-widest uppercase mb-1" style={{ color: "rgba(162,137,89,0.45)" }}>
-                        {t("pkg.firstPayment")}
+                    {/* Total price */}
+                    <div className="mb-5">
+                      <span className="text-4xl font-extrabold" style={{ color: pkg.color }}>{total}</span>
+                      <span className="text-sm ml-2" style={{ color: "rgba(162,137,89,0.45)" }}>total</span>
+                      <p className="text-[11px] mt-0.5" style={{ color: "rgba(162,137,89,0.35)" }}>package</p>
+                    </div>
+
+                    {/* First payment chips */}
+                    <div className="flex flex-col gap-1.5 mb-6">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold self-start"
+                        style={{ background: "rgba(96,165,250,0.12)", color: "#93c5fd", border: "1px solid rgba(96,165,250,0.2)" }}>
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#60a5fa" }} />
+                        First payment: HK$3,000
+                      </div>
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-medium self-start"
+                        style={{ background: "rgba(251,191,36,0.08)", color: "rgba(251,191,36,0.7)", border: "1px solid rgba(251,191,36,0.15)" }}>
+                        🔒 non-refundable consultancy fee
+                      </div>
+                    </div>
+
+                    {/* Features */}
+                    <ul className="space-y-2.5 mb-6">
+                      {pkg.features.map((f, fi) => (
+                        <li key={fi} className="flex items-start gap-2.5 text-sm" style={{ color: GOLD_DIM }}>
+                          <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: pkg.color }}>
+                            <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Payment Schedule */}
+                    <div className="rounded-xl p-4 mb-4 border" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(251,100,48,0.22)" }}>
+                      <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-3 flex items-center gap-1.5"
+                        style={{ color: "rgba(251,100,48,0.85)" }}>
+                        <span>⭐</span> Balance Payment Schedule (Binding)
                       </p>
-                      <p className="text-xl font-bold" style={{ color: GOLD }}>{pkg.firstPayment}</p>
-                      <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.4)" }}>
-                        {t("pkg.balance")}
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>Stage 2 –</p>
+                            <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>Application</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold" style={{ color: pkg.color }}>{pkg.stage2Amount}</p>
+                            <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{pkg.stage2Note}</p>
+                          </div>
+                        </div>
+                        <div className="border-t pt-2" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>Stage 3 –</p>
+                              <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>Success fee</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-bold" style={{ color: pkg.color }}>{stage3Amount}</p>
+                              <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{pkg.stage3Note}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Per-card note */}
+                    <div className="rounded-xl px-3.5 py-3 mb-6 border" style={{ background: "rgba(251,191,36,0.04)", borderColor: "rgba(251,191,36,0.12)" }}>
+                      <p className="text-[11px] leading-relaxed" style={{ color: "rgba(251,191,36,0.55)" }}>
+                        💡 {pkg.cardNote}
                       </p>
                     </div>
                   </div>
 
-                  <ul className="flex-1 space-y-3 mb-8">
-                    {(["pkg.f1", "pkg.f2", "pkg.f3"] as const).map((fKey) => (
-                      <li key={fKey} className="flex items-start gap-2.5 text-sm" style={{ color: GOLD_DIM }}>
-                        <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: pkg.color }}>
-                          <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        {t(fKey)}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link href="/sign-up"
-                    className="w-full text-center py-4 rounded-2xl text-sm font-bold transition-all hover:opacity-90"
-                    style={{ background: pkg.highlight ? GOLD : "transparent", color: pkg.highlight ? BG : pkg.color, border: pkg.highlight ? "none" : `1.5px solid ${pkg.border}` }}>
-                    {t("pkg.startFor")} {pkg.firstPayment} →
-                  </Link>
+                  {/* CTA */}
+                  <div className="px-7 pb-7 mt-auto">
+                    <Link href="/sign-up"
+                      className="block w-full text-center py-4 rounded-2xl text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.02]"
+                      style={{
+                        background: pkg.highlight ? GOLD : "transparent",
+                        color: pkg.highlight ? BG : pkg.color,
+                        border: pkg.highlight ? "none" : `1.5px solid ${pkg.border}`,
+                      }}>
+                      Start with HK$3,000 →
+                    </Link>
+                  </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Note */}
+          {/* After payment note */}
           <div className="mt-12 rounded-2xl p-6 border text-center max-w-2xl mx-auto" style={{ background: "rgba(162,137,89,0.04)", borderColor: GOLD_FAINT }}>
             <p className="text-base font-semibold mb-2" style={{ color: GOLD }}>{t("pkg.afterTitle")}</p>
             <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{t("pkg.afterSub")}</p>

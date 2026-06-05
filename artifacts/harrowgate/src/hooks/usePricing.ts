@@ -12,12 +12,12 @@ export type PricingConfig = {
 };
 
 export const DEFAULT_PRICING: PricingConfig = {
-  mastersTotal: 140000,
-  bachelorTotal: 130000,
+  mastersTotal: 130000,
+  bachelorTotal: 120000,
   associateTotal: 90000,
-  mastersLastPayment: 125000,
-  bachelorLastPayment: 115000,
-  associateLastPayment: 75000,
+  mastersLastPayment: 82000,
+  bachelorLastPayment: 77000,
+  associateLastPayment: 57000,
 };
 
 export function fmtHKD(n: number): string {
