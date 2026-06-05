@@ -167,13 +167,19 @@ export default function Packages() {
                 tier2: pricing.bachelorTotal,
                 tier3: pricing.associateTotal,
               };
+              const stage2Map: Record<string, string> = {
+                tier1: pricing.mastersStage2,
+                tier2: pricing.bachelorStage2,
+                tier3: pricing.associateStage2,
+              };
               const stage3Map: Record<string, string> = {
                 tier1: pricing.mastersLastPayment,
                 tier2: pricing.bachelorLastPayment,
                 tier3: pricing.associateLastPayment,
               };
-              const total   = totalMap[pkg.tierKey];
+              const total        = totalMap[pkg.tierKey];
               const stage3Amount = stage3Map[pkg.tierKey];
+              const dynamicStage2 = stage2Map[pkg.tierKey];
 
               return (
                 <div key={pkg.tierKey}
@@ -244,7 +250,7 @@ export default function Packages() {
                             <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>Application</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm font-bold" style={{ color: pkg.color }}>{pkg.stage2Amount}</p>
+                            <p className="text-sm font-bold" style={{ color: pkg.color }}>{dynamicStage2}</p>
                             <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{pkg.stage2Note}</p>
                           </div>
                         </div>

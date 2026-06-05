@@ -6,12 +6,15 @@ import { eq } from "drizzle-orm";
 const router = Router();
 
 const DEFAULT_PRICING = {
-  mastersTotal: 140000,
-  bachelorTotal: 130000,
+  mastersTotal: 130000,
+  bachelorTotal: 120000,
   associateTotal: 90000,
-  mastersLastPayment: 125000,
-  bachelorLastPayment: 115000,
-  associateLastPayment: 75000,
+  mastersStage2: 45000,
+  bachelorStage2: 40000,
+  associateStage2: 30000,
+  mastersLastPayment: 82000,
+  bachelorLastPayment: 77000,
+  associateLastPayment: 57000,
 };
 
 router.get("/settings/pricing", async (_req, res) => {

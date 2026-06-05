@@ -6,6 +6,9 @@ export type PricingConfig = {
   mastersTotal: number;
   bachelorTotal: number;
   associateTotal: number;
+  mastersStage2: number;
+  bachelorStage2: number;
+  associateStage2: number;
   mastersLastPayment: number;
   bachelorLastPayment: number;
   associateLastPayment: number;
@@ -15,6 +18,9 @@ export const DEFAULT_PRICING: PricingConfig = {
   mastersTotal: 130000,
   bachelorTotal: 120000,
   associateTotal: 90000,
+  mastersStage2: 45000,
+  bachelorStage2: 40000,
+  associateStage2: 30000,
   mastersLastPayment: 82000,
   bachelorLastPayment: 77000,
   associateLastPayment: 57000,
@@ -40,11 +46,14 @@ export function usePricing() {
 
   return {
     raw: p,
-    mastersTotal:        fmtHKD(p.mastersTotal),
-    bachelorTotal:       fmtHKD(p.bachelorTotal),
-    associateTotal:      fmtHKD(p.associateTotal),
-    mastersLastPayment:  fmtHKD(p.mastersLastPayment),
-    bachelorLastPayment: fmtHKD(p.bachelorLastPayment),
-    associateLastPayment:fmtHKD(p.associateLastPayment),
+    mastersTotal:         fmtHKD(p.mastersTotal),
+    bachelorTotal:        fmtHKD(p.bachelorTotal),
+    associateTotal:       fmtHKD(p.associateTotal),
+    mastersStage2:        fmtHKD(p.mastersStage2 ?? 45000),
+    bachelorStage2:       fmtHKD(p.bachelorStage2 ?? 40000),
+    associateStage2:      fmtHKD(p.associateStage2 ?? 30000),
+    mastersLastPayment:   fmtHKD(p.mastersLastPayment),
+    bachelorLastPayment:  fmtHKD(p.bachelorLastPayment),
+    associateLastPayment: fmtHKD(p.associateLastPayment),
   };
 }
