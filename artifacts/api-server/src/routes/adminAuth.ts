@@ -35,7 +35,10 @@ export function verifyAdminToken(token: string | undefined | null): boolean {
 
 export function requireAdminAuth(req: any, res: any, next: any) {
   const auth = req.headers.authorization;
-  const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+  const headerToken = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+  // Also accept ?token= query param so browser <iframe>/<img>/<a href> navigations work
+  const queryToken = typeof req.query?.token === "string" ? req.query.token : null;
+  const token = headerToken ?? queryToken;
   if (!verifyAdminToken(token)) {
     return res.status(401).json({ error: "Unauthorized" });
   }

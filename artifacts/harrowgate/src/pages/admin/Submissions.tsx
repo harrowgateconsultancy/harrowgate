@@ -594,8 +594,9 @@ export default function Submissions() {
     finally { setMegaSyncing(false); setTimeout(() => setMegaSyncResult(null), 6000); }
   };
 
-  const viewUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/view`;
-  const downloadUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/download`;
+  const adminToken = localStorage.getItem("admin_token") ?? "";
+  const viewUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/view?token=${encodeURIComponent(adminToken)}`;
+  const downloadUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/download?token=${encodeURIComponent(adminToken)}`;
 
   const filterKeys = ["all", "pending", "approved", "docs_requested", "payment_pending", "payment_received", "acknowledged", "rejected"];
 
@@ -975,7 +976,7 @@ export default function Submissions() {
                   </div>
                   {receiptDoc && (
                     <a
-                      href={`${getApiBase()}/api/admin/student-submissions/${s.id}/documents/${receiptDoc.id}/view`}
+                      href={`${getApiBase()}/api/admin/student-submissions/${s.id}/documents/${receiptDoc.id}/view?token=${encodeURIComponent(localStorage.getItem("admin_token") ?? "")}`}
                       target="_blank" rel="noopener noreferrer"
                       onClick={e => e.stopPropagation()}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shrink-0 transition-all hover:opacity-80"
