@@ -23,6 +23,21 @@ function fmtNum(n: number) {
 
 const FIRST_PAYMENT = 3000;
 
+const SHARED_FEATURES: { text: string; bold?: boolean }[] = [
+  { text: "1st semester tuition fee inclusive (paid by students)", bold: true },
+  { text: "Application documents review" },
+  { text: "University enrollment guidance" },
+  { text: "Visa document checklist" },
+  { text: "Full application & form filling guide" },
+  { text: "Immigration letter assistance" },
+  { text: "Visa form review & Guidance" },
+  { text: "Pre-departure briefing session" },
+  { text: "Phone plan setup guide" },
+  { text: "Emergency contact protocols" },
+  { text: "Priority WhatsApp support" },
+  { text: "Service ends upon arrival at university", bold: true },
+];
+
 const TIERS = [
   {
     id: "associate",
@@ -33,13 +48,7 @@ const TIERS = [
     totalKey: "associateTotal" as keyof PricingConfig,
     stage2Key: "associateStage2" as keyof PricingConfig,
     stage3Key: "associateLastPayment" as keyof PricingConfig,
-    features: [
-      "1st semester tuition support (6 months up to cap*)",
-      "Admission strategy & document planning",
-      "Full application & form filling",
-      "Immigration / visa letter assistance",
-      "All-time WhatsApp & email support",
-    ],
+    features: SHARED_FEATURES,
     note: "HK$3,000 initial fee is for consultancy services only. Non-refundable once paid — separate from tuition.",
   },
   {
@@ -51,13 +60,7 @@ const TIERS = [
     totalKey: "bachelorTotal" as keyof PricingConfig,
     stage2Key: "bachelorStage2" as keyof PricingConfig,
     stage3Key: "bachelorLastPayment" as keyof PricingConfig,
-    features: [
-      "1st semester tuition support (6 months up to cap*)",
-      "Full consulting & mock interviews",
-      "Application & document processing",
-      "CAS / immigration letter support",
-      "Priority WhatsApp & checklist tracking",
-    ],
+    features: SHARED_FEATURES,
     note: "Initial HK$3,000 covers professional consultancy (non-refundable). Full payment schedule contractually binding per HK law.",
   },
   {
@@ -69,13 +72,7 @@ const TIERS = [
     totalKey: "mastersTotal" as keyof PricingConfig,
     stage2Key: "mastersStage2" as keyof PricingConfig,
     stage3Key: "mastersLastPayment" as keyof PricingConfig,
-    features: [
-      "1st semester tuition support (6 months up to cap*)",
-      "Premium consulting & interview prep",
-      "Full application, forms & follow-up",
-      "Immigration & visa letter guidance",
-      "Dedicated senior consultant + unlimited WhatsApp",
-    ],
+    features: SHARED_FEATURES,
     note: "The HK$3,000 initial fee is solely for consultancy services (non-refundable). Balance stages are binding after this payment.",
   },
 ];
@@ -266,11 +263,13 @@ export default function Pricing() {
                 {/* Features */}
                 <ul className="space-y-2 mb-5">
                   {tier.features.map((f, fi) => (
-                    <li key={fi} className="flex items-start gap-2.5 text-sm text-foreground">
+                    <li key={fi}
+                      className="flex items-start gap-2.5 text-sm text-foreground"
+                      style={{ color: f.bold ? tier.color : undefined, fontWeight: f.bold ? 700 : 400 }}>
                       <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: tier.color }}>
                         <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      {f}
+                      {f.text}
                     </li>
                   ))}
                 </ul>

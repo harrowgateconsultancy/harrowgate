@@ -11,6 +11,21 @@ const GOLD_DIM = "rgba(162,137,89,0.7)";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+const SHARED_FEATURES: { text: string; bold?: boolean }[] = [
+  { text: "1st semester tuition fee inclusive (paid by students)", bold: true },
+  { text: "Application documents review" },
+  { text: "University enrollment guidance" },
+  { text: "Visa document checklist" },
+  { text: "Full application & form filling guide" },
+  { text: "Immigration letter assistance" },
+  { text: "Visa form review & Guidance" },
+  { text: "Pre-departure briefing session" },
+  { text: "Phone plan setup guide" },
+  { text: "Emergency contact protocols" },
+  { text: "Priority WhatsApp support" },
+  { text: "Service ends upon arrival at university", bold: true },
+];
+
 const PACKAGES = [
   {
     tierKey:   "tier3",
@@ -19,13 +34,7 @@ const PACKAGES = [
     bg:        "rgba(74,222,128,0.05)",
     border:    "rgba(74,222,128,0.18)",
     highlight: false,
-    features: [
-      "1st semester tuition support (6 months up to cap*)",
-      "Admission strategy & document planning",
-      "Full application & form filling",
-      "Immigration / visa letter assistance",
-      "All-time WhatsApp & email support",
-    ],
+    features:  SHARED_FEATURES,
     stage2Amount: "HK$30,000",
     stage2Note:   "due before first submission",
     stage3Note:   "within 7 days of offer letter",
@@ -38,13 +47,7 @@ const PACKAGES = [
     bg:        "rgba(162,137,89,0.07)",
     border:    "rgba(162,137,89,0.25)",
     highlight: true,
-    features: [
-      "1st semester tuition support (6 months up to cap*)",
-      "Full consulting & mock interviews",
-      "Application & document processing",
-      "CAS / immigration letter support",
-      "Priority WhatsApp & checklist tracking",
-    ],
+    features:  SHARED_FEATURES,
     stage2Amount: "HK$40,000",
     stage2Note:   "due before first submission",
     stage3Note:   "within 7 days of offer letter",
@@ -57,13 +60,7 @@ const PACKAGES = [
     bg:        "rgba(96,165,250,0.05)",
     border:    "rgba(96,165,250,0.18)",
     highlight: false,
-    features: [
-      "1st semester tuition support (6 months up to cap*)",
-      "Premium consulting & interview prep",
-      "Full application, forms & follow-up",
-      "Immigration & visa letter guidance",
-      "Dedicated senior consultant + unlimited WhatsApp",
-    ],
+    features:  SHARED_FEATURES,
     stage2Amount: "HK$45,000",
     stage2Note:   "due before first submission",
     stage3Note:   "within 7 days of offer letter",
@@ -228,11 +225,12 @@ export default function Packages() {
                     {/* Features */}
                     <ul className="space-y-2.5 mb-6">
                       {pkg.features.map((f, fi) => (
-                        <li key={fi} className="flex items-start gap-2.5 text-sm" style={{ color: GOLD_DIM }}>
+                        <li key={fi} className="flex items-start gap-2.5 text-sm"
+                          style={{ color: f.bold ? pkg.color : GOLD_DIM, fontWeight: f.bold ? 700 : 400 }}>
                           <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: pkg.color }}>
                             <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
-                          {f}
+                          {f.text}
                         </li>
                       ))}
                     </ul>
