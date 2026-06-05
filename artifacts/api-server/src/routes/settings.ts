@@ -17,6 +17,14 @@ const DEFAULT_PRICING = {
   associateLastPayment: 57000,
 };
 
+const DEFAULT_BANK_DETAILS = {
+  bankName: "",
+  accountName: "",
+  accountNumber: "",
+  fps: "",
+  additionalInfo: "",
+};
+
 router.get("/settings/pricing", async (_req, res) => {
   try {
     const [row] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "pricing")).limit(1);
@@ -32,6 +40,23 @@ router.put("/admin/settings/pricing", async (req, res) => {
       .onConflictDoUpdate({ target: appSettingsTable.key, set: { value: pricing, updatedAt: new Date() } });
     res.json(pricing);
   } catch { res.status(500).json({ error: "Failed to update pricing" }); }
+});
+
+router.get("/settings/bank-details", async (_req, res) => {
+  try {
+    const [row] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "bank_details")).limit(1);
+    res.json(row ? row.value : DEFAULT_BANK_DETAILS);
+  } catch { res.status(500).json({ error: "Failed to fetch bank details" }); }
+});
+
+router.put("/admin/settings/bank-details", async (req, res) => {
+  try {
+    const details = req.body;
+    await db.insert(appSettingsTable)
+      .values({ key: "bank_details", value: details })
+      .onConflictDoUpdate({ target: appSettingsTable.key, set: { value: details, updatedAt: new Date() } });
+    res.json(details);
+  } catch { res.status(500).json({ error: "Failed to update bank details" }); }
 });
 
 export default router;

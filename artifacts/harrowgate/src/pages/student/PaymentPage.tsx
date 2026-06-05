@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSession } from "@clerk/react";
 import type { Submission } from "./Portal";
 import TermsModal from "./TermsModal";
@@ -7,6 +7,14 @@ const BG = "#0b2213";
 const GOLD = "#a28959";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
+
+interface BankDetails {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  fps: string;
+  additionalInfo: string;
+}
 
 async function uploadToStorage(file: File): Promise<{ url: string }> {
   const res = await fetch(`${getApiBase()}/api/storage/uploads/request-url`, {
@@ -27,6 +35,14 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [bankDetails, setBankDetails] = useState<BankDetails | null>(null);
+
+  useEffect(() => {
+    fetch(`${getApiBase()}/api/settings/bank-details`)
+      .then(r => r.json())
+      .then((b: BankDetails) => setBankDetails(b))
+      .catch(() => {});
+  }, []);
 
   const needsTerms = paymentType === "first" && !submission.termsAcceptedAt;
 
@@ -117,7 +133,7 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
           {/* Steps */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { n: "1", title: "Contact Your Consultant", body: "Our team will provide the bank details and payment amount via WhatsApp or your portal messages." },
+              { n: "1", title: "Review Bank Details", body: "Bank details are shown below. Use Bank Transfer or FPS to make the payment." },
               { n: "2", title: "Make the Transfer", body: "Pay via Bank Transfer or FPS. Reference your full name on the transfer." },
               { n: "3", title: "Upload Your Receipt", body: "Take a screenshot of your payment confirmation and upload it below." },
             ].map(step => (
@@ -138,17 +154,76 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
             style={{ background: "rgba(251,146,60,0.04)", borderColor: "rgba(251,146,60,0.12)" }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "rgba(251,146,60,0.4)" }}>Payment Info</p>
             <div className="space-y-2 text-sm" style={{ color: "rgba(251,146,60,0.7)" }}>
-              <div className="flex justify-between items-center">
-                <span>Service Fee</span>
-                <span className="font-semibold" style={{ color: "#fb923c" }}>To be confirmed</span>
-              </div>
+              {paymentType === "first" && (
+                <div className="flex justify-between items-center">
+                  <span>Amount Due</span>
+                  <div className="text-right">
+                    <span className="font-bold text-base" style={{ color: "#fb923c" }}>HKD 3,000</span>
+                    <span className="block text-xs" style={{ color: "rgba(251,146,60,0.5)" }}>non-refundable consultancy fee</span>
+                  </div>
+                </div>
+              )}
+              {paymentType !== "first" && (
+                <div className="flex justify-between items-center">
+                  <span>Service Fee</span>
+                  <span className="font-semibold" style={{ color: "#fb923c" }}>To be confirmed</span>
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span>Accepted Methods</span>
                 <span className="font-semibold" style={{ color: "#fb923c" }}>Bank Transfer / FPS</span>
               </div>
             </div>
+
+            {/* Bank details */}
+            {bankDetails && (bankDetails.bankName || bankDetails.accountName || bankDetails.accountNumber || bankDetails.fps) && (
+              <div className="mt-4 pt-4 border-t space-y-2.5" style={{ borderColor: "rgba(251,146,60,0.1)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(251,146,60,0.4)" }}>Bank Details</p>
+                {bankDetails.bankName && (
+                  <div className="flex justify-between text-sm">
+                    <span style={{ color: "rgba(251,146,60,0.55)" }}>Bank</span>
+                    <span className="font-semibold" style={{ color: "#fb923c" }}>{bankDetails.bankName}</span>
+                  </div>
+                )}
+                {bankDetails.accountName && (
+                  <div className="flex justify-between text-sm">
+                    <span style={{ color: "rgba(251,146,60,0.55)" }}>Account Name</span>
+                    <span className="font-semibold" style={{ color: "#fb923c" }}>{bankDetails.accountName}</span>
+                  </div>
+                )}
+                {bankDetails.accountNumber && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span style={{ color: "rgba(251,146,60,0.55)" }}>Account No.</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-semibold" style={{ color: "#fb923c" }}>{bankDetails.accountNumber}</span>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(bankDetails.accountNumber)}
+                        className="text-xs px-2 py-0.5 rounded border transition-opacity hover:opacity-70"
+                        style={{ borderColor: "rgba(251,146,60,0.2)", color: "rgba(251,146,60,0.5)", background: "rgba(251,146,60,0.05)" }}
+                        title="Copy"
+                      >Copy</button>
+                    </div>
+                  </div>
+                )}
+                {bankDetails.fps && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span style={{ color: "rgba(251,146,60,0.55)" }}>FPS</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-semibold" style={{ color: "#fb923c" }}>{bankDetails.fps}</span>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(bankDetails.fps)}
+                        className="text-xs px-2 py-0.5 rounded border transition-opacity hover:opacity-70"
+                        style={{ borderColor: "rgba(251,146,60,0.2)", color: "rgba(251,146,60,0.5)", background: "rgba(251,146,60,0.05)" }}
+                        title="Copy"
+                      >Copy</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <p className="text-xs mt-3 pt-3 border-t" style={{ borderColor: "rgba(251,146,60,0.1)", color: "rgba(251,146,60,0.4)" }}>
-              Please include your full name in the payment reference. Bank details will be provided by your consultant.
+              {bankDetails?.additionalInfo || "Please include your full name in the payment reference."}
             </p>
           </div>
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle, AlertCircle, Save, RefreshCw } from "lucide-react";
+import { CheckCircle, AlertCircle, Save, RefreshCw, Building2 } from "lucide-react";
 import { DEFAULT_PRICING, type PricingConfig } from "../../hooks/usePricing";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -83,6 +83,22 @@ interface TierDraft {
   stage3: string;
 }
 
+interface BankDetails {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  fps: string;
+  additionalInfo: string;
+}
+
+const DEFAULT_BANK_DETAILS: BankDetails = {
+  bankName: "",
+  accountName: "",
+  accountNumber: "",
+  fps: "",
+  additionalInfo: "",
+};
+
 function parseDraft(v: string): number {
   return parseInt(v.replace(/[^0-9]/g, ""), 10) || 0;
 }
@@ -99,6 +115,11 @@ export default function Pricing() {
   const [saved, setSaved] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+
+  const [bankDetails, setBankDetails] = useState<BankDetails>(DEFAULT_BANK_DETAILS);
+  const [bankSaving, setBankSaving] = useState(false);
+  const [bankSaved, setBankSaved] = useState(false);
+  const [bankError, setBankError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${getApiBase()}/api/settings/pricing`)
@@ -127,7 +148,31 @@ export default function Pricing() {
         setDrafts(d);
       })
       .finally(() => setLoading(false));
+
+    fetch(`${getApiBase()}/api/settings/bank-details`)
+      .then(r => r.json())
+      .then((b: BankDetails) => setBankDetails(b))
+      .catch(() => {});
   }, []);
+
+  async function saveBankDetails() {
+    setBankSaving(true);
+    setBankError(null);
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/settings/bank-details`, {
+        method: "PUT",
+        body: JSON.stringify(bankDetails),
+      });
+      if (!res.ok) throw new Error("Server error");
+      qc.invalidateQueries({ queryKey: ["bank-details"] });
+      setBankSaved(true);
+      setTimeout(() => setBankSaved(false), 3000);
+    } catch {
+      setBankError("Failed to save. Please try again.");
+    } finally {
+      setBankSaving(false);
+    }
+  }
 
   function updateDraft(tierId: string, field: keyof TierDraft, value: string) {
     setDrafts(prev => ({ ...prev, [tierId]: { ...prev[tierId], [field]: value } }));
@@ -382,6 +427,88 @@ export default function Pricing() {
             Changes take effect immediately on the public packages page. Each card saves independently.
           </span>
         </p>
+      </div>
+
+      {/* Bank Details Editor */}
+      <div className="mt-10">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-muted border border-border">
+            <Building2 size={18} className="text-muted-foreground" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-foreground">Payment Bank Details</h2>
+            <p className="text-sm text-muted-foreground">
+              Displayed on the student portal payment page. Update whenever account details change.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-card border border-border overflow-hidden">
+          <div className="h-1 w-full" style={{ background: "linear-gradient(to right, #a28959, #60a5fa)" }} />
+          <div className="p-6 grid md:grid-cols-2 gap-5">
+            {(
+              [
+                { key: "bankName",      label: "Bank Name",       placeholder: "e.g. Hang Seng Bank" },
+                { key: "accountName",   label: "Account Name",    placeholder: "e.g. Harrowgate Consultancy Ltd" },
+                { key: "accountNumber", label: "Account Number",  placeholder: "e.g. 123-456789-001" },
+                { key: "fps",           label: "FPS ID / Phone",  placeholder: "e.g. 60606457" },
+              ] as { key: keyof BankDetails; label: string; placeholder: string }[]
+            ).map(({ key, label, placeholder }) => (
+              <div key={key}>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wider">
+                  {label}
+                </label>
+                <input
+                  type="text"
+                  value={bankDetails[key]}
+                  onChange={e => { setBankDetails(prev => ({ ...prev, [key]: e.target.value })); setBankSaved(false); }}
+                  placeholder={placeholder}
+                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-muted text-foreground text-sm outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground/40"
+                />
+              </div>
+            ))}
+
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wider">
+                Additional Info (optional)
+              </label>
+              <textarea
+                rows={2}
+                value={bankDetails.additionalInfo}
+                onChange={e => { setBankDetails(prev => ({ ...prev, additionalInfo: e.target.value })); setBankSaved(false); }}
+                placeholder="e.g. Please include your full name in the payment reference."
+                className="w-full px-3 py-2.5 rounded-xl border border-border bg-muted text-foreground text-sm outline-none focus:ring-2 focus:ring-ring resize-none placeholder:text-muted-foreground/40"
+              />
+            </div>
+          </div>
+
+          <div className="px-6 pb-6 flex items-center gap-4">
+            {bankError && (
+              <div className="flex items-center gap-2 text-destructive text-sm">
+                <AlertCircle size={14} />
+                {bankError}
+              </div>
+            )}
+            <button
+              onClick={saveBankDetails}
+              disabled={bankSaving}
+              className="ml-auto flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 border"
+              style={{
+                background: bankSaved ? "rgba(74,222,128,0.15)" : "rgba(162,137,89,0.12)",
+                color: bankSaved ? "#4ade80" : "#a28959",
+                borderColor: bankSaved ? "rgba(74,222,128,0.4)" : "rgba(162,137,89,0.4)",
+              }}
+            >
+              {bankSaving ? (
+                <><RefreshCw size={14} className="animate-spin" /> Saving…</>
+              ) : bankSaved ? (
+                <><CheckCircle size={14} /> Saved</>
+              ) : (
+                <><Save size={14} /> Save Bank Details</>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
