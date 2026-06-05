@@ -7,8 +7,6 @@ const TERMS_TEXT = `IMPORTANT DISCLAIMER
 
 Harrowgate Consultancy is an EDUCATION CONSULTANCY ONLY. We are NOT a licensed immigration service provider under the Immigration Service Providers (Regulation) Ordinance (Cap. 658) of Hong Kong. We do NOT provide immigration advice, immigration services, or act as a representative in any immigration matter. Nothing in these Terms or our services constitutes immigration advice.
 
-If you require immigration advice or wish to engage a licensed immigration service provider, please consult a provider registered with the Immigration Service Providers Board (www.ispb.gov.hk).
-
 ────────────────────────────────────────
 
 1. DEFINITIONS
@@ -41,8 +39,8 @@ Exclusions: Our Service Fee does NOT include:
 
 3. FEE STRUCTURE AND PAYMENT
 
-3.1 First Semester Fee Arrangement
-The Service Fee covers tuition and related charges for the FIRST SEMESTER ONLY. All fees for subsequent semesters must be paid DIRECTLY BY THE STUDENT TO THE INSTITUTION in accordance with the Institution's payment schedule.
+3.1 Tuition and University Charges
+All tuition and university charges must be paid directly by the student to the institution in accordance with the university's payment schedule.
 
 3.2 Payment to Harrowgate
 The full Service Fee must be remitted to Harrowgate Consultancy via the payment methods specified in your invoice. A valid receipt issued by Harrowgate must be obtained and retained as proof of payment. No application will be processed without receipt verification.
@@ -52,16 +50,19 @@ All fees are quoted and payable in Hong Kong Dollars (HKD) unless otherwise stat
 
 4. REFUND POLICY
 
-4.1 Subject to Institution Policy
-All refunds of tuition fees, deposits, or other charges paid to or through Harrowgate are STRICTLY SUBJECT TO THE OFFICIAL REFUND POLICY OF THE RELEVANT INSTITUTION. Harrowgate acts solely as an intermediary and has no authority to override or amend Institution refund decisions.
+4.1 Harrowgate's Role in Payments
+Harrowgate does not collect, hold, or transmit any tuition payments or deposits to any institution on the student's behalf.
+All tuition, deposits, and charges are paid directly by the student to the institution, and all refunds are governed solely by the institution's official refund policy.
+Harrowgate has no authority to override, amend, or influence any institution's refund decisions and accepts no liability for any refund disputes between the student and the institution.
 
 4.2 Consultancy Fee Non-Refundable
 The Service Fee paid to Harrowgate is NON-REFUNDABLE except where:
-• Harrowgate fails to submit the application through demonstrable negligence; or
-• The Institution formally rejects the application and the Institution's policy provides for refund of tuition deposit.
+• Harrowgate fails to submit the application through demonstrable negligence.
+
+In all circumstances, the first HKD 3,000 of the Service Fee is strictly non-refundable regardless of the reason for cancellation or withdrawal.
 
 4.3 Processing Time
-Refund processing from Institutions typically takes 60 to 90 business days from the date of formal withdrawal or rejection. Harrowgate will facilitate but does not guarantee processing timelines.
+Refund processing from institutions typically takes 60 to 90 business days from the date of formal withdrawal or rejection. Harrowgate will facilitate but does not guarantee processing timelines.
 
 5. PERSONAL DATA COLLECTION AND PRIVACY
 
