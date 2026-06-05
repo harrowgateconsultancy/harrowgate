@@ -123,8 +123,7 @@ export default function Packages() {
         <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.85)", position: "sticky", top: 0, zIndex: 50 }}>
           <div className="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
             <Link href="/">
-              <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-16 object-contain cursor-pointer"
-                style={{ filter: "drop-shadow(0 0 14px rgba(162,137,89,0.7)) drop-shadow(0 0 5px rgba(162,137,89,0.4))" }} />
+              <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-20 object-contain cursor-pointer" />
             </Link>
             <div className="flex items-center gap-3">
               <LangPicker lang={lang} setLang={setLang} />

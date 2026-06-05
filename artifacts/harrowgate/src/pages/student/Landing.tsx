@@ -89,7 +89,7 @@ export default function Landing() {
         {/* Nav */}
         <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.85)", position: "sticky", top: 0, zIndex: 50 }}>
           <div className="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
-            <img src="/harrowgate-logo.png" alt="HARROWGATE Consultancy" className="h-20 object-contain" style={{ filter: "drop-shadow(0 0 18px rgba(162,137,89,0.75)) drop-shadow(0 0 6px rgba(162,137,89,0.5))" }} />
+            <img src="/harrowgate-logo.png" alt="HARROWGATE Consultancy" className="h-24 object-contain" />
             <div className="flex items-center gap-2">
               <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
               <Link href="/packages"
@@ -115,8 +115,7 @@ export default function Landing() {
         <section className="flex flex-col items-center justify-center px-6 pt-24 pb-20 text-center max-w-5xl mx-auto">
           <Link href="/sign-in">
             <div className="mb-8 cursor-pointer transition-transform hover:scale-105">
-              <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-52 object-contain mx-auto"
-                style={{ filter: "drop-shadow(0 0 40px rgba(162,137,89,0.85)) drop-shadow(0 0 16px rgba(162,137,89,0.6)) drop-shadow(0 8px 32px rgba(162,137,89,0.4))" }} />
+              <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-64 object-contain mx-auto" />
             </div>
           </Link>
 

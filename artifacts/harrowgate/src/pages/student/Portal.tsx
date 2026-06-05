@@ -422,7 +422,7 @@ export default function Portal() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: BG }}>
         <div className="text-center">
-          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-16 object-contain mx-auto mb-6 opacity-60" style={{ filter: "drop-shadow(0 0 14px rgba(162,137,89,0.6)) drop-shadow(0 0 5px rgba(162,137,89,0.4))" }} />
+          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-16 object-contain mx-auto mb-6 opacity-60" />
           <div className="w-6 h-6 rounded-full border-2 animate-spin mx-auto mb-3" style={{ borderColor: GOLD, borderTopColor: "transparent" }} />
           <p className="text-sm" style={{ color: "rgba(162,137,89,0.5)" }}>Loading your portal…</p>
         </div>
@@ -438,7 +438,7 @@ export default function Portal() {
       {/* Nav */}
       <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.9)", position: "sticky", top: 0, zIndex: 50 }}>
         <div className="flex items-center justify-between px-6 py-3.5 max-w-5xl mx-auto">
-          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-16 object-contain" style={{ filter: "drop-shadow(0 0 14px rgba(162,137,89,0.7)) drop-shadow(0 0 5px rgba(162,137,89,0.45))" }} />
+          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-20 object-contain" />
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border" style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(162,137,89,0.05)" }}>
               <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"

@@ -33,8 +33,7 @@ export default function StaffLogin() {
       style={{ background: "#0b1f10", fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif" }}>
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
-          <img src={`${BASE}/harrowgate-logo.png`} alt="HARROWGATE" className="h-16 object-contain mb-4"
-            style={{ filter: "drop-shadow(0 0 12px rgba(162,137,89,0.5))" }} />
+          <img src={`${BASE}/harrowgate-logo.png`} alt="HARROWGATE" className="h-20 object-contain mb-4" />
           <h1 className="text-xl font-bold" style={{ color: "#a28959" }}>Staff Portal</h1>
           <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.5)" }}>Sign in to view your assigned tasks</p>
         </div>

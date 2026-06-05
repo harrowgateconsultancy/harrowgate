@@ -613,7 +613,7 @@ export default function Submissions() {
               Back
             </button>
             <div className="w-px h-4" style={{ background: "rgba(162,137,89,0.15)" }} />
-            <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-11 object-contain" style={{ filter: "drop-shadow(0 0 12px rgba(162,137,89,0.7)) drop-shadow(0 0 4px rgba(162,137,89,0.45))" }} />
+            <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-11 object-contain" />
             <span className="text-xs font-semibold tracking-[0.2em] uppercase px-2.5 py-1 rounded-full"
               style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>
               Admin
