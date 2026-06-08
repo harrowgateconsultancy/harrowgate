@@ -140,6 +140,108 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
   return { url: objectPath };
 }
 
+type OutboxEmail = { id: number; toAddress: string; subject: string; body: string; status: string; createdAt: string; sentAt: string | null; };
+
+function OutboxPanel({ submissionId }: { submissionId: number }) {
+  const queryClient = useQueryClient();
+  const { data: items = [], isLoading } = useQuery<OutboxEmail[]>({
+    queryKey: ["outbox", submissionId],
+    queryFn: async () => {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${submissionId}/outbox`);
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    refetchInterval: 30000,
+  });
+
+  const pending = items.filter(i => i.status === "pending");
+  const rest = items.filter(i => i.status !== "pending");
+
+  const approveMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${submissionId}/outbox/${id}/approve`, { method: "POST" });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? "Failed"); }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["outbox", submissionId] }),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${submissionId}/outbox/${id}/reject`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) });
+      if (!res.ok) throw new Error("Failed");
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["outbox", submissionId] }),
+  });
+
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  if (!isLoading && items.length === 0) return null;
+
+  return (
+    <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: pending.length > 0 ? "rgba(251,146,60,0.35)" : "rgba(162,137,89,0.2)" }}>
+      <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: pending.length > 0 ? "rgba(251,146,60,0.2)" : "rgba(162,137,89,0.12)" }}>
+        <div className="flex items-center gap-2">
+          <span>📤</span>
+          <p className="text-sm font-semibold" style={{ color: pending.length > 0 ? "#fb923c" : GOLD }}>Student Outbox</p>
+          {pending.length > 0 && (
+            <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(251,146,60,0.18)", color: "#fb923c" }}>
+              {pending.length} awaiting approval
+            </span>
+          )}
+        </div>
+        {isLoading && <span className="text-xs" style={{ color: "rgba(162,137,89,0.4)" }}>Loading…</span>}
+      </div>
+      <div className="divide-y" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
+        {items.map(item => (
+          <div key={item.id} className="px-4 py-3" style={{ borderBottom: "1px solid rgba(162,137,89,0.07)" }}>
+            <div className="flex items-start gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-mono truncate" style={{ color: "rgba(162,137,89,0.6)" }}>To: {item.toAddress}</span>
+                  <span className="text-xs px-1.5 py-0.5 rounded-full" style={{
+                    background: item.status === "pending" ? "rgba(251,146,60,0.12)" : item.status === "sent" ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)",
+                    color: item.status === "pending" ? "#fb923c" : item.status === "sent" ? "#4ade80" : "#f87171",
+                  }}>
+                    {item.status === "pending" ? "Pending" : item.status === "sent" ? "✓ Sent" : "Rejected"}
+                  </span>
+                  <span className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>{new Date(item.createdAt).toLocaleString()}</span>
+                </div>
+                <p className="text-sm font-medium mt-0.5 truncate" style={{ color: GOLD }}>{item.subject}</p>
+                {expanded === item.id ? (
+                  <p className="text-xs mt-1 whitespace-pre-wrap leading-relaxed" style={{ color: "rgba(162,137,89,0.7)" }}>{item.body}</p>
+                ) : (
+                  <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.45)" }}>{item.body}</p>
+                )}
+                <button onClick={() => setExpanded(expanded === item.id ? null : item.id)} className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.4)" }}>
+                  {expanded === item.id ? "Show less" : "Read more"}
+                </button>
+              </div>
+              {item.status === "pending" && (
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  <button
+                    onClick={() => { if (!approveMutation.isPending) approveMutation.mutate(item.id); }}
+                    disabled={approveMutation.isPending || rejectMutation.isPending}
+                    className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all hover:opacity-80 disabled:opacity-40"
+                    style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.25)" }}>
+                    {approveMutation.isPending ? "Sending…" : "✓ Approve & Send"}
+                  </button>
+                  <button
+                    onClick={() => { if (!rejectMutation.isPending) rejectMutation.mutate(item.id); }}
+                    disabled={approveMutation.isPending || rejectMutation.isPending}
+                    className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all hover:opacity-80 disabled:opacity-40"
+                    style={{ background: "rgba(248,113,113,0.08)", color: "#f87171", border: "1px solid rgba(248,113,113,0.2)" }}>
+                    ✕ Discard
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Submissions() {
   const qc = useQueryClient();
   const [, setLocation] = useLocation();
@@ -1430,6 +1532,11 @@ export default function Submissions() {
                       </div>
                     </div>
                   </div>
+                )}
+
+                {/* Outbox: student emails awaiting admin approval */}
+                {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
+                  <OutboxPanel submissionId={selected.id} />
                 )}
 
                 {/* Mock Interview — Schedule (acknowledged only) */}

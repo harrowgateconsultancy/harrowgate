@@ -5,10 +5,11 @@ import {
   studentSubmissionsTable,
   studentDocumentsTable,
   studentMessagesTable,
+  studentOutboxTable,
 } from "@workspace/db/schema";
 import { eq, desc, and, isNull, isNotNull } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
-import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail } from "../email";
+import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail, sendApprovedOutboxEmail } from "../email";
 import { upsertStudentRow, deleteStudentRow } from "../lib/googleIntegration";
 import { uploadToMega, syncStudentToMega } from "../lib/megaService";
 
@@ -460,6 +461,66 @@ router.get("/admin/student-submissions/:id/messages", async (req: any, res) => {
       .orderBy(studentMessagesTable.createdAt);
     res.json(messages);
   } catch { res.status(500).json({ error: "Failed to fetch messages" }); }
+});
+
+// ─── Admin: list pending outbox emails for a submission ──────────────────────
+router.get("/admin/student-submissions/:id/outbox", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const items = await db.select().from(studentOutboxTable)
+      .where(eq(studentOutboxTable.submissionId, submissionId))
+      .orderBy(desc(studentOutboxTable.createdAt));
+    res.json(items);
+  } catch { res.status(500).json({ error: "Failed to fetch outbox" }); }
+});
+
+// ─── Admin: approve outbox email → send it ───────────────────────────────────
+router.post("/admin/student-submissions/:id/outbox/:emailId/approve", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const emailId = parseInt(req.params.emailId);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(eq(studentSubmissionsTable.id, submissionId)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+    const [outbox] = await db.select().from(studentOutboxTable)
+      .where(and(eq(studentOutboxTable.id, emailId), eq(studentOutboxTable.submissionId, submissionId))).limit(1);
+    if (!outbox) return res.status(404).json({ error: "Email not found" });
+    if (outbox.status !== "pending") return res.status(400).json({ error: "Already processed" });
+    if (!submission.sharedEmail || !submission.sharedEmailPassword) {
+      return res.status(400).json({ error: "No shared email configured for this student" });
+    }
+    await sendApprovedOutboxEmail({
+      fromEmail: submission.sharedEmail,
+      fromPassword: submission.sharedEmailPassword,
+      to: outbox.toAddress,
+      subject: outbox.subject,
+      body: outbox.body,
+      studentName: submission.name,
+    });
+    await db.update(studentOutboxTable)
+      .set({ status: "sent", sentAt: new Date() })
+      .where(eq(studentOutboxTable.id, emailId));
+    res.json({ ok: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message ?? "Failed to approve" });
+  }
+});
+
+// ─── Admin: reject outbox email (silently) ────────────────────────────────────
+router.post("/admin/student-submissions/:id/outbox/:emailId/reject", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const emailId = parseInt(req.params.emailId);
+    const [outbox] = await db.select().from(studentOutboxTable)
+      .where(and(eq(studentOutboxTable.id, emailId), eq(studentOutboxTable.submissionId, submissionId))).limit(1);
+    if (!outbox) return res.status(404).json({ error: "Email not found" });
+    await db.update(studentOutboxTable)
+      .set({ status: "rejected", adminNote: req.body.note || null })
+      .where(eq(studentOutboxTable.id, emailId));
+    res.json({ ok: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message ?? "Failed to reject" });
+  }
 });
 
 export default router;

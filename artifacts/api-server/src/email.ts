@@ -643,6 +643,52 @@ export async function sendEVisaReadyEmail(opts: {
   } catch (err) { console.error("[email] Failed to send e-visa email:", err); }
 }
 
+// ── Notify admin: student composed email awaiting approval ────────────────────
+export async function sendOutboxPendingNotification(opts: {
+  name: string; studentEmail: string | null; submissionId: number;
+  to: string; subject: string; body: string;
+}) {
+  const transport = createTransport();
+  if (!transport) return;
+  try {
+    await transport.sendMail({
+      from: `"HARROWGATE Portal" <${process.env.GMAIL_USER}>`,
+      to: NOTIFY_TO,
+      subject: `✉️ Student Email Awaiting Approval — ${opts.name}`,
+      html: adminHtml(
+        "✉️ Student Composed an Email",
+        `A student has written an email that is pending your approval before it is sent.`,
+        [
+          ["Student", opts.name],
+          ["Contact", opts.studentEmail || "—"],
+          ["To (Recipient)", opts.to],
+          ["Subject", opts.subject],
+          ["Preview", opts.body.substring(0, 300) + (opts.body.length > 300 ? "…" : "")],
+        ],
+        "Review & Approve in Admin Panel →"
+      ),
+    });
+  } catch (err) { console.error("[email] Failed to send outbox notification:", err); }
+}
+
+// ── Send approved outbox email via shared Gmail account ───────────────────────
+export async function sendApprovedOutboxEmail(opts: {
+  fromEmail: string; fromPassword: string;
+  to: string; subject: string; body: string; studentName: string;
+}) {
+  const transport = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: opts.fromEmail, pass: opts.fromPassword },
+  });
+  await transport.sendMail({
+    from: `"${opts.studentName}" <${opts.fromEmail}>`,
+    to: opts.to,
+    subject: opts.subject,
+    text: opts.body,
+    html: `<div style="font-family:sans-serif;font-size:14px;line-height:1.6;color:#333;white-space:pre-wrap">${opts.body.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>`,
+  });
+}
+
 // ── Shared admin email template ──────────────────────────────────────────────
 function adminHtml(heading: string, intro: string, rows: [string, string][], cta: string) {
   return `

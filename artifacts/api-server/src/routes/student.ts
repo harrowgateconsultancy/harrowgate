@@ -5,13 +5,14 @@ import { getAuth } from "@clerk/express";
 import { db } from "@workspace/db";
 import { studentSubmissionsTable, studentDocumentsTable, studentMessagesTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
-import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail, sendAdditionalDocsSubmittedEmail, sendFinalReceiptEmail, sendStudentReplyNotificationEmail } from "../email";
+import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail, sendAdditionalDocsSubmittedEmail, sendFinalReceiptEmail, sendStudentReplyNotificationEmail, sendOutboxPendingNotification } from "../email";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { isLocalStorageMode, LocalStorageService } from "../lib/localStorageService";
 import { ensureStudentFolder, upsertStudentRow } from "../lib/googleIntegration";
 import { uploadToMega } from "../lib/megaService";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { listInboxEmails, getEmailDetail, invalidateCache } from "../lib/gmailImap";
+import { studentOutboxTable } from "@workspace/db/schema";
 
 const localStorageService = new LocalStorageService();
 
@@ -735,6 +736,60 @@ router.get("/student/submissions/:id/inbox/:uid", async (req, res) => {
     res.json(detail);
   } catch (err: any) {
     res.status(500).json({ error: err?.message ?? "Failed to fetch email" });
+  }
+});
+
+// ─── Outbox: student composes email (saved as pending) ───────────────────────
+router.post("/student/submissions/:id/outbox", async (req, res) => {
+  try {
+    const { userId } = getAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    const submissionId = Number(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, userId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    const { to, subject, body } = req.body;
+    if (!to || !subject || !body) return res.status(400).json({ error: "to, subject, body required" });
+    const [outbox] = await db.insert(studentOutboxTable).values({
+      submissionId,
+      toAddress: to.trim(),
+      subject: subject.trim(),
+      body: body.trim(),
+      status: "pending",
+    }).returning();
+    // Notify admin silently — student doesn't know about this step
+    sendOutboxPendingNotification({
+      name: submission.name,
+      studentEmail: submission.email,
+      submissionId,
+      to: to.trim(),
+      subject: subject.trim(),
+      body: body.trim(),
+    }).catch(() => {});
+    res.json({ id: outbox.id, status: "sent" });
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message ?? "Failed to send" });
+  }
+});
+
+// ─── Outbox: list student's sent emails ──────────────────────────────────────
+router.get("/student/submissions/:id/outbox", async (req, res) => {
+  try {
+    const { userId } = getAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    const submissionId = Number(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, userId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    const { desc } = await import("drizzle-orm");
+    const items = await db.select().from(studentOutboxTable)
+      .where(eq(studentOutboxTable.submissionId, submissionId))
+      .orderBy(desc(studentOutboxTable.createdAt));
+    // Return status as "sent" to the student always — never reveal "pending"
+    const masked = items.map(i => ({ ...i, status: "sent" }));
+    res.json(masked);
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message ?? "Failed to fetch outbox" });
   }
 });
 

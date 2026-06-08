@@ -242,6 +242,7 @@ function buildTimeline(submission: Submission, t: (key: string) => string): Time
 
 interface EmailSummary { uid: number; subject: string; from: string; date: string; snippet: string; seen: boolean; }
 interface EmailDetail extends EmailSummary { html: string | null; text: string | null; }
+interface OutboxItem { id: number; toAddress: string; subject: string; body: string; status: string; createdAt: string; }
 
 function InboxCard({ submission }: { submission: Submission }) {
   const { session } = useSession();
@@ -251,6 +252,15 @@ function InboxCard({ submission }: { submission: Submission }) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<EmailDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [tab, setTab] = useState<"inbox" | "sent">("inbox");
+  const [outbox, setOutbox] = useState<OutboxItem[]>([]);
+  const [outboxLoading, setOutboxLoading] = useState(false);
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [composeTo, setComposeTo] = useState("");
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [composeSending, setComposeSending] = useState(false);
+  const [composeSent, setComposeSent] = useState(false);
 
   const authHdr = async () => {
     const token = await session?.getToken();
@@ -269,6 +279,16 @@ function InboxCard({ submission }: { submission: Submission }) {
     finally { setLoading(false); }
   };
 
+  const fetchOutbox = async () => {
+    setOutboxLoading(true);
+    try {
+      const hdr = await authHdr();
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/outbox`, { credentials: "include", headers: hdr });
+      if (res.ok) setOutbox(await res.json());
+    } catch { }
+    finally { setOutboxLoading(false); }
+  };
+
   const openEmail = async (uid: number) => {
     setLoadingDetail(true); setSelected(null);
     try {
@@ -282,11 +302,41 @@ function InboxCard({ submission }: { submission: Submission }) {
     finally { setLoadingDetail(false); }
   };
 
-  // Load inbox when section first opens
   const handleToggle = () => {
     const next = !open;
     setOpen(next);
     if (next && emails.length === 0 && !loading) fetchInbox();
+  };
+
+  const handleTabChange = (t: "inbox" | "sent") => {
+    setTab(t);
+    setSelected(null);
+    if (t === "sent" && outbox.length === 0) fetchOutbox();
+  };
+
+  const handleCompose = () => {
+    setComposeTo(""); setComposeSubject(""); setComposeBody("");
+    setComposeSent(false);
+    setComposeOpen(true);
+  };
+
+  const handleSend = async () => {
+    if (!composeTo.trim() || !composeSubject.trim() || !composeBody.trim()) return;
+    setComposeSending(true);
+    try {
+      const hdr = await authHdr();
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/outbox`, {
+        method: "POST",
+        credentials: "include",
+        headers: { ...hdr, "Content-Type": "application/json" },
+        body: JSON.stringify({ to: composeTo, subject: composeSubject, body: composeBody }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error ?? "Failed");
+      setComposeSent(true);
+      setOutbox([]);
+      setTimeout(() => { setComposeOpen(false); setComposeSent(false); }, 1600);
+    } catch (e: any) { alert(e.message ?? "Failed to send. Please try again."); }
+    finally { setComposeSending(false); }
   };
 
   const unread = emails.filter(e => !e.seen).length;
@@ -308,6 +358,70 @@ function InboxCard({ submission }: { submission: Submission }) {
   }
 
   return (
+    <>
+    {/* ── Compose modal ── */}
+    {composeOpen && (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+        <div className="w-full max-w-lg rounded-2xl border overflow-hidden" style={{ background: "#0d1a3a", borderColor: "rgba(162,137,89,0.3)" }}>
+          <div className="px-5 py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
+            <p className="text-sm font-semibold" style={{ color: _GOLD }}>✉️ New Email</p>
+            <button onClick={() => setComposeOpen(false)} className="text-lg leading-none" style={{ color: "rgba(162,137,89,0.4)" }}>✕</button>
+          </div>
+          {composeSent ? (
+            <div className="px-5 py-10 text-center">
+              <div className="text-3xl mb-3">✅</div>
+              <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>Message sent!</p>
+              <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.45)" }}>Your email has been sent successfully.</p>
+            </div>
+          ) : (
+            <div className="px-5 py-4 space-y-3">
+              <div>
+                <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.55)" }}>To</label>
+                <input
+                  type="email" value={composeTo} onChange={e => setComposeTo(e.target.value)}
+                  placeholder="recipient@example.com"
+                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none"
+                  style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.2)", color: _GOLD }}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.55)" }}>Subject</label>
+                <input
+                  type="text" value={composeSubject} onChange={e => setComposeSubject(e.target.value)}
+                  placeholder="Subject"
+                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none"
+                  style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.2)", color: _GOLD }}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.55)" }}>Message</label>
+                <textarea
+                  rows={7} value={composeBody} onChange={e => setComposeBody(e.target.value)}
+                  placeholder="Write your message…"
+                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none resize-none"
+                  style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.2)", color: _GOLD }}
+                />
+              </div>
+              <div className="flex gap-2 pt-1">
+                <button onClick={() => setComposeOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
+                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.5)", background: "transparent" }}>
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSend}
+                  disabled={composeSending || !composeTo.trim() || !composeSubject.trim() || !composeBody.trim()}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80 disabled:opacity-40"
+                  style={{ background: _GOLD, color: "#0b2213" }}>
+                  {composeSending ? "Sending…" : "Send ✉️"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+
     <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.25)" }}>
       {/* ── Header / toggle ── */}
       <button
@@ -326,14 +440,25 @@ function InboxCard({ submission }: { submission: Submission }) {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {open && (
-            <button
-              onClick={e => { e.stopPropagation(); fetchInbox(true); }}
-              disabled={loading}
-              className="text-xs px-2.5 py-1 rounded-lg border transition-all hover:opacity-70 disabled:opacity-40"
-              style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}
-            >
-              {loading ? "…" : "↻ Refresh"}
-            </button>
+            <>
+              <button
+                onClick={e => { e.stopPropagation(); handleCompose(); }}
+                className="text-xs px-2.5 py-1 rounded-lg border transition-all hover:opacity-70 flex items-center gap-1"
+                style={{ borderColor: "rgba(162,137,89,0.28)", color: _GOLD, background: "rgba(162,137,89,0.1)" }}
+              >
+                ✏️ Compose
+              </button>
+              {tab === "inbox" && (
+                <button
+                  onClick={e => { e.stopPropagation(); fetchInbox(true); }}
+                  disabled={loading}
+                  className="text-xs px-2.5 py-1 rounded-lg border transition-all hover:opacity-70 disabled:opacity-40"
+                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}
+                >
+                  {loading ? "…" : "↻ Refresh"}
+                </button>
+              )}
+            </>
           )}
           <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 transition-transform" style={{ color: "rgba(162,137,89,0.4)", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>
             <path d="M4.22 6.22a.75.75 0 011.06 0L8 8.94l2.72-2.72a.75.75 0 111.06 1.06l-3.25 3.25a.75.75 0 01-1.06 0L4.22 7.28a.75.75 0 010-1.06z"/>
@@ -344,6 +469,24 @@ function InboxCard({ submission }: { submission: Submission }) {
       {/* ── Inbox panel ── */}
       {open && (
         <div className="border-t" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+
+          {/* Tab bar */}
+          {!selected && (
+            <div className="flex border-b" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+              {(["inbox", "sent"] as const).map(t => (
+                <button key={t} onClick={() => handleTabChange(t)}
+                  className="flex-1 py-2.5 text-xs font-semibold transition-all"
+                  style={{
+                    color: tab === t ? _GOLD : "rgba(162,137,89,0.4)",
+                    borderBottom: tab === t ? `2px solid ${_GOLD}` : "2px solid transparent",
+                    background: tab === t ? "rgba(162,137,89,0.04)" : "transparent",
+                  }}>
+                  {t === "inbox" ? "📥 Inbox" : "📤 Sent"}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Email detail view */}
           {selected && (
             <div className="flex flex-col" style={{ maxHeight: 520 }}>
@@ -382,8 +525,8 @@ function InboxCard({ submission }: { submission: Submission }) {
             </div>
           )}
 
-          {/* Email list */}
-          {!selected && (
+          {/* Inbox tab */}
+          {!selected && tab === "inbox" && (
             <div style={{ maxHeight: 420, overflowY: "auto" }}>
               {loading && (
                 <div className="px-5 py-8 flex items-center justify-center gap-2" style={{ color: "rgba(162,137,89,0.4)" }}>
@@ -433,9 +576,49 @@ function InboxCard({ submission }: { submission: Submission }) {
               ))}
             </div>
           )}
+
+          {/* Sent tab */}
+          {!selected && tab === "sent" && (
+            <div style={{ maxHeight: 420, overflowY: "auto" }}>
+              {outboxLoading && (
+                <div className="px-5 py-8 flex items-center justify-center gap-2" style={{ color: "rgba(162,137,89,0.4)" }}>
+                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity=".25"/><path d="M12 2a10 10 0 0110 10" strokeLinecap="round"/></svg>
+                  <span className="text-sm">Loading…</span>
+                </div>
+              )}
+              {!outboxLoading && outbox.length === 0 && (
+                <div className="px-5 py-8 text-center" style={{ color: "rgba(162,137,89,0.35)" }}>
+                  <p className="text-sm">No sent emails yet</p>
+                  <button onClick={handleCompose} className="mt-3 text-xs px-3 py-1.5 rounded-lg border" style={{ borderColor: "rgba(162,137,89,0.25)", color: _GOLD }}>
+                    ✏️ Compose your first email
+                  </button>
+                </div>
+              )}
+              {!outboxLoading && outbox.map(item => (
+                <div key={item.id} className="px-5 py-3.5 border-b" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
+                  <div className="flex items-start gap-3">
+                    <span className="mt-1 text-sm">📤</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <p className="text-sm truncate font-medium" style={{ color: "rgba(162,137,89,0.75)" }}>To: {item.toAddress}</p>
+                        <span className="text-xs shrink-0" style={{ color: "rgba(162,137,89,0.35)" }}>
+                          {new Date(item.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                        </span>
+                      </div>
+                      <p className="text-xs mt-0.5 truncate font-medium" style={{ color: "rgba(162,137,89,0.8)" }}>{item.subject}</p>
+                      <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.35)" }}>{item.body}</p>
+                    </div>
+                    <span className="text-xs px-2 py-0.5 rounded-full shrink-0" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>Sent</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
         </div>
       )}
     </div>
+    </>
   );
 }
 
