@@ -1116,9 +1116,9 @@ export default function Submissions() {
               <div key={s.id}
                 className="rounded-2xl border transition-all cursor-pointer hover:scale-[1.005] hover:shadow-lg group"
                 style={{
-                  background: isDone ? "rgba(134,239,172,0.06)" : C.card,
-                  borderColor: selectedIds.has(s.id) ? GOLD : isDone ? "rgba(134,239,172,0.3)" : hasAction ? "rgba(251,146,60,0.25)" : C.border,
-                  boxShadow: hasAction ? "0 0 0 1px rgba(251,146,60,0.08)" : "none",
+                  background: isDone ? "rgba(162,137,89,0.10)" : C.card,
+                  borderColor: selectedIds.has(s.id) ? GOLD : isDone ? "rgba(162,137,89,0.55)" : hasAction ? "rgba(251,146,60,0.25)" : C.border,
+                  boxShadow: isDone ? "0 0 0 1px rgba(162,137,89,0.12)" : hasAction ? "0 0 0 1px rgba(251,146,60,0.08)" : "none",
                 }}
                 onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setRefNumInput(s.immigrationRefNumber || ""); setRefSetSuccess(false); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setEVisaSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed","visa_issued"].includes(s.status)) loadLetters(s.id); }}>
                 {/* Orange left accent for action-needed */}
@@ -1139,7 +1139,7 @@ export default function Submissions() {
                   </button>
                   {/* Avatar initial */}
                   <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
-                    style={{ background: isDone ? "rgba(74,222,128,0.12)" : C.muted, color: isDone ? "#4ade80" : GOLD }}>
+                    style={{ background: isDone ? "rgba(162,137,89,0.22)" : C.muted, color: GOLD }}>
                     {(s.name[0] || "?").toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
