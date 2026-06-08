@@ -6,8 +6,9 @@ import {
   studentDocumentsTable,
   studentMessagesTable,
   studentOutboxTable,
+  clientsTable,
 } from "@workspace/db/schema";
-import { eq, desc, and, isNull, isNotNull } from "drizzle-orm";
+import { eq, desc, and, isNull, isNotNull, sql } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail, sendApprovedOutboxEmail } from "../email";
 import { upsertStudentRow, deleteStudentRow } from "../lib/googleIntegration";
@@ -64,6 +65,22 @@ router.patch("/admin/student-submissions/:id/status", async (req, res) => {
     if (!updated) return res.status(404).json({ error: "Not found" });
 
     const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
+
+    if (status === "acknowledged" && updated.email) {
+      const existingClient = await db.select({ id: clientsTable.id })
+        .from(clientsTable)
+        .where(eq(clientsTable.email, updated.email))
+        .limit(1);
+      if (!existingClient.length) {
+        db.insert(clientsTable).values({
+          name: updated.name,
+          email: updated.email,
+          passportNumber: updated.passportNumber,
+          dateOfBirth: updated.dateOfBirth,
+          nationality: (updated as any).nationality || "—",
+        }).catch(err => console.error("[Clients] auto-register failed:", err));
+      }
+    }
 
     if (status === "approved" && updated.email) {
       sendApprovalEmail({ name: updated.name, studentEmail: updated.email, portalUrl }).catch(() => {});
@@ -338,6 +355,29 @@ router.post("/admin/google-sync", async (_req, res) => {
   } catch (err) {
     console.error("[Google] bulk sync failed:", err);
     res.status(500).json({ error: "Sync failed" });
+  }
+});
+
+// Dashboard: get submissions that need admin action
+router.get("/admin/action-needed", async (req: any, res) => {
+  try {
+    const ACTION_STATUSES = ["pending", "payment_received", "second_payment_received", "final_payment_received"];
+    const rows = await db
+      .select()
+      .from(studentSubmissionsTable)
+      .where(sql`${studentSubmissionsTable.status} = ANY(ARRAY[${sql.raw(ACTION_STATUSES.map(s => `'${s}'`).join(","))}]::text[])`)
+      .orderBy(desc(studentSubmissionsTable.createdAt));
+    res.json(rows.map(r => ({
+      id: r.id,
+      name: r.name,
+      email: r.email,
+      passportNumber: r.passportNumber,
+      status: r.status,
+      createdAt: r.createdAt,
+    })));
+  } catch (err) {
+    console.error("[action-needed]", err);
+    res.status(500).json({ error: "Failed to fetch action-needed submissions" });
   }
 });
 

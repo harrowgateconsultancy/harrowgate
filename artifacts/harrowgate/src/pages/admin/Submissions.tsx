@@ -5,7 +5,7 @@ import { useLocation } from "wouter";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
 import { io as socketIo } from "socket.io-client";
 
-const BG = "#0b2213";
+const BG = "#0d1a3a";
 const GOLD = "#a28959";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
