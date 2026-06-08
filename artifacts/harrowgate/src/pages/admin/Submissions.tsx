@@ -47,7 +47,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   second_payment_confirmed:        { label: "2nd Payment Confirmed", color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
   university_interview_arranged:   { label: "Uni Interview Arranged", color: "#38bdf8",  bg: "rgba(56,189,248,0.12)" },
   university_interview_completed:  { label: "Uni Interview Done",    color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  offer_letter_pending:            { label: "Offer Letter Sent",      color: "#f0abfc",   bg: "rgba(240,171,252,0.12)" },
+  offer_letter_pending:            { label: "Offer Letter Sent",      color: "#9333ea",   bg: "rgba(147,51,234,0.1)" },
   final_payment_received:          { label: "Final Receipt Received", color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
   final_payment_confirmed:         { label: "Final Payment Done",     color: "#4ade80",   bg: "rgba(74,222,128,0.12)"  },
   visa_issued:                     { label: "e-Visa Issued 🎉",       color: "#34d399",   bg: "rgba(52,211,153,0.12)"  },
@@ -71,7 +71,7 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
     { label: "Unreject — Move to Pending", nextStatus: "pending",        color: "#d97706", icon: "↩" },
   ],
   payment_received: [
-    { label: "Confirm Payment & Acknowledge", nextStatus: "acknowledged", color: "#1e3a5f", icon: "✅" },
+    { label: "Confirm Payment & Acknowledge", nextStatus: "acknowledged", color: "#16a34a", icon: "✅" },
   ],
   interview_arranged: [],
   interview_completed: [
@@ -112,7 +112,7 @@ function getDocMeta(dt: string): { label: string; tagColor: string; tagText: str
   if (dt === "payment_receipt")        return { label: "Payment Receipt",            tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Receipt"       };
   if (dt === "second_payment_receipt") return { label: "2nd Payment Receipt",        tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "2nd Receipt"   };
   if (dt === "additional_doc")         return { label: "Additional Document",        tagColor: "rgba(251,146,60,0.18)",  tagText: "#fb923c", tag: "Additional"    };
-  if (dt === "offer_letter")           return { label: "Offer Letter",               tagColor: "rgba(240,171,252,0.18)", tagText: "#f0abfc", tag: "Offer Letter"  };
+  if (dt === "offer_letter")           return { label: "Offer Letter",               tagColor: "rgba(147,51,234,0.1)", tagText: "#9333ea", tag: "Offer Letter"  };
   if (dt === "final_payment_receipt")  return { label: "Final Payment Receipt",      tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Final Receipt" };
   if (dt === "passport_photo")         return { label: "Passport Size Photo",        tagColor: "#e8ecf2",  tagText: GOLD,      tag: "Student"       };
   if (dt === "passport_doc")           return { label: "Passport / Travel Document", tagColor: "#e8ecf2",  tagText: GOLD,      tag: "Student"       };
@@ -945,13 +945,13 @@ export default function Submissions() {
                 style={{ background: "rgba(248,113,113,0.1)", color: "#f87171" }}>🗑</div>
               <div>
                 <p className="text-sm font-bold" style={{ color: "#f87171" }}>Trash</p>
-                <p className="text-xs" style={{ color: "rgba(248,113,113,0.5)" }}>
+                <p className="text-xs" style={{ color: "#ef4444" }}>
                   {trashItems.length} deleted profile{trashItems.length !== 1 ? "s" : ""} — restore or permanently delete
                 </p>
               </div>
               <button onClick={loadTrash} disabled={trashLoading}
                 className="ml-auto text-xs font-medium px-3 py-1.5 rounded-full border transition-all hover:opacity-80 disabled:opacity-40"
-                style={{ borderColor: "rgba(248,113,113,0.2)", color: "rgba(248,113,113,0.6)" }}>
+                style={{ borderColor: "rgba(248,113,113,0.2)", color: "#ef4444" }}>
                 {trashLoading ? "Loading…" : "↻ Refresh"}
               </button>
             </div>
@@ -963,7 +963,7 @@ export default function Submissions() {
             {!trashLoading && trashItems.length === 0 && (
               <div className="text-center py-16 rounded-2xl border" style={{ borderColor: "rgba(248,113,113,0.1)", background: "rgba(248,113,113,0.02)" }}>
                 <p className="text-3xl mb-3">🗑</p>
-                <p className="text-sm font-semibold" style={{ color: "rgba(248,113,113,0.5)" }}>Trash is empty</p>
+                <p className="text-sm font-semibold" style={{ color: "#ef4444" }}>Trash is empty</p>
               </div>
             )}
 
@@ -1009,7 +1009,7 @@ export default function Submissions() {
           {filterKeys.map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className="px-4 py-1.5 rounded-full text-xs font-semibold border transition-all shrink-0"
-              style={filter === f ? { background: GOLD, color: BG, borderColor: GOLD } : { background: "transparent", color: "#4b5563", borderColor: "#e2e5ea" }}>
+              style={filter === f ? { background: GOLD, color: "#ffffff", borderColor: GOLD } : { background: "transparent", color: "#4b5563", borderColor: "#e2e5ea" }}>
               {f === "all" ? "All" : (statusConfig[f]?.label || f)}
               {f !== "all" && <span className="ml-1.5 opacity-50">{submissions.filter(s => s.status === f).length}</span>}
             </button>
@@ -1137,7 +1137,7 @@ export default function Submissions() {
                     {sc.label}
                   </span>
                   <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5"
-                    style={{ color: "#d1d5db" }}>
+                    style={{ color: "#9ca3af" }}>
                     <path fillRule="evenodd" d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z" clipRule="evenodd" />
                   </svg>
                 </div>
@@ -1152,7 +1152,7 @@ export default function Submissions() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ background: "rgba(0,0,0,0.8)" }}
           onClick={e => { if (e.target === e.currentTarget) { setSelected(null); setPreviewDoc(null); } }}>
-          <div className="w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl border flex flex-col" style={{ background: "#0a1f0e", borderColor: "#e2e5ea", maxHeight: "94dvh" }}>
+          <div className="w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl border flex flex-col" style={{ background: "#ffffff", borderColor: "#e2e5ea", maxHeight: "94dvh" }}>
 
             {/* Modal top accent */}
             <div className="h-0.5 rounded-t-3xl" style={{ background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
@@ -1272,7 +1272,7 @@ export default function Submissions() {
                       <div className="flex flex-col items-center justify-center py-12 gap-4">
                         <span className="text-5xl">📎</span>
                         <a href={downloadUrl(previewDoc)} download={previewDoc.fileName}
-                          className="px-5 py-2 rounded-full text-sm font-semibold" style={{ background: GOLD, color: BG }}>
+                          className="px-5 py-2 rounded-full text-sm font-semibold" style={{ background: GOLD, color: "#ffffff" }}>
                           ↓ Download to view
                         </a>
                       </div>
@@ -1342,7 +1342,7 @@ export default function Submissions() {
                       {/* Mock Interview */}
                       {(selected.interviewZoomLink || selected.interviewDateTime) && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(96,165,250,0.7)" }}>🎥 Mock Interview</p>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#3b82f6" }}>🎥 Mock Interview</p>
                           <div className="space-y-1.5">
                             {selected.interviewDateTime && (
                               <div className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.15)", color: "#60a5fa" }}>
@@ -1363,7 +1363,7 @@ export default function Submissions() {
                       {/* University Interview */}
                       {(selected.uniInterviewLink || selected.uniInterviewDateTime) && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(56,189,248,0.7)" }}>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#0ea5e9" }}>
                             🏫 University Interview{selected.uniInterviewPlatform ? ` · ${selected.uniInterviewPlatform === "zoom" ? "Zoom" : "Teams"}` : ""}
                           </p>
                           <div className="space-y-1.5">
@@ -1386,7 +1386,7 @@ export default function Submissions() {
                       {/* Additional Docs Request */}
                       {selected.additionalDocsRequestNote && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(251,146,60,0.7)" }}>📎 Additional Docs Requested</p>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#f97316" }}>📎 Additional Docs Requested</p>
                           <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.15)", color: "#fb923c" }}>
                             {selected.additionalDocsRequestNote}
                           </div>
@@ -1711,7 +1711,7 @@ export default function Submissions() {
                 {selected.status === "university_interview_completed" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "rgba(240,171,252,0.2)" }}>
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(240,171,252,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#f0abfc" }}>🎓 Upload Offer Letter</p>
+                      <p className="text-sm font-semibold" style={{ color: "#9333ea" }}>🎓 Upload Offer Letter</p>
                       {offerLetterSent === selected.id && (
                         <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>✓ Sent to student</span>
                       )}
@@ -1722,9 +1722,9 @@ export default function Submissions() {
                       </p>
                       <button onClick={() => offerLetterFileRef.current?.click()} disabled={offerLetterUploading}
                         className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-50 flex items-center justify-center gap-2"
-                        style={{ background: "rgba(240,171,252,0.06)", borderColor: "rgba(240,171,252,0.22)", color: "#f0abfc", borderStyle: "dashed" }}>
+                        style={{ background: "rgba(147,51,234,0.04)", borderColor: "rgba(147,51,234,0.2)", color: "#9333ea", borderStyle: "dashed" }}>
                         {offerLetterUploading
-                          ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#f0abfc", borderTopColor: "transparent" }} /> Uploading…</>
+                          ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#9333ea", borderTopColor: "transparent" }} /> Uploading…</>
                           : <>📄 Choose Offer Letter File…</>}
                       </button>
                       <input ref={offerLetterFileRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
@@ -1737,7 +1737,7 @@ export default function Submissions() {
                 {selected.status === "offer_letter_pending" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "rgba(240,171,252,0.2)" }}>
                     <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(240,171,252,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#f0abfc" }}>🎓 Offer Letter Sent</p>
+                      <p className="text-sm font-semibold" style={{ color: "#9333ea" }}>🎓 Offer Letter Sent</p>
                     </div>
                     <div className="px-4 py-3">
                       <p className="text-xs" style={{ color: "rgba(240,171,252,0.6)" }}>
@@ -2029,7 +2029,7 @@ export default function Submissions() {
                     </div>
                     <div className="px-4 py-4">
                       {selected.additionalDocsRequestNote && (
-                        <div className="mb-3 rounded-xl px-3 py-2 border text-xs" style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.15)", color: "rgba(251,146,60,0.7)" }}>
+                        <div className="mb-3 rounded-xl px-3 py-2 border text-xs" style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.15)", color: "#f97316" }}>
                           <strong>Last request note:</strong> {selected.additionalDocsRequestNote}
                         </div>
                       )}
@@ -2185,7 +2185,7 @@ export default function Submissions() {
       {/* Move to Trash Confirmation Modal */}
       {deleteConfirmOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}>
-          <div className="rounded-2xl border overflow-hidden max-w-sm w-full mx-4" style={{ background: "#0b2213", borderColor: "rgba(248,113,113,0.3)" }}>
+          <div className="rounded-2xl border overflow-hidden max-w-sm w-full mx-4" style={{ background: "#ffffff", borderColor: "rgba(248,113,113,0.3)" }}>
             <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(248,113,113,0.12)" }}>
               <p className="text-base font-bold" style={{ color: "#f87171" }}>🗑 Move {selectedIds.size} Profile{selectedIds.size !== 1 ? "s" : ""} to Trash?</p>
             </div>
@@ -2215,7 +2215,7 @@ export default function Submissions() {
       {/* Permanent Delete Confirmation Modal */}
       {permDeleteConfirmId !== null && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(6px)" }}>
-          <div className="rounded-2xl border overflow-hidden max-w-sm w-full mx-4" style={{ background: "#0b2213", borderColor: "rgba(248,113,113,0.5)" }}>
+          <div className="rounded-2xl border overflow-hidden max-w-sm w-full mx-4" style={{ background: "#ffffff", borderColor: "rgba(248,113,113,0.5)" }}>
             <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(248,113,113,0.18)" }}>
               <p className="text-base font-bold" style={{ color: "#f87171" }}>⚠️ Permanently Delete?</p>
             </div>
@@ -2246,7 +2246,7 @@ export default function Submissions() {
       {showCourses && (
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
           onClick={e => { if (e.target === e.currentTarget) setShowCourses(false); }}>
-          <div className="rounded-2xl border overflow-hidden w-full max-w-3xl mx-4 flex flex-col" style={{ background: "#0b2213", borderColor: "#d1d5db", maxHeight: "88vh" }}>
+          <div className="rounded-2xl border overflow-hidden w-full max-w-3xl mx-4 flex flex-col" style={{ background: "#ffffff", borderColor: "#d1d5db", maxHeight: "88vh" }}>
             <div className="px-6 py-4 border-b flex items-center justify-between gap-3 flex-wrap shrink-0" style={{ borderColor: "#e5e7eb" }}>
               <div>
                 <p className="text-base font-bold" style={{ color: GOLD }}>Course Catalogue</p>
@@ -2322,7 +2322,7 @@ export default function Submissions() {
       {/* ── Live View Modal ─────────────────────────────────────────── */}
       {liveViewOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.85)" }}>
-          <div className="rounded-2xl border flex flex-col overflow-hidden" style={{ width: "min(90vw, 1100px)", maxHeight: "90vh", background: "#0a1628", borderColor: "#c8cdd6" }}>
+          <div className="rounded-2xl border flex flex-col overflow-hidden" style={{ width: "min(90vw, 1100px)", maxHeight: "90vh", background: "#ffffff", borderColor: "#c8cdd6" }}>
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b shrink-0" style={{ borderColor: "#e5e7eb" }}>
               <div className="flex items-center gap-3">
