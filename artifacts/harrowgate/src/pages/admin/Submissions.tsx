@@ -761,7 +761,7 @@ export default function Submissions() {
     setMegaSyncing(true);
     setMegaSyncResult(null);
     try {
-      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${megaSyncTarget.id}/mega-sync`, { method: "POST" });
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${megaSyncTarget.id}/webdav-sync`, { method: "POST" });
       const data = await res.json();
       if (data.success) {
         setMegaSyncResult(`✓ ${data.synced} file${data.synced !== 1 ? "s" : ""} synced${data.failed ? ` · ${data.failed} failed` : ""}`);
@@ -863,14 +863,14 @@ export default function Submissions() {
               Sign Out
             </button>
             <button onClick={handleMegaSync} disabled={megaSyncing || !megaSyncTarget}
-              title={!megaSyncTarget ? "Select a student first" : `Sync ${megaSyncTarget.name} to MEGA`}
+              title={!megaSyncTarget ? "Select a student first" : `Sync ${megaSyncTarget.name} to UGreen server`}
               className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
               style={{ borderColor: "rgba(162,137,89,0.2)", color: megaSyncResult?.startsWith("✓") ? "#4ade80" : GOLD, background: "rgba(162,137,89,0.05)" }}>
               {megaSyncing
                 ? <><span className="w-3 h-3 rounded-full border animate-spin shrink-0" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Syncing…</>
                 : megaSyncResult
                   ? megaSyncResult
-                  : <><svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 8c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Sync to MEGA{megaSyncTarget ? ` — ${megaSyncTarget.name.split(" ")[0]}` : ""}</>}
+                  : <><svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 8c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Sync to UGreen{megaSyncTarget ? ` — ${megaSyncTarget.name.split(" ")[0]}` : ""}</>}
             </button>
           </div>
         </div>

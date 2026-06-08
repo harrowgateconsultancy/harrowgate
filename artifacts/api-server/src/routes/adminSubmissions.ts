@@ -11,7 +11,7 @@ import { eq, desc, and, isNull, isNotNull } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail, sendApprovedOutboxEmail } from "../email";
 import { upsertStudentRow, deleteStudentRow } from "../lib/googleIntegration";
-import { uploadToMega, syncStudentToMega } from "../lib/megaService";
+import { uploadToWebDav, syncStudentToWebDav } from "../lib/webdavService";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -225,7 +225,7 @@ router.post("/admin/student-submissions/:id/documents", async (req: any, res) =>
     const { documentType, fileName, fileUrl, fileSize, mimeType } = req.body;
     if (!documentType || !fileName || !fileUrl) return res.status(400).json({ error: "documentType, fileName, and fileUrl are required" });
     const [doc] = await db.insert(studentDocumentsTable).values({ submissionId, documentType, fileName, fileUrl, fileSize, mimeType }).returning();
-    uploadToMega({ submissionId, studentName: submission.name, fileName, fileUrl, documentType }).catch(() => {});
+    uploadToWebDav({ submissionId, studentName: submission.name, fileName, fileUrl, documentType }).catch(() => {});
     res.status(201).json(doc);
   } catch { res.status(500).json({ error: "Failed to attach document" }); }
 });
@@ -262,7 +262,7 @@ router.post("/admin/student-submissions/:id/upload-offer-letter", async (req: an
     const [updated] = await db.update(studentSubmissionsTable)
       .set({ status: "offer_letter_pending" })
       .where(eq(studentSubmissionsTable.id, id)).returning();
-    uploadToMega({ submissionId: id, studentName: submission.name, fileName, fileUrl, documentType: "offer_letter" }).catch(() => {});
+    uploadToWebDav({ submissionId: id, studentName: submission.name, fileName, fileUrl, documentType: "offer_letter" }).catch(() => {});
     const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
     if (submission.email) {
       sendOfferLetterAvailableEmail({ name: submission.name, studentEmail: submission.email, portalUrl }).catch(() => {});
@@ -341,18 +341,18 @@ router.post("/admin/google-sync", async (_req, res) => {
   }
 });
 
-// Admin: sync a single student (all docs + profile) to MEGA
-router.post("/admin/student-submissions/:id/mega-sync", async (req: any, res) => {
+// Admin: sync a single student (all docs + profile) to UGreen server via WebDAV
+router.post("/admin/student-submissions/:id/webdav-sync", async (req: any, res) => {
   try {
     const id = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
     if (!submission) return res.status(404).json({ error: "Not found" });
     const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, id));
-    const { synced, failed } = await syncStudentToMega(submission as any, documents);
+    const { synced, failed } = await syncStudentToWebDav(submission as any, documents);
     res.json({ success: true, synced, failed });
   } catch (err) {
-    console.error("[MEGA] mega-sync failed:", err);
-    res.status(500).json({ error: "MEGA sync failed" });
+    console.error("[WebDAV] webdav-sync failed:", err);
+    res.status(500).json({ error: "WebDAV sync failed" });
   }
 });
 
@@ -410,7 +410,7 @@ router.post("/admin/student-submissions/:id/upload-evisa", async (req: any, res)
     const [updated] = await db.update(studentSubmissionsTable)
       .set({ status: "visa_issued" })
       .where(eq(studentSubmissionsTable.id, id)).returning();
-    uploadToMega({ submissionId: id, studentName: submission.name, fileName, fileUrl, documentType: "evisa" }).catch(() => {});
+    uploadToWebDav({ submissionId: id, studentName: submission.name, fileName, fileUrl, documentType: "evisa" }).catch(() => {});
     const portalUrl = `https://${process.env.REPLIT_DEV_DOMAIN || "localhost"}/portal`;
     if (submission.email) {
       sendEVisaReadyEmail({ name: submission.name, studentEmail: submission.email, portalUrl }).catch(() => {});
