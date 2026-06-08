@@ -192,13 +192,13 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Cards: white bg, 28px radius, soft shadow */
+/* Cards: dark green bg, 28px radius, gold shadow */
 .admin-submissions .rounded-2xl {
   border-radius: 28px !important;
   transition: box-shadow 0.2s ease;
 }
 .admin-submissions .rounded-2xl:not([class*="overflow"]) {
-  box-shadow: 0 2px 16px rgba(30, 70, 110, 0.08);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
 }
 .admin-submissions .rounded-xl {
   border-radius: 20px !important;
@@ -226,14 +226,14 @@
 .admin-submissions input:focus,
 .admin-submissions textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(30, 70, 110, 0.12);
+  box-shadow: 0 0 0 3px rgba(162, 137, 89, 0.18);
 }
 
 /* File upload drag zone */
 .admin-submissions .upload-zone {
-  border: 2px dashed rgba(30, 70, 110, 0.30);
+  border: 2px dashed rgba(162, 137, 89, 0.30);
   border-radius: 20px;
-  background: rgba(30, 70, 110, 0.03);
+  background: rgba(162, 137, 89, 0.03);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -242,8 +242,8 @@
   cursor: pointer;
 }
 .admin-submissions .upload-zone:hover {
-  border-color: rgba(30, 70, 110, 0.55);
-  background: rgba(30, 70, 110, 0.06);
+  border-color: rgba(162, 137, 89, 0.55);
+  background: rgba(162, 137, 89, 0.07);
 }
 
 /* Toast slide-in animation */

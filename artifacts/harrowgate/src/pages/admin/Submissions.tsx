@@ -244,39 +244,24 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
 export default function Submissions() {
   const { isDark } = useAdminTheme();
 
-  const C = isDark ? {
-    card: "#1e2d42",
-    subtle: "#1a2840",
-    muted: "#1d2e47",
-    softBlue: "#1e3558",
-    border: "#2d3e58",
-    borderFaint: "#243252",
-    borderMed: "#374f72",
-    text: "#e2e8f0",
-    textSec: "#cbd5e1",
-    textMid: "#a0aec0",
-    textMuted: "#94a3b8",
-    textFaint: "#64748b",
-    textDark: "#e2e8f0",
-    inputBg: "#162032",
-  } : {
-    card: "#dde4ef",
-    subtle: "#cdd6e6",
-    muted: "rgba(30,70,110,0.12)",
-    softBlue: "#cdd6e6",
-    border: "rgba(30,70,110,0.18)",
-    borderFaint: "rgba(30,70,110,0.11)",
-    borderMed: "rgba(30,70,110,0.32)",
-    text: "#1e466e",
-    textSec: "#1e466e",
-    textMid: "#2c6e9e",
-    textMuted: "rgba(30,70,110,0.65)",
-    textFaint: "rgba(30,70,110,0.45)",
-    textDark: "#1e466e",
-    inputBg: "#cdd6e6",
+  const C = {
+    card: "#0f2d18",
+    subtle: "#0b2213",
+    muted: "rgba(162,137,89,0.10)",
+    softBlue: "#163320",
+    border: "rgba(162,137,89,0.15)",
+    borderFaint: "rgba(162,137,89,0.09)",
+    borderMed: "rgba(162,137,89,0.32)",
+    text: "#a28959",
+    textSec: "#b09a6e",
+    textMid: "rgba(162,137,89,0.80)",
+    textMuted: "rgba(162,137,89,0.58)",
+    textFaint: "rgba(162,137,89,0.38)",
+    textDark: "#c8aa7c",
+    inputBg: "rgba(162,137,89,0.07)",
   };
-  const GOLD = C.text;
-  const BG = "transparent";
+  const GOLD = "#a28959";
+  const BG = "#0b2213";
 
   const qc = useQueryClient();
   const [, setLocation] = useLocation();
@@ -829,7 +814,7 @@ export default function Submissions() {
           <div key={t.id} style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "12px 18px", borderRadius: 16,
-            background: t.type === "success" ? "#1e466e" : t.type === "error" ? "#dc2626" : "#2c6e9e",
+            background: t.type === "success" ? "#1a4d2e" : t.type === "error" ? "#7f1d1d" : "#163320",
             color: "#fff", fontSize: 13, fontWeight: 500,
             boxShadow: "0 4px 24px rgba(30,70,110,0.22)",
             maxWidth: 360, pointerEvents: "auto",
@@ -1768,22 +1753,22 @@ export default function Submissions() {
 
                 {/* Offer Letter Upload — university_interview_completed */}
                 {selected.status === "university_interview_completed" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#f3eaff", borderColor: "#b97de8" }}>
-                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "#ead5fa", borderColor: "#c49de0" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#6b21a8" }}>🎓 Upload Offer Letter</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0f2d18", borderColor: "#a28959" }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "rgba(162,137,89,0.18)", borderColor: "rgba(162,137,89,0.35)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>🎓 Upload Offer Letter</p>
                       {offerLetterSent === selected.id && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.2)", color: "#15803d" }}>✓ Sent to student</span>
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.25)", color: "#a28959" }}>✓ Sent to student</span>
                       )}
                     </div>
                     <div className="px-4 py-4 space-y-3">
-                      <p className="text-xs font-medium" style={{ color: "#7e22ce" }}>
+                      <p className="text-xs font-medium" style={{ color: "rgba(162,137,89,0.80)" }}>
                         Once the university sends the offer letter, upload it here. The student will be notified and prompted to make the final payment before they can download it.
                       </p>
                       <button onClick={() => offerLetterFileRef.current?.click()} disabled={offerLetterUploading}
                         className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-50 flex items-center justify-center gap-2"
-                        style={{ background: "#ead5fa", borderColor: "#9333ea", borderStyle: "dashed", color: "#6b21a8" }}>
+                        style={{ background: "rgba(162,137,89,0.10)", borderColor: "#a28959", borderStyle: "dashed", color: "#c8aa7c" }}>
                         {offerLetterUploading
-                          ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#9333ea", borderTopColor: "transparent" }} /> Uploading…</>
+                          ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#a28959", borderTopColor: "transparent" }} /> Uploading…</>
                           : <>📄 Choose Offer Letter File…</>}
                       </button>
                       <input ref={offerLetterFileRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
@@ -1794,12 +1779,12 @@ export default function Submissions() {
 
                 {/* Offer Letter Pending — info (offer_letter_pending) */}
                 {selected.status === "offer_letter_pending" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#f3eaff", borderColor: "#b97de8" }}>
-                    <div className="px-4 py-3 border-b" style={{ background: "#ead5fa", borderColor: "#c49de0" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#6b21a8" }}>🎓 Offer Letter Sent</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0f2d18", borderColor: "#a28959" }}>
+                    <div className="px-4 py-3 border-b" style={{ background: "rgba(162,137,89,0.18)", borderColor: "rgba(162,137,89,0.35)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>🎓 Offer Letter Sent</p>
                     </div>
                     <div className="px-4 py-3">
-                      <p className="text-xs font-medium" style={{ color: "#7e22ce" }}>
+                      <p className="text-xs font-medium" style={{ color: "rgba(162,137,89,0.80)" }}>
                         The offer letter has been sent to the student. They have been notified and will upload their final payment receipt once payment is made.
                       </p>
                     </div>
@@ -2076,47 +2061,47 @@ export default function Submissions() {
 
                 {/* Request Additional Documents — universal panel */}
                 {selected.status !== "rejected" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#fff7ed", borderColor: "#f97316" }}>
-                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "#fed7aa", borderColor: "#ea8a3a" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#9a3412" }}>📎 Additional Documents</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0f2d18", borderColor: "rgba(162,137,89,0.55)" }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "rgba(162,137,89,0.15)", borderColor: "rgba(162,137,89,0.30)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>📎 Additional Documents</p>
                       {selected.additionalDocsRequested && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#f97316", color: "#ffffff" }}>Pending student response</span>
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#a28959", color: "#0b2213" }}>Pending student response</span>
                       )}
                       {additionalDocsSent === selected.id && !selected.additionalDocsRequested && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.25)", color: "#15803d" }}>✓ Request sent</span>
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.25)", color: "#a28959" }}>✓ Request sent</span>
                       )}
                     </div>
                     <div className="px-4 py-4">
                       {selected.additionalDocsRequestNote && (
-                        <div className="mb-3 rounded-xl px-3 py-2 border text-xs" style={{ background: "#ffedd5", borderColor: "#f97316", color: "#9a3412" }}>
+                        <div className="mb-3 rounded-xl px-3 py-2 border text-xs" style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.32)", color: "#b09a6e" }}>
                           <strong>Last request note:</strong> {selected.additionalDocsRequestNote}
                         </div>
                       )}
                       {!additionalDocsForm ? (
                         <button onClick={() => setAdditionalDocsForm({ note: "" })}
                           className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
-                          style={{ background: "#ffedd5", borderColor: "#f97316", color: "#9a3412" }}>
+                          style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(162,137,89,0.45)", color: "#c8aa7c" }}>
                           📎 {selected.additionalDocsRequested ? "Send Another Request" : "Request Additional Documents"}
                         </button>
                       ) : (
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-xs font-medium mb-1" style={{ color: "#9a3412" }}>Note to student (optional)</label>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "#b09a6e" }}>Note to student (optional)</label>
                             <textarea rows={2} placeholder="Describe what documents are needed…"
                               value={additionalDocsForm.note}
                               onChange={e => setAdditionalDocsForm(f => f ? { ...f, note: e.target.value } : f)}
                               className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
-                              style={{ background: "#ffedd5", borderColor: "#f97316", color: "#9a3412" }} />
+                              style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.35)", color: "#c8aa7c" }} />
                           </div>
                           <div className="flex gap-2">
                             <button onClick={handleRequestAdditionalDocs} disabled={sendingAdditionalDocs}
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
-                              style={{ background: "#f97316", borderColor: "#ea580c", color: "#ffffff" }}>
-                              {sendingAdditionalDocs ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#ffffff", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Request"}
+                              style={{ background: "#a28959", borderColor: "#8a7245", color: "#0b2213" }}>
+                              {sendingAdditionalDocs ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#0b2213", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Request"}
                             </button>
                             <button onClick={() => setAdditionalDocsForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
-                              style={{ borderColor: "#f97316", color: "#9a3412", background: "#ffedd5" }}>
+                              style={{ borderColor: "rgba(162,137,89,0.40)", color: "#b09a6e", background: "rgba(162,137,89,0.08)" }}>
                               Cancel
                             </button>
                           </div>
@@ -2128,11 +2113,11 @@ export default function Submissions() {
 
                 {/* Send Message to Student */}
                 {selected.status !== "rejected" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#eff6ff", borderColor: "#3b82f6" }}>
-                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "#bfdbfe", borderColor: "#60a5fa" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#1e3a8a" }}>✉️ Message Student</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.45)" }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "rgba(162,137,89,0.12)", borderColor: "rgba(162,137,89,0.25)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>✉️ Message Student</p>
                       {messageSent === selected.id && !messageForm && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.25)", color: "#15803d" }}>✓ Sent</span>
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.22)", color: "#a28959" }}>✓ Sent</span>
                       )}
                     </div>
                     <div className="px-4 py-4 space-y-3">
@@ -2142,28 +2127,28 @@ export default function Submissions() {
                           {adminMessages.map(msg => (
                             <div key={msg.id} className={`rounded-xl px-3 py-2.5 border text-xs ${msg.fromAdmin ? "ml-4" : "mr-4"}`}
                               style={{
-                                background: msg.fromAdmin ? "#dbeafe" : "#dcfce7",
-                                borderColor: msg.fromAdmin ? "#3b82f6" : "#22c55e",
+                                background: msg.fromAdmin ? "rgba(162,137,89,0.14)" : "rgba(162,137,89,0.06)",
+                                borderColor: msg.fromAdmin ? "rgba(162,137,89,0.40)" : "rgba(162,137,89,0.22)",
                               }}>
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-semibold" style={{ color: msg.fromAdmin ? "#1e3a8a" : "#15803d" }}>
+                                <span className="font-semibold" style={{ color: msg.fromAdmin ? "#c8aa7c" : "#a28959" }}>
                                   {msg.fromAdmin ? "You (Admin)" : selected.name}
                                 </span>
                                 {!msg.isRead && !msg.fromAdmin && (
-                                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: "#22c55e", color: "#ffffff" }}>NEW</span>
+                                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: "#a28959", color: "#0b2213" }}>NEW</span>
                                 )}
-                                <span className="ml-auto" style={{ color: msg.fromAdmin ? "#1e40af" : "#166534", opacity: 0.6 }}>
+                                <span className="ml-auto" style={{ color: "rgba(162,137,89,0.55)" }}>
                                   {new Date(msg.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} {new Date(msg.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                                 </span>
                               </div>
-                              {msg.subject && !msg.fromAdmin && <p className="font-medium mb-1" style={{ color: msg.fromAdmin ? "#1e3a8a" : "#15803d", opacity: 0.8 }}>{msg.subject}</p>}
-                              {msg.body && <p className="leading-relaxed" style={{ color: msg.fromAdmin ? "#1e40af" : "#166534", whiteSpace: "pre-wrap" }}>{msg.body}</p>}
+                              {msg.subject && !msg.fromAdmin && <p className="font-medium mb-1" style={{ color: "#b09a6e", opacity: 0.8 }}>{msg.subject}</p>}
+                              {msg.body && <p className="leading-relaxed" style={{ color: msg.fromAdmin ? "#c8aa7c" : "#a28959", whiteSpace: "pre-wrap" }}>{msg.body}</p>}
                               {msg.attachments?.length > 0 && (
                                 <div className="mt-1.5 flex flex-wrap gap-1">
                                   {msg.attachments.map((att: any, i: number) => (
                                     <a key={i} href={`${getApiBase()}/api/storage/objects/${att.fileUrl}`} target="_blank" rel="noopener noreferrer"
                                       className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-medium hover:opacity-80 transition-opacity"
-                                      style={{ borderColor: "#3b82f6", color: "#1e3a8a", background: "#dbeafe" }}>
+                                      style={{ borderColor: "rgba(162,137,89,0.35)", color: "#c8aa7c", background: "rgba(162,137,89,0.10)" }}>
                                       📎 {att.fileName}
                                     </a>
                                   ))}
@@ -2176,7 +2161,7 @@ export default function Submissions() {
                       {!messageForm ? (
                         <button onClick={() => setMessageForm({ subject: "Message from HARROWGATE", body: "", attachments: [] })}
                           className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
-                          style={{ background: "#dbeafe", borderColor: "#3b82f6", color: "#1e3a8a" }}>
+                          style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(162,137,89,0.40)", color: "#c8aa7c" }}>
                           ✉️ Compose New Message
                         </button>
                       ) : (
@@ -2185,17 +2170,17 @@ export default function Submissions() {
                             value={messageForm.subject}
                             onChange={e => setMessageForm(f => f ? { ...f, subject: e.target.value } : f)}
                             className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
-                            style={{ background: "#dbeafe", borderColor: "#3b82f6", color: "#1e3a8a" }} />
+                            style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.35)", color: "#c8aa7c" }} />
                           <textarea rows={4} placeholder="Type your message to the student…"
                             value={messageForm.body}
                             onChange={e => setMessageForm(f => f ? { ...f, body: e.target.value } : f)}
                             className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
-                            style={{ background: "#dbeafe", borderColor: "#3b82f6", color: "#1e3a8a" }} />
+                            style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.35)", color: "#c8aa7c" }} />
                           {messageForm.attachments.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {messageForm.attachments.map((att, i) => (
                                 <div key={i} className="flex items-center gap-1 px-2 py-1 rounded-lg border text-xs"
-                                  style={{ borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa", background: "rgba(96,165,250,0.05)" }}>
+                                  style={{ borderColor: "rgba(162,137,89,0.25)", color: "#a28959", background: "rgba(162,137,89,0.07)" }}>
                                   📎 {att.fileName}
                                   <button onClick={() => setMessageForm(f => f ? { ...f, attachments: f.attachments.filter((_, j) => j !== i) } : f)}
                                     className="ml-1 hover:opacity-70" style={{ color: "#f87171" }}>✕</button>
