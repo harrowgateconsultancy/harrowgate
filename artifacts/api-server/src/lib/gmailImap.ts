@@ -15,7 +15,6 @@ export interface EmailDetail extends EmailSummary {
   text: string | null;
 }
 
-// Per-account cache: 3-minute TTL
 const listCache = new Map<string, { at: number; data: EmailSummary[] }>();
 const CACHE_TTL = 3 * 60 * 1000;
 
@@ -27,7 +26,26 @@ function makeClient(email: string, appPassword: string) {
     auth: { user: email, pass: appPassword },
     logger: false,
     tls: { rejectUnauthorized: false },
+    // Fail fast so the endpoint doesn't hang
+    connectionTimeout: 12000,
+    greetingTimeout: 8000,
+    socketTimeout: 12000,
   });
+}
+
+function friendlyError(err: any): string {
+  const code: string = err?.code ?? "";
+  const msg: string = (err?.message ?? "").toLowerCase();
+  if (code === "ETIMEOUT" || msg.includes("timeout") || msg.includes("timed out")) {
+    return "Could not connect to Gmail — IMAP may be blocked in this environment. The inbox will work on the live site. Make sure IMAP is enabled in the Gmail account settings.";
+  }
+  if (code === "EAUTH" || msg.includes("authentication") || msg.includes("credentials") || msg.includes("invalid credentials") || msg.includes("app-specific password")) {
+    return "Gmail authentication failed. Please ensure the password is a valid Google App Password (not the regular Gmail password).";
+  }
+  if (code === "ENOTFOUND" || code === "ECONNREFUSED") {
+    return "Could not reach Gmail. Please check your network and try again.";
+  }
+  return err?.message ?? "Failed to connect to inbox";
 }
 
 export async function listInboxEmails(
@@ -43,7 +61,18 @@ export async function listInboxEmails(
   }
 
   const client = makeClient(email, appPassword);
-  await client.connect();
+
+  // Catch idle/background errors so they don't become unhandled rejections
+  client.on("error", () => {});
+
+  try {
+    await client.connect();
+  } catch (err) {
+    // Ensure the client is destroyed before throwing
+    try { client.close(); } catch { /* ignore */ }
+    throw new Error(friendlyError(err));
+  }
+
   const results: EmailSummary[] = [];
 
   try {
@@ -57,9 +86,7 @@ export async function listInboxEmails(
       }
 
       const start = Math.max(1, total - maxMessages + 1);
-      const range = `${start}:${total}`;
-
-      for await (const msg of client.fetch(range, {
+      for await (const msg of client.fetch(`${start}:${total}`, {
         uid: true,
         flags: true,
         envelope: true,
@@ -75,8 +102,7 @@ export async function listInboxEmails(
         try {
           const part = msg.bodyParts?.get("1");
           if (part) {
-            const raw = part.toString().replace(/=\r?\n/g, "").replace(/<[^>]+>/g, " ").trim();
-            snippet = raw.slice(0, 180);
+            snippet = part.toString().replace(/=\r?\n/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 180);
           }
         } catch { /* no preview */ }
 
@@ -92,11 +118,13 @@ export async function listInboxEmails(
     } finally {
       lock.release();
     }
+  } catch (err) {
+    throw new Error(friendlyError(err));
   } finally {
-    await client.logout();
+    try { await client.logout(); } catch { try { client.close(); } catch { /* ignore */ } }
   }
 
-  results.reverse(); // newest first
+  results.reverse();
   listCache.set(key, { at: Date.now(), data: results });
   return results;
 }
@@ -111,12 +139,18 @@ export async function getEmailDetail(
   uid: number,
 ): Promise<EmailDetail | null> {
   const client = makeClient(email, appPassword);
-  await client.connect();
+  client.on("error", () => {});
+
+  try {
+    await client.connect();
+  } catch (err) {
+    try { client.close(); } catch { /* ignore */ }
+    throw new Error(friendlyError(err));
+  }
 
   try {
     const lock = await client.getMailboxLock("INBOX");
     try {
-      // Mark as read
       await client.messageFlagsAdd({ uid }, ["\\Seen"], { uid: true });
 
       const dl = await client.download(`${uid}`, undefined, { uid: true });
@@ -144,7 +178,9 @@ export async function getEmailDetail(
     } finally {
       lock.release();
     }
+  } catch (err) {
+    throw new Error(friendlyError(err));
   } finally {
-    await client.logout();
+    try { await client.logout(); } catch { try { client.close(); } catch { /* ignore */ } }
   }
 }
