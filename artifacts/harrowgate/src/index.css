@@ -182,6 +182,63 @@
   opacity: 1;
 }
 
+/* ── Student Portal Theme ────────────────────────────────────────────── */
+.student-portal {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* All cards get white bg + soft shadow + 28px radius */
+.student-portal .s-card {
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 2px 20px rgba(30, 70, 110, 0.09);
+  border: 1px solid rgba(30, 70, 110, 0.10);
+  transition: box-shadow 0.2s ease;
+}
+.student-portal .s-card:hover {
+  box-shadow: 0 4px 28px rgba(30, 70, 110, 0.14);
+}
+
+/* Rounded-full buttons with smooth transitions */
+.student-portal button:not([class*="rounded"]):not([role="tab"]) {
+  border-radius: 9999px;
+  transition: opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+.student-portal button:hover:not(:disabled) {
+  opacity: 0.88;
+}
+.student-portal button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Dashed file-upload zone */
+.student-portal .s-upload-zone {
+  border: 2px dashed rgba(30, 70, 110, 0.28);
+  border-radius: 20px;
+  background: rgba(30, 70, 110, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+.student-portal .s-upload-zone:hover {
+  border-color: rgba(30, 70, 110, 0.55);
+  background: rgba(30, 70, 110, 0.06);
+}
+.student-portal .s-upload-zone.drag-over {
+  border-color: #2c6e9e;
+  background: rgba(44, 110, 158, 0.09);
+}
+
+/* Smooth transition on all bordered elements */
+.student-portal [style*="border"],
+.student-portal [style*="background"],
+.student-portal [style*="color"] {
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
 @media print {
   .no-print {
     display: none !important;

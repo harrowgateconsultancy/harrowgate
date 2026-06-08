@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
 import { useSession } from "@clerk/react";
 
-const GOLD = "#a28959";
-const BG = "#0b2213";
+const GOLD = "#1e466e";
+const BG = "#f0f2f8";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
 
@@ -113,10 +113,10 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
       </div>
 
       {/* Document slots */}
-      <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
-        <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+      <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(30,70,110,0.05)", borderColor: "rgba(30,70,110,0.14)" }}>
+        <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(30,70,110,0.12)" }}>
           <h3 className="text-base font-semibold" style={{ color: GOLD }}>Your Documents</h3>
-          <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Click a document to preview it · Use Replace to swap a file</p>
+          <p className="text-xs mt-0.5" style={{ color: "rgba(30,70,110,0.44)" }}>Click a document to preview it · Use Replace to swap a file</p>
         </div>
         <div className="px-6 py-5 space-y-3">
           {DOC_SLOTS.map(slot => {
@@ -138,20 +138,20 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
                   }}
                   style={{
                     background: dragOverSlot === slot.type
-                      ? "rgba(162,137,89,0.12)"
-                      : doc ? "rgba(162,137,89,0.06)" : "rgba(162,137,89,0.02)",
+                      ? "rgba(30,70,110,0.12)"
+                      : doc ? "rgba(30,70,110,0.07)" : "rgba(162,137,89,0.02)",
                     borderColor: dragOverSlot === slot.type
                       ? GOLD
-                      : doc ? "rgba(162,137,89,0.22)" : "rgba(162,137,89,0.08)",
+                      : doc ? "rgba(162,137,89,0.22)" : "rgba(30,70,110,0.09)",
                     borderStyle: !doc && dragOverSlot !== slot.type ? "dashed" : "solid",
                     transform: dragOverSlot === slot.type ? "scale(1.005)" : "scale(1)",
-                    boxShadow: dragOverSlot === slot.type ? "0 0 12px rgba(162,137,89,0.1)" : "none",
+                    boxShadow: dragOverSlot === slot.type ? "0 0 12px rgba(30,70,110,0.10)" : "none",
                   }}>
-                  <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "rgba(162,137,89,0.12)", color: GOLD }}>
+                  <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "rgba(30,70,110,0.12)", color: GOLD }}>
                     {DOC_SLOTS.indexOf(slot) + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium" style={{ color: "rgba(162,137,89,0.55)" }}>{slot.label}</p>
+                    <p className="text-xs font-medium" style={{ color: "rgba(30,70,110,0.55)" }}>{slot.label}</p>
                     {doc && <p className="text-sm font-semibold truncate mt-0.5" style={{ color: GOLD }}>{doc.fileName}</p>}
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -159,13 +159,13 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
                       <>
                         <button onClick={() => setPreview(preview?.id === doc.id ? null : doc)}
                           className="text-xs px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
-                          style={{ background: preview?.id === doc.id ? "rgba(162,137,89,0.15)" : "transparent", borderColor: "rgba(162,137,89,0.2)", color: GOLD }}>
+                          style={{ background: preview?.id === doc.id ? "rgba(30,70,110,0.14)" : "transparent", borderColor: "rgba(30,70,110,0.18)", color: GOLD }}>
                           {preview?.id === doc.id ? "Hide" : "View"}
                         </button>
                         <button onClick={() => inputRefs.current[`replace_${slot.type}`]?.click()}
                           disabled={isUp}
                           className="text-xs px-3 py-1.5 rounded-lg border transition-all hover:opacity-80 disabled:opacity-50"
-                          style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD }}>
+                          style={{ borderColor: "rgba(30,70,110,0.18)", color: GOLD }}>
                           {isUp ? "…" : "Replace"}
                         </button>
                         <button onClick={() => handleDelete(doc)}
@@ -181,9 +181,9 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
                         className="text-xs px-4 py-1.5 rounded-lg border transition-all hover:opacity-80 disabled:opacity-50 flex items-center gap-1.5"
                         style={{
                           borderColor: dragOverSlot === slot.type ? GOLD : "rgba(162,137,89,0.22)",
-                          color: dragOverSlot === slot.type ? GOLD : "rgba(162,137,89,0.55)",
+                          color: dragOverSlot === slot.type ? GOLD : "rgba(30,70,110,0.55)",
                           borderStyle: "dashed",
-                          background: dragOverSlot === slot.type ? "rgba(162,137,89,0.1)" : "transparent",
+                          background: dragOverSlot === slot.type ? "rgba(30,70,110,0.10)" : "transparent",
                         }}>
                         {isUp
                           ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin inline-block" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Uploading…</>
@@ -197,7 +197,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
 
                 {/* Inline preview */}
                 {preview?.id === doc?.id && doc && (
-                  <div className="mt-2 rounded-xl border overflow-hidden" style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(0,0,0,0.3)" }}>
+                  <div className="mt-2 rounded-xl border overflow-hidden" style={{ borderColor: "rgba(30,70,110,0.14)", background: "#ffffff" }}>
                     {isImage(doc.fileName, doc.mimeType) ? (
                       <img src={viewUrl(doc)} alt={doc.fileName} className="max-w-full mx-auto rounded-xl p-2" style={{ maxHeight: 320, objectFit: "contain" }} />
                     ) : isPdf(doc.fileName, doc.mimeType) ? (
@@ -205,9 +205,9 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
                     ) : (
                       <div className="flex flex-col items-center justify-center py-8 gap-3">
                         <span className="text-4xl">📎</span>
-                        <p className="text-sm" style={{ color: "rgba(162,137,89,0.5)" }}>Preview not available</p>
+                        <p className="text-sm" style={{ color: "rgba(30,70,110,0.50)" }}>Preview not available</p>
                         <a href={viewUrl(doc)} target="_blank" rel="noopener noreferrer"
-                          className="text-xs px-4 py-2 rounded-full border" style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>
+                          className="text-xs px-4 py-2 rounded-full border" style={{ borderColor: "rgba(30,70,110,0.22)", color: GOLD }}>
                           Open file ↗
                         </a>
                       </div>
