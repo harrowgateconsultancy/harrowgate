@@ -1269,7 +1269,7 @@ export default function Submissions() {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <a
-                  href={`${getApiBase()}/api/admin/student-submissions/${selected.id}/print`}
+                  href={`${getApiBase()}/api/admin/student-submissions/${selected.id}/print?token=${encodeURIComponent(getAdminToken())}`}
                   target="_blank" rel="noopener noreferrer"
                   title="Print student profile"
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all hover:opacity-80"
