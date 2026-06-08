@@ -87,7 +87,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
     ? getCoursesByLevel(preferredLevel).filter(c => {
         if (!courseSearch.trim()) return true;
         const q = courseSearch.toLowerCase();
-        return c.institution.toLowerCase().includes(q) || c.programme.toLowerCase().includes(q);
+        return c.programme.toLowerCase().includes(q);
       })
     : [];
 
@@ -349,7 +349,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                     type="text"
                     value={courseSearch}
                     onChange={e => { setCourseSearch(e.target.value); setPreferredCourseId(""); }}
-                    placeholder="Search by institution or programme name…"
+                    placeholder="Search by programme name…"
                     className="w-full rounded-xl pl-9 pr-4 py-3 text-sm outline-none border transition-all"
                     style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: GOLD }}
                   />
@@ -381,48 +381,31 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                       No courses match your search
                     </div>
                   ) : (
-                    (() => {
-                      const groups: Record<string, typeof filteredCourses> = {};
-                      filteredCourses.forEach(c => {
-                        if (!groups[c.institution]) groups[c.institution] = [];
-                        groups[c.institution].push(c);
-                      });
-                      return Object.entries(groups).map(([institution, courses]) => (
-                        <div key={institution}>
+                    filteredCourses.map(course => {
+                      const isSelected = preferredCourseId === course.id;
+                      return (
+                        <button
+                          key={course.id}
+                          type="button"
+                          onClick={() => { setPreferredCourseId(course.id); setCourseSearch(""); }}
+                          className="w-full px-4 py-3 text-left border-b flex items-center gap-3 transition-colors"
+                          style={{
+                            borderColor: "rgba(162,137,89,0.07)",
+                            background: isSelected ? "rgba(162,137,89,0.1)" : "transparent",
+                          }}
+                        >
                           <div
-                            className="px-4 py-2 text-xs font-bold tracking-wide sticky top-0 border-b"
-                            style={{ background: "rgba(0,0,0,0.4)", color: "rgba(162,137,89,0.5)", borderColor: "rgba(162,137,89,0.1)" }}
+                            className="w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center"
+                            style={{ borderColor: isSelected ? GOLD : "rgba(162,137,89,0.25)" }}
                           >
-                            {institution}
+                            {isSelected && <div className="w-2 h-2 rounded-full" style={{ background: GOLD }} />}
                           </div>
-                          {courses.map(course => {
-                            const isSelected = preferredCourseId === course.id;
-                            return (
-                              <button
-                                key={course.id}
-                                type="button"
-                                onClick={() => { setPreferredCourseId(course.id); setCourseSearch(""); }}
-                                className="w-full px-4 py-3 text-left border-b flex items-center gap-3 transition-colors"
-                                style={{
-                                  borderColor: "rgba(162,137,89,0.07)",
-                                  background: isSelected ? "rgba(162,137,89,0.1)" : "transparent",
-                                }}
-                              >
-                                <div
-                                  className="w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center"
-                                  style={{ borderColor: isSelected ? GOLD : "rgba(162,137,89,0.25)" }}
-                                >
-                                  {isSelected && <div className="w-2 h-2 rounded-full" style={{ background: GOLD }} />}
-                                </div>
-                                <span className="text-sm" style={{ color: isSelected ? GOLD : "rgba(162,137,89,0.7)" }}>
-                                  {course.programme}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ));
-                    })()
+                          <span className="text-sm" style={{ color: isSelected ? GOLD : "rgba(162,137,89,0.7)" }}>
+                            {course.programme}
+                          </span>
+                        </button>
+                      );
+                    })
                   )}
                 </div>
 
@@ -438,7 +421,6 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                     <div>
                       <p className="text-xs font-semibold mb-0.5" style={{ color: "#4ade80" }}>Selected course</p>
                       <p className="text-sm font-medium" style={{ color: GOLD }}>{selectedCourse.programme}</p>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.5)" }}>{selectedCourse.institution}</p>
                     </div>
                   </div>
                 )}
