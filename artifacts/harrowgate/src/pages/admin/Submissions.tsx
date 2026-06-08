@@ -260,20 +260,20 @@ export default function Submissions() {
     textDark: "#e2e8f0",
     inputBg: "#162032",
   } : {
-    card: "#ffffff",
-    subtle: "#eef2fa",
-    muted: "rgba(30,70,110,0.06)",
-    softBlue: "#eef2fa",
-    border: "rgba(30,70,110,0.13)",
-    borderFaint: "rgba(30,70,110,0.08)",
-    borderMed: "rgba(30,70,110,0.28)",
+    card: "#dde4ef",
+    subtle: "#cdd6e6",
+    muted: "rgba(30,70,110,0.12)",
+    softBlue: "#cdd6e6",
+    border: "rgba(30,70,110,0.18)",
+    borderFaint: "rgba(30,70,110,0.11)",
+    borderMed: "rgba(30,70,110,0.32)",
     text: "#1e466e",
     textSec: "#1e466e",
     textMid: "#2c6e9e",
     textMuted: "rgba(30,70,110,0.65)",
     textFaint: "rgba(30,70,110,0.45)",
     textDark: "#1e466e",
-    inputBg: "#eef2fa",
+    inputBg: "#cdd6e6",
   };
   const GOLD = C.text;
   const BG = "transparent";
