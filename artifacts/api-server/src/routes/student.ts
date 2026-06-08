@@ -11,6 +11,7 @@ import { isLocalStorageMode, LocalStorageService } from "../lib/localStorageServ
 import { ensureStudentFolder, upsertStudentRow } from "../lib/googleIntegration";
 import { uploadToMega } from "../lib/megaService";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { listInboxEmails, getEmailDetail, invalidateCache } from "../lib/gmailImap";
 
 const localStorageService = new LocalStorageService();
 
@@ -691,6 +692,49 @@ router.post("/student/submissions/:id/messages/reply", requireStudentAuth, async
     }).catch(() => {});
     res.json(msg);
   } catch { res.status(500).json({ error: "Failed to send reply" }); }
+});
+
+// ─── Inbox: list emails ──────────────────────────────────────────────────────
+router.get("/student/submissions/:id/inbox", async (req, res) => {
+  try {
+    const { userId } = getAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    const submissionId = Number(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, userId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    if (!submission.sharedEmail || !submission.sharedEmailPassword) {
+      return res.json([]);
+    }
+    const refresh = req.query.refresh === "1";
+    const emails = await listInboxEmails(submission.sharedEmail, submission.sharedEmailPassword, 50, refresh);
+    res.json(emails);
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message ?? "Failed to fetch inbox" });
+  }
+});
+
+// ─── Inbox: get single email ─────────────────────────────────────────────────
+router.get("/student/submissions/:id/inbox/:uid", async (req, res) => {
+  try {
+    const { userId } = getAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    const submissionId = Number(req.params.id);
+    const uid = Number(req.params.uid);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, userId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Not found" });
+    if (!submission.sharedEmail || !submission.sharedEmailPassword) {
+      return res.status(400).json({ error: "No inbox configured" });
+    }
+    // Invalidate list cache so unread count refreshes next time
+    invalidateCache(submission.sharedEmail);
+    const detail = await getEmailDetail(submission.sharedEmail, submission.sharedEmailPassword, uid);
+    if (!detail) return res.status(404).json({ error: "Email not found" });
+    res.json(detail);
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message ?? "Failed to fetch email" });
+  }
 });
 
 export default router;

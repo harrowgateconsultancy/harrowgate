@@ -1389,7 +1389,7 @@ export default function Submissions() {
                           {selected.sharedEmailPassword && (
                             <div className="flex items-center gap-3">
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium mb-0.5" style={{ color: "rgba(162,137,89,0.5)" }}>Password</p>
+                                <p className="text-xs font-medium mb-0.5" style={{ color: "rgba(162,137,89,0.5)" }}>App Password</p>
                                 <p className="text-sm font-mono" style={{ color: GOLD }}>{selected.sharedEmailPassword}</p>
                               </div>
                             </div>
@@ -1408,7 +1408,7 @@ export default function Submissions() {
                         <div className="relative">
                           <input
                             type={sharedEmailShowPw ? "text" : "password"}
-                            placeholder="Gmail password"
+                            placeholder="Gmail App Password (16-char)"
                             value={sharedEmailForm.password}
                             onChange={e => setSharedEmailForm(f => ({ ...f, password: e.target.value }))}
                             className="w-full rounded-xl px-3 py-2.5 pr-10 text-sm border outline-none font-mono"

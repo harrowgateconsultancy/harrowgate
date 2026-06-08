@@ -240,15 +240,56 @@ function buildTimeline(submission: Submission, t: (key: string) => string): Time
   ];
 }
 
-function SharedEmailCard({ submission, t }: { submission: Submission; t: (key: string) => string }) {
-  const [showPw, setShowPw] = useState(false);
-  const [copied, setCopied] = useState<"email" | "pw" | null>(null);
+interface EmailSummary { uid: number; subject: string; from: string; date: string; snippet: string; seen: boolean; }
+interface EmailDetail extends EmailSummary { html: string | null; text: string | null; }
 
-  const copy = (text: string, kind: "email" | "pw") => {
-    navigator.clipboard.writeText(text).catch(() => {});
-    setCopied(kind);
-    setTimeout(() => setCopied(null), 2000);
+function InboxCard({ submission }: { submission: Submission }) {
+  const { session } = useSession();
+  const [emails, setEmails] = useState<EmailSummary[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<EmailDetail | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+
+  const authHdr = async () => {
+    const token = await session?.getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
   };
+
+  const fetchInbox = async (refresh = false) => {
+    setLoading(true); setError(null);
+    try {
+      const hdr = await authHdr();
+      const url = `${getApiBase()}/api/student/submissions/${submission.id}/inbox${refresh ? "?refresh=1" : ""}`;
+      const res = await fetch(url, { credentials: "include", headers: hdr });
+      if (!res.ok) throw new Error((await res.json()).error ?? "Failed");
+      setEmails(await res.json());
+    } catch (e: any) { setError(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const openEmail = async (uid: number) => {
+    setLoadingDetail(true); setSelected(null);
+    try {
+      const hdr = await authHdr();
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/inbox/${uid}`, { credentials: "include", headers: hdr });
+      if (!res.ok) throw new Error((await res.json()).error ?? "Failed");
+      const detail: EmailDetail = await res.json();
+      setSelected(detail);
+      setEmails(prev => prev.map(e => e.uid === uid ? { ...e, seen: true } : e));
+    } catch (e: any) { setError((e as any).message); }
+    finally { setLoadingDetail(false); }
+  };
+
+  // Load inbox when section first opens
+  const handleToggle = () => {
+    const next = !open;
+    setOpen(next);
+    if (next && emails.length === 0 && !loading) fetchInbox();
+  };
+
+  const unread = emails.filter(e => !e.seen).length;
 
   if (!submission.sharedEmail) {
     return (
@@ -256,7 +297,7 @@ function SharedEmailCard({ submission, t }: { submission: Submission; t: (key: s
         <div className="px-5 py-4 flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg" style={{ background: "rgba(162,137,89,0.08)" }}>✉️</div>
           <div>
-            <p className="text-sm font-semibold" style={{ color: GOLD }}>Application Email</p>
+            <p className="text-sm font-semibold" style={{ color: _GOLD }}>Application Email</p>
             <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>
               Your dedicated application email is being set up. You will be notified once it is ready.
             </p>
@@ -268,82 +309,132 @@ function SharedEmailCard({ submission, t }: { submission: Submission; t: (key: s
 
   return (
     <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.25)" }}>
-      {/* Header */}
-      <div className="px-5 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
+      {/* ── Header / toggle ── */}
+      <button
+        className="w-full px-5 py-4 flex items-center gap-3 text-left transition-colors hover:bg-white/[0.02]"
+        onClick={handleToggle}
+      >
         <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg" style={{ background: "rgba(162,137,89,0.1)" }}>✉️</div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold" style={{ color: GOLD }}>Your Application Email</p>
-          <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>
-            This Gmail account is shared between you and Harrowgate for university applications in Hong Kong
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold" style={{ color: _GOLD }}>Application Inbox</p>
+            {unread > 0 && (
+              <span className="text-xs px-1.5 py-0.5 rounded-full font-bold" style={{ background: "#a28959", color: "#0b2213" }}>{unread}</span>
+            )}
+          </div>
+          <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.45)" }}>{submission.sharedEmail}</p>
         </div>
-        <a
-          href={`https://mail.google.com`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0 text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all hover:opacity-80 flex items-center gap-1"
-          style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD, background: "rgba(162,137,89,0.08)" }}
-        >
-          Open Gmail ↗
-        </a>
-      </div>
-
-      {/* Credentials */}
-      <div className="px-5 py-5 space-y-4">
-        {/* Email */}
-        <div>
-          <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "rgba(162,137,89,0.5)" }}>Email Address</p>
-          <div className="flex items-center gap-3 rounded-xl px-4 py-3 border" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)" }}>
-            <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0" style={{ color: "rgba(162,137,89,0.5)" }}>
-              <path d="M1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0114.25 14H1.75A1.75 1.75 0 010 12.25v-8.5C0 2.784.784 2 1.75 2zM1.5 5.36v6.89c0 .138.112.25.25.25h12.5a.25.25 0 00.25-.25V5.36L8.38 9.04a.75.75 0 01-.76 0L1.5 5.36zm13-1.63L8 7.46 1.5 3.73v-.48c0-.138.112-.25.25-.25h12.5a.25.25 0 01.25.25v.48z"/>
-            </svg>
-            <span className="flex-1 text-sm font-mono" style={{ color: GOLD }}>{submission.sharedEmail}</span>
+        <div className="flex items-center gap-2 shrink-0">
+          {open && (
             <button
-              onClick={() => copy(submission.sharedEmail!, "email")}
-              className="text-xs px-3 py-1 rounded-full border transition-all hover:opacity-80 shrink-0"
-              style={{ borderColor: copied === "email" ? "rgba(74,222,128,0.4)" : "rgba(162,137,89,0.22)", color: copied === "email" ? "#4ade80" : "rgba(162,137,89,0.55)" }}
+              onClick={e => { e.stopPropagation(); fetchInbox(true); }}
+              disabled={loading}
+              className="text-xs px-2.5 py-1 rounded-lg border transition-all hover:opacity-70 disabled:opacity-40"
+              style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}
             >
-              {copied === "email" ? "✓ Copied" : "Copy"}
+              {loading ? "…" : "↻ Refresh"}
             </button>
-          </div>
+          )}
+          <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 transition-transform" style={{ color: "rgba(162,137,89,0.4)", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>
+            <path d="M4.22 6.22a.75.75 0 011.06 0L8 8.94l2.72-2.72a.75.75 0 111.06 1.06l-3.25 3.25a.75.75 0 01-1.06 0L4.22 7.28a.75.75 0 010-1.06z"/>
+          </svg>
         </div>
+      </button>
 
-        {/* Password */}
-        {submission.sharedEmailPassword && (
-          <div>
-            <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "rgba(162,137,89,0.5)" }}>Password</p>
-            <div className="flex items-center gap-3 rounded-xl px-4 py-3 border" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)" }}>
-              <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0" style={{ color: "rgba(162,137,89,0.5)" }}>
-                <path fillRule="evenodd" d="M8 0a4 4 0 00-4 4v2H3a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1V4a4 4 0 00-4-4zm2 6V4a2 2 0 10-4 0v2h4zm-5 2.5a.5.5 0 01.5-.5h5a.5.5 0 010 1H5.5a.5.5 0 01-.5-.5zm.5 2.5a.5.5 0 000 1h5a.5.5 0 000-1H5.5z" clipRule="evenodd"/>
-              </svg>
-              <span className="flex-1 text-sm font-mono tracking-widest" style={{ color: GOLD }}>
-                {showPw ? submission.sharedEmailPassword : "•".repeat(Math.min(submission.sharedEmailPassword.length, 12))}
-              </span>
-              <button
-                onClick={() => setShowPw(v => !v)}
-                className="text-xs px-3 py-1 rounded-full border transition-all hover:opacity-80 shrink-0"
-                style={{ borderColor: "rgba(162,137,89,0.22)", color: "rgba(162,137,89,0.55)" }}
-              >
-                {showPw ? "Hide" : "Show"}
-              </button>
-              <button
-                onClick={() => copy(submission.sharedEmailPassword!, "pw")}
-                className="text-xs px-3 py-1 rounded-full border transition-all hover:opacity-80 shrink-0"
-                style={{ borderColor: copied === "pw" ? "rgba(74,222,128,0.4)" : "rgba(162,137,89,0.22)", color: copied === "pw" ? "#4ade80" : "rgba(162,137,89,0.55)" }}
-              >
-                {copied === "pw" ? "✓ Copied" : "Copy"}
-              </button>
+      {/* ── Inbox panel ── */}
+      {open && (
+        <div className="border-t" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+          {/* Email detail view */}
+          {selected && (
+            <div className="flex flex-col" style={{ maxHeight: 520 }}>
+              <div className="px-5 py-3 border-b flex items-center gap-3" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+                <button
+                  onClick={() => setSelected(null)}
+                  className="text-xs px-2.5 py-1 rounded-lg border transition-all hover:opacity-70"
+                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}
+                >
+                  ← Back
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate" style={{ color: _GOLD }}>{selected.subject}</p>
+                  <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.45)" }}>{selected.from} · {new Date(selected.date).toLocaleString()}</p>
+                </div>
+              </div>
+              <div className="overflow-y-auto flex-1 p-4">
+                {selected.html ? (
+                  <iframe
+                    srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;font-size:14px;color:#ddd;background:transparent;margin:0;padding:0;word-wrap:break-word;}a{color:#a28959;}img{max-width:100%;}</style></head><body>${selected.html}</body></html>`}
+                    sandbox="allow-same-origin"
+                    className="w-full rounded-xl border"
+                    style={{ border: "1px solid rgba(162,137,89,0.1)", minHeight: 300, background: "rgba(0,0,0,0.15)" }}
+                    onLoad={e => {
+                      const iframe = e.currentTarget;
+                      const h = iframe.contentDocument?.body?.scrollHeight;
+                      if (h) iframe.style.height = `${h + 32}px`;
+                    }}
+                  />
+                ) : (
+                  <pre className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: "rgba(162,137,89,0.8)", fontFamily: "inherit" }}>
+                    {selected.text ?? "(No content)"}
+                  </pre>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Notice */}
-        <div className="rounded-xl px-4 py-3 border" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.1)" }}>
-          <p className="text-xs leading-relaxed" style={{ color: "rgba(162,137,89,0.45)" }}>
-            Keep these credentials safe. This email will be used for all communications with Hong Kong universities on your behalf. Both you and Harrowgate have full access to this inbox.
-          </p>
+          {/* Email list */}
+          {!selected && (
+            <div style={{ maxHeight: 420, overflowY: "auto" }}>
+              {loading && (
+                <div className="px-5 py-8 flex items-center justify-center gap-2" style={{ color: "rgba(162,137,89,0.4)" }}>
+                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity=".25"/><path d="M12 2a10 10 0 0110 10" strokeLinecap="round"/></svg>
+                  <span className="text-sm">Loading inbox…</span>
+                </div>
+              )}
+              {error && !loading && (
+                <div className="px-5 py-6 text-center">
+                  <p className="text-sm mb-3" style={{ color: "#f87171" }}>{error}</p>
+                  <button onClick={() => fetchInbox(true)} className="text-xs px-3 py-1.5 rounded-lg border" style={{ borderColor: "rgba(162,137,89,0.25)", color: _GOLD }}>Try again</button>
+                </div>
+              )}
+              {!loading && !error && emails.length === 0 && (
+                <div className="px-5 py-8 text-center" style={{ color: "rgba(162,137,89,0.35)" }}>
+                  <p className="text-sm">No emails yet</p>
+                </div>
+              )}
+              {!loading && emails.map(email => (
+                <button
+                  key={email.uid}
+                  onClick={() => openEmail(email.uid)}
+                  disabled={loadingDetail}
+                  className="w-full text-left px-5 py-3.5 border-b transition-colors hover:bg-white/[0.03] disabled:opacity-50"
+                  style={{ borderColor: "rgba(162,137,89,0.08)" }}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ background: email.seen ? "transparent" : "#a28959", border: email.seen ? "1.5px solid rgba(162,137,89,0.25)" : "none" }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <p className="text-sm truncate" style={{ color: email.seen ? "rgba(162,137,89,0.65)" : _GOLD, fontWeight: email.seen ? 400 : 600 }}>
+                          {email.from.split(" <")[0]}
+                        </p>
+                        <span className="text-xs shrink-0" style={{ color: "rgba(162,137,89,0.35)" }}>
+                          {new Date(email.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                        </span>
+                      </div>
+                      <p className="text-xs mt-0.5 truncate" style={{ color: email.seen ? "rgba(162,137,89,0.5)" : "rgba(162,137,89,0.8)", fontWeight: email.seen ? 400 : 500 }}>
+                        {email.subject}
+                      </p>
+                      {email.snippet && (
+                        <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.35)" }}>{email.snippet}</p>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -1343,7 +1434,7 @@ export default function Portal() {
 
             {/* ── SHARED APPLICATION EMAIL ── */}
             {submission && ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(submission.status) && (
-              <SharedEmailCard submission={submission} t={t} />
+              <InboxCard submission={submission} />
             )}
 
             {/* ── AVAILABLE COURSES (visible after first payment confirmed) ── */}
