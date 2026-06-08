@@ -141,7 +141,7 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
 
 type OutboxEmail = { id: number; toAddress: string; subject: string; body: string; status: string; createdAt: string; sentAt: string | null; };
 
-function OutboxPanel({ submissionId }: { submissionId: number }) {
+function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Record<string, string>; GOLD: string }) {
   const queryClient = useQueryClient();
   const { data: items = [], isLoading } = useQuery<OutboxEmail[]>({
     queryKey: ["outbox", submissionId],
@@ -1334,7 +1334,7 @@ export default function Submissions() {
                           onDownload={() => window.open(downloadUrl(doc), "_blank")}
                           onDelete={() => { if (confirm(`Delete "${doc.fileName}"?`)) deleteDoc.mutate({ submissionId: selected.id, docId: doc.id }); }}
                           isActive={previewDoc?.id === doc.id}
-                          tagColor={m.tagColor} tagTextColor={m.tagText} tag={m.tag} />
+                          tagColor={m.tagColor} tagTextColor={m.tagText} tag={m.tag} C={C} GOLD={GOLD} />
                       );
                     })}
                   </div>
@@ -1539,7 +1539,7 @@ export default function Submissions() {
 
                 {/* Outbox: student emails awaiting admin approval */}
                 {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
-                  <OutboxPanel submissionId={selected.id} />
+                  <OutboxPanel submissionId={selected.id} C={C} GOLD={GOLD} />
                 )}
 
                 {/* Mock Interview — Schedule (acknowledged only) */}
@@ -1858,7 +1858,7 @@ export default function Submissions() {
                       </button>
                       {id995aOpen && (
                         <div className="border-t" style={{ borderColor: C.border }}>
-                          <Id995aPanel submissionId={selected.id} apiBase={getApiBase()} />
+                          <Id995aPanel submissionId={selected.id} apiBase={getApiBase()} C={C} GOLD={GOLD} />
                         </div>
                       )}
                     </div>
@@ -2471,7 +2471,7 @@ const FORM_FIELDS: { key: string; label: string; section: string; type?: "select
   { section: "Financial Resources", key: "totalCost",         label: "Total Estimated Cost (HK$)" },
 ];
 
-function Id995aPanel({ submissionId, apiBase }: { submissionId: number; apiBase: string }) {
+function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number; apiBase: string; C: Record<string, string>; GOLD: string }) {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -2599,9 +2599,10 @@ function Id995aPanel({ submissionId, apiBase }: { submissionId: number; apiBase:
   );
 }
 
-function DocRow({ doc, label, onPreview, onDownload, onDelete, isActive, tagColor, tagTextColor, tag }: {
+function DocRow({ doc, label, onPreview, onDownload, onDelete, isActive, tagColor, tagTextColor, tag, C, GOLD }: {
   doc: Document; label: string; onPreview: () => void; onDownload: () => void; onDelete: () => void;
   isActive: boolean; tagColor: string; tagTextColor: string; tag: string;
+  C: Record<string, string>; GOLD: string;
 }) {
   return (
     <div className="rounded-xl border transition-all" style={{ background: isActive ? C.muted : C.subtle, borderColor: isActive ? C.borderMed : C.border }}>
