@@ -53,7 +53,7 @@ export default function ApplicationNew() {
       onSuccess: (app) => {
         queryClient.invalidateQueries({ queryKey: getListApplicationsQueryKey() });
         toast({ title: "Application created", description: "You can now upload documents." });
-        setLocation(`/applications/${app.id}`);
+        setLocation(`/admin/applications/${app.id}`);
       },
       onError: () => {
         toast({ title: "Error", description: "Failed to create application.", variant: "destructive" });
@@ -63,7 +63,7 @@ export default function ApplicationNew() {
 
   return (
     <div className="p-6 lg:p-8 max-w-2xl mx-auto">
-      <Link href="/applications" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6" data-testid="link-back-applications">
+      <Link href="/admin/applications" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6" data-testid="link-back-applications">
         <ArrowLeft size={14} /> Back to Applications
       </Link>
 

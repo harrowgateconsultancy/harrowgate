@@ -21,7 +21,7 @@ export default function Clients() {
           <p className="text-muted-foreground text-sm mt-1">{clients?.length ?? 0} registered clients</p>
         </div>
         <Link
-          href="/clients/new"
+          href="/admin/clients/new"
           className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded text-sm font-medium hover:opacity-90 transition-opacity"
           data-testid="button-add-client"
         >
@@ -75,7 +75,7 @@ export default function Clients() {
                   data-testid={`row-client-${client.id}`}
                 >
                   <td className="px-5 py-3.5">
-                    <Link href={`/clients/${client.id}`} className="font-medium text-foreground hover:text-primary">
+                    <Link href={`/admin/clients/${client.id}`} className="font-medium text-foreground hover:text-primary">
                       {client.name}
                     </Link>
                     <div className="text-xs text-muted-foreground sm:hidden">{client.email}</div>

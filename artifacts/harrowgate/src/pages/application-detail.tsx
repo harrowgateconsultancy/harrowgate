@@ -371,7 +371,7 @@ export default function ApplicationDetail() {
   };
 
   if (isLoading) return <div className="p-8 text-center"><div className="h-6 w-40 bg-muted animate-pulse rounded mx-auto" /></div>;
-  if (!application) return <div className="p-8 text-center text-muted-foreground">Application not found. <Link href="/applications" className="text-primary">Go back</Link></div>;
+  if (!application) return <div className="p-8 text-center text-muted-foreground">Application not found. <Link href="/admin/applications" className="text-primary">Go back</Link></div>;
 
   const statusInfo = STATUS_LABELS[application.status] ?? { label: application.status, color: "bg-muted text-muted-foreground" };
   const availableTransitions = STATUS_TRANSITIONS[application.status] ?? [];
@@ -388,7 +388,7 @@ export default function ApplicationDetail() {
       {/* Header */}
       <div className="flex items-start justify-between mb-5">
         <div>
-          <Link href="/applications" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-2">
+          <Link href="/admin/applications" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-2">
             <ArrowLeft size={14} /> Applications
           </Link>
           <h1 className="text-xl font-bold text-foreground">

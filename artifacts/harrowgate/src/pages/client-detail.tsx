@@ -88,7 +88,7 @@ export default function ClientDetail() {
   if (!client) {
     return (
       <div className="p-8 text-center text-muted-foreground">
-        Client not found. <Link href="/clients" className="text-primary hover:underline">Go back</Link>
+        Client not found. <Link href="/admin/clients" className="text-primary hover:underline">Go back</Link>
       </div>
     );
   }
@@ -104,7 +104,7 @@ export default function ClientDetail() {
 
   return (
     <div className="p-6 lg:p-8 max-w-4xl mx-auto">
-      <Link href="/clients" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6" data-testid="link-back-clients">
+      <Link href="/admin/clients" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6" data-testid="link-back-clients">
         <ArrowLeft size={14} /> Back to Clients
       </Link>
 
@@ -118,7 +118,7 @@ export default function ClientDetail() {
           </p>
         </div>
         <Link
-          href={`/applications/new?clientId=${clientId}`}
+          href={`/admin/applications/new?clientId=${clientId}`}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded text-sm font-medium hover:opacity-90"
           data-testid="button-new-application"
         >
@@ -154,7 +154,7 @@ export default function ClientDetail() {
         ) : !applications?.length ? (
           <div className="py-12 text-center text-muted-foreground text-sm">
             No applications yet.{" "}
-            <Link href={`/applications/new?clientId=${clientId}`} className="text-primary hover:underline">
+            <Link href={`/admin/applications/new?clientId=${clientId}`} className="text-primary hover:underline">
               Create one
             </Link>
           </div>
@@ -163,7 +163,7 @@ export default function ClientDetail() {
             {applications.map(app => (
               <Link
                 key={app.id}
-                href={`/applications/${app.id}`}
+                href={`/admin/applications/${app.id}`}
                 className="flex items-center justify-between px-5 py-3.5 hover:bg-accent transition-colors"
                 data-testid={`row-application-${app.id}`}
               >
@@ -232,7 +232,7 @@ export default function ClientDetail() {
                       <ExternalLink size={13} />
                     </a>
                     {app && (
-                      <Link href={`/applications/${app.id}`}
+                      <Link href={`/admin/applications/${app.id}`}
                         className="text-xs text-primary hover:underline hidden sm:block">
                         View App
                       </Link>

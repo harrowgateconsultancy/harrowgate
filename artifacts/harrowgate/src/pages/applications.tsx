@@ -44,7 +44,7 @@ export default function Applications() {
           <p className="text-muted-foreground text-sm mt-1">{applications?.length ?? 0} applications</p>
         </div>
         <Link
-          href="/applications/new"
+          href="/admin/applications/new"
           className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded text-sm font-medium hover:opacity-90"
           data-testid="button-new-application"
         >
@@ -97,7 +97,7 @@ export default function Applications() {
                   key={app.id}
                   className="hover:bg-accent transition-colors cursor-pointer"
                   data-testid={`row-application-${app.id}`}
-                  onClick={() => navigate(`/applications/${app.id}`)}
+                  onClick={() => navigate(`/admin/applications/${app.id}`)}
                 >
                   <td className="px-5 py-3.5 font-medium text-foreground">
                     {app.clientName ?? "Unknown"}

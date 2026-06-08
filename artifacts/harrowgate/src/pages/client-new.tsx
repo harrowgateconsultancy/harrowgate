@@ -39,7 +39,7 @@ export default function ClientNew() {
       onSuccess: (client) => {
         queryClient.invalidateQueries({ queryKey: getListClientsQueryKey() });
         toast({ title: "Client created", description: `${client.name} has been added.` });
-        setLocation(`/clients/${client.id}`);
+        setLocation(`/admin/clients/${client.id}`);
       },
       onError: () => {
         toast({ title: "Error", description: "Failed to create client.", variant: "destructive" });
@@ -49,7 +49,7 @@ export default function ClientNew() {
 
   return (
     <div className="p-6 lg:p-8 max-w-2xl mx-auto">
-      <Link href="/clients" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6" data-testid="link-back-clients">
+      <Link href="/admin/clients" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6" data-testid="link-back-clients">
         <ArrowLeft size={14} /> Back to Clients
       </Link>
 
