@@ -710,6 +710,7 @@ router.get("/student/submissions/:id/inbox", async (req, res) => {
     const emails = await listInboxEmails(submission.sharedEmail, submission.sharedEmailPassword, 50, refresh);
     res.json(emails);
   } catch (err: any) {
+    console.error("[inbox] error:", err?.code, err?.message);
     res.status(500).json({ error: err?.message ?? "Failed to fetch inbox" });
   }
 });

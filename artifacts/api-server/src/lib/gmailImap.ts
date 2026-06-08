@@ -36,11 +36,25 @@ function makeClient(email: string, appPassword: string) {
 function friendlyError(err: any): string {
   const code: string = err?.code ?? "";
   const msg: string = (err?.message ?? "").toLowerCase();
-  if (code === "ETIMEOUT" || msg.includes("timeout") || msg.includes("timed out")) {
-    return "Could not connect to Gmail — IMAP may be blocked in this environment. The inbox will work on the live site. Make sure IMAP is enabled in the Gmail account settings.";
+  if (
+    code === "ETIMEOUT" ||
+    msg.includes("timeout") ||
+    msg.includes("timed out") ||
+    msg.includes("command failed") ||
+    msg.includes("socket") ||
+    code === "ECONNRESET"
+  ) {
+    return "Could not connect to Gmail — IMAP (port 993) may be blocked in this environment. The inbox works on the live deployed site. Make sure IMAP is enabled in Gmail settings and the password is a Google App Password.";
   }
-  if (code === "EAUTH" || msg.includes("authentication") || msg.includes("credentials") || msg.includes("invalid credentials") || msg.includes("app-specific password")) {
-    return "Gmail authentication failed. Please ensure the password is a valid Google App Password (not the regular Gmail password).";
+  if (
+    code === "EAUTH" ||
+    msg.includes("authentication") ||
+    msg.includes("credentials") ||
+    msg.includes("invalid credentials") ||
+    msg.includes("app-specific password") ||
+    msg.includes("username and password")
+  ) {
+    return "Gmail authentication failed — please ensure the password set by admin is a valid Google App Password (not the regular Gmail password).";
   }
   if (code === "ENOTFOUND" || code === "ECONNREFUSED") {
     return "Could not reach Gmail. Please check your network and try again.";
