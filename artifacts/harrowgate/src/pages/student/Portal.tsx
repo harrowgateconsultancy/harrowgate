@@ -75,6 +75,9 @@ export type Submission = {
   additionalDocsRequested?: boolean | null; additionalDocsRequestNote?: string | null;
   immigrationRefNumber?: string | null;
   termsAcceptedAt?: string | null;
+  preferredLevel?: string | null;
+  preferredCourse?: string | null;
+  preferredInstitution?: string | null;
   deletedAt?: string | null;
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };

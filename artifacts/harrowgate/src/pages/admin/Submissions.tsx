@@ -25,6 +25,9 @@ type Submission = {
   uniInterviewLink?: string | null; uniInterviewDateTime?: string | null; uniInterviewPlatform?: string | null;
   additionalDocsRequested?: boolean | null; additionalDocsRequestNote?: string | null;
   immigrationRefNumber?: string | null;
+  preferredLevel?: string | null;
+  preferredCourse?: string | null;
+  preferredInstitution?: string | null;
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -1047,6 +1050,19 @@ export default function Submissions() {
                       </span>
                     )}
                   </p>
+                  {(selected.preferredCourse || selected.preferredLevel) && (
+                    <div className="mt-2 flex items-start gap-2">
+                      <span className="text-xs px-2 py-0.5 rounded-full font-semibold shrink-0" style={{ background: "rgba(162,137,89,0.12)", color: GOLD }}>
+                        {selected.preferredLevel === "masters" ? "Master's" : selected.preferredLevel === "bachelors" ? "Bachelor's" : selected.preferredLevel === "associate" ? "Associate" : selected.preferredLevel}
+                      </span>
+                      {selected.preferredCourse && (
+                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.65)" }}>
+                          {selected.preferredCourse}
+                          {selected.preferredInstitution && <span style={{ color: "rgba(162,137,89,0.4)" }}> · {selected.preferredInstitution}</span>}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">

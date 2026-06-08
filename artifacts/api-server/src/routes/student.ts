@@ -52,17 +52,17 @@ router.get("/student/submissions/me", requireStudentAuth, async (req: any, res) 
 
 router.post("/student/submissions", requireStudentAuth, async (req: any, res) => {
   try {
-    const { name, dateOfBirth, passportNumber, email } = req.body;
+    const { name, dateOfBirth, passportNumber, email, preferredLevel, preferredCourse, preferredInstitution } = req.body;
     if (!name || !dateOfBirth || !passportNumber) return res.status(400).json({ error: "Name, date of birth, and passport number are required" });
     const existing = await db.select().from(studentSubmissionsTable)
       .where(eq(studentSubmissionsTable.clerkUserId, req.clerkUserId)).limit(1);
     if (existing.length > 0) {
-      const [updated] = await db.update(studentSubmissionsTable).set({ name, dateOfBirth, passportNumber, email })
+      const [updated] = await db.update(studentSubmissionsTable).set({ name, dateOfBirth, passportNumber, email, preferredLevel, preferredCourse, preferredInstitution })
         .where(eq(studentSubmissionsTable.clerkUserId, req.clerkUserId)).returning();
       return res.json(updated);
     }
     const [created] = await db.insert(studentSubmissionsTable)
-      .values({ clerkUserId: req.clerkUserId, name, dateOfBirth, passportNumber, email }).returning();
+      .values({ clerkUserId: req.clerkUserId, name, dateOfBirth, passportNumber, email, preferredLevel, preferredCourse, preferredInstitution }).returning();
     sendNewApplicationEmail({ name, email: email || null, passportNumber, dateOfBirth, docCount: 0 }).catch(() => {});
     // WhatsApp notification via CallMeBot (set CALLMEBOT_API_KEY secret to enable)
     const waKey = process.env.CALLMEBOT_API_KEY;
