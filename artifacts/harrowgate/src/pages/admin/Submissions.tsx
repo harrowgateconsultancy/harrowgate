@@ -107,7 +107,7 @@ function calcAge(dob: string): number | null {
   return age;
 }
 
-function getDocMeta(dt: string): { label: string; tagColor: string; tagText: string; tag: string } {
+function getDocMeta(dt: string, C: Record<string, string>, GOLD: string): { label: string; tagColor: string; tagText: string; tag: string } {
   if (dt === "payment_receipt")        return { label: "Payment Receipt",            tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Receipt"       };
   if (dt === "second_payment_receipt") return { label: "2nd Payment Receipt",        tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "2nd Receipt"   };
   if (dt === "additional_doc")         return { label: "Additional Document",        tagColor: "rgba(251,146,60,0.18)",  tagText: "#fb923c", tag: "Additional"    };
@@ -1327,7 +1327,7 @@ export default function Submissions() {
                   )}
                   <div className="space-y-2">
                     {selected.documents.map(doc => {
-                      const m = getDocMeta(doc.documentType);
+                      const m = getDocMeta(doc.documentType, C, GOLD);
                       return (
                         <DocRow key={doc.id} doc={doc} label={m.label}
                           onPreview={() => setPreviewDoc(previewDoc?.id === doc.id ? null : doc)}
