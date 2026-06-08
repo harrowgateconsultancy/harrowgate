@@ -781,43 +781,48 @@ export default function Submissions() {
   return (
     <div className="min-h-screen" style={{ background: BG }}>
       <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.9)", position: "sticky", top: 0, zIndex: 50 }}>
-        <div className="flex items-center justify-between px-6 py-3.5 max-w-6xl mx-auto">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 max-w-6xl mx-auto">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button onClick={() => setLocation("/admin")}
               className="inline-flex items-center gap-1 text-xs transition-opacity hover:opacity-70"
               style={{ color: "rgba(162,137,89,0.45)" }}>
               <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
                 <path fillRule="evenodd" d="M9.78 12.78a.75.75 0 01-1.06 0L4.47 8.53a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L6.06 8l3.72 3.72a.75.75 0 010 1.06z" clipRule="evenodd" />
               </svg>
-              Back
+              <span className="hidden xs:inline">Back</span>
             </button>
             <div className="w-px h-4" style={{ background: "rgba(162,137,89,0.15)" }} />
-            <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-11 object-contain" />
-            <span className="text-xs font-semibold tracking-[0.2em] uppercase px-2.5 py-1 rounded-full"
+            <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-8 sm:h-11 object-contain" />
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase px-2 sm:px-2.5 py-1 rounded-full"
               style={{ background: "rgba(162,137,89,0.1)", color: GOLD }}>
               Admin
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {pendingCount > 0 && (
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
                 {pendingCount} pending
               </span>
             )}
-            <a href={`${BASE}/admin`} className="text-xs transition-opacity hover:opacity-70" style={{ color: "rgba(162,137,89,0.4)" }}>
+            <a href={`${BASE}/admin`} className="text-xs transition-opacity hover:opacity-70 hidden sm:inline" style={{ color: "rgba(162,137,89,0.4)" }}>
               Portal →
             </a>
+            <button onClick={() => { localStorage.removeItem("admin_token"); window.location.href = "/admin/login"; }}
+              className="sm:hidden text-xs px-3 py-1.5 rounded-full border transition-all hover:opacity-80"
+              style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}>
+              Out
+            </button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-6 py-10">
-        <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-3xl font-bold mb-1" style={{ color: GOLD }}>Student Submissions</h1>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        <div className="mb-6 sm:mb-8">
+          <div className="mb-4">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: GOLD }}>Student Submissions</h1>
             <p className="text-sm" style={{ color: "rgba(162,137,89,0.55)" }}>{submissions.length} total · {pendingCount} requiring action</p>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {pendingCount > 0 && (
               <div className="px-4 py-2 rounded-full text-sm font-semibold" style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
                 ⚡ {pendingCount} need{pendingCount !== 1 ? "" : "s"} your attention
@@ -1036,10 +1041,10 @@ export default function Submissions() {
         {/* ── NORMAL LIST (hidden when trash is open) ── */}
         {!showTrash && (<>
 
-        <div className="flex gap-2 mb-6 flex-wrap">
+        <div className="flex gap-2 mb-5 sm:mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
           {filterKeys.map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className="px-4 py-1.5 rounded-full text-xs font-semibold border transition-all"
+              className="px-4 py-1.5 rounded-full text-xs font-semibold border transition-all shrink-0"
               style={filter === f ? { background: GOLD, color: BG, borderColor: GOLD } : { background: "transparent", color: "rgba(162,137,89,0.55)", borderColor: "rgba(162,137,89,0.18)" }}>
               {f === "all" ? "All" : (statusConfig[f]?.label || f)}
               {f !== "all" && <span className="ml-1.5 opacity-50">{submissions.filter(s => s.status === f).length}</span>}
@@ -1182,14 +1187,14 @@ export default function Submissions() {
 
       {/* Detail Modal */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.8)" }}
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ background: "rgba(0,0,0,0.8)" }}
           onClick={e => { if (e.target === e.currentTarget) { setSelected(null); setPreviewDoc(null); } }}>
-          <div className="w-full max-w-3xl rounded-3xl border flex flex-col" style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.18)", maxHeight: "92vh" }}>
+          <div className="w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl border flex flex-col" style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.18)", maxHeight: "94dvh" }}>
 
             {/* Modal top accent */}
             <div className="h-0.5 rounded-t-3xl" style={{ background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
 
-            <div className="px-6 py-4 border-b flex items-start justify-between gap-4 shrink-0" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+            <div className="px-4 sm:px-6 py-4 border-b flex items-start justify-between gap-4 shrink-0" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
               <div className="flex items-start gap-3 min-w-0">
                 {/* Avatar */}
                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-base font-bold mt-0.5"
@@ -1282,7 +1287,7 @@ export default function Submissions() {
             <div className="overflow-y-auto flex-1">
               {/* Inline preview */}
               {previewDoc && (
-                <div className="mx-6 mt-5 rounded-2xl border overflow-hidden" style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(0,0,0,0.3)" }}>
+                <div className="mx-3 sm:mx-6 mt-4 sm:mt-5 rounded-2xl border overflow-hidden" style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(0,0,0,0.3)" }}>
                   <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                     <span className="text-sm font-medium truncate max-w-xs" style={{ color: GOLD }}>{previewDoc.fileName}</span>
                     <div className="flex items-center gap-2 shrink-0 ml-3">
@@ -1313,7 +1318,7 @@ export default function Submissions() {
                 </div>
               )}
 
-              <div className="px-6 py-5 space-y-6">
+              <div className="px-4 sm:px-6 py-4 sm:py-5 space-y-6">
                 {/* Documents */}
                 <div>
                   <p className="text-sm font-semibold mb-3" style={{ color: GOLD }}>Documents ({selected.documents.length})</p>

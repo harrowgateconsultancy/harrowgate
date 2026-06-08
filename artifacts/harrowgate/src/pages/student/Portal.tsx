@@ -361,8 +361,8 @@ function InboxCard({ submission }: { submission: Submission }) {
     <>
     {/* ── Compose modal ── */}
     {composeOpen && (
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
-        <div className="w-full max-w-lg rounded-2xl border overflow-hidden" style={{ background: "#0d1a3a", borderColor: "rgba(162,137,89,0.3)" }}>
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+        <div className="w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl border overflow-hidden" style={{ background: "#0d1a3a", borderColor: "rgba(162,137,89,0.3)" }}>
           <div className="px-5 py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
             <p className="text-sm font-semibold" style={{ color: _GOLD }}>✉️ New Email</p>
             <button onClick={() => setComposeOpen(false)} className="text-lg leading-none" style={{ color: "rgba(162,137,89,0.4)" }}>✕</button>
@@ -886,7 +886,7 @@ export default function Portal() {
       {/* Screen share banner */}
       {isBeingWatched && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 9998, background: "rgba(13,26,58,0.97)", borderBottom: "1px solid rgba(162,137,89,0.3)", backdropFilter: "blur(8px)" }}>
-          <div className="flex items-center justify-between px-6 py-2.5 max-w-5xl mx-auto">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 max-w-5xl mx-auto">
             <div className="flex items-center gap-2.5">
               <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#f87171" }} />
               <span className="text-xs sm:text-sm" style={{ color: "rgba(162,137,89,0.85)" }}>
@@ -909,8 +909,8 @@ export default function Portal() {
 
       {/* Nav */}
       <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.9)", position: "sticky", top: isBeingWatched ? 37 : 0, zIndex: 50 }}>
-        <div className="flex items-center justify-between px-6 py-3.5 max-w-5xl mx-auto">
-          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-20 object-contain" />
+        <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3.5 max-w-5xl mx-auto">
+          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-12 sm:h-20 object-contain" />
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border" style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(162,137,89,0.05)" }}>
               <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
@@ -952,7 +952,7 @@ export default function Portal() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-6 py-10">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {submission === null && <ApplyForm user={user} onSubmitted={fetchSubmission} />}
 
         {submission && (
@@ -968,15 +968,15 @@ export default function Portal() {
             )}
 
             {/* Status Banner */}
-            <div className="mb-8 rounded-2xl overflow-hidden border" style={{ background: "rgba(0,0,0,0.3)", borderColor: "rgba(162,137,89,0.14)" }}>
+            <div className="mb-6 sm:mb-8 rounded-2xl overflow-hidden border" style={{ background: "rgba(0,0,0,0.3)", borderColor: "rgba(162,137,89,0.14)" }}>
               <div className="h-0.5 w-full" style={{ background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
-              <div className="p-6">
-                <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="p-4 sm:p-6">
+                <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div>
                     <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-2" style={{ color: "rgba(162,137,89,0.4)" }}>
                       {t("portal.title")}
                     </p>
-                    <h2 className="text-2xl font-bold mb-1" style={{ color: GOLD }}>
+                    <h2 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: GOLD }}>
                       {t("portal.welcomeBack")}, {submission.name.split(" ")[0]}.
                     </h2>
                     <p className="text-sm" style={{ color: "rgba(162,137,89,0.45)" }}>
