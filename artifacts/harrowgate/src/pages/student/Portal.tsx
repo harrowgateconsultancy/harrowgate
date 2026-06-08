@@ -78,6 +78,8 @@ export type Submission = {
   preferredLevel?: string | null;
   preferredCourse?: string | null;
   preferredInstitution?: string | null;
+  sharedEmail?: string | null;
+  sharedEmailPassword?: string | null;
   deletedAt?: string | null;
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };
@@ -235,6 +237,114 @@ function buildTimeline(submission: Submission, t: (key: string) => string): Time
       current: !!submission.immigrationRefNumber && !eVisaDoc,
     },
   ];
+}
+
+function SharedEmailCard({ submission, t }: { submission: Submission; t: (key: string) => string }) {
+  const [showPw, setShowPw] = useState(false);
+  const [copied, setCopied] = useState<"email" | "pw" | null>(null);
+
+  const copy = (text: string, kind: "email" | "pw") => {
+    navigator.clipboard.writeText(text).catch(() => {});
+    setCopied(kind);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  if (!submission.sharedEmail) {
+    return (
+      <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.15)" }}>
+        <div className="px-5 py-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg" style={{ background: "rgba(162,137,89,0.08)" }}>✉️</div>
+          <div>
+            <p className="text-sm font-semibold" style={{ color: GOLD }}>Application Email</p>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>
+              Your dedicated application email is being set up. You will be notified once it is ready.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.25)" }}>
+      {/* Header */}
+      <div className="px-5 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg" style={{ background: "rgba(162,137,89,0.1)" }}>✉️</div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold" style={{ color: GOLD }}>Your Application Email</p>
+          <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>
+            This Gmail account is shared between you and Harrowgate for university applications in Hong Kong
+          </p>
+        </div>
+        <a
+          href={`https://mail.google.com`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all hover:opacity-80 flex items-center gap-1"
+          style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD, background: "rgba(162,137,89,0.08)" }}
+        >
+          Open Gmail ↗
+        </a>
+      </div>
+
+      {/* Credentials */}
+      <div className="px-5 py-5 space-y-4">
+        {/* Email */}
+        <div>
+          <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "rgba(162,137,89,0.5)" }}>Email Address</p>
+          <div className="flex items-center gap-3 rounded-xl px-4 py-3 border" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)" }}>
+            <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0" style={{ color: "rgba(162,137,89,0.5)" }}>
+              <path d="M1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0114.25 14H1.75A1.75 1.75 0 010 12.25v-8.5C0 2.784.784 2 1.75 2zM1.5 5.36v6.89c0 .138.112.25.25.25h12.5a.25.25 0 00.25-.25V5.36L8.38 9.04a.75.75 0 01-.76 0L1.5 5.36zm13-1.63L8 7.46 1.5 3.73v-.48c0-.138.112-.25.25-.25h12.5a.25.25 0 01.25.25v.48z"/>
+            </svg>
+            <span className="flex-1 text-sm font-mono" style={{ color: GOLD }}>{submission.sharedEmail}</span>
+            <button
+              onClick={() => copy(submission.sharedEmail!, "email")}
+              className="text-xs px-3 py-1 rounded-full border transition-all hover:opacity-80 shrink-0"
+              style={{ borderColor: copied === "email" ? "rgba(74,222,128,0.4)" : "rgba(162,137,89,0.22)", color: copied === "email" ? "#4ade80" : "rgba(162,137,89,0.55)" }}
+            >
+              {copied === "email" ? "✓ Copied" : "Copy"}
+            </button>
+          </div>
+        </div>
+
+        {/* Password */}
+        {submission.sharedEmailPassword && (
+          <div>
+            <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "rgba(162,137,89,0.5)" }}>Password</p>
+            <div className="flex items-center gap-3 rounded-xl px-4 py-3 border" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)" }}>
+              <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0" style={{ color: "rgba(162,137,89,0.5)" }}>
+                <path fillRule="evenodd" d="M8 0a4 4 0 00-4 4v2H3a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1V4a4 4 0 00-4-4zm2 6V4a2 2 0 10-4 0v2h4zm-5 2.5a.5.5 0 01.5-.5h5a.5.5 0 010 1H5.5a.5.5 0 01-.5-.5zm.5 2.5a.5.5 0 000 1h5a.5.5 0 000-1H5.5z" clipRule="evenodd"/>
+              </svg>
+              <span className="flex-1 text-sm font-mono tracking-widest" style={{ color: GOLD }}>
+                {showPw ? submission.sharedEmailPassword : "•".repeat(Math.min(submission.sharedEmailPassword.length, 12))}
+              </span>
+              <button
+                onClick={() => setShowPw(v => !v)}
+                className="text-xs px-3 py-1 rounded-full border transition-all hover:opacity-80 shrink-0"
+                style={{ borderColor: "rgba(162,137,89,0.22)", color: "rgba(162,137,89,0.55)" }}
+              >
+                {showPw ? "Hide" : "Show"}
+              </button>
+              <button
+                onClick={() => copy(submission.sharedEmailPassword!, "pw")}
+                className="text-xs px-3 py-1 rounded-full border transition-all hover:opacity-80 shrink-0"
+                style={{ borderColor: copied === "pw" ? "rgba(74,222,128,0.4)" : "rgba(162,137,89,0.22)", color: copied === "pw" ? "#4ade80" : "rgba(162,137,89,0.55)" }}
+              >
+                {copied === "pw" ? "✓ Copied" : "Copy"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Notice */}
+        <div className="rounded-xl px-4 py-3 border" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.1)" }}>
+          <p className="text-xs leading-relaxed" style={{ color: "rgba(162,137,89,0.45)" }}>
+            Keep these credentials safe. This email will be used for all communications with Hong Kong universities on your behalf. Both you and Harrowgate have full access to this inbox.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 async function uploadToStorage(file: File): Promise<{ url: string }> {
@@ -1156,6 +1266,11 @@ export default function Portal() {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* ── SHARED APPLICATION EMAIL ── */}
+            {submission && ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(submission.status) && (
+              <SharedEmailCard submission={submission} t={t} />
             )}
 
             {/* ── AVAILABLE COURSES (visible after first payment confirmed) ── */}

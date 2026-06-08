@@ -24,6 +24,8 @@ export const studentSubmissionsTable = pgTable("student_submissions", {
   preferredLevel: text("preferred_level"),
   preferredCourse: text("preferred_course"),
   preferredInstitution: text("preferred_institution"),
+  sharedEmail: text("shared_email"),
+  sharedEmailPassword: text("shared_email_password"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),

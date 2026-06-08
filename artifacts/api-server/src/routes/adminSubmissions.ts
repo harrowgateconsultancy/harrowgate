@@ -418,6 +418,24 @@ router.post("/admin/student-submissions/:id/upload-evisa", async (req: any, res)
   } catch { res.status(500).json({ error: "Failed to upload e-visa" }); }
 });
 
+// Admin sets shared application email + password
+router.patch("/admin/student-submissions/:id/shared-email", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { sharedEmail, sharedEmailPassword } = req.body;
+    const [updated] = await db
+      .update(studentSubmissionsTable)
+      .set({
+        sharedEmail: sharedEmail || null,
+        sharedEmailPassword: sharedEmailPassword || null,
+      })
+      .where(eq(studentSubmissionsTable.id, id))
+      .returning();
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to update shared email" }); }
+});
+
 // Admin sets immigration reference number
 router.patch("/admin/student-submissions/:id/immigration-ref", async (req, res) => {
   try {

@@ -28,6 +28,8 @@ type Submission = {
   preferredLevel?: string | null;
   preferredCourse?: string | null;
   preferredInstitution?: string | null;
+  sharedEmail?: string | null;
+  sharedEmailPassword?: string | null;
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -203,6 +205,30 @@ export default function Submissions() {
   const [permDeleting, setPermDeleting] = useState(false);
   const [coursesLevel, setCoursesLevel] = useState<DegreeLevel>("masters");
   const [coursesSearch, setCoursesSearch] = useState("");
+  const [sharedEmailForm, setSharedEmailForm] = useState({ email: "", password: "" });
+  const [sharedEmailShowPw, setSharedEmailShowPw] = useState(false);
+  const [savingSharedEmail, setSavingSharedEmail] = useState(false);
+  const [sharedEmailSaved, setSharedEmailSaved] = useState(false);
+
+  const handleSaveSharedEmail = async () => {
+    if (!selected) return;
+    setSavingSharedEmail(true);
+    setSharedEmailSaved(false);
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/shared-email`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sharedEmail: sharedEmailForm.email, sharedEmailPassword: sharedEmailForm.password }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const updated = await res.json();
+      setSelected((prev: any) => prev ? { ...prev, sharedEmail: updated.sharedEmail, sharedEmailPassword: updated.sharedEmailPassword } : prev);
+      setSubmissions(prev => prev.map(s => s.id === updated.id ? { ...s, sharedEmail: updated.sharedEmail, sharedEmailPassword: updated.sharedEmailPassword } : s));
+      setSharedEmailSaved(true);
+      setSharedEmailForm({ email: "", password: "" });
+      setTimeout(() => setSharedEmailSaved(false), 3000);
+    } catch { /* silent */ } finally { setSavingSharedEmail(false); }
+  };
 
   const handleSetImmigrationRef = async () => {
     if (!selected) return;
@@ -1277,6 +1303,76 @@ export default function Submissions() {
                         {updateStatus.isPending ? "Updating…" : action.label}
                       </button>
                     ))}
+                  </div>
+                )}
+
+                {/* Shared Application Email — visible for acknowledged and beyond */}
+                {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.25)" }}>
+                    <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
+                      <span>✉️</span>
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: GOLD }}>Shared Application Email</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Gmail account shared between you and the student for HK university applications</p>
+                      </div>
+                    </div>
+                    <div className="px-4 py-4 space-y-3">
+                      {selected.sharedEmail && (
+                        <div className="rounded-xl px-4 py-3 border space-y-2" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)" }}>
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-xs font-medium mb-0.5" style={{ color: "rgba(162,137,89,0.5)" }}>Email address</p>
+                              <p className="text-sm font-mono font-semibold truncate" style={{ color: GOLD }}>{selected.sharedEmail}</p>
+                            </div>
+                            <a href={`https://mail.google.com/mail/u/0/?authuser=${selected.sharedEmail}`} target="_blank" rel="noopener noreferrer"
+                              className="shrink-0 text-xs px-3 py-1.5 rounded-lg border font-medium transition-all hover:opacity-80 flex items-center gap-1"
+                              style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.08)" }}>
+                              Open Gmail ↗
+                            </a>
+                          </div>
+                          {selected.sharedEmailPassword && (
+                            <div className="flex items-center gap-3">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium mb-0.5" style={{ color: "rgba(162,137,89,0.5)" }}>Password</p>
+                                <p className="text-sm font-mono" style={{ color: GOLD }}>{selected.sharedEmailPassword}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        <input
+                          type="email"
+                          placeholder={selected.sharedEmail ? `Update: ${selected.sharedEmail}` : "e.g. chan.hk2025@gmail.com"}
+                          value={sharedEmailForm.email}
+                          onChange={e => setSharedEmailForm(f => ({ ...f, email: e.target.value }))}
+                          className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none font-mono"
+                          style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }}
+                        />
+                        <div className="relative">
+                          <input
+                            type={sharedEmailShowPw ? "text" : "password"}
+                            placeholder="Gmail password"
+                            value={sharedEmailForm.password}
+                            onChange={e => setSharedEmailForm(f => ({ ...f, password: e.target.value }))}
+                            className="w-full rounded-xl px-3 py-2.5 pr-10 text-sm border outline-none font-mono"
+                            style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }}
+                          />
+                          <button type="button" onClick={() => setSharedEmailShowPw(v => !v)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
+                            style={{ color: "rgba(162,137,89,0.45)" }}>
+                            {sharedEmailShowPw ? "Hide" : "Show"}
+                          </button>
+                        </div>
+                        <button
+                          onClick={handleSaveSharedEmail}
+                          disabled={savingSharedEmail || (!sharedEmailForm.email && !sharedEmailForm.password)}
+                          className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                          style={{ background: "rgba(162,137,89,0.1)", borderColor: "rgba(162,137,89,0.3)", color: GOLD }}>
+                          {savingSharedEmail ? "Saving…" : sharedEmailSaved ? "✓ Saved" : selected.sharedEmail ? "Update Credentials" : "Set Credentials"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
 
