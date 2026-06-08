@@ -568,10 +568,10 @@ export default function Portal() {
         try {
           const h2c = await import("html2canvas");
           const canvas = await h2c.default(portalRef.current, {
-            scale: 0.4, useCORS: true, allowTaint: true,
+            scale: 0.85, useCORS: true, allowTaint: true,
             backgroundColor: "#0b2213", logging: false,
           });
-          socket.emit("student:frame", canvas.toDataURL("image/jpeg", 0.45));
+          socket.emit("student:frame", canvas.toDataURL("image/jpeg", 0.82));
         } catch { /* ignore capture errors */ }
       }, 1200);
     };
