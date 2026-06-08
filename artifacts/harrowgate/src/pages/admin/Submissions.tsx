@@ -192,7 +192,7 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
       </div>
       <div className="divide-y" style={{ borderColor: C.borderFaint }}>
         {items.map(item => (
-          <div key={item.id} className="px-4 py-3" style={{ borderBottom: "1px solid #f0f0f0" }}>
+          <div key={item.id} className="px-4 py-3" style={{ borderBottom: `1px solid ${C.borderFaint}` }}>
             <div className="flex items-start gap-2">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -260,20 +260,20 @@ export default function Submissions() {
     textDark: "#e2e8f0",
     inputBg: "#162032",
   } : {
-    card: "#ffffff",
-    subtle: "#f9fafb",
-    muted: "#f3f4f6",
-    softBlue: "#e8ecf2",
-    border: "#e5e7eb",
-    borderFaint: "#f0f0f0",
-    borderMed: "#d1d5db",
-    text: "#1e293b",
-    textSec: "#374151",
-    textMid: "#4b5563",
-    textMuted: "#6b7280",
-    textFaint: "#9ca3af",
-    textDark: "#111827",
-    inputBg: "#f3f4f6",
+    card: "#f2f5f9",
+    subtle: "#e9edf4",
+    muted: "#e2e8f0",
+    softBlue: "#dce3ed",
+    border: "#c8d0dc",
+    borderFaint: "#d6dce6",
+    borderMed: "#8896aa",
+    text: "#0f172a",
+    textSec: "#1e293b",
+    textMid: "#334155",
+    textMuted: "#475569",
+    textFaint: "#64748b",
+    textDark: "#0f172a",
+    inputBg: "#e9edf4",
   };
   const GOLD = C.text;
   const BG = "transparent";
