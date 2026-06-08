@@ -260,20 +260,20 @@ export default function Submissions() {
     textDark: "#e2e8f0",
     inputBg: "#162032",
   } : {
-    card: "#f2f5f9",
-    subtle: "#e9edf4",
-    muted: "#e2e8f0",
-    softBlue: "#dce3ed",
-    border: "#c8d0dc",
-    borderFaint: "#d6dce6",
-    borderMed: "#8896aa",
-    text: "#0f172a",
-    textSec: "#1e293b",
-    textMid: "#334155",
-    textMuted: "#475569",
-    textFaint: "#64748b",
-    textDark: "#0f172a",
-    inputBg: "#e9edf4",
+    card: "#ffffff",
+    subtle: "#eef2fa",
+    muted: "rgba(30,70,110,0.06)",
+    softBlue: "#eef2fa",
+    border: "rgba(30,70,110,0.13)",
+    borderFaint: "rgba(30,70,110,0.08)",
+    borderMed: "rgba(30,70,110,0.28)",
+    text: "#1e466e",
+    textSec: "#1e466e",
+    textMid: "#2c6e9e",
+    textMuted: "rgba(30,70,110,0.65)",
+    textFaint: "rgba(30,70,110,0.45)",
+    textDark: "#1e466e",
+    inputBg: "#eef2fa",
   };
   const GOLD = C.text;
   const BG = "transparent";
@@ -348,6 +348,14 @@ export default function Submissions() {
   const [sharedEmailShowPw, setSharedEmailShowPw] = useState(false);
   const [savingSharedEmail, setSavingSharedEmail] = useState(false);
   const [sharedEmailSaved, setSharedEmailSaved] = useState(false);
+
+  // Toast notifications
+  const [toasts, setToasts] = useState<Array<{ id: number; msg: string; type: "success" | "error" | "info" }>>([]);
+  const showToast = (msg: string, type: "success" | "error" | "info" = "success") => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, msg, type }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
+  };
 
   // Live View (screen mirror)
   const [liveViewOpen, setLiveViewOpen] = useState(false);
@@ -429,7 +437,7 @@ export default function Submissions() {
       setSubmissions(prev => prev.map(s => s.id === updated.id ? { ...s, immigrationRefNumber: updated.immigrationRefNumber } : s));
       setRefSetSuccess(true);
       setTimeout(() => setRefSetSuccess(false), 3000);
-    } catch { alert("Failed to save immigration reference number."); }
+    } catch { showToast("Failed to save immigration reference number.", "error"); }
     finally { setSettingRef(false); }
   };
 
@@ -490,7 +498,7 @@ export default function Submissions() {
       setMessageSent(selected.id);
       setMessageForm(null);
       loadAdminMessages(selected.id);
-    } catch { alert("Failed to send message. Please try again."); }
+    } catch { showToast("Failed to send message. Please try again.", "error"); }
     finally { setSendingMessage(false); }
   };
 
@@ -499,7 +507,7 @@ export default function Submissions() {
     try {
       const { url } = await uploadToStorage(file);
       setMessageForm(f => f ? { ...f, attachments: [...f.attachments, { fileName: file.name, fileUrl: url, mimeType: file.type }] } : f);
-    } catch { alert("Attachment upload failed."); }
+    } catch { showToast("Attachment upload failed.", "error"); }
     finally { setUploadingMsgAttachment(false); if (msgAttachmentRef.current) msgAttachmentRef.current.value = ""; }
   };
 
@@ -570,7 +578,7 @@ export default function Submissions() {
       setInterviewForm(null);
       setSelected(prev => prev ? { ...prev, status: updated.status, interviewZoomLink: updated.interviewZoomLink, interviewDateTime: updated.interviewDateTime } : null);
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
-    } catch { alert("Failed to send interview invite. Please check the student has an email on file."); }
+    } catch { showToast("Failed to send interview invite. Please check the student has an email on file.", "error"); }
     finally { setSendingInvite(false); }
   };
 
@@ -588,7 +596,7 @@ export default function Submissions() {
       setUniInterviewForm(null);
       setSelected(prev => prev ? { ...prev, status: updated.status, uniInterviewLink: updated.uniInterviewLink, uniInterviewDateTime: updated.uniInterviewDateTime, uniInterviewPlatform: updated.uniInterviewPlatform } : null);
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
-    } catch { alert("Failed to send university interview invite."); }
+    } catch { showToast("Failed to send university interview invite.", "error"); }
     finally { setSendingUniInvite(false); }
   };
 
@@ -602,7 +610,7 @@ export default function Submissions() {
       const updated = await res.json();
       setSelected(prev => prev ? { ...prev, status: updated.status } : null);
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
-    } catch { alert("Failed to mark interview as completed."); }
+    } catch { showToast("Failed to mark interview as completed.", "error"); }
   };
 
   const handleRequestAdditionalDocs = async () => {
@@ -619,7 +627,7 @@ export default function Submissions() {
       setAdditionalDocsForm(null);
       setSelected(prev => prev ? { ...prev, additionalDocsRequested: updated.additionalDocsRequested, additionalDocsRequestNote: updated.additionalDocsRequestNote } : null);
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
-    } catch { alert("Failed to send additional documents request."); }
+    } catch { showToast("Failed to send additional documents request.", "error"); }
     finally { setSendingAdditionalDocs(false); }
   };
 
@@ -636,7 +644,7 @@ export default function Submissions() {
       setOfferLetterSent(selected.id);
       setSelected(prev => prev ? { ...prev, status: "offer_letter_pending" } : null);
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
-    } catch { alert("Failed to upload offer letter."); }
+    } catch { showToast("Failed to upload offer letter.", "error"); }
     finally { setOfferLetterUploading(false); if (offerLetterFileRef.current) offerLetterFileRef.current.value = ""; }
   };
 
@@ -653,7 +661,7 @@ export default function Submissions() {
       setEVisaSent(selected.id);
       setSelected(prev => prev ? { ...prev, status: "visa_issued" } : null);
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
-    } catch { alert("Failed to upload e-visa."); }
+    } catch { showToast("Failed to upload e-visa.", "error"); }
     finally { setEVisaUploading(false); if (eVisaFileRef.current) eVisaFileRef.current.value = ""; }
   };
 
@@ -670,14 +678,14 @@ export default function Submissions() {
       const newDoc: Document = await res.json();
       setSelected(prev => prev ? { ...prev, documents: [...prev.documents, newDoc] } : null);
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
-    } catch { alert("Upload failed."); }
+    } catch { showToast("Upload failed.", "error"); }
     finally { setUploadingDoc(false); if (adminFileRef.current) adminFileRef.current.value = ""; }
   };
 
   const handleId995aDownload = async () => {
     if (!selected) return;
     const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/id995a/download`, { credentials: "include" });
-    if (!res.ok) { alert("Failed to download PDF"); return; }
+    if (!res.ok) { showToast("Failed to download PDF", "error"); return; }
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = `ID995A_${selected.name.replace(/\s+/g, "_")}.pdf`;
@@ -729,7 +737,7 @@ export default function Submissions() {
       setSelectedIds(new Set());
       setDeleteConfirmOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
-    } catch { alert("Failed to delete some profiles."); }
+    } catch { showToast("Failed to delete some profiles.", "error"); }
     finally { setDeletingSelected(false); }
   };
 
@@ -750,9 +758,9 @@ export default function Submissions() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(pricingForm),
       });
-      if (res.ok) { setPricingSaved(true); setTimeout(() => setPricingSaved(false), 3000); }
-      else alert("Failed to save pricing.");
-    } catch { alert("Failed to save pricing."); }
+      if (res.ok) { setPricingSaved(true); showToast("Pricing saved successfully."); setTimeout(() => setPricingSaved(false), 3000); }
+      else showToast("Failed to save pricing.", "error");
+    } catch { showToast("Failed to save pricing.", "error"); }
     finally { setPricingSaving(false); }
   };
 
@@ -769,7 +777,7 @@ export default function Submissions() {
       await adminFetch(`${getApiBase()}/api/admin/trash/${id}/restore`, { method: "POST" });
       setTrashItems(prev => prev.filter(s => s.id !== id));
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
-    } catch { alert("Failed to restore."); }
+    } catch { showToast("Failed to restore.", "error"); }
   };
 
   const permanentDelete = async (id: number) => {
@@ -778,7 +786,7 @@ export default function Submissions() {
       await adminFetch(`${getApiBase()}/api/admin/trash/${id}`, { method: "DELETE" });
       setTrashItems(prev => prev.filter(s => s.id !== id));
       setPermDeleteConfirmId(null);
-    } catch { alert("Failed to permanently delete."); }
+    } catch { showToast("Failed to permanently delete.", "error"); }
     finally { setPermDeleting(false); }
   };
 
@@ -814,7 +822,23 @@ export default function Submissions() {
   const filterKeys = ["all", "pending", "approved", "docs_requested", "payment_pending", "payment_received", "acknowledged", "rejected"];
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-8 admin-submissions">
+      {/* Toast notifications */}
+      <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, display: "flex", flexDirection: "column", gap: 10, pointerEvents: "none" }}>
+        {toasts.map(t => (
+          <div key={t.id} style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "12px 18px", borderRadius: 16,
+            background: t.type === "success" ? "#1e466e" : t.type === "error" ? "#dc2626" : "#2c6e9e",
+            color: "#fff", fontSize: 13, fontWeight: 500,
+            boxShadow: "0 4px 24px rgba(30,70,110,0.22)",
+            maxWidth: 360, pointerEvents: "auto",
+          }}>
+            <span>{t.type === "success" ? "\u2713" : t.type === "error" ? "\u2715" : "\u2139"}</span>
+            <span>{t.msg}</span>
+          </div>
+        ))}
+      </div>
 
         <div className="mb-6 sm:mb-8">
           <div className="mb-4">
@@ -2502,7 +2526,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
       const data = await res.json();
       setFormData((data.formData as Record<string, string>) || {});
       setAiGenerated(true);
-    } catch { alert("AI generation failed. Please try again."); }
+    } catch { showToast("AI generation failed. Please try again.", "error"); }
     finally { setGenerating(false); }
   };
 
@@ -2516,7 +2540,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
       });
       if (!res.ok) throw new Error("Failed");
       setSaved(true); setTimeout(() => setSaved(false), 3000);
-    } catch { alert("Failed to save form data."); }
+    } catch { showToast("Failed to save form data.", "error"); }
     finally { setSaving(false); }
   };
 
