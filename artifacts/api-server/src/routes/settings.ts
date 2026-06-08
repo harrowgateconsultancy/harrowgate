@@ -13,8 +13,8 @@ const DEFAULT_PRICING = {
   bachelorStage2: 40000,
   associateStage2: 30000,
   mastersLastPayment: 82000,
-  bachelorLastPayment: 77000,
-  associateLastPayment: 57000,
+  bachelorLastPayment: 57000,
+  associateLastPayment: 47000,
 };
 
 const DEFAULT_BANK_DETAILS = {

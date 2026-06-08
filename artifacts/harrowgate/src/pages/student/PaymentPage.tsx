@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useSession } from "@clerk/react";
 import type { Submission } from "./Portal";
 import TermsModal from "./TermsModal";
+import { usePricing } from "../../hooks/usePricing";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -36,6 +37,7 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [bankDetails, setBankDetails] = useState<BankDetails | null>(null);
+  const pricing = usePricing();
 
   useEffect(() => {
     fetch(`${getApiBase()}/api/settings/bank-details`)
@@ -163,10 +165,40 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                   </div>
                 </div>
               )}
-              {paymentType !== "first" && (
-                <div className="flex justify-between items-center">
-                  <span>Service Fee</span>
-                  <span className="font-semibold" style={{ color: "#fb923c" }}>To be confirmed</span>
+              {paymentType === "second" && (
+                <div className="space-y-2">
+                  <span style={{ color: "rgba(251,146,60,0.6)" }}>Amount Due (by degree)</span>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {[
+                      { label: "Master's Degree",    amount: pricing.mastersStage2 },
+                      { label: "Bachelor's Degree",  amount: pricing.bachelorStage2 },
+                      { label: "Associate Degree",   amount: pricing.associateStage2 },
+                    ].map(({ label, amount }) => (
+                      <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
+                        style={{ background: "rgba(251,146,60,0.06)", borderColor: "rgba(251,146,60,0.18)" }}>
+                        <span className="font-bold text-sm" style={{ color: "#fb923c" }}>{amount}</span>
+                        <span className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.5)" }}>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {paymentType === "final" && (
+                <div className="space-y-2">
+                  <span style={{ color: "rgba(251,146,60,0.6)" }}>Amount Due (by degree)</span>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {[
+                      { label: "Master's Degree",    amount: pricing.mastersLastPayment },
+                      { label: "Bachelor's Degree",  amount: pricing.bachelorLastPayment },
+                      { label: "Associate Degree",   amount: pricing.associateLastPayment },
+                    ].map(({ label, amount }) => (
+                      <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
+                        style={{ background: "rgba(251,146,60,0.06)", borderColor: "rgba(251,146,60,0.18)" }}>
+                        <span className="font-bold text-sm" style={{ color: "#fb923c" }}>{amount}</span>
+                        <span className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.5)" }}>{label}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
               <div className="flex justify-between items-center">

@@ -114,7 +114,19 @@ const PAYMENT_JOURNEY = [
   { num: 1, labelKey: "journey.s1", amount: null as string | null, noteKey: null as string | null },
   { num: 2, labelKey: "journey.s2", amount: "HKD$ 3,000",          noteKey: "journey.nonRefundable" },
   { num: 3, labelKey: "journey.s3", amount: null,                   noteKey: null },
-  { num: 4, labelKey: "journey.s4", amount: "HKD$ 12,000",          noteKey: null },
+  {
+    num: 4,
+    labelKey: "journey.s4",
+    amount: null as string | null,
+    noteKey: null as string | null,
+    tiers: [
+      { labelKey: "pkg.tier1", amount: "HKD$ 45,000" },
+      { labelKey: "pkg.tier2", amount: "HKD$ 40,000" },
+      { labelKey: "pkg.tier3", amount: "HKD$ 30,000" },
+    ],
+    tierType: "stage2",
+    tierNoteKey: null as string | null,
+  },
   { num: 5, labelKey: "journey.s5", amount: null,                   noteKey: null },
   {
     num: 6,
@@ -615,11 +627,18 @@ export default function Portal() {
                                   <div className="mt-2.5 space-y-1.5">
                                     <div className="flex flex-wrap gap-2">
                                       {(step as any).tiers.map((tier: { labelKey: string; amount: string }) => {
-                                        const tierAmountMap: Record<string, string> = {
-                                          "pkg.tier1": pricing.mastersLastPayment,
-                                          "pkg.tier2": pricing.bachelorLastPayment,
-                                          "pkg.tier3": pricing.associateLastPayment,
-                                        };
+                                        const isStage2 = (step as any).tierType === "stage2";
+                                        const tierAmountMap: Record<string, string> = isStage2
+                                          ? {
+                                              "pkg.tier1": pricing.mastersStage2,
+                                              "pkg.tier2": pricing.bachelorStage2,
+                                              "pkg.tier3": pricing.associateStage2,
+                                            }
+                                          : {
+                                              "pkg.tier1": pricing.mastersLastPayment,
+                                              "pkg.tier2": pricing.bachelorLastPayment,
+                                              "pkg.tier3": pricing.associateLastPayment,
+                                            };
                                         const displayAmount = tierAmountMap[tier.labelKey] ?? tier.amount;
                                         return (
                                         <div key={tier.labelKey} className="flex flex-col items-center px-3 py-2 rounded-lg border text-center"
