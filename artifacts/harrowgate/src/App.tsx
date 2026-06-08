@@ -278,7 +278,11 @@ function ClerkProviderWithRoutes() {
 
             {/* Admin / Consultant portal — protected */}
             <Route path="/admin/submissions">
-              <AdminGuard><Submissions /></AdminGuard>
+              <AdminGuard>
+                <AdminLayout>
+                  <Submissions />
+                </AdminLayout>
+              </AdminGuard>
             </Route>
             <Route path="/print/:applicationId" component={PrintView} />
             <Route>
