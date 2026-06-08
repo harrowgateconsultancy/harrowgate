@@ -3,6 +3,7 @@ import { playAlertSound, unlockAudio } from "../../lib/notificationSound";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
+import { io as socketIo } from "socket.io-client";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -210,6 +211,51 @@ export default function Submissions() {
   const [sharedEmailShowPw, setSharedEmailShowPw] = useState(false);
   const [savingSharedEmail, setSavingSharedEmail] = useState(false);
   const [sharedEmailSaved, setSharedEmailSaved] = useState(false);
+
+  // Live View (screen mirror)
+  const [liveViewOpen, setLiveViewOpen] = useState(false);
+  const [liveViewSubId, setLiveViewSubId] = useState<number | null>(null);
+  const [liveViewStatus, setLiveViewStatus] = useState<"connecting" | "waiting" | "streaming" | "offline">("connecting");
+  const liveViewSocketRef = useRef<ReturnType<typeof socketIo> | null>(null);
+  const liveViewCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const openLiveView = (submissionId: number) => {
+    setLiveViewOpen(true);
+    setLiveViewSubId(submissionId);
+    setLiveViewStatus("connecting");
+    const socket = socketIo(window.location.origin, {
+      path: `${BASE}/api/socket.io`,
+      transports: ["polling", "websocket"],
+      auth: { role: "admin", token: getAdminToken() },
+    });
+    liveViewSocketRef.current = socket;
+    socket.on("connect", () => {
+      socket.emit("watch:start", submissionId);
+      setLiveViewStatus("waiting");
+    });
+    socket.on("frame", (frame: string) => {
+      setLiveViewStatus("streaming");
+      const img = new Image();
+      img.onload = () => {
+        const canvas = liveViewCanvasRef.current;
+        if (!canvas) return;
+        canvas.width = img.width;
+        canvas.height = img.height;
+        canvas.getContext("2d")?.drawImage(img, 0, 0);
+      };
+      img.src = frame;
+    });
+    socket.on("student:offline", () => setLiveViewStatus("offline"));
+    socket.on("connect_error", () => setLiveViewStatus("offline"));
+  };
+
+  const closeLiveView = () => {
+    if (liveViewSubId !== null) liveViewSocketRef.current?.emit("watch:stop", liveViewSubId);
+    liveViewSocketRef.current?.disconnect();
+    liveViewSocketRef.current = null;
+    setLiveViewOpen(false);
+    setLiveViewSubId(null);
+  };
 
   const handleSaveSharedEmail = async () => {
     if (!selected) return;
@@ -1113,6 +1159,15 @@ export default function Submissions() {
                   <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M8 1a.75.75 0 01.75.75v7.69l2.72-2.72a.75.75 0 011.06 1.06l-4 4a.75.75 0 01-1.06 0l-4-4a.75.75 0 111.06-1.06L7.25 9.44V1.75A.75.75 0 018 1zM1.75 14a.75.75 0 000 1.5h12.5a.75.75 0 000-1.5H1.75z" clipRule="evenodd" /></svg>
                   ZIP
                 </a>
+                <button
+                  onClick={() => openLiveView(selected.id)}
+                  title="Live View — mirror student's portal"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all hover:opacity-80"
+                  style={{ borderColor: "rgba(162,137,89,0.35)", color: "#a28959", background: "rgba(162,137,89,0.08)" }}
+                >
+                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5"><circle cx="8" cy="8" r="2.5"/><path fillRule="evenodd" d="M8 2C4.5 2 1.5 4.5 0 8c1.5 3.5 4.5 6 8 6s6.5-2.5 8-6c-1.5-3.5-4.5-6-8-6zm0 10a4 4 0 110-8 4 4 0 010 8z" clipRule="evenodd"/></svg>
+                  Live View
+                </button>
                 <button
                   onClick={() => { setSelected(null); setPreviewDoc(null); }}
                   className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80"
@@ -2184,6 +2239,53 @@ export default function Submissions() {
               <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>
                 {LEVEL_LABELS[coursesLevel]} · Annual fees shown · Institution names & fees are hidden from students
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Live View Modal ─────────────────────────────────────────── */}
+      {liveViewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.85)" }}>
+          <div className="rounded-2xl border flex flex-col overflow-hidden" style={{ width: "min(90vw, 1100px)", maxHeight: "90vh", background: "#0a1628", borderColor: "rgba(162,137,89,0.25)" }}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b shrink-0" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full" style={{ background: liveViewStatus === "streaming" ? "#4ade80" : liveViewStatus === "waiting" ? GOLD : "#f87171", boxShadow: liveViewStatus === "streaming" ? "0 0 6px #4ade80" : "none" }} />
+                  <span className="text-sm font-semibold" style={{ color: GOLD }}>Live View</span>
+                </div>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(162,137,89,0.08)", color: "rgba(162,137,89,0.6)" }}>
+                  {liveViewStatus === "connecting" && "Connecting…"}
+                  {liveViewStatus === "waiting" && "Waiting for student…"}
+                  {liveViewStatus === "streaming" && "Streaming"}
+                  {liveViewStatus === "offline" && "Student offline"}
+                </span>
+              </div>
+              <button onClick={closeLiveView} className="w-7 h-7 rounded-lg flex items-center justify-center text-lg leading-none hover:opacity-70" style={{ background: "rgba(162,137,89,0.08)", color: "rgba(162,137,89,0.5)" }}>×</button>
+            </div>
+            {/* Canvas area */}
+            <div className="flex-1 overflow-auto flex items-center justify-center p-4" style={{ minHeight: 300 }}>
+              {liveViewStatus === "streaming" ? (
+                <canvas ref={liveViewCanvasRef} className="rounded-xl w-full" style={{ maxWidth: "100%", border: "1px solid rgba(162,137,89,0.12)" }} />
+              ) : (
+                <div className="flex flex-col items-center gap-4" style={{ color: "rgba(162,137,89,0.4)" }}>
+                  <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-16 h-16 opacity-40">
+                    <ellipse cx="24" cy="24" rx="20" ry="14" />
+                    <circle cx="24" cy="24" r="5" />
+                    {liveViewStatus === "offline" && <line x1="6" y1="6" x2="42" y2="42" stroke="#f87171" strokeWidth="2" />}
+                  </svg>
+                  <p className="text-sm">
+                    {liveViewStatus === "connecting" && "Establishing connection…"}
+                    {liveViewStatus === "waiting" && "Student portal not open yet. Share is sent as soon as they load their portal."}
+                    {liveViewStatus === "offline" && "Could not reach student — they may not be logged in."}
+                  </p>
+                </div>
+              )}
+            </div>
+            {/* Footer note */}
+            <div className="px-5 py-2.5 border-t shrink-0 text-xs" style={{ borderColor: "rgba(162,137,89,0.1)", color: "rgba(162,137,89,0.3)" }}>
+              The student sees a "Being watched" banner and can stop sharing at any time. Frames are not recorded.
             </div>
           </div>
         </div>

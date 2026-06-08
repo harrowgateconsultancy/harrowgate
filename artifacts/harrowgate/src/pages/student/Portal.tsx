@@ -8,6 +8,7 @@ import DropZone from "../../components/DropZone";
 import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
+import { io as socketIo } from "socket.io-client";
 
 const BG = "#0b2213";
 const _GOLD = "#a28959";
@@ -385,6 +386,12 @@ export default function Portal() {
   const [showLangPicker, setShowLangPicker] = useState(false);
   const langPickerRef = useRef<HTMLDivElement | null>(null);
 
+  // Screen share state
+  const [isBeingWatched, setIsBeingWatched] = useState(false);
+  const socketRef = useRef<ReturnType<typeof socketIo> | null>(null);
+  const captureIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const portalRef = useRef<HTMLDivElement | null>(null);
+
   const authHeaders = async (): Promise<HeadersInit> => {
     const token = await session?.getToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -543,6 +550,47 @@ export default function Portal() {
     }
   }, [submission?.status]);
 
+  // Screen share: connect socket when submission is loaded
+  useEffect(() => {
+    if (!submission?.id) return;
+    const BASE_URL = import.meta.env.BASE_URL.replace(/\/$/, "");
+    const socket = socketIo(window.location.origin, {
+      path: `${BASE_URL}/api/socket.io`,
+      transports: ["polling", "websocket"],
+      auth: { role: "student", submissionId: submission.id },
+    });
+    socketRef.current = socket;
+
+    const startCapture = () => {
+      setIsBeingWatched(true);
+      captureIntervalRef.current = setInterval(async () => {
+        if (!portalRef.current) return;
+        try {
+          const h2c = await import("html2canvas");
+          const canvas = await h2c.default(portalRef.current, {
+            scale: 0.4, useCORS: true, allowTaint: true,
+            backgroundColor: "#0b2213", logging: false,
+          });
+          socket.emit("student:frame", canvas.toDataURL("image/jpeg", 0.45));
+        } catch { /* ignore capture errors */ }
+      }, 1200);
+    };
+
+    const stopCapture = () => {
+      setIsBeingWatched(false);
+      if (captureIntervalRef.current) { clearInterval(captureIntervalRef.current); captureIntervalRef.current = null; }
+    };
+
+    socket.on("watch:start", startCapture);
+    socket.on("watch:stop", stopCapture);
+
+    return () => {
+      stopCapture();
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [submission?.id]);
+
   if (!isLoaded || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: BG }}>
@@ -559,9 +607,34 @@ export default function Portal() {
   const statusLabel = (s: string) => t(`status.${s}`);
 
   return (
-    <div className="min-h-screen" dir={isRtl ? "rtl" : "ltr"} style={{ background: BG }}>
+    <div ref={portalRef} className="min-h-screen" dir={isRtl ? "rtl" : "ltr"} style={{ background: BG }}>
+
+      {/* Screen share banner */}
+      {isBeingWatched && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 9998, background: "rgba(13,26,58,0.97)", borderBottom: "1px solid rgba(162,137,89,0.3)", backdropFilter: "blur(8px)" }}>
+          <div className="flex items-center justify-between px-6 py-2.5 max-w-5xl mx-auto">
+            <div className="flex items-center gap-2.5">
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#f87171" }} />
+              <span className="text-xs sm:text-sm" style={{ color: "rgba(162,137,89,0.85)" }}>
+                Harrowgate support is viewing your screen to guide you through your application
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                setIsBeingWatched(false);
+                if (captureIntervalRef.current) { clearInterval(captureIntervalRef.current); captureIntervalRef.current = null; }
+                socketRef.current?.emit("watch:stop");
+              }}
+              className="text-xs px-3 py-1 rounded-full border ml-4 shrink-0 transition-all hover:opacity-80"
+              style={{ borderColor: "rgba(248,113,113,0.35)", color: "#f87171" }}>
+              Stop sharing
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Nav */}
-      <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.9)", position: "sticky", top: 0, zIndex: 50 }}>
+      <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.9)", position: "sticky", top: isBeingWatched ? 37 : 0, zIndex: 50 }}>
         <div className="flex items-center justify-between px-6 py-3.5 max-w-5xl mx-auto">
           <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-20 object-contain" />
           <div className="flex items-center gap-2">
