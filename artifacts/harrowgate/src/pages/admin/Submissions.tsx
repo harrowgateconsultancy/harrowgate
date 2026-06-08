@@ -123,6 +123,7 @@ function getDocMeta(dt: string): { label: string; tagColor: string; tagText: str
   if (dt === "higher_edu_transcript")  return { label: "Higher Education Transcript",tagColor: "rgba(162,137,89,0.18)", tagText: GOLD,      tag: "Student"       };
   if (dt.startsWith("edu_"))           return { label: `Education Document ${dt.replace("edu_", "")}`, tagColor: "rgba(162,137,89,0.18)", tagText: GOLD, tag: "Student" };
   if (dt === "evisa")                  return { label: "e-Visa (HK Immigration)", tagColor: "rgba(52,211,153,0.18)", tagText: "#34d399", tag: "e-Visa" };
+  if (dt === "signed_terms")           return { label: "Signed Terms & Conditions", tagColor: "rgba(162,137,89,0.22)", tagText: GOLD, tag: "Signed T&C" };
   if (dt.startsWith("admin_"))         return { label: dt === "admin_doc" ? "Admin Document" : dt.replace("admin_", "").replace(/_/g, " "), tagColor: "rgba(74,222,128,0.15)", tagText: "#4ade80", tag: "Admin" };
   return { label: dt.replace(/_/g, " ").toUpperCase(), tagColor: "rgba(162,137,89,0.18)", tagText: GOLD, tag: "Student" };
 }
