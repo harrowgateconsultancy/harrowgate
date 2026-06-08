@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useAdminColors } from "../../contexts/AdminThemeContext";
 import { TrendingUp, TrendingDown, DollarSign, Moon, Plus, Trash2, X, Upload, FileText, CheckCircle, AlertCircle, ChevronDown } from "lucide-react";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -179,6 +180,8 @@ function guessCategory(desc: string, type: "income" | "expense"): string {
 
 // ── DBS Import Modal ──────────────────────────────────────────────────────────
 function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImported: () => void }) {
+  const C = useAdminColors();
+  const NAVY = C.navyText;
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [parsed, setParsed] = useState<ParsedRow[] | null>(null);
@@ -244,21 +247,21 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(0,0,0,0.5)" }}>
-      <div className="w-full max-w-3xl rounded-2xl border shadow-2xl flex flex-col max-h-[90vh]" style={{ background: "#fff", borderColor: "rgba(13,26,58,0.15)" }}>
+      <div className="w-full max-w-3xl rounded-2xl border shadow-2xl flex flex-col max-h-[90vh]" style={{ background: C.card, borderColor: C.n15 }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b shrink-0" style={{ borderColor: "rgba(13,26,58,0.1)" }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b shrink-0" style={{ borderColor: C.n10 }}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(13,26,58,0.06)" }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: C.n06 }}>
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/DBS_Bank_logo.svg/120px-DBS_Bank_logo.svg.png"
                 alt="DBS" className="h-5 object-contain" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
             </div>
             <div>
-              <h2 className="font-bold text-base" style={{ color: NAVY }}>Import DBS Statement</h2>
-              <p className="text-xs" style={{ color: "rgba(13,26,58,0.4)" }}>Drop a CSV exported from DBS iBanking</p>
+              <h2 className="font-bold text-base" style={{ color: C.navyText }}>Import DBS Statement</h2>
+              <p className="text-xs" style={{ color: C.n40 }}>Drop a CSV exported from DBS iBanking</p>
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded hover:bg-slate-100">
-            <X size={16} style={{ color: "rgba(13,26,58,0.5)" }} />
+            <X size={16} style={{ color: C.n50 }} />
           </button>
         </div>
 
@@ -271,13 +274,13 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
               onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false); }}
               onClick={() => fileRef.current?.click()}
               className="rounded-2xl border-2 border-dashed py-10 flex flex-col items-center gap-3 cursor-pointer transition-all"
-              style={{ borderColor: dragging ? NAVY : "rgba(13,26,58,0.2)", background: dragging ? "rgba(13,26,58,0.04)" : "rgba(13,26,58,0.01)" }}>
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(13,26,58,0.06)" }}>
-                <Upload size={20} style={{ color: NAVY }} />
+              style={{ borderColor: dragging ? C.navyBorder : C.n20, background: dragging ? C.n04 : C.n01 }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: C.n06 }}>
+                <Upload size={20} style={{ color: C.navyText }} />
               </div>
               <div className="text-center">
-                <p className="font-semibold text-sm" style={{ color: NAVY }}>{dragging ? "Drop it here" : "Drag & drop your DBS CSV"}</p>
-                <p className="text-xs mt-1" style={{ color: "rgba(13,26,58,0.4)" }}>or click to browse · .csv files only</p>
+                <p className="font-semibold text-sm" style={{ color: C.navyText }}>{dragging ? "Drop it here" : "Drag & drop your DBS CSV"}</p>
+                <p className="text-xs mt-1" style={{ color: C.n40 }}>or click to browse · .csv files only</p>
               </div>
               <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden"
                 onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }} />
@@ -286,8 +289,8 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
 
           {/* How to export instructions */}
           {!parsed && !parseError && (
-            <div className="rounded-xl border px-5 py-4" style={{ background: "rgba(13,26,58,0.02)", borderColor: "rgba(13,26,58,0.08)" }}>
-              <p className="text-xs font-semibold mb-2" style={{ color: "rgba(13,26,58,0.5)" }}>HOW TO EXPORT FROM DBS iBanking</p>
+            <div className="rounded-xl border px-5 py-4" style={{ background: C.n02, borderColor: C.n08 }}>
+              <p className="text-xs font-semibold mb-2" style={{ color: C.n50 }}>HOW TO EXPORT FROM DBS iBanking</p>
               <ol className="space-y-1">
                 {[
                   "Log in at www.dbs.com.hk → iBanking",
@@ -296,9 +299,9 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
                   'Click "Download" → choose CSV format',
                   'Drop the file above',
                 ].map((step, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "rgba(13,26,58,0.6)" }}>
+                  <li key={i} className="flex items-start gap-2 text-xs" style={{ color: C.n60 }}>
                     <span className="w-4 h-4 rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold mt-0.5"
-                      style={{ background: "rgba(13,26,58,0.08)", color: NAVY }}>{i + 1}</span>
+                      style={{ background: C.n08, color: C.navyText }}>{i + 1}</span>
                     {step}
                   </li>
                 ))}
@@ -341,51 +344,51 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
               {/* File info + summary */}
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                  <FileText size={14} style={{ color: "rgba(13,26,58,0.4)" }} />
-                  <span className="text-xs font-mono" style={{ color: "rgba(13,26,58,0.5)" }}>{fileName}</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: "rgba(13,26,58,0.06)", color: NAVY }}>
+                  <FileText size={14} style={{ color: C.n40 }} />
+                  <span className="text-xs font-mono" style={{ color: C.n50 }}>{fileName}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: C.n06, color: C.navyText }}>
                     {parsed.length} rows detected
                   </span>
                 </div>
                 <button onClick={() => { setParsed(null); setFileName(""); fileRef.current?.click(); }}
-                  className="text-xs underline" style={{ color: "rgba(13,26,58,0.4)" }}>Use different file</button>
+                  className="text-xs underline" style={{ color: C.n40 }}>Use different file</button>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="rounded-xl border px-4 py-3 text-center" style={{ borderColor: "rgba(74,222,128,0.2)", background: "rgba(74,222,128,0.05)" }}>
-                  <p className="text-xs font-semibold" style={{ color: "rgba(13,26,58,0.4)" }}>Income</p>
+                  <p className="text-xs font-semibold" style={{ color: C.n40 }}>Income</p>
                   <p className="text-base font-bold mt-1" style={{ color: "#16a34a" }}>+{fmt(incomeTotal)}</p>
                 </div>
                 <div className="rounded-xl border px-4 py-3 text-center" style={{ borderColor: "rgba(248,113,113,0.2)", background: "rgba(248,113,113,0.05)" }}>
-                  <p className="text-xs font-semibold" style={{ color: "rgba(13,26,58,0.4)" }}>Expenses</p>
+                  <p className="text-xs font-semibold" style={{ color: C.n40 }}>Expenses</p>
                   <p className="text-base font-bold mt-1" style={{ color: "#dc2626" }}>−{fmt(expenseTotal)}</p>
                 </div>
-                <div className="rounded-xl border px-4 py-3 text-center" style={{ borderColor: "rgba(13,26,58,0.1)", background: "rgba(13,26,58,0.02)" }}>
-                  <p className="text-xs font-semibold" style={{ color: "rgba(13,26,58,0.4)" }}>Selected</p>
-                  <p className="text-base font-bold mt-1" style={{ color: NAVY }}>{selectedCount} / {parsed.length}</p>
+                <div className="rounded-xl border px-4 py-3 text-center" style={{ borderColor: C.n10, background: C.n02 }}>
+                  <p className="text-xs font-semibold" style={{ color: C.n40 }}>Selected</p>
+                  <p className="text-base font-bold mt-1" style={{ color: C.navyText }}>{selectedCount} / {parsed.length}</p>
                 </div>
               </div>
 
               {/* Rows */}
-              <div className="rounded-xl border overflow-hidden" style={{ borderColor: "rgba(13,26,58,0.1)" }}>
-                <div className="flex items-center gap-3 px-4 py-2.5 border-b" style={{ borderColor: "rgba(13,26,58,0.08)", background: "rgba(13,26,58,0.02)" }}>
+              <div className="rounded-xl border overflow-hidden" style={{ borderColor: C.n10 }}>
+                <div className="flex items-center gap-3 px-4 py-2.5 border-b" style={{ borderColor: C.n08, background: C.n02 }}>
                   <input type="checkbox" checked={parsed.every(r => r.selected)} onChange={toggleAll}
                     className="rounded" style={{ accentColor: NAVY }} />
-                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(13,26,58,0.4)" }}>
+                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: C.n40 }}>
                     Select all · review categories before importing
                   </span>
                 </div>
-                <div className="divide-y max-h-72 overflow-y-auto" style={{ borderColor: "rgba(13,26,58,0.06)" }}>
+                <div className="divide-y max-h-72 overflow-y-auto" style={{ borderColor: C.n06 }}>
                   {parsed.map((row, i) => (
                     <div key={i} className="flex items-start gap-3 px-4 py-3 transition-colors"
-                      style={{ background: row.selected ? "transparent" : "rgba(13,26,58,0.02)", opacity: row.selected ? 1 : 0.5 }}>
+                      style={{ background: row.selected ? "transparent" : C.n02, opacity: row.selected ? 1 : 0.5 }}>
                       <input type="checkbox" checked={row.selected} onChange={() => toggleRow(i)}
                         className="mt-0.5 shrink-0 rounded" style={{ accentColor: NAVY }} />
                       <div className="flex-1 min-w-0 grid grid-cols-[80px_1fr_120px_100px] gap-2 items-center text-xs">
-                        <span className="font-mono" style={{ color: "rgba(13,26,58,0.5)" }}>
+                        <span className="font-mono" style={{ color: C.n50 }}>
                           {new Date(row.date + "T00:00:00").toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}
                         </span>
-                        <span className="truncate font-medium" style={{ color: NAVY }} title={row.description}>{row.description}</span>
+                        <span className="truncate font-medium" style={{ color: C.navyText }} title={row.description}>{row.description}</span>
                         {/* Type toggle */}
                         <button onClick={() => updateType(i, row.type === "income" ? "expense" : "income")}
                           className="px-2 py-0.5 rounded-full font-semibold transition-all text-[11px]"
@@ -399,12 +402,12 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
                         <div className="relative">
                           <select value={row.category} onChange={e => updateCategory(i, e.target.value)}
                             className="w-full text-[11px] px-2 py-0.5 rounded-lg border pr-5 appearance-none outline-none truncate"
-                            style={{ borderColor: "rgba(13,26,58,0.15)", color: "rgba(13,26,58,0.6)", background: "#fff" }}>
+                            style={{ borderColor: C.n15, color: C.n60, background: C.card }}>
                             {(row.type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map(c => (
                               <option key={c} value={c}>{c}</option>
                             ))}
                           </select>
-                          <ChevronDown size={10} className="absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "rgba(13,26,58,0.3)" }} />
+                          <ChevronDown size={10} className="absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: C.n30 }} />
                         </div>
                       </div>
                     </div>
@@ -417,16 +420,16 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
 
         {/* Footer */}
         {parsed && !importResult && (
-          <div className="px-6 py-4 border-t shrink-0 flex items-center justify-between gap-4" style={{ borderColor: "rgba(13,26,58,0.1)" }}>
-            <p className="text-xs" style={{ color: "rgba(13,26,58,0.4)" }}>
+          <div className="px-6 py-4 border-t shrink-0 flex items-center justify-between gap-4" style={{ borderColor: C.n10 }}>
+            <p className="text-xs" style={{ color: C.n40 }}>
               Click a row's amount to toggle income/expense · edit categories before importing
             </p>
             <div className="flex gap-3">
               <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm border hover:bg-slate-50"
-                style={{ borderColor: "rgba(13,26,58,0.15)", color: "rgba(13,26,58,0.6)" }}>Cancel</button>
+                style={{ borderColor: C.n15, color: C.n60 }}>Cancel</button>
               <button onClick={doImport} disabled={importing || selectedCount === 0}
                 className="px-5 py-2 rounded-lg text-sm font-bold transition-all hover:opacity-90 disabled:opacity-40 flex items-center gap-2"
-                style={{ background: NAVY, color: GOLD }}>
+                style={{ background: C.navyBg, color: GOLD }}>
                 {importing
                   ? <><span className="w-3.5 h-3.5 rounded-full border-2 animate-spin" style={{ borderColor: GOLD, borderTopColor: "transparent" }} />Importing…</>
                   : <>Import {selectedCount} transaction{selectedCount !== 1 ? "s" : ""}</>}
@@ -441,6 +444,8 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
 
 // ── Main Finance page ─────────────────────────────────────────────────────────
 export default function Finance() {
+  const C = useAdminColors();
+
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<Summary>({ income: 0, expenses: 0, profit: 0, zakat: 0 });
   const [loading, setLoading] = useState(true);
@@ -511,18 +516,18 @@ export default function Finance() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight" style={{ color: NAVY }}>Finance</h1>
-          <p className="text-sm mt-1" style={{ color: "rgba(13,26,58,0.5)" }}>Income, expenses, profit &amp; Zakat</p>
+          <h1 className="text-2xl font-bold tracking-tight" style={{ color: C.navyText }}>Finance</h1>
+          <p className="text-sm mt-1" style={{ color: C.n50 }}>Income, expenses, profit &amp; Zakat</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setShowImport(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition-all hover:opacity-90"
-            style={{ borderColor: "rgba(13,26,58,0.2)", color: NAVY, background: "rgba(13,26,58,0.04)" }}>
+            style={{ borderColor: C.n20, color: C.navyText, background: C.n04 }}>
             <Upload size={14} /> Import DBS CSV
           </button>
           <button onClick={() => setShowAdd(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
-            style={{ background: NAVY, color: GOLD }}>
+            style={{ background: C.navyBg, color: GOLD }}>
             <Plus size={14} /> Add Transaction
           </button>
         </div>
@@ -533,7 +538,7 @@ export default function Finance() {
         {statCards.map(({ label, value, icon: Icon, color, bg, border }) => (
           <div key={label} className="rounded-xl border p-5" style={{ background: bg, borderColor: border }}>
             <div className="flex items-center justify-between mb-3">
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(13,26,58,0.5)" }}>{label}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: C.n50 }}>{label}</p>
               <Icon size={16} style={{ color }} />
             </div>
             <p className="text-xl font-bold" style={{ color }}>{fmt(value)}</p>
@@ -546,7 +551,7 @@ export default function Finance() {
         <div className="mb-6 rounded-xl border px-5 py-4 flex items-center gap-3"
           style={{ background: "rgba(192,132,252,0.05)", borderColor: "rgba(192,132,252,0.2)" }}>
           <Moon size={18} style={{ color: "#c084fc" }} />
-          <p className="text-sm" style={{ color: "rgba(13,26,58,0.65)" }}>
+          <p className="text-sm" style={{ color: C.n60 }}>
             Zakat is calculated at <strong>2.5%</strong> of net profit ({fmt(summary.profit)}).
             Amount due: <strong style={{ color: "#c084fc" }}>{fmt(summary.zakat)}</strong>
           </p>
@@ -554,47 +559,47 @@ export default function Finance() {
       )}
 
       {/* Transactions Table */}
-      <div className="rounded-xl border overflow-hidden" style={{ borderColor: "rgba(13,26,58,0.12)" }}>
-        <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: "rgba(13,26,58,0.1)", background: "rgba(13,26,58,0.02)" }}>
+      <div className="rounded-xl border overflow-hidden" style={{ borderColor: C.n10 }}>
+        <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: C.n10, background: C.n02 }}>
           <div className="flex gap-1">
             {(["all", "income", "expense"] as const).map(t => (
               <button key={t} onClick={() => setTab(t)}
                 className="px-3 py-1 rounded-md text-xs font-semibold capitalize transition-all"
-                style={{ background: tab === t ? NAVY : "transparent", color: tab === t ? GOLD : "rgba(13,26,58,0.5)" }}>
+                style={{ background: tab === t ? NAVY : "transparent", color: tab === t ? GOLD : C.n50 }}>
                 {t === "all" ? "All" : t === "income" ? "Income" : "Expenses"}
               </button>
             ))}
           </div>
-          <span className="text-xs" style={{ color: "rgba(13,26,58,0.4)" }}>{filtered.length} records</span>
+          <span className="text-xs" style={{ color: C.n40 }}>{filtered.length} records</span>
         </div>
 
         {loading ? (
-          <div className="py-16 text-center text-sm" style={{ color: "rgba(13,26,58,0.4)" }}>Loading…</div>
+          <div className="py-16 text-center text-sm" style={{ color: C.n40 }}>Loading…</div>
         ) : !filtered.length ? (
           <div className="py-16 text-center space-y-3">
-            <p className="text-sm" style={{ color: "rgba(13,26,58,0.4)" }}>No {tab === "all" ? "" : tab} transactions yet.</p>
+            <p className="text-sm" style={{ color: C.n40 }}>No {tab === "all" ? "" : tab} transactions yet.</p>
             <button onClick={() => setShowImport(true)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border transition-all hover:opacity-90"
-              style={{ borderColor: "rgba(13,26,58,0.2)", color: NAVY }}>
+              style={{ borderColor: C.n20, color: C.navyText }}>
               <Upload size={13} /> Import from DBS CSV
             </button>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b" style={{ borderColor: "rgba(13,26,58,0.08)", background: "rgba(13,26,58,0.02)" }}>
-                <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(13,26,58,0.4)" }}>Date</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider hidden sm:table-cell" style={{ color: "rgba(13,26,58,0.4)" }}>Category</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(13,26,58,0.4)" }}>Description</th>
-                <th className="text-right px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(13,26,58,0.4)" }}>Amount</th>
+              <tr className="border-b" style={{ borderColor: C.n08, background: C.n02 }}>
+                <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: C.n40 }}>Date</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider hidden sm:table-cell" style={{ color: C.n40 }}>Category</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: C.n40 }}>Description</th>
+                <th className="text-right px-5 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: C.n40 }}>Amount</th>
                 <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody>
               {filtered.map(tx => (
-                <tr key={tx.id} className="border-b transition-colors hover:bg-slate-50" style={{ borderColor: "rgba(13,26,58,0.06)" }}>
+                <tr key={tx.id} className="border-b transition-colors hover:bg-slate-50" style={{ borderColor: C.n06 }}>
                   <td className="px-5 py-3.5">
-                    <span className="text-xs font-mono" style={{ color: "rgba(13,26,58,0.55)" }}>
+                    <span className="text-xs font-mono" style={{ color: C.n50 }}>
                       {new Date(tx.date + "T00:00:00").toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                     </span>
                   </td>
@@ -605,8 +610,8 @@ export default function Finance() {
                     </span>
                   </td>
                   <td className="px-5 py-3.5">
-                    <p className="font-medium text-sm" style={{ color: NAVY }}>{tx.description}</p>
-                    {tx.notes && <p className="text-xs mt-0.5" style={{ color: "rgba(13,26,58,0.4)" }}>{tx.notes}</p>}
+                    <p className="font-medium text-sm" style={{ color: C.navyText }}>{tx.description}</p>
+                    {tx.notes && <p className="text-xs mt-0.5" style={{ color: C.n40 }}>{tx.notes}</p>}
                   </td>
                   <td className="px-5 py-3.5 text-right">
                     <span className="font-bold text-sm" style={{ color: tx.type === "income" ? "#16a34a" : "#dc2626" }}>
@@ -628,11 +633,11 @@ export default function Finance() {
       {/* Add Transaction Modal */}
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(0,0,0,0.4)" }}>
-          <div className="w-full max-w-md rounded-2xl border shadow-2xl" style={{ background: "#fff", borderColor: "rgba(13,26,58,0.15)" }}>
-            <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "rgba(13,26,58,0.1)" }}>
-              <h2 className="font-bold text-base" style={{ color: NAVY }}>Add Transaction</h2>
+          <div className="w-full max-w-md rounded-2xl border shadow-2xl" style={{ background: C.card, borderColor: C.n15 }}>
+            <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: C.n10 }}>
+              <h2 className="font-bold text-base" style={{ color: C.navyText }}>Add Transaction</h2>
               <button onClick={() => { setShowAdd(false); setFormError(null); }} className="p-1.5 rounded hover:bg-slate-100">
-                <X size={16} style={{ color: "rgba(13,26,58,0.5)" }} />
+                <X size={16} style={{ color: C.n50 }} />
               </button>
             </div>
             <form onSubmit={handleAdd} className="px-6 py-5 space-y-4">
@@ -642,8 +647,8 @@ export default function Finance() {
                     className="flex-1 py-2 rounded-lg text-sm font-semibold border transition-all"
                     style={{
                       background: form.type === t ? (t === "income" ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)") : "transparent",
-                      borderColor: form.type === t ? (t === "income" ? "rgba(74,222,128,0.4)" : "rgba(248,113,113,0.4)") : "rgba(13,26,58,0.15)",
-                      color: form.type === t ? (t === "income" ? "#16a34a" : "#dc2626") : "rgba(13,26,58,0.5)",
+                      borderColor: form.type === t ? (t === "income" ? "rgba(74,222,128,0.4)" : "rgba(248,113,113,0.4)") : C.n15,
+                      color: form.type === t ? (t === "income" ? "#16a34a" : "#dc2626") : C.n50,
                     }}>
                     {t === "income" ? "Income" : "Expense"}
                   </button>
@@ -651,39 +656,39 @@ export default function Finance() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold mb-1" style={{ color: "rgba(13,26,58,0.5)" }}>Amount (HKD)</label>
+                  <label className="block text-xs font-semibold mb-1" style={{ color: C.n50 }}>Amount (HKD)</label>
                   <input type="number" min={0} step={1} value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} required
                     className="w-full px-3 py-2 rounded-lg border text-sm outline-none"
-                    style={{ borderColor: "rgba(13,26,58,0.2)", color: NAVY }} placeholder="e.g. 45000" />
+                    style={{ borderColor: C.n20, color: C.navyText }} placeholder="e.g. 45000" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold mb-1" style={{ color: "rgba(13,26,58,0.5)" }}>Date</label>
+                  <label className="block text-xs font-semibold mb-1" style={{ color: C.n50 }}>Date</label>
                   <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} required
                     className="w-full px-3 py-2 rounded-lg border text-sm outline-none"
-                    style={{ borderColor: "rgba(13,26,58,0.2)", color: NAVY }} />
+                    style={{ borderColor: C.n20, color: C.navyText }} />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1" style={{ color: "rgba(13,26,58,0.5)" }}>Category</label>
+                <label className="block text-xs font-semibold mb-1" style={{ color: C.n50 }}>Category</label>
                 <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg border text-sm outline-none"
-                  style={{ borderColor: "rgba(13,26,58,0.2)", color: NAVY }}>
+                  style={{ borderColor: C.n20, color: C.navyText }}>
                   {(form.type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map(c => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1" style={{ color: "rgba(13,26,58,0.5)" }}>Description</label>
+                <label className="block text-xs font-semibold mb-1" style={{ color: C.n50 }}>Description</label>
                 <input type="text" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required
                   className="w-full px-3 py-2 rounded-lg border text-sm outline-none"
-                  style={{ borderColor: "rgba(13,26,58,0.2)", color: NAVY }} placeholder="Brief description…" />
+                  style={{ borderColor: C.n20, color: C.navyText }} placeholder="Brief description…" />
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1" style={{ color: "rgba(13,26,58,0.5)" }}>Notes (optional)</label>
+                <label className="block text-xs font-semibold mb-1" style={{ color: C.n50 }}>Notes (optional)</label>
                 <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2}
                   className="w-full px-3 py-2 rounded-lg border text-sm outline-none resize-none"
-                  style={{ borderColor: "rgba(13,26,58,0.2)", color: NAVY }} placeholder="Additional details…" />
+                  style={{ borderColor: C.n20, color: C.navyText }} placeholder="Additional details…" />
               </div>
               {formError && (
                 <p className="text-xs rounded-lg px-3 py-2" style={{ background: "rgba(248,113,113,0.08)", color: "#dc2626", border: "1px solid rgba(248,113,113,0.2)" }}>
@@ -693,10 +698,10 @@ export default function Finance() {
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => { setShowAdd(false); setFormError(null); }}
                   className="flex-1 py-2.5 rounded-lg text-sm font-medium border transition-all hover:bg-slate-50"
-                  style={{ borderColor: "rgba(13,26,58,0.2)", color: "rgba(13,26,58,0.6)" }}>Cancel</button>
+                  style={{ borderColor: C.n20, color: C.n60 }}>Cancel</button>
                 <button type="submit" disabled={saving}
                   className="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all hover:opacity-90 disabled:opacity-50"
-                  style={{ background: NAVY, color: GOLD }}>
+                  style={{ background: C.navyBg, color: GOLD }}>
                   {saving ? "Saving…" : "Add Transaction"}
                 </button>
               </div>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useAdminTheme } from "../../contexts/AdminThemeContext";
+import { useAdminTheme, useAdminColors } from "../../contexts/AdminThemeContext";
 import { playAlertSound, unlockAudio } from "../../lib/notificationSound";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
