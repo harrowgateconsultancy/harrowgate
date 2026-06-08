@@ -1,7 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FileText, Menu, X, Bell, TrendingUp, UserCog, Tag } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Menu, X, Bell, TrendingUp, UserCog, Tag, Sun, Moon } from "lucide-react";
 import { useState } from "react";
+import { AdminThemeProvider, useAdminTheme } from "@/contexts/AdminThemeContext";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -13,12 +14,13 @@ const navItems = [
   { href: "/admin/pricing", label: "Pricing", icon: Tag, exact: false },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isDark, toggleTheme } = useAdminTheme();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className={cn("flex h-screen overflow-hidden bg-background", isDark && "dark")}>
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-sidebar border-r border-sidebar-border transition-transform duration-200",
@@ -53,7 +55,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="px-6 py-4 border-t border-sidebar-border space-y-2">
+        <div className="px-6 py-4 border-t border-sidebar-border space-y-3">
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-2 w-full text-sidebar-foreground/50 hover:text-sidebar-foreground/80 transition-colors text-[11px] tracking-wider uppercase"
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark
+              ? <Sun size={13} className="shrink-0" />
+              : <Moon size={13} className="shrink-0" />}
+            <span>{isDark ? "Light Mode" : "Dark Mode"}</span>
+          </button>
           <Link
             href="/"
             className="block text-sidebar-foreground/40 text-[10px] tracking-wider uppercase hover:text-sidebar-foreground/70 transition-colors"
@@ -75,8 +87,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
           <span className="font-bold tracking-widest text-sm uppercase text-foreground">Harrowgate Admin</span>
         </header>
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-background">{children}</main>
       </div>
     </div>
+  );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminThemeProvider>
+      <AdminLayoutInner>{children}</AdminLayoutInner>
+    </AdminThemeProvider>
   );
 }
