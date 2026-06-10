@@ -259,8 +259,12 @@ export default function Landing() {
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.badge")}</p>
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: GOLD }}>{t("pricing.startJust")}</h2>
-            <p className="text-base max-w-xl mx-auto mb-8" style={{ color: GOLD_DIM }}>
+            <p className="text-base max-w-xl mx-auto mb-5" style={{ color: GOLD_DIM }}>
               {t("pricing.desc")}
+            </p>
+            <p className="text-sm font-semibold max-w-lg mx-auto mb-8 px-5 py-3 rounded-full border"
+              style={{ color: GOLD, borderColor: "rgba(162,137,89,0.25)", background: "rgba(162,137,89,0.07)" }}>
+              ✦ Pay only <span className="font-extrabold">HKD$ 3,000</span> and an expert will guide you through the complete procedure from A–Z
             </p>
             <div className="flex flex-wrap gap-4 justify-center items-center mb-6">
               {[
