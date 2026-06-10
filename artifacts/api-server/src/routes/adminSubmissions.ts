@@ -492,6 +492,24 @@ router.patch("/admin/student-submissions/:id/immigration-ref", async (req, res) 
   } catch { res.status(500).json({ error: "Failed to update immigration ref" }); }
 });
 
+router.patch("/admin/student-submissions/:id/programme", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { programmeType } = req.body;
+    const VALID = ["masters", "bachelor", "associate", "diploma"];
+    if (programmeType && !VALID.includes(programmeType)) {
+      return res.status(400).json({ error: "Invalid programme type" });
+    }
+    const [updated] = await db
+      .update(studentSubmissionsTable)
+      .set({ programmeType: programmeType || null })
+      .where(eq(studentSubmissionsTable.id, id))
+      .returning();
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to update programme type" }); }
+});
+
 router.patch("/admin/student-submissions/:id/bank-details", async (req, res) => {
   try {
     const id = parseInt(req.params.id);

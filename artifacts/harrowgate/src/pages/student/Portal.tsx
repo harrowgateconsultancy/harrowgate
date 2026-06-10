@@ -82,6 +82,7 @@ export type Submission = {
   sharedEmail?: string | null;
   sharedEmailPassword?: string | null;
   customBankDetails?: { bankName: string; accountName: string; accountNumber: string; fps: string; additionalInfo: string } | null;
+  programmeType?: string | null;
   deletedAt?: string | null;
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };
@@ -1438,7 +1439,7 @@ export default function Portal() {
                                 {hasTiers && (
                                   <div className="mt-2.5 space-y-1.5">
                                     <div className="flex flex-wrap gap-2">
-                                      {(step as any).tiers.map((tier: { labelKey: string; amount: string }) => {
+                                      {(() => {
                                         const isStage2 = (step as any).tierType === "stage2";
                                         const tierAmountMap: Record<string, string> = isStage2
                                           ? {
@@ -1453,18 +1454,30 @@ export default function Portal() {
                                               "pkg.tier3": pricing.associateLastPayment,
                                               "pkg.tier4": pricing.diplomaLastPayment,
                                             };
-                                        const displayAmount = tierAmountMap[tier.labelKey] ?? tier.amount;
-                                        return (
-                                        <div key={tier.labelKey} className="flex flex-col items-center px-3 py-2 rounded-lg border text-center"
-                                          style={{
-                                            background: isUpcoming ? "rgba(162,137,89,0.03)" : isCurrent ? "rgba(162,137,89,0.1)" : "rgba(74,222,128,0.06)",
-                                            borderColor: isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.25)" : "rgba(74,222,128,0.2)",
-                                          }}>
-                                          <p className="text-sm font-bold" style={{ color: isUpcoming ? "rgba(162,137,89,0.28)" : isCurrent ? GOLD : "#4ade80" }}>{displayAmount}</p>
-                                          <p className="text-xs mt-0.5" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>{t(tier.labelKey)}</p>
-                                        </div>
-                                        );
-                                      })}
+                                        const programmeTierKey: Record<string, string> = {
+                                          masters:   "pkg.tier1",
+                                          bachelor:  "pkg.tier2",
+                                          associate: "pkg.tier3",
+                                          diploma:   "pkg.tier4",
+                                        };
+                                        const assignedKey = submission.programmeType ? programmeTierKey[submission.programmeType] : null;
+                                        const visibleTiers = assignedKey
+                                          ? (step as any).tiers.filter((t: { labelKey: string }) => t.labelKey === assignedKey)
+                                          : (step as any).tiers;
+                                        return visibleTiers.map((tier: { labelKey: string; amount: string }) => {
+                                          const displayAmount = tierAmountMap[tier.labelKey] ?? tier.amount;
+                                          return (
+                                            <div key={tier.labelKey} className="flex flex-col items-center px-3 py-2 rounded-lg border text-center"
+                                              style={{
+                                                background: isUpcoming ? "rgba(162,137,89,0.03)" : isCurrent ? "rgba(162,137,89,0.1)" : "rgba(74,222,128,0.06)",
+                                                borderColor: isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.25)" : "rgba(74,222,128,0.2)",
+                                              }}>
+                                              <p className="text-sm font-bold" style={{ color: isUpcoming ? "rgba(162,137,89,0.28)" : isCurrent ? GOLD : "#4ade80" }}>{displayAmount}</p>
+                                              <p className="text-xs mt-0.5" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>{t(tier.labelKey)}</p>
+                                            </div>
+                                          );
+                                        });
+                                      })()}
                                     </div>
                                     <p className="text-xs" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>
                                       * {t((step as any).tierNoteKey)}

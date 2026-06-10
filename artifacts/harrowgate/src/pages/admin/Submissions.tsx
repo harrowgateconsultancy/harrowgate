@@ -31,6 +31,7 @@ type Submission = {
   sharedEmail?: string | null;
   sharedEmailPassword?: string | null;
   customBankDetails?: { bankName: string; accountName: string; accountNumber: string; fps: string; additionalInfo: string } | null;
+  programmeType?: string | null;
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -337,6 +338,8 @@ export default function Submissions() {
   const [customBankForm, setCustomBankForm] = useState({ bankName: "", accountName: "", accountNumber: "", fps: "", additionalInfo: "" });
   const [savingCustomBank, setSavingCustomBank] = useState(false);
   const [customBankSaved, setCustomBankSaved] = useState(false);
+  const [savingProgramme, setSavingProgramme] = useState(false);
+  const [programmeSaved, setProgrammeSaved] = useState(false);
 
   // Toast notifications
   const [toasts, setToasts] = useState<Array<{ id: number; msg: string; type: "success" | "error" | "info" }>>([]);
@@ -430,6 +433,26 @@ export default function Submissions() {
       setCustomBankForm({ bankName: "", accountName: "", accountNumber: "", fps: "", additionalInfo: "" });
       setTimeout(() => setCustomBankSaved(false), 3000);
     } catch { /* silent */ } finally { setSavingCustomBank(false); }
+  };
+
+  const handleSaveProgramme = async (value: string) => {
+    if (!selected) return;
+    setSavingProgramme(true);
+    setProgrammeSaved(false);
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/programme`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ programmeType: value || null }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const updated = await res.json();
+      setSelected((prev: any) => prev ? { ...prev, programmeType: updated.programmeType } : prev);
+      setSubmissions(prev => prev.map(s => s.id === updated.id ? { ...s, programmeType: updated.programmeType } : s));
+      setProgrammeSaved(true);
+      setTimeout(() => setProgrammeSaved(false), 3000);
+    } catch { showToast("Failed to save programme type.", "error"); }
+    finally { setSavingProgramme(false); }
   };
 
   const handleSetImmigrationRef = async () => {
@@ -1567,6 +1590,65 @@ export default function Submissions() {
                           {savingSharedEmail ? "Saving…" : sharedEmailSaved ? "✓ Saved" : selected.sharedEmail ? "Update Credentials" : "Set Credentials"}
                         </button>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Programme Type Selector */}
+                {!["pending","rejected"].includes(selected.status) && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
+                    <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: C.border }}>
+                      <span>🎓</span>
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: GOLD }}>Programme Type</p>
+                        <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>Assign a programme level — filters the payment amounts shown to this student.</p>
+                      </div>
+                    </div>
+                    <div className="px-4 py-4 space-y-3">
+                      {selected.programmeType && (
+                        <div className="rounded-xl px-4 py-2 border" style={{ background: C.muted, borderColor: "rgba(74,222,128,0.2)" }}>
+                          <p className="text-xs font-semibold" style={{ color: "#4ade80" }}>
+                            ✓ Currently assigned: {
+                              selected.programmeType === "masters" ? "Master's Degree"
+                              : selected.programmeType === "bachelor" ? "Bachelor's Degree"
+                              : selected.programmeType === "associate" ? "Associate Degree"
+                              : "Diploma"
+                            }
+                          </p>
+                        </div>
+                      )}
+                      <div className="flex flex-wrap gap-2">
+                        {([
+                          { value: "masters",   label: "Master's Degree" },
+                          { value: "bachelor",  label: "Bachelor's Degree" },
+                          { value: "associate", label: "Associate Degree" },
+                          { value: "diploma",   label: "Diploma" },
+                        ] as { value: string; label: string }[]).map(({ value, label }) => (
+                          <button
+                            key={value}
+                            onClick={() => !savingProgramme && handleSaveProgramme(value)}
+                            disabled={savingProgramme}
+                            className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all hover:opacity-85 disabled:opacity-40"
+                            style={{
+                              background: selected.programmeType === value ? "rgba(162,137,89,0.18)" : C.muted,
+                              borderColor: selected.programmeType === value ? GOLD : C.border,
+                              color: selected.programmeType === value ? GOLD : C.textMuted,
+                            }}>
+                            {label}
+                          </button>
+                        ))}
+                        {selected.programmeType && (
+                          <button
+                            onClick={() => !savingProgramme && handleSaveProgramme("")}
+                            disabled={savingProgramme}
+                            className="px-3 py-2 rounded-xl text-xs border transition-all hover:opacity-80 disabled:opacity-40"
+                            style={{ background: "transparent", borderColor: "rgba(248,113,113,0.25)", color: "rgba(248,113,113,0.6)" }}>
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      {programmeSaved && <p className="text-xs" style={{ color: "#4ade80" }}>✓ Saved</p>}
+                      {savingProgramme && <p className="text-xs" style={{ color: C.textFaint }}>Saving…</p>}
                     </div>
                   </div>
                 )}

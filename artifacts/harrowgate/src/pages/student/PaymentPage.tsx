@@ -169,44 +169,39 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                   </div>
                 </div>
               )}
-              {paymentType === "second" && (
-                <div className="space-y-2">
-                  <span style={{ color: "rgba(251,146,60,0.6)" }}>Amount Due (by degree)</span>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {[
-                      { label: "Master's Degree",    amount: pricing.mastersStage2 },
-                      { label: "Bachelor's Degree",  amount: pricing.bachelorStage2 },
-                      { label: "Associate Degree",   amount: pricing.associateStage2 },
-                      { label: "Diploma",            amount: pricing.diplomaStage2 },
-                    ].map(({ label, amount }) => (
-                      <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
-                        style={{ background: "rgba(251,146,60,0.06)", borderColor: "rgba(251,146,60,0.18)" }}>
-                        <span className="font-bold text-sm" style={{ color: "#fb923c" }}>{amount}</span>
-                        <span className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.5)" }}>{label}</span>
-                      </div>
-                    ))}
+              {(paymentType === "second" || paymentType === "final") && (() => {
+                const progType = (submission as any).programmeType as string | null | undefined;
+                const allSecond = [
+                  { key: "masters",   label: "Master's Degree",   amount: pricing.mastersStage2 },
+                  { key: "bachelor",  label: "Bachelor's Degree",  amount: pricing.bachelorStage2 },
+                  { key: "associate", label: "Associate Degree",   amount: pricing.associateStage2 },
+                  { key: "diploma",   label: "Diploma",            amount: pricing.diplomaStage2 },
+                ];
+                const allFinal = [
+                  { key: "masters",   label: "Master's Degree",   amount: pricing.mastersLastPayment },
+                  { key: "bachelor",  label: "Bachelor's Degree",  amount: pricing.bachelorLastPayment },
+                  { key: "associate", label: "Associate Degree",   amount: pricing.associateLastPayment },
+                  { key: "diploma",   label: "Diploma",            amount: pricing.diplomaLastPayment },
+                ];
+                const allTiers = paymentType === "second" ? allSecond : allFinal;
+                const tiers = progType ? allTiers.filter(t => t.key === progType) : allTiers;
+                return (
+                  <div className="space-y-2">
+                    <span style={{ color: "rgba(251,146,60,0.6)" }}>
+                      {progType ? "Amount Due" : "Amount Due (by degree)"}
+                    </span>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {tiers.map(({ label, amount }) => (
+                        <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
+                          style={{ background: "rgba(251,146,60,0.06)", borderColor: "rgba(251,146,60,0.18)" }}>
+                          <span className="font-bold text-sm" style={{ color: "#fb923c" }}>{amount}</span>
+                          <span className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.5)" }}>{label}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-              {paymentType === "final" && (
-                <div className="space-y-2">
-                  <span style={{ color: "rgba(251,146,60,0.6)" }}>Amount Due (by degree)</span>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {[
-                      { label: "Master's Degree",    amount: pricing.mastersLastPayment },
-                      { label: "Bachelor's Degree",  amount: pricing.bachelorLastPayment },
-                      { label: "Associate Degree",   amount: pricing.associateLastPayment },
-                      { label: "Diploma",            amount: pricing.diplomaLastPayment },
-                    ].map(({ label, amount }) => (
-                      <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
-                        style={{ background: "rgba(251,146,60,0.06)", borderColor: "rgba(251,146,60,0.18)" }}>
-                        <span className="font-bold text-sm" style={{ color: "#fb923c" }}>{amount}</span>
-                        <span className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.5)" }}>{label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                );
+              })()}
               <div className="flex justify-between items-center">
                 <span>Accepted Methods</span>
                 <span className="font-semibold" style={{ color: "#fb923c" }}>Bank Transfer / FPS</span>
