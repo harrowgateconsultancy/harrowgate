@@ -352,11 +352,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                       rows={3}
                       value={freeTextCourse}
                       onChange={e => setFreeTextCourse(e.target.value)}
-                      placeholder={
-                        preferredLevel === "diploma"
-                          ? "e.g. Diploma in Business Administration at VTC, or describe the programme you're interested in…"
-                          : "e.g. Professional qualification, language course, vocational training, or any other enquiry…"
-                      }
+                      placeholder=""
                       className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition-all resize-none"
                       style={{ background: "rgba(162,137,89,0.06)", borderColor: freeTextCourse.trim() ? GOLD : "rgba(162,137,89,0.2)", color: GOLD }}
                     />
