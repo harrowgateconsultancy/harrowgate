@@ -129,6 +129,7 @@ const PAYMENT_JOURNEY = [
       { labelKey: "pkg.tier1", amount: "HKD$ 45,000" },
       { labelKey: "pkg.tier2", amount: "HKD$ 40,000" },
       { labelKey: "pkg.tier3", amount: "HKD$ 30,000" },
+      { labelKey: "pkg.tier4", amount: "HKD$ 25,000" },
     ],
     tierType: "stage2",
     tierNoteKey: null as string | null,
@@ -143,6 +144,7 @@ const PAYMENT_JOURNEY = [
       { labelKey: "pkg.tier1", amount: "HKD$ 125,000" },
       { labelKey: "pkg.tier2", amount: "HKD$ 115,000" },
       { labelKey: "pkg.tier3", amount: "HKD$ 75,000" },
+      { labelKey: "pkg.tier4", amount: "HKD$ 42,000" },
     ],
     tierNoteKey: "journey.tierNote",
   },
@@ -1093,11 +1095,13 @@ export default function Portal() {
                                               "pkg.tier1": pricing.mastersStage2,
                                               "pkg.tier2": pricing.bachelorStage2,
                                               "pkg.tier3": pricing.associateStage2,
+                                              "pkg.tier4": pricing.diplomaStage2,
                                             }
                                           : {
                                               "pkg.tier1": pricing.mastersLastPayment,
                                               "pkg.tier2": pricing.bachelorLastPayment,
                                               "pkg.tier3": pricing.associateLastPayment,
+                                              "pkg.tier4": pricing.diplomaLastPayment,
                                             };
                                         const displayAmount = tierAmountMap[tier.labelKey] ?? tier.amount;
                                         return (
