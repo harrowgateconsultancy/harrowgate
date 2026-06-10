@@ -135,13 +135,18 @@ export default function Landing() {
             {t("hero.sub")}
           </p>
 
-          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border mb-10"
+          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border mb-6"
             style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
             <span className="text-base">🏛️</span>
             <p className="text-sm font-medium" style={{ color: GOLD }}>
               {t("hero.pr")}
             </p>
           </div>
+
+          <p className="text-sm font-semibold px-6 py-3 rounded-full border mb-10"
+            style={{ color: GOLD, borderColor: "rgba(162,137,89,0.25)", background: "rgba(162,137,89,0.07)" }}>
+            ✦ Pay only <span className="font-extrabold">HKD$ 3,000</span> and an expert will guide you through the complete procedure from A–Z
+          </p>
 
           <div className="flex flex-col sm:flex-row gap-4 items-center mb-16">
             <Link href="/sign-up"
