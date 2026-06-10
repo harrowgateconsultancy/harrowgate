@@ -81,6 +81,7 @@ export type Submission = {
   preferredInstitution?: string | null;
   sharedEmail?: string | null;
   sharedEmailPassword?: string | null;
+  customBankDetails?: { bankName: string; accountName: string; accountNumber: string; fps: string; additionalInfo: string } | null;
   deletedAt?: string | null;
   documents: Array<{ id: number; submissionId: number; documentType: string; fileName: string; fileUrl: string; mimeType?: string | null }>;
 };

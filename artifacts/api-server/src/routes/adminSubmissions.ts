@@ -492,6 +492,24 @@ router.patch("/admin/student-submissions/:id/immigration-ref", async (req, res) 
   } catch { res.status(500).json({ error: "Failed to update immigration ref" }); }
 });
 
+router.patch("/admin/student-submissions/:id/bank-details", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { bankName, accountName, accountNumber, fps, additionalInfo } = req.body;
+    const hasData = bankName || accountName || accountNumber || fps;
+    const customBankDetails = hasData
+      ? { bankName: bankName || "", accountName: accountName || "", accountNumber: accountNumber || "", fps: fps || "", additionalInfo: additionalInfo || "" }
+      : null;
+    const [updated] = await db
+      .update(studentSubmissionsTable)
+      .set({ customBankDetails })
+      .where(eq(studentSubmissionsTable.id, id))
+      .returning();
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to update bank details" }); }
+});
+
 // Admin lists messages for a submission
 router.get("/admin/student-submissions/:id/messages", async (req: any, res) => {
   try {

@@ -36,15 +36,19 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [bankDetails, setBankDetails] = useState<BankDetails | null>(null);
+  const [globalBankDetails, setGlobalBankDetails] = useState<BankDetails | null>(null);
   const pricing = usePricing();
 
   useEffect(() => {
     fetch(`${getApiBase()}/api/settings/bank-details`)
       .then(r => r.json())
-      .then((b: BankDetails) => setBankDetails(b))
+      .then((b: BankDetails) => setGlobalBankDetails(b))
       .catch(() => {});
   }, []);
+
+  const bankDetails: BankDetails | null = (submission as any).customBankDetails?.accountNumber || (submission as any).customBankDetails?.bankName
+    ? (submission as any).customBankDetails as BankDetails
+    : globalBankDetails;
 
   const needsTerms = paymentType === "first" && !submission.termsAcceptedAt;
 

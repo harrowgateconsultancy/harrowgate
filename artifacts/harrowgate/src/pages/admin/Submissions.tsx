@@ -30,6 +30,7 @@ type Submission = {
   preferredInstitution?: string | null;
   sharedEmail?: string | null;
   sharedEmailPassword?: string | null;
+  customBankDetails?: { bankName: string; accountName: string; accountNumber: string; fps: string; additionalInfo: string } | null;
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -333,6 +334,9 @@ export default function Submissions() {
   const [sharedEmailShowPw, setSharedEmailShowPw] = useState(false);
   const [savingSharedEmail, setSavingSharedEmail] = useState(false);
   const [sharedEmailSaved, setSharedEmailSaved] = useState(false);
+  const [customBankForm, setCustomBankForm] = useState({ bankName: "", accountName: "", accountNumber: "", fps: "", additionalInfo: "" });
+  const [savingCustomBank, setSavingCustomBank] = useState(false);
+  const [customBankSaved, setCustomBankSaved] = useState(false);
 
   // Toast notifications
   const [toasts, setToasts] = useState<Array<{ id: number; msg: string; type: "success" | "error" | "info" }>>([]);
@@ -405,6 +409,27 @@ export default function Submissions() {
       setSharedEmailForm({ email: "", password: "" });
       setTimeout(() => setSharedEmailSaved(false), 3000);
     } catch { /* silent */ } finally { setSavingSharedEmail(false); }
+  };
+
+  const handleSaveCustomBank = async (overrideForm?: typeof customBankForm) => {
+    if (!selected) return;
+    setSavingCustomBank(true);
+    setCustomBankSaved(false);
+    const payload = overrideForm ?? customBankForm;
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/bank-details`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const updated = await res.json();
+      setSelected((prev: any) => prev ? { ...prev, customBankDetails: updated.customBankDetails } : prev);
+      setSubmissions(prev => prev.map(s => s.id === updated.id ? { ...s, customBankDetails: updated.customBankDetails } : s));
+      setCustomBankSaved(true);
+      setCustomBankForm({ bankName: "", accountName: "", accountNumber: "", fps: "", additionalInfo: "" });
+      setTimeout(() => setCustomBankSaved(false), 3000);
+    } catch { /* silent */ } finally { setSavingCustomBank(false); }
   };
 
   const handleSetImmigrationRef = async () => {
@@ -1120,7 +1145,7 @@ export default function Submissions() {
                   borderColor: selectedIds.has(s.id) ? GOLD : isDone ? "rgba(162,137,89,0.55)" : hasAction ? "rgba(251,146,60,0.25)" : C.border,
                   boxShadow: isDone ? "0 0 0 1px rgba(162,137,89,0.12)" : hasAction ? "0 0 0 1px rgba(251,146,60,0.08)" : "none",
                 }}
-                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setRefNumInput(s.immigrationRefNumber || ""); setRefSetSuccess(false); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setEVisaSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed","visa_issued"].includes(s.status)) loadLetters(s.id); }}>
+                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setRefNumInput(s.immigrationRefNumber || ""); setRefSetSuccess(false); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setEVisaSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); setCustomBankForm({ bankName: "", accountName: "", accountNumber: "", fps: "", additionalInfo: "" }); setCustomBankSaved(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed","visa_issued"].includes(s.status)) loadLetters(s.id); }}>
                 {/* Orange left accent for action-needed */}
                 {hasAction && <div className="h-0.5 w-full rounded-t-2xl" style={{ background: "linear-gradient(to right, transparent, rgba(251,146,60,0.5), transparent)" }} />}
                 <div className="px-5 py-4 flex items-center gap-4">
@@ -1541,6 +1566,66 @@ export default function Submissions() {
                           style={{ background: C.subtle, borderColor: C.borderMed, color: GOLD }}>
                           {savingSharedEmail ? "Saving…" : sharedEmailSaved ? "✓ Saved" : selected.sharedEmail ? "Update Credentials" : "Set Credentials"}
                         </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Per-Student Dedicated Bank Account */}
+                {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
+                    <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: C.border }}>
+                      <span>🏦</span>
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: GOLD }}>Dedicated Bank Account</p>
+                        <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>Override the global bank details for this student. Shown on their payment page immediately.</p>
+                      </div>
+                    </div>
+                    <div className="px-4 py-4 space-y-3">
+                      {selected.customBankDetails && (selected.customBankDetails.bankName || selected.customBankDetails.accountNumber) && (
+                        <div className="rounded-xl px-4 py-3 border space-y-1.5" style={{ background: C.muted, borderColor: "rgba(74,222,128,0.2)" }}>
+                          <p className="text-xs font-semibold mb-2" style={{ color: "#4ade80" }}>✓ Custom account active</p>
+                          {selected.customBankDetails.bankName && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Bank</span><span className="font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.bankName}</span></div>}
+                          {selected.customBankDetails.accountName && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Account Name</span><span className="font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.accountName}</span></div>}
+                          {selected.customBankDetails.accountNumber && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Account No.</span><span className="font-mono font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.accountNumber}</span></div>}
+                          {selected.customBankDetails.fps && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>FPS</span><span className="font-mono font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.fps}</span></div>}
+                          {selected.customBankDetails.additionalInfo && <div className="flex justify-between text-xs gap-4"><span style={{ color: C.textMuted }}>Note</span><span className="text-right" style={{ color: GOLD }}>{selected.customBankDetails.additionalInfo}</span></div>}
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        {([
+                          { field: "bankName",       placeholder: "Bank Name (e.g. Hang Seng Bank)" },
+                          { field: "accountName",    placeholder: "Account Name" },
+                          { field: "accountNumber",  placeholder: "Account Number" },
+                          { field: "fps",            placeholder: "FPS ID / Phone" },
+                          { field: "additionalInfo", placeholder: "Additional info (optional)" },
+                        ] as { field: keyof typeof customBankForm; placeholder: string }[]).map(({ field, placeholder }) => (
+                          <input
+                            key={field}
+                            type="text"
+                            placeholder={placeholder}
+                            value={customBankForm[field]}
+                            onChange={e => setCustomBankForm(f => ({ ...f, [field]: e.target.value }))}
+                            className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none"
+                            style={{ background: C.muted, borderColor: C.border, color: GOLD }}
+                          />
+                        ))}
+                        <button
+                          onClick={() => handleSaveCustomBank()}
+                          disabled={savingCustomBank || (!customBankForm.bankName && !customBankForm.accountNumber)}
+                          className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                          style={{ background: C.subtle, borderColor: C.borderMed, color: GOLD }}>
+                          {savingCustomBank ? "Saving…" : customBankSaved ? "✓ Saved" : selected.customBankDetails ? "Update Bank Details" : "Set Bank Details"}
+                        </button>
+                        {selected.customBankDetails && (
+                          <button
+                            onClick={() => handleSaveCustomBank({ bankName: "", accountName: "", accountNumber: "", fps: "", additionalInfo: "" })}
+                            disabled={savingCustomBank}
+                            className="w-full py-2 rounded-xl text-xs border transition-all hover:opacity-80 disabled:opacity-40"
+                            style={{ background: "transparent", borderColor: "rgba(248,113,113,0.25)", color: "rgba(248,113,113,0.6)" }}>
+                            Clear — revert to global bank details
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
