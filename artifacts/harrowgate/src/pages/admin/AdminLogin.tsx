@@ -31,6 +31,8 @@ export default function AdminLogin() {
         return;
       }
       localStorage.setItem("admin_token", data.token);
+      localStorage.setItem("admin_role", data.role ?? "admin");
+      localStorage.setItem("admin_name", data.name ?? "Admin");
       setLocation("/admin/submissions");
     } catch {
       setError("Could not reach server. Please try again.");

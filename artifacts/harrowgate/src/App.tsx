@@ -24,6 +24,7 @@ import ApplicationDetail from "@/pages/application-detail";
 import Finance from "@/pages/admin/Finance";
 import Staff from "@/pages/admin/Staff";
 import Pricing from "@/pages/admin/Pricing";
+import AdminSettings from "@/pages/admin/Settings";
 import StaffLogin from "@/pages/staff/StaffLogin";
 import StaffDashboard from "@/pages/staff/StaffDashboard";
 import PrintView from "@/pages/print";
@@ -299,6 +300,7 @@ function ClerkProviderWithRoutes() {
                     <Route path="/admin/finance" component={Finance} />
                     <Route path="/admin/staff" component={Staff} />
                     <Route path="/admin/pricing" component={Pricing} />
+                    <Route path="/admin/settings" component={AdminSettings} />
                     <Route component={NotFound} />
                   </Switch>
                 </AdminLayout>

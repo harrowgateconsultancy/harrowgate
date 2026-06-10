@@ -315,6 +315,24 @@ export default function Staff() {
               </button>
             </div>
             <form onSubmit={handleAddStaff} className="px-6 py-5 space-y-4">
+              {/* Role selector */}
+              <div>
+                <label className="block text-xs font-semibold mb-2" style={{ color: C.n50 }}>Role</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[{ value: "manager", label: "Manager" }, { value: "staff", label: "Staff" }].map(r => (
+                    <button key={r.value} type="button"
+                      onClick={() => setStaffForm(f => ({ ...f, role: r.value }))}
+                      className="py-2.5 rounded-xl text-sm font-semibold border transition-all"
+                      style={{
+                        borderColor: staffForm.role === r.value ? GOLD : C.n15,
+                        background: staffForm.role === r.value ? "rgba(162,137,89,0.12)" : "transparent",
+                        color: staffForm.role === r.value ? GOLD : C.n50,
+                      }}>
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {[
                 { label: "Full Name", key: "name", type: "text", placeholder: "e.g. Sarah Wong" },
                 { label: "Username", key: "username", type: "text", placeholder: "e.g. sarah" },
