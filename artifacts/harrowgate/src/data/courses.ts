@@ -1,4 +1,4 @@
-export type DegreeLevel = "masters" | "bachelors" | "associate";
+export type DegreeLevel = "masters" | "bachelors" | "associate" | "diploma" | "others";
 
 export interface Course {
   id: number;
@@ -152,6 +152,8 @@ export const LEVEL_LABELS: Record<DegreeLevel, string> = {
   masters: "Master's Degree",
   bachelors: "Bachelor's Degree",
   associate: "Associate Degree / Higher Diploma",
+  diploma: "Diploma",
+  others: "Others",
 };
 
 export function getCoursesByLevel(level: DegreeLevel) {

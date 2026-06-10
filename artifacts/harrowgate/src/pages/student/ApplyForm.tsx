@@ -30,6 +30,8 @@ const DEGREE_LEVELS: { value: DegreeLevel; label: string; description: string }[
   { value: "associate", label: "Associate Degree", description: "Higher Diploma or Associate Degree programmes" },
   { value: "bachelors", label: "Bachelor's Degree", description: "Undergraduate degree programmes" },
   { value: "masters", label: "Master's Degree", description: "Postgraduate degree programmes" },
+  { value: "diploma", label: "Diploma", description: "Certificate or Diploma programmes" },
+  { value: "others", label: "Others", description: "Other qualifications or enquiries" },
 ];
 
 async function uploadToStorage(file: File): Promise<{ url: string }> {
@@ -55,6 +57,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
   const [preferredLevel, setPreferredLevel] = useState<DegreeLevel | "">("");
   const [preferredCourseId, setPreferredCourseId] = useState<number | "">("");
   const [courseSearch, setCourseSearch] = useState("");
+  const [freeTextCourse, setFreeTextCourse] = useState("");
   const [docs, setDocs] = useState<UploadState[]>(Array.from({ length: DOC_CONFIG.length }, emptyUpload));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,14 +80,17 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
     }
   };
 
+  const needsFreeText = preferredLevel === "diploma" || preferredLevel === "others";
+
   const handleLevelChange = (level: DegreeLevel) => {
     setPreferredLevel(level);
     setPreferredCourseId("");
     setCourseSearch("");
+    setFreeTextCourse("");
   };
 
-  const filteredCourses = preferredLevel
-    ? getCoursesByLevel(preferredLevel).filter(c => {
+  const filteredCourses = preferredLevel && !needsFreeText
+    ? getCoursesByLevel(preferredLevel as "masters" | "bachelors" | "associate").filter(c => {
         if (!courseSearch.trim()) return true;
         const q = courseSearch.toLowerCase();
         return c.programme.toLowerCase().includes(q);
@@ -102,7 +108,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
     if (!dob) { setError("Please enter your date of birth."); return; }
     if (!passport.trim()) { setError("Please enter your passport number."); return; }
     if (!preferredLevel) { setError("Please select your preferred degree level."); return; }
-    if (!preferredCourseId) { setError("Please select your preferred course."); return; }
+    if (needsFreeText ? !freeTextCourse.trim() : !preferredCourseId) { setError("Please describe or select your preferred course."); return; }
     const missingRequired = DOC_CONFIG
       .map((cfg, i) => cfg.required && !docs[i].url ? cfg.label : null)
       .filter(Boolean);
@@ -113,7 +119,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
     if (docs.some(d => d.uploading)) { setError("Please wait for all uploads to finish."); return; }
 
     const fullName = `${surname.trim()} ${givenName.trim()}`;
-    const course = COURSES.find(c => c.id === preferredCourseId);
+    const course = needsFreeText ? null : COURSES.find(c => c.id === preferredCourseId);
 
     setSubmitting(true);
     try {
@@ -128,8 +134,8 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
           passportNumber: passport.trim(),
           email: user?.primaryEmailAddress?.emailAddress,
           preferredLevel: preferredLevel || null,
-          preferredCourse: course?.programme || null,
-          preferredInstitution: course?.institution || null,
+          preferredCourse: needsFreeText ? freeTextCourse.trim() : (course?.programme || null),
+          preferredInstitution: needsFreeText ? null : (course?.institution || null),
         }),
       });
       if (!res.ok) throw new Error("Failed");
@@ -160,7 +166,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
   };
 
   const requiredFilled = [surname.trim(), givenName.trim(), dob, passport.trim()].every(Boolean);
-  const courseSelected = !!preferredLevel && !!preferredCourseId;
+  const courseSelected = !!preferredLevel && (needsFreeText ? !!freeTextCourse.trim() : !!preferredCourseId);
   const requiredDocs = DOC_CONFIG.filter(c => c.required).length;
   const uploadedRequired = DOC_CONFIG.filter((c, i) => c.required && docs[i].url).length;
   const allRequiredUploaded = uploadedRequired === requiredDocs;
@@ -300,7 +306,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
             {/* Step 1: Degree level */}
             <div>
               <p className="text-xs font-semibold mb-3" style={{ color: "rgba(162,137,89,0.65)" }}>Step 1 — Degree Level *</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-wrap">
                 {DEGREE_LEVELS.map(level => {
                   const isSelected = preferredLevel === level.value;
                   return (
@@ -333,95 +339,118 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
               </div>
             </div>
 
-            {/* Step 2: Course selection */}
+            {/* Step 2: Course selection or free text */}
             {preferredLevel && (
               <div>
-                <p className="text-xs font-semibold mb-3" style={{ color: "rgba(162,137,89,0.65)" }}>
-                  Step 2 — Preferred Course * <span style={{ color: "rgba(162,137,89,0.35)", fontWeight: 400 }}>({LEVEL_LABELS[preferredLevel]})</span>
-                </p>
+                {needsFreeText ? (
+                  /* Free-text input for Diploma / Others */
+                  <div>
+                    <p className="text-xs font-semibold mb-3" style={{ color: "rgba(162,137,89,0.65)" }}>
+                      Step 2 — Describe Your Preferred Course *
+                    </p>
+                    <textarea
+                      rows={3}
+                      value={freeTextCourse}
+                      onChange={e => setFreeTextCourse(e.target.value)}
+                      placeholder={
+                        preferredLevel === "diploma"
+                          ? "e.g. Diploma in Business Administration at VTC, or describe the programme you're interested in…"
+                          : "e.g. Professional qualification, language course, vocational training, or any other enquiry…"
+                      }
+                      className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition-all resize-none"
+                      style={{ background: "rgba(162,137,89,0.06)", borderColor: freeTextCourse.trim() ? GOLD : "rgba(162,137,89,0.2)", color: GOLD }}
+                    />
+                    {freeTextCourse.trim() && (
+                      <div className="mt-3 rounded-xl px-4 py-3 border flex items-start gap-3"
+                        style={{ background: "rgba(74,222,128,0.05)", borderColor: "rgba(74,222,128,0.15)" }}>
+                        <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "#4ade80" }}>
+                          <path fillRule="evenodd" d="M12.416 3.376a.75.75 0 01.208 1.04l-5 7.5a.75.75 0 01-1.154.114l-3-3a.75.75 0 011.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 011.04-.207z" clipRule="evenodd" />
+                        </svg>
+                        <div>
+                          <p className="text-xs font-semibold mb-0.5" style={{ color: "#4ade80" }}>Preference saved</p>
+                          <p className="text-sm font-medium" style={{ color: GOLD }}>{freeTextCourse.trim()}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Searchable course list for Associate / Bachelor / Master */
+                  <div>
+                    <p className="text-xs font-semibold mb-3" style={{ color: "rgba(162,137,89,0.65)" }}>
+                      Step 2 — Preferred Course * <span style={{ color: "rgba(162,137,89,0.35)", fontWeight: 400 }}>({LEVEL_LABELS[preferredLevel]})</span>
+                    </p>
 
-                {/* Search box */}
-                <div className="relative mb-3">
-                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "rgba(162,137,89,0.4)" }}>
-                    <path fillRule="evenodd" d="M9.965 11.026a5 5 0 111.06-1.06l2.755 2.754a.75.75 0 11-1.06 1.06l-2.755-2.754zM10.5 7a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0z" clipRule="evenodd" />
-                  </svg>
-                  <input
-                    type="text"
-                    value={courseSearch}
-                    onChange={e => { setCourseSearch(e.target.value); setPreferredCourseId(""); }}
-                    placeholder="Search by programme name…"
-                    className="w-full rounded-xl pl-9 pr-4 py-3 text-sm outline-none border transition-all"
-                    style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: GOLD }}
-                  />
-                  {courseSearch && (
-                    <button
-                      type="button"
-                      onClick={() => { setCourseSearch(""); setPreferredCourseId(""); }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2"
-                      style={{ color: "rgba(162,137,89,0.4)" }}
-                    >
-                      <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
-                        <path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z" />
+                    {/* Search box */}
+                    <div className="relative mb-3">
+                      <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "rgba(162,137,89,0.4)" }}>
+                        <path fillRule="evenodd" d="M9.965 11.026a5 5 0 111.06-1.06l2.755 2.754a.75.75 0 11-1.06 1.06l-2.755-2.754zM10.5 7a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0z" clipRule="evenodd" />
                       </svg>
-                    </button>
-                  )}
-                </div>
-
-                {/* Course list */}
-                <div
-                  className="rounded-xl border overflow-y-auto"
-                  style={{
-                    borderColor: "rgba(162,137,89,0.15)",
-                    background: "rgba(0,0,0,0.15)",
-                    maxHeight: "320px",
-                  }}
-                >
-                  {filteredCourses.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-sm" style={{ color: "rgba(162,137,89,0.35)" }}>
-                      No courses match your search
-                    </div>
-                  ) : (
-                    filteredCourses.map(course => {
-                      const isSelected = preferredCourseId === course.id;
-                      return (
+                      <input
+                        type="text"
+                        value={courseSearch}
+                        onChange={e => { setCourseSearch(e.target.value); setPreferredCourseId(""); }}
+                        placeholder="Search by programme name…"
+                        className="w-full rounded-xl pl-9 pr-4 py-3 text-sm outline-none border transition-all"
+                        style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: GOLD }}
+                      />
+                      {courseSearch && (
                         <button
-                          key={course.id}
                           type="button"
-                          onClick={() => { setPreferredCourseId(course.id); setCourseSearch(""); }}
-                          className="w-full px-4 py-3 text-left border-b flex items-center gap-3 transition-colors"
-                          style={{
-                            borderColor: "rgba(162,137,89,0.07)",
-                            background: isSelected ? "rgba(162,137,89,0.1)" : "transparent",
-                          }}
+                          onClick={() => { setCourseSearch(""); setPreferredCourseId(""); }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2"
+                          style={{ color: "rgba(162,137,89,0.4)" }}
                         >
-                          <div
-                            className="w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center"
-                            style={{ borderColor: isSelected ? GOLD : "rgba(162,137,89,0.25)" }}
-                          >
-                            {isSelected && <div className="w-2 h-2 rounded-full" style={{ background: GOLD }} />}
-                          </div>
-                          <span className="text-sm" style={{ color: isSelected ? GOLD : "rgba(162,137,89,0.7)" }}>
-                            {course.programme}
-                          </span>
+                          <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+                            <path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z" />
+                          </svg>
                         </button>
-                      );
-                    })
-                  )}
-                </div>
-
-                {/* Selected course confirmation */}
-                {selectedCourse && (
-                  <div
-                    className="mt-3 rounded-xl px-4 py-3 border flex items-start gap-3"
-                    style={{ background: "rgba(74,222,128,0.05)", borderColor: "rgba(74,222,128,0.15)" }}
-                  >
-                    <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "#4ade80" }}>
-                      <path fillRule="evenodd" d="M12.416 3.376a.75.75 0 01.208 1.04l-5 7.5a.75.75 0 01-1.154.114l-3-3a.75.75 0 011.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 011.04-.207z" clipRule="evenodd" />
-                    </svg>
-                    <div>
-                      <p className="text-xs font-semibold mb-0.5" style={{ color: "#4ade80" }}>Selected course</p>
-                      <p className="text-sm font-medium" style={{ color: GOLD }}>{selectedCourse.programme}</p>
+                      )}
                     </div>
+
+                    {/* Course list */}
+                    <div className="rounded-xl border overflow-y-auto"
+                      style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(0,0,0,0.15)", maxHeight: "320px" }}>
+                      {filteredCourses.length === 0 ? (
+                        <div className="px-4 py-8 text-center text-sm" style={{ color: "rgba(162,137,89,0.35)" }}>
+                          No courses match your search
+                        </div>
+                      ) : (
+                        filteredCourses.map(course => {
+                          const isSelected = preferredCourseId === course.id;
+                          return (
+                            <button
+                              key={course.id}
+                              type="button"
+                              onClick={() => { setPreferredCourseId(course.id); setCourseSearch(""); }}
+                              className="w-full px-4 py-3 text-left border-b flex items-center gap-3 transition-colors"
+                              style={{ borderColor: "rgba(162,137,89,0.07)", background: isSelected ? "rgba(162,137,89,0.1)" : "transparent" }}
+                            >
+                              <div className="w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center"
+                                style={{ borderColor: isSelected ? GOLD : "rgba(162,137,89,0.25)" }}>
+                                {isSelected && <div className="w-2 h-2 rounded-full" style={{ background: GOLD }} />}
+                              </div>
+                              <span className="text-sm" style={{ color: isSelected ? GOLD : "rgba(162,137,89,0.7)" }}>
+                                {course.programme}
+                              </span>
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    {/* Selected course confirmation */}
+                    {selectedCourse && (
+                      <div className="mt-3 rounded-xl px-4 py-3 border flex items-start gap-3"
+                        style={{ background: "rgba(74,222,128,0.05)", borderColor: "rgba(74,222,128,0.15)" }}>
+                        <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "#4ade80" }}>
+                          <path fillRule="evenodd" d="M12.416 3.376a.75.75 0 01.208 1.04l-5 7.5a.75.75 0 01-1.154.114l-3-3a.75.75 0 011.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 011.04-.207z" clipRule="evenodd" />
+                        </svg>
+                        <div>
+                          <p className="text-xs font-semibold mb-0.5" style={{ color: "#4ade80" }}>Selected course</p>
+                          <p className="text-sm font-medium" style={{ color: GOLD }}>{selectedCourse.programme}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
