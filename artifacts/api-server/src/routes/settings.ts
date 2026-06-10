@@ -9,12 +9,15 @@ const DEFAULT_PRICING = {
   mastersTotal: 130000,
   bachelorTotal: 120000,
   associateTotal: 90000,
+  diplomaTotal: 70000,
   mastersStage2: 45000,
   bachelorStage2: 40000,
   associateStage2: 30000,
+  diplomaStage2: 25000,
   mastersLastPayment: 82000,
   bachelorLastPayment: 57000,
   associateLastPayment: 47000,
+  diplomaLastPayment: 42000,
 };
 
 const DEFAULT_BANK_DETAILS = {

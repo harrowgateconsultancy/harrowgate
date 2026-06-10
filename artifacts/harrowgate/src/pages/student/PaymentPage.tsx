@@ -173,6 +173,7 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                       { label: "Master's Degree",    amount: pricing.mastersStage2 },
                       { label: "Bachelor's Degree",  amount: pricing.bachelorStage2 },
                       { label: "Associate Degree",   amount: pricing.associateStage2 },
+                      { label: "Diploma",            amount: pricing.diplomaStage2 },
                     ].map(({ label, amount }) => (
                       <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
                         style={{ background: "rgba(251,146,60,0.06)", borderColor: "rgba(251,146,60,0.18)" }}>
@@ -191,6 +192,7 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                       { label: "Master's Degree",    amount: pricing.mastersLastPayment },
                       { label: "Bachelor's Degree",  amount: pricing.bachelorLastPayment },
                       { label: "Associate Degree",   amount: pricing.associateLastPayment },
+                      { label: "Diploma",            amount: pricing.diplomaLastPayment },
                     ].map(({ label, amount }) => (
                       <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
                         style={{ background: "rgba(251,146,60,0.06)", borderColor: "rgba(251,146,60,0.18)" }}>
