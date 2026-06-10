@@ -35,7 +35,6 @@ const PACKAGES = [
     border:    "rgba(74,222,128,0.18)",
     highlight: false,
     features:  SHARED_FEATURES,
-    stage2Amount: "HK$30,000",
     stage2Note:   "due before first submission",
     stage3Note:   "within 7 days of offer letter",
     cardNote: "HK$3,000 initial fee is for consultancy services only (eligibility, strategy, planning). Non-refundable once paid — separate from tuition. Remaining stages become binding upon deposit.",
@@ -48,7 +47,6 @@ const PACKAGES = [
     border:    "rgba(162,137,89,0.25)",
     highlight: true,
     features:  SHARED_FEATURES,
-    stage2Amount: "HK$40,000",
     stage2Note:   "due before first submission",
     stage3Note:   "within 7 days of offer letter",
     cardNote: "Initial HK$3,000 covers professional consultancy (non-refundable). Not a deposit toward tuition. Once paid, the full payment schedule is contractually binding per HK law.",
@@ -61,10 +59,21 @@ const PACKAGES = [
     border:    "rgba(96,165,250,0.18)",
     highlight: false,
     features:  SHARED_FEATURES,
-    stage2Amount: "HK$45,000",
     stage2Note:   "due before first submission",
     stage3Note:   "within 7 days of offer letter",
     cardNote: "The HK$3,000 initial fee is solely for consultancy services (non-refundable). It is earned upon delivery of strategy & eligibility work. Balance stages are binding after this payment.",
+  },
+  {
+    tierKey:   "tier4",
+    badge:     false,
+    color:     "#c084fc",
+    bg:        "rgba(192,132,252,0.05)",
+    border:    "rgba(192,132,252,0.18)",
+    highlight: false,
+    features:  SHARED_FEATURES,
+    stage2Note:   "due before first submission",
+    stage3Note:   "within 7 days of offer letter",
+    cardNote: "HK$3,000 initial fee covers consultancy services only (non-refundable). Balance stages are contractually binding upon first payment per HK law.",
   },
 ];
 
@@ -155,23 +164,26 @@ export default function Packages() {
         </section>
 
         {/* Packages Grid */}
-        <section className="max-w-6xl mx-auto px-6 pb-20">
-          <div className="grid md:grid-cols-3 gap-6 items-stretch">
+        <section className="max-w-7xl mx-auto px-6 pb-20">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {PACKAGES.map((pkg) => {
               const totalMap: Record<string, string> = {
                 tier1: pricing.mastersTotal,
                 tier2: pricing.bachelorTotal,
                 tier3: pricing.associateTotal,
+                tier4: pricing.diplomaTotal,
               };
               const stage2Map: Record<string, string> = {
                 tier1: pricing.mastersStage2,
                 tier2: pricing.bachelorStage2,
                 tier3: pricing.associateStage2,
+                tier4: pricing.diplomaStage2,
               };
               const stage3Map: Record<string, string> = {
                 tier1: pricing.mastersLastPayment,
                 tier2: pricing.bachelorLastPayment,
                 tier3: pricing.associateLastPayment,
+                tier4: pricing.diplomaLastPayment,
               };
               const total        = totalMap[pkg.tierKey];
               const stage3Amount = stage3Map[pkg.tierKey];

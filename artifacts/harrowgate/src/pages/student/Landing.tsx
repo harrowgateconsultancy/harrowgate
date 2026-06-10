@@ -262,11 +262,12 @@ export default function Landing() {
             <p className="text-base max-w-xl mx-auto mb-8" style={{ color: GOLD_DIM }}>
               {t("pricing.desc")}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+            <div className="flex flex-wrap gap-4 justify-center items-center mb-6">
               {[
                 { lk: "pkg.tier1", cost: pricing.mastersTotal },
                 { lk: "pkg.tier2", cost: pricing.bachelorTotal },
                 { lk: "pkg.tier3", cost: pricing.associateTotal },
+                { lk: "pkg.tier4", cost: pricing.diplomaTotal },
               ].map(p => (
                 <div key={p.lk} className="rounded-2xl px-6 py-4 border text-center min-w-[160px]"
                   style={{ background: "rgba(162,137,89,0.05)", borderColor: GOLD_FAINT }}>

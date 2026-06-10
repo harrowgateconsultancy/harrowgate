@@ -75,6 +75,18 @@ const TIERS = [
     features: SHARED_FEATURES,
     note: "The HK$3,000 initial fee is solely for consultancy services (non-refundable). Balance stages are binding after this payment.",
   },
+  {
+    id: "diploma",
+    label: "Diploma Courses",
+    color: "#c084fc",
+    accentBg: "rgba(192,132,252,0.12)",
+    badge: false,
+    totalKey: "diplomaTotal" as keyof PricingConfig,
+    stage2Key: "diplomaStage2" as keyof PricingConfig,
+    stage3Key: "diplomaLastPayment" as keyof PricingConfig,
+    features: SHARED_FEATURES,
+    note: "HK$3,000 initial fee covers consultancy services only (non-refundable). Balance stages are contractually binding upon first payment per HK law.",
+  },
 ];
 
 interface TierDraft {
@@ -244,7 +256,7 @@ export default function Pricing() {
       </div>
 
       {/* Cards */}
-      <div className="grid md:grid-cols-3 gap-6 items-stretch">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
         {TIERS.map(tier => {
           const d = drafts[tier.id] ?? { total: "", stage2: "", stage3: "" };
           const ok = sumOk(d);
