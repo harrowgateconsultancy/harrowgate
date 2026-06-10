@@ -215,36 +215,20 @@ export default function Landing() {
               {
                 num: "01", title: "Create Your Account",
                 desc: "Register with your email or Google account in under a minute. No lengthy forms upfront.",
-                note: "📌 Your data is handled in accordance with the Personal Data (Privacy) Ordinance (Cap. 486).",
-                noteColor: "rgba(162,137,89,0.55)",
-                noteBorder: "rgba(162,137,89,0.25)",
-                noteBg: "rgba(162,137,89,0.05)",
               },
               {
                 num: "02", title: "Submit Your Information",
                 desc: "Provide your personal details and upload your educational documents through our secure client portal.",
-                note: "📌 We review your documents for completeness. You remain responsible for the accuracy of all information submitted.",
-                noteColor: "rgba(162,137,89,0.55)",
-                noteBorder: "rgba(162,137,89,0.25)",
-                noteBg: "rgba(162,137,89,0.05)",
               },
               {
                 num: "03", title: "Expert Review & Preparation",
                 desc: "Our consultants review your submission, prepare a draft of the ID995A form, and provide mock interview guidance.",
-                note: "⚠️ Important: The final ID995A form must be reviewed, signed, and submitted by you personally. We do not sign any government forms on your behalf.",
-                noteColor: "rgba(251,191,36,0.65)",
-                noteBorder: "rgba(251,191,36,0.3)",
-                noteBg: "rgba(251,191,36,0.05)",
               },
             ].map(step => (
               <div key={step.num} className="flex flex-col rounded-2xl p-6 border" style={{ background: "rgba(162,137,89,0.03)", borderColor: GOLD_FAINT }}>
                 <p className="text-4xl font-black mb-4" style={{ color: "rgba(162,137,89,0.25)", letterSpacing: "-0.02em" }}>{step.num}</p>
                 <h3 className="text-lg font-bold mb-2" style={{ color: GOLD }}>{step.title}</h3>
-                <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: GOLD_DIM }}>{step.desc}</p>
-                <div className="rounded-xl px-4 py-3 border-l-4 text-xs leading-relaxed"
-                  style={{ background: step.noteBg, borderLeftColor: step.noteBorder, color: step.noteColor }}>
-                  {step.note}
-                </div>
+                <p className="text-sm leading-relaxed flex-1" style={{ color: GOLD_DIM }}>{step.desc}</p>
               </div>
             ))}
           </div>
@@ -255,28 +239,16 @@ export default function Landing() {
               {
                 num: "04", title: "University Interview Support",
                 desc: "We help you prepare for your university interview through mock sessions and provide checklists for post-interview follow-up.",
-                note: "📌 We guide you on how to communicate with the university. Direct communication remains your responsibility unless you provide signed written authorization that the university expressly accepts.",
-                noteColor: "rgba(162,137,89,0.55)",
-                noteBorder: "rgba(162,137,89,0.25)",
-                noteBg: "rgba(162,137,89,0.05)",
               },
               {
                 num: "05", title: "Receive Your Offer Letter",
                 desc: "Once accepted, you receive the official offer letter directly from the university (email or university portal). We help you understand the next steps.",
-                note: "✅ We do not issue offer letters. The official offer comes solely from the university.",
-                noteColor: "rgba(74,222,128,0.65)",
-                noteBorder: "rgba(74,222,128,0.3)",
-                noteBg: "rgba(74,222,128,0.05)",
               },
             ].map(step => (
               <div key={step.num} className="flex flex-col rounded-2xl p-6 border" style={{ background: "rgba(162,137,89,0.03)", borderColor: GOLD_FAINT }}>
                 <p className="text-4xl font-black mb-4" style={{ color: "rgba(162,137,89,0.25)", letterSpacing: "-0.02em" }}>{step.num}</p>
                 <h3 className="text-lg font-bold mb-2" style={{ color: GOLD }}>{step.title}</h3>
-                <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: GOLD_DIM }}>{step.desc}</p>
-                <div className="rounded-xl px-4 py-3 border-l-4 text-xs leading-relaxed"
-                  style={{ background: step.noteBg, borderLeftColor: step.noteBorder, color: step.noteColor }}>
-                  {step.note}
-                </div>
+                <p className="text-sm leading-relaxed flex-1" style={{ color: GOLD_DIM }}>{step.desc}</p>
               </div>
             ))}
           </div>
