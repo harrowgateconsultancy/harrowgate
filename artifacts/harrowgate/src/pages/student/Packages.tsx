@@ -11,69 +11,57 @@ const GOLD_DIM = "rgba(162,137,89,0.7)";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-const SHARED_FEATURES: { text: string; bold?: boolean }[] = [
-  { text: "1st semester tuition fee inclusive (paid by students)", bold: true },
-  { text: "Application documents review" },
-  { text: "University enrollment guidance" },
-  { text: "Visa document checklist" },
-  { text: "Full application & form filling guide" },
-  { text: "Immigration letter assistance" },
-  { text: "Visa form review & Guidance" },
-  { text: "Pre-departure briefing session" },
-  { text: "Phone plan setup guide" },
-  { text: "Emergency contact protocols" },
-  { text: "Priority WhatsApp support" },
-  { text: "Service ends upon arrival at university", bold: true },
+const FEATURE_KEYS: { key: string; bold?: boolean }[] = [
+  { key: "pkg.feat1", bold: true },
+  { key: "pkg.feat2" },
+  { key: "pkg.feat3" },
+  { key: "pkg.feat4" },
+  { key: "pkg.feat5" },
+  { key: "pkg.feat6" },
+  { key: "pkg.feat7" },
+  { key: "pkg.feat8" },
+  { key: "pkg.feat9" },
+  { key: "pkg.feat10" },
+  { key: "pkg.feat11" },
+  { key: "pkg.feat12", bold: true },
 ];
 
 const PACKAGES = [
   {
-    tierKey:   "tier3",
-    badge:     false,
-    color:     "#4ade80",
-    bg:        "rgba(74,222,128,0.05)",
-    border:    "rgba(74,222,128,0.18)",
-    highlight: false,
-    features:  SHARED_FEATURES,
-    stage2Note:   "due before first submission",
-    stage3Note:   "within 7 days of offer letter",
-    cardNote: "HK$3,000 initial fee is for consultancy services only (eligibility, strategy, planning). Non-refundable once paid — separate from tuition. Remaining stages become binding upon deposit.",
+    tierKey:      "tier3",
+    badge:        false,
+    color:        "#4ade80",
+    bg:           "rgba(74,222,128,0.05)",
+    border:       "rgba(74,222,128,0.18)",
+    highlight:    false,
+    cardNoteKey:  "pkg.note.tier3",
   },
   {
-    tierKey:   "tier2",
-    badge:     true,
-    color:     "#a28959",
-    bg:        "rgba(162,137,89,0.07)",
-    border:    "rgba(162,137,89,0.25)",
-    highlight: true,
-    features:  SHARED_FEATURES,
-    stage2Note:   "due before first submission",
-    stage3Note:   "within 7 days of offer letter",
-    cardNote: "Initial HK$3,000 covers professional consultancy (non-refundable). Not a deposit toward tuition. Once paid, the full payment schedule is contractually binding per HK law.",
+    tierKey:      "tier2",
+    badge:        true,
+    color:        "#a28959",
+    bg:           "rgba(162,137,89,0.07)",
+    border:       "rgba(162,137,89,0.25)",
+    highlight:    true,
+    cardNoteKey:  "pkg.note.tier2",
   },
   {
-    tierKey:   "tier1",
-    badge:     false,
-    color:     "#60a5fa",
-    bg:        "rgba(96,165,250,0.05)",
-    border:    "rgba(96,165,250,0.18)",
-    highlight: false,
-    features:  SHARED_FEATURES,
-    stage2Note:   "due before first submission",
-    stage3Note:   "within 7 days of offer letter",
-    cardNote: "The HK$3,000 initial fee is solely for consultancy services (non-refundable). It is earned upon delivery of strategy & eligibility work. Balance stages are binding after this payment.",
+    tierKey:      "tier1",
+    badge:        false,
+    color:        "#60a5fa",
+    bg:           "rgba(96,165,250,0.05)",
+    border:       "rgba(96,165,250,0.18)",
+    highlight:    false,
+    cardNoteKey:  "pkg.note.tier1",
   },
   {
-    tierKey:   "tier4",
-    badge:     false,
-    color:     "#c084fc",
-    bg:        "rgba(192,132,252,0.05)",
-    border:    "rgba(192,132,252,0.18)",
-    highlight: false,
-    features:  SHARED_FEATURES,
-    stage2Note:   "due before first submission",
-    stage3Note:   "within 7 days of offer letter",
-    cardNote: "HK$3,000 initial fee covers consultancy services only (non-refundable). Balance stages are contractually binding upon first payment per HK law.",
+    tierKey:      "tier4",
+    badge:        false,
+    color:        "#c084fc",
+    bg:           "rgba(192,132,252,0.05)",
+    border:       "rgba(192,132,252,0.18)",
+    highlight:    false,
+    cardNoteKey:  "pkg.note.tier4",
   },
 ];
 
@@ -216,8 +204,8 @@ export default function Packages() {
                     {/* Total price */}
                     <div className="mb-5">
                       <span className="text-4xl font-extrabold" style={{ color: pkg.color }}>{total}</span>
-                      <span className="text-sm ml-2" style={{ color: "rgba(162,137,89,0.45)" }}>total</span>
-                      <p className="text-[11px] mt-0.5" style={{ color: "rgba(162,137,89,0.35)" }}>package</p>
+                      <span className="text-sm ml-2" style={{ color: "rgba(162,137,89,0.45)" }}>{t("pkg.total")}</span>
+                      <p className="text-[11px] mt-0.5" style={{ color: "rgba(162,137,89,0.35)" }}>{t("pkg.package")}</p>
                     </div>
 
                     {/* First payment chips */}
@@ -225,23 +213,23 @@ export default function Packages() {
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold self-start"
                         style={{ background: "rgba(96,165,250,0.12)", color: "#93c5fd", border: "1px solid rgba(96,165,250,0.2)" }}>
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#60a5fa" }} />
-                        First payment: HK$3,000
+                        {t("pkg.firstPay")}
                       </div>
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-medium self-start"
                         style={{ background: "rgba(251,191,36,0.08)", color: "rgba(251,191,36,0.7)", border: "1px solid rgba(251,191,36,0.15)" }}>
-                        🔒 non-refundable consultancy fee
+                        🔒 {t("pkg.nonRefund")}
                       </div>
                     </div>
 
                     {/* Features */}
                     <ul className="space-y-2.5 mb-6">
-                      {pkg.features.map((f, fi) => (
+                      {FEATURE_KEYS.map((f, fi) => (
                         <li key={fi} className="flex items-start gap-2.5 text-sm"
                           style={{ color: f.bold ? pkg.color : GOLD_DIM, fontWeight: f.bold ? 700 : 400 }}>
                           <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: pkg.color }}>
                             <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
-                          {f.text}
+                          {t(f.key)}
                         </li>
                       ))}
                     </ul>
@@ -250,28 +238,28 @@ export default function Packages() {
                     <div className="rounded-xl p-4 mb-4 border" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(251,100,48,0.22)" }}>
                       <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-3 flex items-center gap-1.5"
                         style={{ color: "rgba(251,100,48,0.85)" }}>
-                        <span>⭐</span> Balance Payment Schedule (Binding)
+                        <span>⭐</span> {t("pkg.balanceSchedule")}
                       </p>
                       <div className="space-y-2">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>Stage 2 –</p>
-                            <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>Application</p>
+                            <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>{t("pkg.stage2")} –</p>
+                            <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.stageApp")}</p>
                           </div>
                           <div className="text-right">
                             <p className="text-sm font-bold" style={{ color: pkg.color }}>{dynamicStage2}</p>
-                            <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{pkg.stage2Note}</p>
+                            <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.stage2note")}</p>
                           </div>
                         </div>
                         <div className="border-t pt-2" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                           <div className="flex items-start justify-between gap-2">
                             <div>
-                              <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>Stage 3 –</p>
-                              <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>Success fee</p>
+                              <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>{t("pkg.stage3")} –</p>
+                              <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.stageSuccess")}</p>
                             </div>
                             <div className="text-right">
                               <p className="text-sm font-bold" style={{ color: pkg.color }}>{stage3Amount}</p>
-                              <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{pkg.stage3Note}</p>
+                              <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.stage3note")}</p>
                             </div>
                           </div>
                         </div>
@@ -281,7 +269,7 @@ export default function Packages() {
                     {/* Per-card note */}
                     <div className="rounded-xl px-3.5 py-3 mb-6 border" style={{ background: "rgba(251,191,36,0.04)", borderColor: "rgba(251,191,36,0.12)" }}>
                       <p className="text-[11px] leading-relaxed" style={{ color: "rgba(251,191,36,0.55)" }}>
-                        💡 {pkg.cardNote}
+                        💡 {t(pkg.cardNoteKey)}
                       </p>
                     </div>
                   </div>
@@ -295,7 +283,7 @@ export default function Packages() {
                         color: pkg.highlight ? BG : pkg.color,
                         border: pkg.highlight ? "none" : `1.5px solid ${pkg.border}`,
                       }}>
-                      Start with HK$3,000 →
+                      {t("pkg.startWith")}
                     </Link>
                   </div>
                 </div>

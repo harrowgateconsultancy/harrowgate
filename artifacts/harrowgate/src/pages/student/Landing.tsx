@@ -217,18 +217,9 @@ export default function Landing() {
           {/* Row 1 — 3 cards */}
           <div className="grid md:grid-cols-3 gap-5 mb-5">
             {[
-              {
-                num: "01", title: "Create Your Account",
-                desc: "Register with your email or Google account in under a minute. No lengthy forms upfront.",
-              },
-              {
-                num: "02", title: "Submit Your Information",
-                desc: "Provide your personal details and upload your educational documents through our secure client portal.",
-              },
-              {
-                num: "03", title: "Expert Review & Preparation",
-                desc: "Our consultants review your submission, prepare a draft of the ID995A form, and provide mock interview guidance.",
-              },
+              { num: "01", title: t("how.step1"), desc: t("how.d1") },
+              { num: "02", title: t("how.step2"), desc: t("how.d2") },
+              { num: "03", title: t("how.step3"), desc: t("how.d3") },
             ].map(step => (
               <div key={step.num} className="flex flex-col rounded-2xl p-6 border" style={{ background: "rgba(162,137,89,0.03)", borderColor: GOLD_FAINT }}>
                 <p className="text-4xl font-black mb-4" style={{ color: "rgba(162,137,89,0.25)", letterSpacing: "-0.02em" }}>{step.num}</p>
@@ -241,14 +232,8 @@ export default function Landing() {
           {/* Row 2 — 2 cards centred */}
           <div className="grid md:grid-cols-2 gap-5 md:max-w-[66%] mx-auto">
             {[
-              {
-                num: "04", title: "University Interview Support",
-                desc: "We help you prepare for your university interview through mock sessions and provide checklists for post-interview follow-up.",
-              },
-              {
-                num: "05", title: "Receive Your Offer Letter",
-                desc: "Once accepted, you receive the official offer letter directly from the university (email or university portal). We help you understand the next steps.",
-              },
+              { num: "04", title: t("how.step4"), desc: t("how.d4") },
+              { num: "05", title: t("how.step5"), desc: t("how.d5") },
             ].map(step => (
               <div key={step.num} className="flex flex-col rounded-2xl p-6 border" style={{ background: "rgba(162,137,89,0.03)", borderColor: GOLD_FAINT }}>
                 <p className="text-4xl font-black mb-4" style={{ color: "rgba(162,137,89,0.25)", letterSpacing: "-0.02em" }}>{step.num}</p>
@@ -269,7 +254,7 @@ export default function Landing() {
             </p>
             <p className="text-sm font-semibold max-w-lg mx-auto mb-8 px-5 py-3 rounded-full border"
               style={{ color: GOLD, borderColor: "rgba(162,137,89,0.25)", background: "rgba(162,137,89,0.07)" }}>
-              ✦ Pay only <span className="font-extrabold">HKD$ 3,000</span> and an expert will guide you through the complete procedure from A–Z
+              ✦ {t("how.payPill")}
             </p>
             <div className="flex flex-wrap gap-4 justify-center items-center mb-6">
               {[
