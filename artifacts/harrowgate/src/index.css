@@ -71,12 +71,12 @@
 
   /* Forest Green + Clean Whites */
   --background: 210 20% 98%;
-  --foreground: 97 34% 10%;
+  --foreground: 106 65% 11%;
   
   --border: 140 20% 88%;
   
   --card: 0 0% 100%;
-  --card-foreground: 97 34% 10%;
+  --card-foreground: 106 65% 11%;
   --card-border: 140 20% 88%;
   
   /* Sidebar uses deep forest green */
@@ -90,7 +90,7 @@
   --sidebar-ring: 153 60% 31%;
   
   --popover: 0 0% 100%;
-  --popover-foreground: 97 34% 10%;
+  --popover-foreground: 106 65% 11%;
   --popover-border: 140 20% 88%;
   
   --primary: 153 60% 31%;
