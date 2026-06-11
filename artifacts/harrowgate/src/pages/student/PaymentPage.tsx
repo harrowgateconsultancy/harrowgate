@@ -4,8 +4,8 @@ import type { Submission } from "./Portal";
 import TermsModal from "./TermsModal";
 import { usePricing } from "../../hooks/usePricing";
 
-const BG = "#f0faf5";
-const GOLD = "#13300a";
+const BG = "#0b2213";
+const GOLD = "#a28959";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
 

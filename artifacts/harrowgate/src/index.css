@@ -69,47 +69,47 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* Forest Green + Clean Whites */
+  /* Deep Navy and Clean Whites */
   --background: 210 20% 98%;
-  --foreground: 106 65% 11%;
+  --foreground: 222 47% 11%;
   
-  --border: 140 20% 88%;
+  --border: 214 32% 91%;
   
   --card: 0 0% 100%;
-  --card-foreground: 106 65% 11%;
-  --card-border: 140 20% 88%;
+  --card-foreground: 222 47% 11%;
+  --card-border: 214 32% 91%;
   
-  /* Sidebar uses deep forest green */
-  --sidebar: 97 34% 17%;
-  --sidebar-foreground: 0 0% 96%;
-  --sidebar-border: 93 40% 10%;
-  --sidebar-primary: 153 60% 31%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 140 44% 26%;
-  --sidebar-accent-foreground: 0 0% 96%;
-  --sidebar-ring: 153 60% 31%;
+  /* Sidebar uses deep navy */
+  --sidebar: 220 64% 16%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-border: 220 64% 12%;
+  --sidebar-primary: 44 54% 54%;
+  --sidebar-primary-foreground: 220 64% 16%;
+  --sidebar-accent: 220 64% 20%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-ring: 44 54% 54%;
   
   --popover: 0 0% 100%;
-  --popover-foreground: 106 65% 11%;
-  --popover-border: 140 20% 88%;
+  --popover-foreground: 222 47% 11%;
+  --popover-border: 214 32% 91%;
   
-  --primary: 153 60% 31%;
-  --primary-foreground: 0 0% 100%;
+  --primary: 44 54% 54%;
+  --primary-foreground: 220 64% 16%;
   
-  --secondary: 97 34% 17%;
+  --secondary: 220 64% 16%;
   --secondary-foreground: 0 0% 100%;
   
-  --muted: 140 15% 95%;
-  --muted-foreground: 97 20% 40%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
   
-  --accent: 140 15% 95%;
-  --accent-foreground: 97 34% 10%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
   
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
   
-  --input: 140 20% 88%;
-  --ring: 153 60% 31%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 44 54% 54%;
   
   --app-font-sans: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --app-font-serif: Georgia, serif;
@@ -126,45 +126,45 @@
 }
 
 .dark {
-  --background: 140 44% 26%;
-  --foreground: 0 0% 97%;
+  --background: 220 64% 12%;
+  --foreground: 210 40% 98%;
   
-  --border: 140 35% 35%;
+  --border: 220 64% 20%;
   
-  --card: 140 40% 32%;
-  --card-foreground: 0 0% 97%;
-  --card-border: 140 35% 35%;
+  --card: 220 64% 16%;
+  --card-foreground: 210 40% 98%;
+  --card-border: 220 64% 20%;
   
-  --sidebar: 97 40% 13%;
-  --sidebar-foreground: 0 0% 96%;
-  --sidebar-border: 97 40% 17%;
-  --sidebar-primary: 153 65% 50%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 140 40% 32%;
-  --sidebar-accent-foreground: 0 0% 96%;
-  --sidebar-ring: 153 65% 50%;
+  --sidebar: 220 64% 10%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-border: 220 64% 16%;
+  --sidebar-primary: 44 54% 54%;
+  --sidebar-primary-foreground: 220 64% 16%;
+  --sidebar-accent: 220 64% 16%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-ring: 44 54% 54%;
   
-  --popover: 140 40% 32%;
-  --popover-foreground: 0 0% 97%;
-  --popover-border: 140 35% 35%;
+  --popover: 220 64% 16%;
+  --popover-foreground: 210 40% 98%;
+  --popover-border: 220 64% 20%;
   
-  --primary: 153 65% 50%;
-  --primary-foreground: 0 0% 100%;
+  --primary: 44 54% 54%;
+  --primary-foreground: 220 64% 16%;
   
-  --secondary: 140 15% 95%;
-  --secondary-foreground: 140 44% 26%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
   
-  --muted: 140 40% 32%;
-  --muted-foreground: 140 20% 75%;
+  --muted: 220 64% 20%;
+  --muted-foreground: 215 20.2% 65.1%;
   
-  --accent: 140 40% 32%;
-  --accent-foreground: 0 0% 97%;
+  --accent: 220 64% 20%;
+  --accent-foreground: 210 40% 98%;
   
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 40% 98%;
   
-  --input: 140 38% 34%;
-  --ring: 153 65% 50%;
+  --input: 220 64% 20%;
+  --ring: 44 54% 54%;
 }
 
 @layer base {
@@ -226,14 +226,14 @@
 .admin-submissions input:focus,
 .admin-submissions textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(31, 125, 83, 0.18);
+  box-shadow: 0 0 0 3px rgba(162, 137, 89, 0.18);
 }
 
 /* File upload drag zone */
 .admin-submissions .upload-zone {
-  border: 2px dashed rgba(31, 125, 83, 0.30);
+  border: 2px dashed rgba(162, 137, 89, 0.30);
   border-radius: 20px;
-  background: rgba(31, 125, 83, 0.03);
+  background: rgba(162, 137, 89, 0.03);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -242,8 +242,8 @@
   cursor: pointer;
 }
 .admin-submissions .upload-zone:hover {
-  border-color: rgba(31, 125, 83, 0.55);
-  background: rgba(31, 125, 83, 0.07);
+  border-color: rgba(162, 137, 89, 0.55);
+  background: rgba(162, 137, 89, 0.07);
 }
 
 /* Toast slide-in animation */

@@ -4,10 +4,10 @@ import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
 import { usePageSEO } from "../../hooks/usePageSEO";
 
-const BG = "#f0faf5";
-const GOLD = "#13300a";
-const GOLD_FAINT = "rgba(19,48,10,0.12)";
-const GOLD_DIM = "rgba(19,48,10,0.7)";
+const BG = "#0b2213";
+const GOLD = "#a28959";
+const GOLD_FAINT = "rgba(162,137,89,0.12)";
+const GOLD_DIM = "rgba(162,137,89,0.7)";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -40,8 +40,8 @@ const PACKAGES = [
     tierKey:      "tier2",
     badge:        true,
     color:        "#13300a",
-    bg:           "rgba(19,48,10,0.07)",
-    border:       "rgba(19,48,10,0.25)",
+    bg:           "rgba(162,137,89,0.07)",
+    border:       "rgba(162,137,89,0.25)",
     highlight:    true,
     cardNoteKey:  "pkg.note.tier2",
   },
@@ -78,18 +78,18 @@ function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void
     <div ref={ref} style={{ position: "relative" }}>
       <button onClick={() => setOpen(v => !v)}
         className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium transition-all hover:opacity-80"
-        style={{ borderColor: "rgba(19,48,10,0.2)", color: "rgba(19,48,10,0.7)", background: "rgba(19,48,10,0.05)" }}>
+        style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.7)", background: "rgba(162,137,89,0.05)" }}>
         <span>{current?.flag}</span>
         <span className="hidden sm:inline">{current?.name}</span>
         <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-2.5 h-2.5"><path d="M1 1l4 4 4-4" /></svg>
       </button>
       {open && (
         <div className="absolute top-full right-0 mt-1.5 rounded-xl border shadow-2xl z-50 overflow-hidden"
-          style={{ background: "#0a1f0e", borderColor: "rgba(19,48,10,0.2)", minWidth: 160 }}>
+          style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.2)", minWidth: 160 }}>
           {LANG_LIST.map((l) => (
             <button key={l.code} onClick={() => { setLang(l.code); setOpen(false); }}
               className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all hover:opacity-90 text-left"
-              style={{ background: l.code === lang ? "rgba(19,48,10,0.12)" : "transparent", color: l.code === lang ? GOLD : "rgba(19,48,10,0.55)" }}>
+              style={{ background: l.code === lang ? "rgba(162,137,89,0.12)" : "transparent", color: l.code === lang ? GOLD : "rgba(162,137,89,0.55)" }}>
               <span className="text-base">{l.flag}</span> {l.name}
             </button>
           ))}
@@ -111,8 +111,8 @@ export default function Packages() {
   return (
     <div className="min-h-screen overflow-x-hidden" dir={isRtl ? "rtl" : "ltr"} style={{ background: BG, fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
-        <div style={{ position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)", width: "900px", height: "600px", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(19,48,10,0.06) 0%, transparent 70%)" }} />
-        <div style={{ position: "absolute", bottom: "10%", right: "-5%", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(19,48,10,0.04) 0%, transparent 70%)" }} />
+        <div style={{ position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)", width: "900px", height: "600px", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(162,137,89,0.06) 0%, transparent 70%)" }} />
+        <div style={{ position: "absolute", bottom: "10%", right: "-5%", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(162,137,89,0.04) 0%, transparent 70%)" }} />
       </div>
 
       <div style={{ position: "relative", zIndex: 1 }}>
@@ -127,7 +127,7 @@ export default function Packages() {
               <Link href="/" className="text-sm transition-opacity hover:opacity-70 px-4 py-2" style={{ color: GOLD_DIM }}>{t("nav.back")}</Link>
               <Link href="/sign-up"
                 className="text-sm font-semibold px-5 py-2.5 rounded-full transition-all hover:opacity-90 hover:scale-105"
-                style={{ background: GOLD, color: BG, boxShadow: "0 4px 16px rgba(19,48,10,0.3)" }}>
+                style={{ background: GOLD, color: BG, boxShadow: "0 4px 16px rgba(162,137,89,0.3)" }}>
                 {t("nav.getStarted")}
               </Link>
             </div>
@@ -137,7 +137,7 @@ export default function Packages() {
         {/* Hero */}
         <section className="pt-20 pb-12 text-center px-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border"
-            style={{ background: "rgba(19,48,10,0.08)", borderColor: GOLD_FAINT }}>
+            style={{ background: "rgba(162,137,89,0.08)", borderColor: GOLD_FAINT }}>
             <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#4ade80" }} />
             <p className="text-xs font-semibold tracking-[0.25em] uppercase" style={{ color: GOLD_DIM }}>
               {t("pkg.badge")}
@@ -183,7 +183,7 @@ export default function Packages() {
                   style={{
                     background: pkg.bg,
                     borderColor: pkg.border,
-                    boxShadow: pkg.highlight ? "0 0 50px rgba(19,48,10,0.15)" : "none",
+                    boxShadow: pkg.highlight ? "0 0 50px rgba(162,137,89,0.15)" : "none",
                   }}>
 
                   {/* Most Popular badge */}
@@ -197,15 +197,15 @@ export default function Packages() {
                   <div className="p-7 pb-5">
                     {/* Title */}
                     <h2 className="text-2xl font-bold mb-0.5" style={{ color: pkg.color }}>{t(`pkg.${pkg.tierKey}`)}</h2>
-                    <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-5" style={{ color: "rgba(19,48,10,0.4)" }}>
+                    <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-5" style={{ color: "rgba(162,137,89,0.4)" }}>
                       {t("pkg.fullService")}
                     </p>
 
                     {/* Total price */}
                     <div className="mb-5">
                       <span className="text-4xl font-extrabold" style={{ color: pkg.color }}>{total}</span>
-                      <span className="text-sm ml-2" style={{ color: "rgba(19,48,10,0.45)" }}>{t("pkg.total")}</span>
-                      <p className="text-[11px] mt-0.5" style={{ color: "rgba(19,48,10,0.35)" }}>{t("pkg.package")}</p>
+                      <span className="text-sm ml-2" style={{ color: "rgba(162,137,89,0.45)" }}>{t("pkg.total")}</span>
+                      <p className="text-[11px] mt-0.5" style={{ color: "rgba(162,137,89,0.35)" }}>{t("pkg.package")}</p>
                     </div>
 
                     {/* First payment chips */}
@@ -244,22 +244,22 @@ export default function Packages() {
                         <div className="flex items-start justify-between gap-2">
                           <div>
                             <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>{t("pkg.stage2")} –</p>
-                            <p className="text-xs" style={{ color: "rgba(19,48,10,0.5)" }}>{t("pkg.stageApp")}</p>
+                            <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.stageApp")}</p>
                           </div>
                           <div className="text-right">
                             <p className="text-sm font-bold" style={{ color: pkg.color }}>{dynamicStage2}</p>
-                            <p className="text-[10px]" style={{ color: "rgba(19,48,10,0.4)" }}>{t("pkg.stage2note")}</p>
+                            <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.stage2note")}</p>
                           </div>
                         </div>
-                        <div className="border-t pt-2" style={{ borderColor: "rgba(19,48,10,0.1)" }}>
+                        <div className="border-t pt-2" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>{t("pkg.stage3")} –</p>
-                              <p className="text-xs" style={{ color: "rgba(19,48,10,0.5)" }}>{t("pkg.stageSuccess")}</p>
+                              <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.stageSuccess")}</p>
                             </div>
                             <div className="text-right">
                               <p className="text-sm font-bold" style={{ color: pkg.color }}>{stage3Amount}</p>
-                              <p className="text-[10px]" style={{ color: "rgba(19,48,10,0.4)" }}>{t("pkg.stage3note")}</p>
+                              <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.stage3note")}</p>
                             </div>
                           </div>
                         </div>
@@ -292,7 +292,7 @@ export default function Packages() {
           </div>
 
           {/* After payment note */}
-          <div className="mt-12 rounded-2xl p-6 border text-center max-w-2xl mx-auto" style={{ background: "rgba(19,48,10,0.04)", borderColor: GOLD_FAINT }}>
+          <div className="mt-12 rounded-2xl p-6 border text-center max-w-2xl mx-auto" style={{ background: "rgba(162,137,89,0.04)", borderColor: GOLD_FAINT }}>
             <p className="text-base font-semibold mb-2" style={{ color: GOLD }}>{t("pkg.afterTitle")}</p>
             <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{t("pkg.afterSub")}</p>
           </div>
@@ -303,12 +303,12 @@ export default function Packages() {
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-5">
               <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-12 object-contain opacity-50" />
-              <p className="text-xs" style={{ color: "rgba(19,48,10,0.3)" }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
+              <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
             </div>
-            <div className="rounded-xl border px-5 py-4 text-center" style={{ borderColor: "rgba(19,48,10,0.12)", background: "rgba(19,48,10,0.04)" }}>
-              <p className="text-[11px] leading-relaxed" style={{ color: "rgba(19,48,10,0.4)" }}>
-                <span className="font-semibold" style={{ color: "rgba(19,48,10,0.6)" }}>Legal Notice:</span> HARROWGATE Consultancy is an education consultancy only. We are <span className="font-semibold">not</span> a licensed immigration service provider under the Immigration Service Providers (Regulation) Ordinance (Cap. 658). We do not provide immigration advice or legal advice. For immigration matters, please consult a provider registered with the{" "}
-                <a href="https://www.ispb.gov.hk" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-70" style={{ color: "rgba(19,48,10,0.55)" }}>Immigration Service Providers Board</a>.
+            <div className="rounded-xl border px-5 py-4 text-center" style={{ borderColor: "rgba(162,137,89,0.12)", background: "rgba(162,137,89,0.04)" }}>
+              <p className="text-[11px] leading-relaxed" style={{ color: "rgba(162,137,89,0.4)" }}>
+                <span className="font-semibold" style={{ color: "rgba(162,137,89,0.6)" }}>Legal Notice:</span> HARROWGATE Consultancy is an education consultancy only. We are <span className="font-semibold">not</span> a licensed immigration service provider under the Immigration Service Providers (Regulation) Ordinance (Cap. 658). We do not provide immigration advice or legal advice. For immigration matters, please consult a provider registered with the{" "}
+                <a href="https://www.ispb.gov.hk" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-70" style={{ color: "rgba(162,137,89,0.55)" }}>Immigration Service Providers Board</a>.
               </p>
             </div>
           </div>
