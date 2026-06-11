@@ -4,9 +4,11 @@ import { useLocation } from "wouter";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
 
-const GOLD = "#1F7D53";
-const GOLD_DIM = "rgba(31,125,83,0.55)";
-const BG = "#18230F";
+const BG = "#1a3d24";
+const ACCENT = "#1F7D53";
+const TEXT = "#ffffff";
+const TEXT_DIM = "rgba(255,255,255,0.65)";
+const TEXT_FAINT = "rgba(255,255,255,0.25)";
 
 export default function AdminLogin() {
   const [, setLocation] = useLocation();
@@ -46,17 +48,17 @@ export default function AdminLogin() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <img src={`${BASE}/harrowgate-logo.png`} alt="HARROWGATE" className="h-16 mx-auto mb-6 object-contain" />
-          <p className="text-xs font-semibold tracking-[0.3em] uppercase" style={{ color: GOLD_DIM }}>
+          <p className="text-xs font-semibold tracking-[0.3em] uppercase" style={{ color: TEXT_DIM }}>
             Admin Portal
           </p>
         </div>
 
         <form onSubmit={handleSubmit}
           className="rounded-2xl border p-8 space-y-5"
-          style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(31,125,83,0.15)" }}>
+          style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(255,255,255,0.10)" }}>
 
           <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: GOLD_DIM }}>
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: TEXT_DIM }}>
               Username
             </label>
             <input
@@ -65,13 +67,13 @@ export default function AdminLogin() {
               onChange={e => setUsername(e.target.value)}
               autoComplete="username"
               required
-              className="w-full text-sm px-4 py-3 rounded-xl border bg-transparent outline-none transition-colors"
-              style={{ borderColor: "rgba(31,125,83,0.2)", color: GOLD, background: "rgba(31,125,83,0.04)" }}
+              className="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-colors"
+              style={{ borderColor: "rgba(255,255,255,0.15)", color: TEXT, background: "rgba(255,255,255,0.07)" }}
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: GOLD_DIM }}>
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: TEXT_DIM }}>
               Password
             </label>
             <input
@@ -80,8 +82,8 @@ export default function AdminLogin() {
               onChange={e => setPassword(e.target.value)}
               autoComplete="current-password"
               required
-              className="w-full text-sm px-4 py-3 rounded-xl border bg-transparent outline-none transition-colors"
-              style={{ borderColor: "rgba(31,125,83,0.2)", color: GOLD, background: "rgba(31,125,83,0.04)" }}
+              className="w-full text-sm px-4 py-3 rounded-xl border outline-none transition-colors"
+              style={{ borderColor: "rgba(255,255,255,0.15)", color: TEXT, background: "rgba(255,255,255,0.07)" }}
             />
           </div>
 
@@ -94,14 +96,14 @@ export default function AdminLogin() {
 
           <button type="submit" disabled={loading}
             className="w-full py-3 rounded-xl text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
-            style={{ background: "rgba(31,125,83,0.15)", color: GOLD, border: `1px solid rgba(31,125,83,0.3)` }}>
+            style={{ background: ACCENT, color: "#ffffff", boxShadow: "0 4px 16px rgba(31,125,83,0.4)" }}>
             {loading
-              ? <><span className="w-4 h-4 rounded-full border-2 animate-spin" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Signing in…</>
+              ? <><span className="w-4 h-4 rounded-full border-2 animate-spin" style={{ borderColor: "#ffffff", borderTopColor: "transparent" }} /> Signing in…</>
               : "Sign In"}
           </button>
         </form>
 
-        <p className="text-xs text-center mt-6" style={{ color: "rgba(31,125,83,0.25)" }}>
+        <p className="text-xs text-center mt-6" style={{ color: TEXT_FAINT }}>
           HARROWGATE Consultancy · Admin access only
         </p>
       </div>

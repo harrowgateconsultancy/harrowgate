@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 
-const BG = "#18230F";
+const BG = "#f0faf5";
 const GOLD = "#1F7D53";
 
 const TERMS_TEXT = `IMPORTANT DISCLAIMER
@@ -340,7 +340,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
             >
               {checked && (
                 <svg viewBox="0 0 12 10" fill="none" width={10} height={10}>
-                  <path d="M1 5l3.5 3.5L11 1" stroke="#18230F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M1 5l3.5 3.5L11 1" stroke="#255F38" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </div>

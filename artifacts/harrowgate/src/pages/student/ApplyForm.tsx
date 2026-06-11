@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { useSession } from "@clerk/react";
 import { COURSES, LEVEL_LABELS, getCoursesByLevel, type DegreeLevel } from "../../data/courses";
 
-const BG = "#18230F";
+const BG = "#f0faf5";
 const GOLD = "#1F7D53";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 

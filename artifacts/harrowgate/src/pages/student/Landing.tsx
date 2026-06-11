@@ -4,7 +4,7 @@ import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
 import { usePageSEO } from "../../hooks/usePageSEO";
 
-const BG = "#18230F";
+const BG = "#f0faf5";
 const GOLD = "#1F7D53";
 const GOLD_DIM = "rgba(31,125,83,0.7)";
 const GOLD_FAINT = "rgba(31,125,83,0.12)";

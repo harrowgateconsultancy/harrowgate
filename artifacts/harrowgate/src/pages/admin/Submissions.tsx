@@ -248,7 +248,7 @@ export default function Submissions() {
 
   const C = {
     card: "#0f2d18",
-    subtle: "#18230F",
+    subtle: "#255F38",
     muted: "rgba(31,125,83,0.10)",
     softBlue: "#163320",
     border: "rgba(31,125,83,0.15)",
@@ -263,7 +263,7 @@ export default function Submissions() {
     inputBg: "rgba(31,125,83,0.07)",
   };
   const GOLD = "#1F7D53";
-  const BG = "#18230F";
+  const BG = "#255F38";
 
   const qc = useQueryClient();
   const [, setLocation] = useLocation();
@@ -1140,7 +1140,7 @@ export default function Submissions() {
                   background: selectedIds.size === filtered.length && filtered.length > 0 ? GOLD : "transparent",
                 }}>
                 {selectedIds.size === filtered.length && filtered.length > 0 && (
-                  <svg viewBox="0 0 10 10" fill="none" className="w-2.5 h-2.5"><path d="M2 5l2 2 4-4" stroke="#18230F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <svg viewBox="0 0 10 10" fill="none" className="w-2.5 h-2.5"><path d="M2 5l2 2 4-4" stroke="#255F38" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 )}
               </div>
               {selectedIds.size === filtered.length && filtered.length > 0 ? "Deselect All" : `Select All (${filtered.length})`}
@@ -1201,7 +1201,7 @@ export default function Submissions() {
                     }}>
                     {selectedIds.has(s.id) && (
                       <svg viewBox="0 0 10 10" fill="none" className="w-2.5 h-2.5">
-                        <path d="M2 5l2 2 4-4" stroke="#18230F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M2 5l2 2 4-4" stroke="#255F38" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     )}
                   </button>
@@ -2332,7 +2332,7 @@ export default function Submissions() {
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "rgba(31,125,83,0.15)", borderColor: "rgba(31,125,83,0.30)" }}>
                       <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>📎 Additional Documents</p>
                       {selected.additionalDocsRequested && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#1F7D53", color: "#18230F" }}>Pending student response</span>
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#1F7D53", color: "#255F38" }}>Pending student response</span>
                       )}
                       {additionalDocsSent === selected.id && !selected.additionalDocsRequested && (
                         <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(31,125,83,0.25)", color: "#1F7D53" }}>✓ Request sent</span>
@@ -2363,8 +2363,8 @@ export default function Submissions() {
                           <div className="flex gap-2">
                             <button onClick={handleRequestAdditionalDocs} disabled={sendingAdditionalDocs}
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
-                              style={{ background: "#1F7D53", borderColor: "#8a7245", color: "#18230F" }}>
-                              {sendingAdditionalDocs ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#18230F", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Request"}
+                              style={{ background: "#1F7D53", borderColor: "#8a7245", color: "#255F38" }}>
+                              {sendingAdditionalDocs ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#255F38", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Request"}
                             </button>
                             <button onClick={() => setAdditionalDocsForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
@@ -2383,7 +2383,7 @@ export default function Submissions() {
                 {detailTab === "messages" && (<div className="space-y-6">
                 {/* Send Message to Student */}
                 {selected.status !== "rejected" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#18230F", borderColor: "rgba(31,125,83,0.45)" }}>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#255F38", borderColor: "rgba(31,125,83,0.45)" }}>
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "rgba(31,125,83,0.12)", borderColor: "rgba(31,125,83,0.25)" }}>
                       <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>✉️ Message Student</p>
                       {messageSent === selected.id && !messageForm && (
@@ -2405,7 +2405,7 @@ export default function Submissions() {
                                   {msg.fromAdmin ? "You (Admin)" : selected.name}
                                 </span>
                                 {!msg.isRead && !msg.fromAdmin && (
-                                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: "#1F7D53", color: "#18230F" }}>NEW</span>
+                                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: "#1F7D53", color: "#255F38" }}>NEW</span>
                                 )}
                                 <span className="ml-auto" style={{ color: "rgba(31,125,83,0.55)" }}>
                                   {new Date(msg.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} {new Date(msg.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}

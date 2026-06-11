@@ -10,7 +10,7 @@ import { usePricing } from "../../hooks/usePricing";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
 import { io as socketIo } from "socket.io-client";
 
-const BG = "#18230F";
+const BG = "#f0faf5";
 const _GOLD = "#1F7D53";
 
 function CoursesPanel() {
@@ -418,7 +418,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                   onClick={handleSend}
                   disabled={composeSending || !composeTo.trim() || !composeSubject.trim() || !composeBody.trim()}
                   className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80 disabled:opacity-40"
-                  style={{ background: _GOLD, color: "#18230F" }}>
+                  style={{ background: _GOLD, color: "#255F38" }}>
                   {composeSending ? "Sending…" : "Send ✉️"}
                 </button>
               </div>
@@ -439,7 +439,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold" style={{ color: _GOLD }}>Application Inbox</p>
             {unread > 0 && (
-              <span className="text-xs px-1.5 py-0.5 rounded-full font-bold" style={{ background: "#1F7D53", color: "#18230F" }}>{unread}</span>
+              <span className="text-xs px-1.5 py-0.5 rounded-full font-bold" style={{ background: "#1F7D53", color: "#255F38" }}>{unread}</span>
             )}
           </div>
           <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(31,125,83,0.45)" }}>{submission.sharedEmail}</p>
@@ -850,7 +850,7 @@ export default function Portal() {
           const h2c = await import("html2canvas");
           const canvas = await h2c.default(portalRef.current, {
             scale: 0.85, useCORS: true, allowTaint: true,
-            backgroundColor: "#18230F", logging: false,
+            backgroundColor: "#255F38", logging: false,
           });
           socket.emit("student:frame", canvas.toDataURL("image/jpeg", 0.82));
         } catch { /* ignore capture errors */ }
@@ -936,7 +936,7 @@ export default function Portal() {
                   <path d="M10 2a6 6 0 00-6 6v2.586l-.707.707A1 1 0 004 13h12a1 1 0 00.707-1.707L16 10.586V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z"/>
                 </svg>
                 <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
-                  style={{ background: GOLD, color: "#18230F" }}>
+                  style={{ background: GOLD, color: "#255F38" }}>
                   {totalUnread > 9 ? "9+" : totalUnread}
                 </span>
               </button>
@@ -1000,7 +1000,7 @@ export default function Portal() {
                 {tab.label}
                 {tab.badge != null && tab.badge > 0 && (
                   <span className="ml-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
-                    style={{ background: GOLD, color: "#18230F" }}>
+                    style={{ background: GOLD, color: "#255F38" }}>
                     {tab.badge > 9 ? "9+" : tab.badge}
                   </span>
                 )}
@@ -1843,10 +1843,10 @@ export default function Portal() {
                     />
                     <button onClick={handleSendReply} disabled={sendingReply || (!replyBody.trim() && replyAttachments.length === 0)}
                       className="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:opacity-90 disabled:opacity-40"
-                      style={{ background: "#60a5fa", color: "#18230F" }}
+                      style={{ background: "#60a5fa", color: "#255F38" }}
                       title={t("portal.ctrlEnter")}>
                       {sendingReply
-                        ? <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#18230F", borderTopColor: "transparent" }} />
+                        ? <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#255F38", borderTopColor: "transparent" }} />
                         : <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>}
                     </button>
                   </div>
