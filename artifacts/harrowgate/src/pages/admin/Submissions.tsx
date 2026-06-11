@@ -340,6 +340,7 @@ export default function Submissions() {
   const [customBankSaved, setCustomBankSaved] = useState(false);
   const [savingProgramme, setSavingProgramme] = useState(false);
   const [programmeSaved, setProgrammeSaved] = useState(false);
+  const [detailTab, setDetailTab] = useState<"overview" | "documents" | "workflow" | "messages" | "settings">("overview");
 
   // Toast notifications
   const [toasts, setToasts] = useState<Array<{ id: number; msg: string; type: "success" | "error" | "info" }>>([]);
@@ -825,6 +826,7 @@ export default function Submissions() {
 
   useEffect(() => { if (showTrash) loadTrash(); }, [showTrash]);
   useEffect(() => { if (showPricing) loadPricing(); }, [showPricing]);
+  useEffect(() => { setDetailTab("overview"); }, [selected?.id]);
 
   const megaSyncTarget: Submission | null =
     selected ??
@@ -1339,6 +1341,38 @@ export default function Submissions() {
               </div>
             </div>
 
+            {/* ── Tab navigation ── */}
+            <div className="flex border-b shrink-0" style={{ borderColor: C.borderFaint, background: C.subtle }}>
+              {([
+                { id: "overview",  label: "Overview",  icon: "📋" },
+                { id: "documents", label: "Docs",      icon: "📁" },
+                { id: "workflow",  label: "Workflow",  icon: "⚡" },
+                { id: "messages",  label: "Messages",  icon: "💬" },
+                { id: "settings",  label: "Settings",  icon: "🔧" },
+              ] as { id: string; label: string; icon: string }[]).map(tab => {
+                const isActive = detailTab === tab.id;
+                const badge =
+                  tab.id === "documents" ? (selected.documents.length || null) :
+                  tab.id === "messages" ? (adminMessages.filter((m: any) => !m.fromAdmin && !m.isRead).length || null) :
+                  null;
+                const dot = tab.id === "workflow" && ["acknowledged","interview_arranged","second_payment_received","second_payment_confirmed","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status);
+                return (
+                  <button key={tab.id}
+                    onClick={() => setDetailTab(tab.id as typeof detailTab)}
+                    className="relative flex-1 flex flex-col items-center py-2.5 gap-0.5 text-xs font-medium transition-colors"
+                    style={{ color: isActive ? GOLD : C.textFaint, borderBottom: `2px solid ${isActive ? GOLD : "transparent"}` }}>
+                    <span className="text-sm leading-none">{tab.icon}</span>
+                    <span className="leading-none">{tab.label}</span>
+                    {(badge && badge > 0) ? (
+                      <span className="absolute top-1 right-2 text-[9px] font-bold px-1 rounded-full leading-4" style={{ background: GOLD, color: C.card }}>{badge}</span>
+                    ) : dot ? (
+                      <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full" style={{ background: "#fb923c" }} />
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+
             <div className="overflow-y-auto flex-1">
               {/* Inline preview */}
               {previewDoc && (
@@ -1373,7 +1407,9 @@ export default function Submissions() {
                 </div>
               )}
 
-              <div className="px-4 sm:px-6 py-4 sm:py-5 space-y-6">
+              <div className="px-4 sm:px-6 py-4 sm:py-5">
+                {/* ── DOCUMENTS TAB ── */}
+                {detailTab === "documents" && (<div className="space-y-6">
                 {/* Documents */}
                 <div>
                   <p className="text-sm font-semibold mb-3" style={{ color: GOLD }}>Documents ({selected.documents.length})</p>
@@ -1422,7 +1458,10 @@ export default function Submissions() {
                       onChange={e => { const f = e.target.files?.[0]; if (f) handleAdminUpload(f); }} />
                   </div>
                 </div>
+                </div>)}
 
+                {/* ── OVERVIEW TAB ── */}
+                {detailTab === "overview" && (<div className="space-y-6">
                 {/* Application Details — always visible summary of all recorded info */}
                 {(selected.interviewZoomLink || selected.interviewDateTime || selected.uniInterviewLink || selected.uniInterviewDateTime || selected.additionalDocsRequestNote || selected.adminNotes) && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.border }}>
@@ -1523,7 +1562,17 @@ export default function Submissions() {
                     ))}
                   </div>
                 )}
+                {/* Save Notes */}
+                <button onClick={() => updateStatus.mutate({ id: selected.id, status: selected.status, adminNotes: notes })}
+                  disabled={updateStatus.isPending}
+                  className="w-full py-2.5 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-50"
+                  style={{ borderColor: C.border, color: C.textMid }}>
+                  Save Notes
+                </button>
+                </div>)}
 
+                {/* ── SETTINGS TAB ── */}
+                {detailTab === "settings" && (<div className="space-y-6">
                 {/* Shared Application Email — visible for acknowledged and beyond */}
                 {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
@@ -1717,7 +1766,18 @@ export default function Submissions() {
                 {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
                   <OutboxPanel submissionId={selected.id} C={C} GOLD={GOLD} />
                 )}
+                </div>)}
 
+                {/* ── WORKFLOW TAB ── */}
+                {detailTab === "workflow" && (<div className="space-y-6">
+                {/* Empty state when no workflow panels apply */}
+                {!["acknowledged","interview_arranged","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
+                  <div className="rounded-2xl border px-5 py-10 text-center" style={{ background: "rgba(162,137,89,0.03)", borderColor: C.borderFaint }}>
+                    <p className="text-2xl mb-2">⏳</p>
+                    <p className="text-sm font-medium" style={{ color: C.textMuted }}>No workflow actions yet</p>
+                    <p className="text-xs mt-1.5" style={{ color: C.textFaint }}>Actions will appear here as the application progresses past the payment stage.</p>
+                  </div>
+                )}
                 {/* Mock Interview — Schedule (acknowledged only) */}
                 {selected.status === "acknowledged" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(96,165,250,0.18)" }}>
@@ -2277,7 +2337,10 @@ export default function Submissions() {
                     </div>
                   </div>
                 )}
+                </div>)}
 
+                {/* ── MESSAGES TAB ── */}
+                {detailTab === "messages" && (<div className="space-y-6">
                 {/* Send Message to Student */}
                 {selected.status !== "rejected" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.45)" }}>
@@ -2380,13 +2443,7 @@ export default function Submissions() {
                   </div>
                 )}
 
-                {/* Save notes */}
-                <button onClick={() => updateStatus.mutate({ id: selected.id, status: selected.status, adminNotes: notes })}
-                  disabled={updateStatus.isPending}
-                  className="w-full py-2.5 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-50"
-                  style={{ borderColor: C.border, color: C.textMid }}>
-                  Save Notes
-                </button>
+                </div>)}
               </div>
             </div>
           </div>
