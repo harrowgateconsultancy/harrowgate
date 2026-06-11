@@ -10,12 +10,12 @@ function staffFetch(url: string, opts?: RequestInit) {
   return fetch(url, { ...opts, headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(opts?.headers ?? {}) } });
 }
 
-const GOLD = "#a28959";
+const GOLD = "#1F7D53";
 const BG = "#0b1f10";
 
 const PRIORITIES: Record<string, { label: string; color: string; bg: string }> = {
   low:    { label: "Low",    color: "#4ade80", bg: "rgba(74,222,128,0.12)" },
-  medium: { label: "Medium", color: GOLD,      bg: "rgba(162,137,89,0.12)" },
+  medium: { label: "Medium", color: GOLD,      bg: "rgba(31,125,83,0.12)" },
   high:   { label: "High",   color: "#fb923c", bg: "rgba(251,146,60,0.12)" },
   urgent: { label: "Urgent", color: "#f87171", bg: "rgba(248,113,113,0.12)" },
 };
@@ -131,19 +131,19 @@ export default function StaffDashboard() {
     <div className="min-h-screen" style={{ background: BG, fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif" }}>
       {/* Header */}
       <header className="sticky top-0 z-10 border-b px-6 py-4 flex items-center justify-between"
-        style={{ background: "rgba(11,31,16,0.95)", borderColor: "rgba(162,137,89,0.15)", backdropFilter: "blur(12px)" }}>
+        style={{ background: "rgba(11,31,16,0.95)", borderColor: "rgba(31,125,83,0.15)", backdropFilter: "blur(12px)" }}>
         <div className="flex items-center gap-3">
           <img src={`${BASE}/harrowgate-logo.png`} alt="HARROWGATE" className="h-8 object-contain" />
           <div>
             <p className="text-xs font-semibold" style={{ color: GOLD }}>Staff Portal</p>
-            <p className="text-[11px]" style={{ color: "rgba(162,137,89,0.5)" }}>Welcome, {staffUser.name || "Staff"}</p>
+            <p className="text-[11px]" style={{ color: "rgba(31,125,83,0.5)" }}>Welcome, {staffUser.name || "Staff"}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {!soundEnabled ? (
             <button onClick={enableSound}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all"
-              style={{ borderColor: "rgba(162,137,89,0.25)", color: "rgba(162,137,89,0.6)", background: "rgba(162,137,89,0.06)" }}>
+              style={{ borderColor: "rgba(31,125,83,0.25)", color: "rgba(31,125,83,0.6)", background: "rgba(31,125,83,0.06)" }}>
               <BellOff size={12} /> Enable Sound
             </button>
           ) : (
@@ -183,7 +183,7 @@ export default function StaffDashboard() {
           <div className="py-20 text-center text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Loading your tasks…</div>
         ) : filtered.length === 0 ? (
           <div className="py-20 text-center">
-            <CheckCircle size={32} className="mx-auto mb-3" style={{ color: "rgba(162,137,89,0.3)" }} />
+            <CheckCircle size={32} className="mx-auto mb-3" style={{ color: "rgba(31,125,83,0.3)" }} />
             <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
               {tab === "done" ? "No completed tasks yet." : tab === "all" ? "No tasks assigned yet." : "No tasks in this category."}
             </p>
@@ -258,7 +258,7 @@ function TaskCard({ task, onToggleChecklist, onStatusChange, onAttachmentAdded, 
 
   return (
     <div className="rounded-2xl border p-5 flex flex-col gap-4 transition-all"
-      style={{ borderColor: overdue ? "rgba(248,113,113,0.4)" : "rgba(162,137,89,0.15)", background: overdue ? "rgba(248,113,113,0.04)" : "rgba(255,255,255,0.03)" }}>
+      style={{ borderColor: overdue ? "rgba(248,113,113,0.4)" : "rgba(31,125,83,0.15)", background: overdue ? "rgba(248,113,113,0.04)" : "rgba(255,255,255,0.03)" }}>
 
       {/* Title row */}
       <div className="flex items-start justify-between gap-2">
@@ -279,7 +279,7 @@ function TaskCard({ task, onToggleChecklist, onStatusChange, onAttachmentAdded, 
           </button>
           {statusOpen && (
             <div className="absolute right-0 top-full mt-1 rounded-xl border shadow-2xl overflow-hidden z-10"
-              style={{ background: "#0f2d14", borderColor: "rgba(162,137,89,0.2)", minWidth: 130 }}>
+              style={{ background: "#0f2d14", borderColor: "rgba(31,125,83,0.2)", minWidth: 130 }}>
               {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
                 <button key={val} onClick={() => { onStatusChange(task.id, val); setStatusOpen(false); }}
                   className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left transition-all hover:bg-white/5"
@@ -313,7 +313,7 @@ function TaskCard({ task, onToggleChecklist, onStatusChange, onAttachmentAdded, 
       {task.checklist.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(162,137,89,0.5)" }}>Checklist</p>
+            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(31,125,83,0.5)" }}>Checklist</p>
             <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{done}/{total}</p>
           </div>
           <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
@@ -339,12 +339,12 @@ function TaskCard({ task, onToggleChecklist, onStatusChange, onAttachmentAdded, 
       {/* Admin attachments (read-only) */}
       {adminAttachments.length > 0 && (
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(162,137,89,0.5)" }}>Files from Admin</p>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(31,125,83,0.5)" }}>Files from Admin</p>
           <div className="space-y-1.5">
             {adminAttachments.map(att => (
               <a key={att.id} href={att.fileUrl} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition-all hover:opacity-80"
-                style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(162,137,89,0.06)", color: GOLD }}>
+                style={{ borderColor: "rgba(31,125,83,0.15)", background: "rgba(31,125,83,0.06)", color: GOLD }}>
                 <Paperclip size={11} />
                 <span className="truncate">{att.fileName}</span>
               </a>

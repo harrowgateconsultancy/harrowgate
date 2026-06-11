@@ -34,26 +34,26 @@ export default function StaffLogin() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
           <img src={`${BASE}/harrowgate-logo.png`} alt="HARROWGATE" className="h-20 object-contain mb-4" />
-          <h1 className="text-xl font-bold" style={{ color: "#a28959" }}>Staff Portal</h1>
-          <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.5)" }}>Sign in to view your assigned tasks</p>
+          <h1 className="text-xl font-bold" style={{ color: "#1F7D53" }}>Staff Portal</h1>
+          <p className="text-xs mt-1" style={{ color: "rgba(31,125,83,0.5)" }}>Sign in to view your assigned tasks</p>
         </div>
 
         <form onSubmit={handleSubmit} className="rounded-2xl border p-6 space-y-4"
-          style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(162,137,89,0.15)" }}>
+          style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(31,125,83,0.15)" }}>
           <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: "rgba(162,137,89,0.6)" }}>Username</label>
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: "rgba(31,125,83,0.6)" }}>Username</label>
             <input type="text" required autoFocus value={form.username}
               onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border text-sm outline-none"
-              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: "#e8d5b0" }}
+              style={{ background: "rgba(31,125,83,0.06)", borderColor: "rgba(31,125,83,0.2)", color: "#e8d5b0" }}
               placeholder="Your username" />
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: "rgba(162,137,89,0.6)" }}>Password</label>
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: "rgba(31,125,83,0.6)" }}>Password</label>
             <input type="password" required value={form.password}
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
               className="w-full px-4 py-2.5 rounded-xl border text-sm outline-none"
-              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: "#e8d5b0" }}
+              style={{ background: "rgba(31,125,83,0.06)", borderColor: "rgba(31,125,83,0.2)", color: "#e8d5b0" }}
               placeholder="Your password" />
           </div>
 
@@ -66,12 +66,12 @@ export default function StaffLogin() {
 
           <button type="submit" disabled={loading}
             className="w-full py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90 disabled:opacity-50"
-            style={{ background: "#a28959", color: "#0b1f10" }}>
+            style={{ background: "#1F7D53", color: "#0b1f10" }}>
             {loading ? "Signing in…" : "Sign In"}
           </button>
         </form>
 
-        <p className="text-center text-xs mt-6" style={{ color: "rgba(162,137,89,0.3)" }}>
+        <p className="text-center text-xs mt-6" style={{ color: "rgba(31,125,83,0.3)" }}>
           This portal is for authorised staff only.
         </p>
       </div>

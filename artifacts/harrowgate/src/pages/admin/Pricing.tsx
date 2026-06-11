@@ -54,8 +54,8 @@ const TIERS = [
   {
     id: "bachelor",
     label: "Bachelor's Degree",
-    color: "#a28959",
-    accentBg: "rgba(162,137,89,0.15)",
+    color: "#1F7D53",
+    accentBg: "rgba(31,125,83,0.15)",
     badge: true,
     totalKey: "bachelorTotal" as keyof PricingConfig,
     stage2Key: "bachelorStage2" as keyof PricingConfig,
@@ -456,7 +456,7 @@ export default function Pricing() {
         </div>
 
         <div className="rounded-2xl bg-card border border-border overflow-hidden">
-          <div className="h-1 w-full" style={{ background: "linear-gradient(to right, #a28959, #60a5fa)" }} />
+          <div className="h-1 w-full" style={{ background: "linear-gradient(to right, #1F7D53, #60a5fa)" }} />
           <div className="p-6 grid md:grid-cols-2 gap-5">
             {(
               [
@@ -506,9 +506,9 @@ export default function Pricing() {
               disabled={bankSaving}
               className="ml-auto flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 border"
               style={{
-                background: bankSaved ? "rgba(74,222,128,0.15)" : "rgba(162,137,89,0.12)",
-                color: bankSaved ? "#4ade80" : "#a28959",
-                borderColor: bankSaved ? "rgba(74,222,128,0.4)" : "rgba(162,137,89,0.4)",
+                background: bankSaved ? "rgba(74,222,128,0.15)" : "rgba(31,125,83,0.12)",
+                color: bankSaved ? "#4ade80" : "#1F7D53",
+                borderColor: bankSaved ? "rgba(74,222,128,0.4)" : "rgba(31,125,83,0.4)",
               }}
             >
               {bankSaving ? (

@@ -10,7 +10,7 @@ function adminFetch(url: string, opts?: RequestInit) {
 }
 
 const NAVY = "#0d1a3a";
-const GOLD = "#a28959";
+const GOLD = "#1F7D53";
 
 function fmt(n: number) {
   return `HKD$ ${n.toLocaleString("en-HK")}`;
@@ -508,7 +508,7 @@ export default function Finance() {
   const statCards = [
     { label: "Total Income", value: summary.income, icon: TrendingUp, color: "#4ade80", bg: "rgba(74,222,128,0.08)", border: "rgba(74,222,128,0.2)" },
     { label: "Total Expenses", value: summary.expenses, icon: TrendingDown, color: "#f87171", bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.2)" },
-    { label: "Net Profit", value: summary.profit, icon: DollarSign, color: GOLD, bg: "rgba(162,137,89,0.08)", border: "rgba(162,137,89,0.2)" },
+    { label: "Net Profit", value: summary.profit, icon: DollarSign, color: GOLD, bg: "rgba(31,125,83,0.08)", border: "rgba(31,125,83,0.2)" },
     { label: "Zakat Due (2.5%)", value: summary.zakat, icon: Moon, color: "#c084fc", bg: "rgba(192,132,252,0.08)", border: "rgba(192,132,252,0.2)" },
   ];
 

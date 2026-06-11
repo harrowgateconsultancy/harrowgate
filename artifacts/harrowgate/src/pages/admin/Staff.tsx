@@ -10,11 +10,11 @@ function adminFetch(url: string, opts?: RequestInit) {
 }
 
 const NAVY = "#0d1a3a";
-const GOLD = "#a28959";
+const GOLD = "#1F7D53";
 
 const PRIORITIES = [
   { value: "low",    label: "Low",    color: "#4ade80", bg: "rgba(74,222,128,0.1)" },
-  { value: "medium", label: "Medium", color: GOLD,      bg: "rgba(162,137,89,0.1)" },
+  { value: "medium", label: "Medium", color: GOLD,      bg: "rgba(31,125,83,0.1)" },
   { value: "high",   label: "High",   color: "#fb923c", bg: "rgba(251,146,60,0.1)" },
   { value: "urgent", label: "Urgent", color: "#f87171", bg: "rgba(248,113,113,0.1)" },
 ];
@@ -325,7 +325,7 @@ export default function Staff() {
                       className="py-2.5 rounded-xl text-sm font-semibold border transition-all"
                       style={{
                         borderColor: staffForm.role === r.value ? GOLD : C.n15,
-                        background: staffForm.role === r.value ? "rgba(162,137,89,0.12)" : "transparent",
+                        background: staffForm.role === r.value ? "rgba(31,125,83,0.12)" : "transparent",
                         color: staffForm.role === r.value ? GOLD : C.n50,
                       }}>
                       {r.label}

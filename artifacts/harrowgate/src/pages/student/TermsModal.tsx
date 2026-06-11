@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 
-const BG = "#0b2213";
-const GOLD = "#a28959";
+const BG = "#18230F";
+const GOLD = "#1F7D53";
 
 const TERMS_TEXT = `IMPORTANT DISCLAIMER
 
@@ -247,7 +247,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
     }}>
       <div style={{
         background: "#0d1f12",
-        border: `1px solid rgba(162,137,89,0.3)`,
+        border: `1px solid rgba(31,125,83,0.3)`,
         borderRadius: 20,
         width: "100%", maxWidth: 680,
         maxHeight: "calc(100vh - 32px)",
@@ -256,11 +256,11 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
         boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
       }}>
         {/* Header */}
-        <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid rgba(162,137,89,0.15)", flexShrink: 0 }}>
+        <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid rgba(31,125,83,0.15)", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
-              background: "rgba(162,137,89,0.12)", color: GOLD, flexShrink: 0,
+              background: "rgba(31,125,83,0.12)", color: GOLD, flexShrink: 0,
             }}>
               <svg viewBox="0 0 20 20" fill="currentColor" width={18} height={18}>
                 <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
@@ -268,7 +268,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
             </div>
             <div>
               <p style={{ color: GOLD, fontWeight: 700, fontSize: 15, margin: 0 }}>Terms &amp; Conditions</p>
-              <p style={{ color: "rgba(162,137,89,0.5)", fontSize: 12, margin: 0 }}>Please read carefully before your first payment</p>
+              <p style={{ color: "rgba(31,125,83,0.5)", fontSize: 12, margin: 0 }}>Please read carefully before your first payment</p>
             </div>
           </div>
         </div>
@@ -292,9 +292,9 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
             }}>
               <div style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
-                background: "rgba(162,137,89,0.1)", border: "1px solid rgba(162,137,89,0.2)",
+                background: "rgba(31,125,83,0.1)", border: "1px solid rgba(31,125,83,0.2)",
                 borderRadius: 20, padding: "4px 12px", fontSize: 11,
-                color: "rgba(162,137,89,0.7)",
+                color: "rgba(31,125,83,0.7)",
               }}>
                 <svg viewBox="0 0 16 16" fill="currentColor" width={10} height={10}>
                   <path fillRule="evenodd" d="M8 1a.75.75 0 01.75.75v6.19l1.72-1.72a.75.75 0 111.06 1.06l-3 3a.75.75 0 01-1.06 0l-3-3a.75.75 0 111.06-1.06l1.72 1.72V1.75A.75.75 0 018 1zM1.5 11.75a.75.75 0 011.5 0v1.5a.25.25 0 00.25.25h9.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 0112.75 15h-9.5A1.75 1.75 0 011.5 13.25v-1.5z" clipRule="evenodd" />
@@ -304,14 +304,14 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
             </div>
           )}
 
-          <div style={{ whiteSpace: "pre-wrap", fontSize: 12.5, lineHeight: 1.75, color: "rgba(162,137,89,0.7)" }}>
+          <div style={{ whiteSpace: "pre-wrap", fontSize: 12.5, lineHeight: 1.75, color: "rgba(31,125,83,0.7)" }}>
             <div style={{
               fontWeight: 700, fontSize: 15, color: GOLD,
               textAlign: "center", marginBottom: 20,
               letterSpacing: "0.08em",
             }}>
               HARROWGATE CONSULTANCY LIMITED<br />
-              <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(162,137,89,0.6)" }}>
+              <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(31,125,83,0.6)" }}>
                 Terms and Conditions of Service
               </span>
             </div>
@@ -320,7 +320,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
         </div>
 
         {/* Checkbox + Signature section */}
-        <div style={{ padding: "16px 24px 20px", borderTop: "1px solid rgba(162,137,89,0.15)", flexShrink: 0 }}>
+        <div style={{ padding: "16px 24px 20px", borderTop: "1px solid rgba(31,125,83,0.15)", flexShrink: 0 }}>
           {/* Checkbox */}
           <label style={{
             display: "flex", alignItems: "flex-start", gap: 10,
@@ -332,7 +332,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
               onClick={() => scrolledToBottom && setChecked(v => !v)}
               style={{
                 width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 1,
-                border: `2px solid ${checked ? GOLD : "rgba(162,137,89,0.35)"}`,
+                border: `2px solid ${checked ? GOLD : "rgba(31,125,83,0.35)"}`,
                 background: checked ? GOLD : "transparent",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 transition: "all 0.15s", cursor: scrolledToBottom ? "pointer" : "not-allowed",
@@ -340,11 +340,11 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
             >
               {checked && (
                 <svg viewBox="0 0 12 10" fill="none" width={10} height={10}>
-                  <path d="M1 5l3.5 3.5L11 1" stroke="#0b2213" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M1 5l3.5 3.5L11 1" stroke="#18230F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </div>
-            <span style={{ fontSize: 13, color: "rgba(162,137,89,0.8)", lineHeight: 1.5 }}>
+            <span style={{ fontSize: 13, color: "rgba(31,125,83,0.8)", lineHeight: 1.5 }}>
               I, <strong style={{ color: GOLD }}>{studentName}</strong>, have read and fully understood the above Terms and Conditions and agree to be bound by them.
             </span>
           </label>
@@ -353,14 +353,14 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
           {checked && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                <p style={{ fontSize: 12, color: "rgba(162,137,89,0.6)", margin: 0 }}>
+                <p style={{ fontSize: 12, color: "rgba(31,125,83,0.6)", margin: 0 }}>
                   Sign below to confirm:
                 </p>
                 <button
                   onClick={clearSignature}
                   style={{
-                    fontSize: 11, color: "rgba(162,137,89,0.5)", background: "transparent",
-                    border: "1px solid rgba(162,137,89,0.2)", borderRadius: 6,
+                    fontSize: 11, color: "rgba(31,125,83,0.5)", background: "transparent",
+                    border: "1px solid rgba(31,125,83,0.2)", borderRadius: 6,
                     padding: "2px 10px", cursor: "pointer",
                   }}
                 >
@@ -380,16 +380,16 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
                 onTouchEnd={stopDraw}
                 style={{
                   width: "100%", height: 120,
-                  border: `1.5px dashed ${hasSigned ? "rgba(162,137,89,0.5)" : "rgba(162,137,89,0.25)"}`,
+                  border: `1.5px dashed ${hasSigned ? "rgba(31,125,83,0.5)" : "rgba(31,125,83,0.25)"}`,
                   borderRadius: 10,
-                  background: "rgba(162,137,89,0.04)",
+                  background: "rgba(31,125,83,0.04)",
                   cursor: "crosshair",
                   touchAction: "none",
                   display: "block",
                 }}
               />
               {!hasSigned && (
-                <p style={{ fontSize: 11, color: "rgba(162,137,89,0.35)", marginTop: 6, textAlign: "center" }}>
+                <p style={{ fontSize: 11, color: "rgba(31,125,83,0.35)", marginTop: 6, textAlign: "center" }}>
                   Draw your signature above using your mouse or finger
                 </p>
               )}
@@ -406,8 +406,8 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
             style={{
               width: "100%", padding: "13px 0",
               borderRadius: 12, border: "none",
-              background: canConfirm ? GOLD : "rgba(162,137,89,0.15)",
-              color: canConfirm ? BG : "rgba(162,137,89,0.3)",
+              background: canConfirm ? GOLD : "rgba(31,125,83,0.15)",
+              color: canConfirm ? BG : "rgba(31,125,83,0.3)",
               fontSize: 14, fontWeight: 700,
               cursor: canConfirm ? "pointer" : "not-allowed",
               transition: "all 0.2s",
@@ -417,7 +417,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
           </button>
 
           {!scrolledToBottom && (
-            <p style={{ fontSize: 11, color: "rgba(162,137,89,0.35)", textAlign: "center", marginTop: 8 }}>
+            <p style={{ fontSize: 11, color: "rgba(31,125,83,0.35)", textAlign: "center", marginTop: 8 }}>
               Please scroll through all the terms above to continue
             </p>
           )}

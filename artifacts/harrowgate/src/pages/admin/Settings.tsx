@@ -27,7 +27,7 @@ interface StaffMember {
 }
 
 const ROLE_CONFIG = {
-  manager: { label: "Manager", color: "#a28959", bg: "rgba(162,137,89,0.12)", desc: "All pages except Finance & Pricing" },
+  manager: { label: "Manager", color: "#1F7D53", bg: "rgba(31,125,83,0.12)", desc: "All pages except Finance & Pricing" },
   staff:   { label: "Staff",   color: "#60a5fa", bg: "rgba(96,165,250,0.12)",  desc: "All pages except Finance & Pricing" },
 };
 
@@ -107,7 +107,7 @@ export default function Settings() {
         <button
           onClick={() => { setShowAdd(true); setFormError(null); }}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
-          style={{ background: C.navyBg, color: "#a28959" }}>
+          style={{ background: C.navyBg, color: "#1F7D53" }}>
           <Plus size={14} /> Add Account
         </button>
       </div>
@@ -124,11 +124,11 @@ export default function Settings() {
               <Shield size={12} /> Super Admin
             </h2>
             <div className="rounded-2xl border p-4 flex items-center justify-between gap-3"
-              style={{ borderColor: "rgba(162,137,89,0.25)", background: "rgba(162,137,89,0.04)" }}>
+              style={{ borderColor: "rgba(31,125,83,0.25)", background: "rgba(31,125,83,0.04)" }}>
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full flex items-center justify-center"
-                  style={{ background: "rgba(162,137,89,0.12)" }}>
-                  <Shield size={16} style={{ color: "#a28959" }} />
+                  style={{ background: "rgba(31,125,83,0.12)" }}>
+                  <Shield size={16} style={{ color: "#1F7D53" }} />
                 </div>
                 <div>
                   <p className="font-bold text-sm" style={{ color: C.navyText }}>Admin</p>
@@ -137,7 +137,7 @@ export default function Settings() {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
-                  style={{ background: "rgba(162,137,89,0.12)", color: "#a28959" }}>
+                  style={{ background: "rgba(31,125,83,0.12)", color: "#1F7D53" }}>
                   Super Admin
                 </span>
                 <div className="p-1.5 rounded-lg opacity-30" title="Cannot be deleted">
@@ -203,7 +203,7 @@ export default function Settings() {
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full mt-0.5 shrink-0"
-                  style={{ background: "rgba(162,137,89,0.12)", color: "#a28959" }}>Admin</span>
+                  style={{ background: "rgba(31,125,83,0.12)", color: "#1F7D53" }}>Admin</span>
                 <p className="text-sm" style={{ color: C.n60 }}>Full access to all pages including Finance, Pricing, and Account Management</p>
               </div>
               <div className="flex items-start gap-3">
@@ -305,7 +305,7 @@ export default function Settings() {
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex-1 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 transition-all hover:opacity-90"
-                  style={{ background: C.navyBg, color: "#a28959" }}>
+                  style={{ background: C.navyBg, color: "#1F7D53" }}>
                   {saving ? "Creating…" : "Create Account"}
                 </button>
               </div>

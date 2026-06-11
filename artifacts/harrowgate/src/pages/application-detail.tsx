@@ -450,9 +450,9 @@ export default function ApplicationDetail() {
                       loading={isUploading}
                       compact
                       accept="image/*,.pdf,.doc,.docx"
-                      accentColor="#a28959"
-                      accentBg="rgba(162,137,89,0.05)"
-                      accentBorder="rgba(162,137,89,0.2)"
+                      accentColor="#1F7D53"
+                      accentBg="rgba(31,125,83,0.05)"
+                      accentBorder="rgba(31,125,83,0.2)"
                     />
                   </div>
                   {uploaded.map(doc => (
