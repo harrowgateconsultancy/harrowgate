@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useAdminTheme, useAdminColors } from "../../contexts/AdminThemeContext";
 import { playAlertSound, unlockAudio } from "../../lib/notificationSound";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
 import { io as socketIo } from "socket.io-client";
 
@@ -267,6 +267,9 @@ export default function Submissions() {
 
   const qc = useQueryClient();
   const [, setLocation] = useLocation();
+  const { id: routeId } = useParams<{ id?: string }>();
+  const detailId = routeId ? parseInt(routeId, 10) : null;
+  const isDetailPage = !!detailId;
   const [selected, setSelected] = useState<Submission | null>(null);
   const [notes, setNotes] = useState("");
   const [filter, setFilter] = useState("all");
@@ -828,6 +831,20 @@ export default function Submissions() {
   useEffect(() => { if (showPricing) loadPricing(); }, [showPricing]);
   useEffect(() => { setDetailTab("overview"); }, [selected?.id]);
 
+  useEffect(() => {
+    if (!detailId || !submissions.length) return;
+    const sub = submissions.find(s => s.id === detailId);
+    if (!sub || selected?.id === detailId) return;
+    setSelected(sub);
+    setNotes(sub.adminNotes || "");
+    setRefNumInput(sub.immigrationRefNumber || "");
+    setPreviewDoc(null);
+    loadAdminMessages(sub.id);
+    if (["final_payment_received", "final_payment_confirmed", "visa_issued"].includes(sub.status)) {
+      loadLetters(sub.id);
+    }
+  }, [detailId, submissions]);
+
   const megaSyncTarget: Submission | null =
     selected ??
     (selectedIds.size === 1
@@ -875,6 +892,7 @@ export default function Submissions() {
         ))}
       </div>
 
+      {!isDetailPage && (<>
         <div className="mb-6 sm:mb-8">
           <div className="mb-4">
             <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: GOLD }}>Student Submissions</h1>
@@ -1170,7 +1188,7 @@ export default function Submissions() {
                   borderColor: selectedIds.has(s.id) ? GOLD : isDone ? "rgba(162,137,89,0.55)" : hasAction ? "rgba(251,146,60,0.25)" : C.border,
                   boxShadow: isDone ? "0 0 0 1px rgba(162,137,89,0.12)" : hasAction ? "0 0 0 1px rgba(251,146,60,0.08)" : "none",
                 }}
-                onClick={() => { setSelected(s); setNotes(s.adminNotes || ""); setRefNumInput(s.immigrationRefNumber || ""); setRefSetSuccess(false); setPreviewDoc(null); setInterviewForm(null); setInviteSent(null); setAdditionalDocsForm(null); setAdditionalDocsSent(null); setOfferLetterSent(null); setEVisaSent(null); setMessageForm(null); setMessageSent(null); setLettersData(null); setLettersError(null); setLettersOpen(false); setCustomBankForm({ bankName: "", accountName: "", accountNumber: "", fps: "", additionalInfo: "" }); setCustomBankSaved(false); loadAdminMessages(s.id); if (["final_payment_received","final_payment_confirmed","visa_issued"].includes(s.status)) loadLetters(s.id); }}>
+                onClick={() => setLocation(`/admin/submissions/${s.id}`)}>
                 {/* Orange left accent for action-needed */}
                 {hasAction && <div className="h-0.5 w-full rounded-t-2xl" style={{ background: "linear-gradient(to right, transparent, rgba(251,146,60,0.5), transparent)" }} />}
                 <div className="px-5 py-4 flex items-center gap-4">
@@ -1241,12 +1259,25 @@ export default function Submissions() {
         </div>
 
         </>)}
+      </>)}
 
-      {/* Detail Modal */}
+      {isDetailPage && !selected && (
+        <div className="flex items-center justify-center py-24">
+          <div className="w-7 h-7 rounded-full border-2 animate-spin" style={{ borderColor: GOLD, borderTopColor: "transparent" }} />
+        </div>
+      )}
+
+      {/* Detail view — modal overlay on list page, full page on /admin/submissions/:id */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ background: "rgba(0,0,0,0.8)" }}
-          onClick={e => { if (e.target === e.currentTarget) { setSelected(null); setPreviewDoc(null); } }}>
-          <div className="w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl border flex flex-col" style={{ background: C.card, borderColor: C.border, maxHeight: "94dvh" }}>
+        <div
+          className={isDetailPage ? "" : "fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"}
+          style={isDetailPage ? {} : { background: "rgba(0,0,0,0.8)" }}
+          onClick={!isDetailPage ? (e => { if (e.target === e.currentTarget) { setSelected(null); setPreviewDoc(null); } }) : undefined}
+        >
+          <div
+            className={isDetailPage ? "w-full rounded-2xl border flex flex-col" : "w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl border flex flex-col"}
+            style={isDetailPage ? { background: C.card, borderColor: C.border, minHeight: "calc(100dvh - 130px)" } : { background: C.card, borderColor: C.border, maxHeight: "94dvh" }}
+          >
 
             {/* Modal top accent */}
             <div className="h-0.5 rounded-t-3xl" style={{ background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
@@ -1332,12 +1363,21 @@ export default function Submissions() {
                   <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5"><circle cx="8" cy="8" r="2.5"/><path fillRule="evenodd" d="M8 2C4.5 2 1.5 4.5 0 8c1.5 3.5 4.5 6 8 6s6.5-2.5 8-6c-1.5-3.5-4.5-6-8-6zm0 10a4 4 0 110-8 4 4 0 010 8z" clipRule="evenodd"/></svg>
                   Live View
                 </button>
-                <button
-                  onClick={() => { setSelected(null); setPreviewDoc(null); }}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80"
-                  style={{ background: C.muted, color: C.textMuted }}>
-                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z" /></svg>
-                </button>
+                {isDetailPage ? (
+                  <button
+                    onClick={() => setLocation("/admin/submissions")}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all hover:opacity-80"
+                    style={{ background: C.muted, borderColor: C.borderMed, color: C.textMid }}>
+                    ← Back
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { setSelected(null); setPreviewDoc(null); }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80"
+                    style={{ background: C.muted, color: C.textMuted }}>
+                    <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z" /></svg>
+                  </button>
+                )}
               </div>
             </div>
 
