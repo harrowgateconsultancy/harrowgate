@@ -277,7 +277,7 @@ export default function Submissions() {
   const [uploadDocType, setUploadDocType] = useState("admin_doc");
   const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
   const adminFileRef = useRef<HTMLInputElement | null>(null);
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem("admin_sound_enabled") === "true");
   const prevCountRef = useRef<number | null>(null);
   const [interviewForm, setInterviewForm] = useState<{ zoomLink: string; dateTime: string; notes: string } | null>(null);
   const [sendingInvite, setSendingInvite] = useState(false);
@@ -905,7 +905,7 @@ export default function Submissions() {
               </div>
             )}
             {!soundEnabled ? (
-              <button onClick={() => { unlockAudio(); setSoundEnabled(true); }}
+              <button onClick={() => { unlockAudio(); setSoundEnabled(true); localStorage.setItem("admin_sound_enabled", "true"); }}
                 className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
                 style={{ borderColor: C.borderMed, color: C.textSec, background: C.muted }}>
                 🔔 Enable Sound Alerts
