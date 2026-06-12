@@ -254,15 +254,15 @@ export default function Submissions() {
     border: "rgba(31,125,83,0.15)",
     borderFaint: "rgba(31,125,83,0.09)",
     borderMed: "rgba(31,125,83,0.32)",
-    text: "#1F7D53",
+    text: "#a28959",
     textSec: "#b09a6e",
-    textMid: "rgba(31,125,83,0.80)",
-    textMuted: "rgba(31,125,83,0.58)",
-    textFaint: "rgba(31,125,83,0.38)",
+    textMid: "rgba(162,137,89,0.85)",
+    textMuted: "rgba(162,137,89,0.60)",
+    textFaint: "rgba(162,137,89,0.45)",
     textDark: "#c8aa7c",
-    inputBg: "rgba(31,125,83,0.07)",
+    inputBg: "rgba(162,137,89,0.07)",
   };
-  const GOLD = "#1F7D53";
+  const GOLD = "#a28959";
   const BG = "#255F38";
 
   const qc = useQueryClient();
