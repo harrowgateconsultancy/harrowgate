@@ -39,7 +39,7 @@ const PACKAGES = [
   {
     tierKey:      "tier2",
     badge:        true,
-    color:        "#13300a",
+    color:        "#a28959",
     bg:           "rgba(162,137,89,0.07)",
     border:       "rgba(162,137,89,0.25)",
     highlight:    true,
