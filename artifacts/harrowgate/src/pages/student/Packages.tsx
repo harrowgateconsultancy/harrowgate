@@ -4,15 +4,17 @@ import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
 import { usePageSEO } from "../../hooks/usePageSEO";
 
-const BG = "#0b2213";
-const GOLD = "#a28959";
-const GOLD_FAINT = "rgba(162,137,89,0.12)";
-const GOLD_DIM = "rgba(162,137,89,0.7)";
+const BG        = "#0b2213";
+const GOLD      = "#a28959";
+const GOLD_BRIGHT = "#c4a96e";
+const GOLD_LIGHT  = "#f0d28c";
+const GOLD_FAINT  = "rgba(162,137,89,0.12)";
+const GOLD_DIM    = "rgba(162,137,89,0.7)";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const FEATURE_KEYS: { key: string; bold?: boolean }[] = [
-  { key: "pkg.feat1", bold: true },
+  { key: "pkg.feat1",  bold: true },
   { key: "pkg.feat2" },
   { key: "pkg.feat3" },
   { key: "pkg.feat4" },
@@ -27,42 +29,10 @@ const FEATURE_KEYS: { key: string; bold?: boolean }[] = [
 ];
 
 const PACKAGES = [
-  {
-    tierKey:      "tier3",
-    badge:        false,
-    color:        "#4ade80",
-    bg:           "rgba(74,222,128,0.05)",
-    border:       "rgba(74,222,128,0.18)",
-    highlight:    false,
-    cardNoteKey:  "pkg.note.tier3",
-  },
-  {
-    tierKey:      "tier2",
-    badge:        true,
-    color:        "#a28959",
-    bg:           "rgba(162,137,89,0.07)",
-    border:       "rgba(162,137,89,0.25)",
-    highlight:    true,
-    cardNoteKey:  "pkg.note.tier2",
-  },
-  {
-    tierKey:      "tier1",
-    badge:        false,
-    color:        "#60a5fa",
-    bg:           "rgba(96,165,250,0.05)",
-    border:       "rgba(96,165,250,0.18)",
-    highlight:    false,
-    cardNoteKey:  "pkg.note.tier1",
-  },
-  {
-    tierKey:      "tier4",
-    badge:        false,
-    color:        "#c084fc",
-    bg:           "rgba(192,132,252,0.05)",
-    border:       "rgba(192,132,252,0.18)",
-    highlight:    false,
-    cardNoteKey:  "pkg.note.tier4",
-  },
+  { tierKey: "tier3", badge: false, highlight: false, cardNoteKey: "pkg.note.tier3" },
+  { tierKey: "tier2", badge: true,  highlight: true,  cardNoteKey: "pkg.note.tier2" },
+  { tierKey: "tier1", badge: false, highlight: false, cardNoteKey: "pkg.note.tier1" },
+  { tierKey: "tier4", badge: false, highlight: false, cardNoteKey: "pkg.note.tier4" },
 ];
 
 function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void }) {
@@ -78,7 +48,7 @@ function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void
     <div ref={ref} style={{ position: "relative" }}>
       <button onClick={() => setOpen(v => !v)}
         className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium transition-all hover:opacity-80"
-        style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.7)", background: "rgba(162,137,89,0.05)" }}>
+        style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD_DIM, background: "rgba(162,137,89,0.07)" }}>
         <span>{current?.flag}</span>
         <span className="hidden sm:inline">{current?.name}</span>
         <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-2.5 h-2.5"><path d="M1 1l4 4 4-4" /></svg>
@@ -88,7 +58,7 @@ function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void
           style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.2)", minWidth: 160 }}>
           {LANG_LIST.map((l) => (
             <button key={l.code} onClick={() => { setLang(l.code); setOpen(false); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all hover:opacity-90 text-left"
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all hover:bg-[rgba(162,137,89,0.1)] text-left"
               style={{ background: l.code === lang ? "rgba(162,137,89,0.12)" : "transparent", color: l.code === lang ? GOLD : "rgba(162,137,89,0.55)" }}>
               <span className="text-base">{l.flag}</span> {l.name}
             </button>
@@ -102,6 +72,7 @@ function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void
 export default function Packages() {
   const { lang, setLang, t, isRtl } = useLang();
   const pricing = usePricing();
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   usePageSEO({
     title: "Service Packages & Pricing — Harrowgate Education Consultancy Hong Kong",
@@ -110,12 +81,15 @@ export default function Packages() {
 
   return (
     <div className="min-h-screen" dir={isRtl ? "rtl" : "ltr"} style={{ background: BG, fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflowX: "clip" }}>
+
+      {/* Ambient background glows */}
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
-        <div style={{ position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)", width: "900px", height: "600px", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(162,137,89,0.06) 0%, transparent 70%)" }} />
-        <div style={{ position: "absolute", bottom: "10%", right: "-5%", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(162,137,89,0.04) 0%, transparent 70%)" }} />
+        <div style={{ position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)", width: "900px", height: "600px", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(162,137,89,0.07) 0%, transparent 70%)" }} />
+        <div style={{ position: "absolute", bottom: "10%", right: "-5%", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(162,137,89,0.05) 0%, transparent 70%)" }} />
       </div>
 
       <div style={{ position: "relative", zIndex: 1 }}>
+
         {/* Nav */}
         <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", background: "rgba(11,34,19,0.18)", position: "sticky", top: 0, zIndex: 50 }}>
           <div className="flex items-center justify-between px-6 lg:px-10 xl:px-16 py-3 w-full">
@@ -124,7 +98,7 @@ export default function Packages() {
             </Link>
             <div className="flex items-center gap-3">
               <LangPicker lang={lang} setLang={setLang} />
-              <Link href="/" className="text-sm transition-opacity hover:opacity-70 px-4 py-2" style={{ color: GOLD_DIM }}>{t("nav.back")}</Link>
+              <Link href="/" className="text-sm transition-all hover:opacity-70 px-4 py-2" style={{ color: GOLD_DIM }}>{t("nav.back")}</Link>
               <Link href="/sign-up"
                 className="text-sm font-semibold px-5 py-2.5 rounded-full transition-all hover:opacity-90 hover:scale-105"
                 style={{ background: GOLD, color: BG, boxShadow: "0 4px 16px rgba(162,137,89,0.3)" }}>
@@ -136,18 +110,19 @@ export default function Packages() {
 
         {/* Hero */}
         <section className="pt-20 pb-12 text-center px-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border"
-            style={{ background: "rgba(162,137,89,0.08)", borderColor: GOLD_FAINT }}>
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full mb-6 border"
+            style={{ background: "rgba(162,137,89,0.09)", borderColor: "rgba(196,169,110,0.35)", boxShadow: "0 0 18px rgba(162,137,89,0.15)" }}>
             <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#4ade80" }} />
-            <p className="text-xs font-semibold tracking-[0.25em] uppercase" style={{ color: GOLD_DIM }}>
+            <p className="text-xs font-bold tracking-[0.25em] uppercase" style={{ color: GOLD_BRIGHT }}>
               {t("pkg.badge")}
             </p>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight" style={{ color: GOLD }}>
+          <h1 className="text-4xl md:text-6xl font-bold mb-5 tracking-tight"
+            style={{ background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 60%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
             {t("pkg.heading")}
           </h1>
           <p className="text-lg max-w-xl mx-auto mb-2" style={{ color: GOLD_DIM }}>
-            {t("pkg.sub")} <span className="font-bold" style={{ color: GOLD }}>HKD$ 3,000</span>. {t("pkg.sub2")}
+            {t("pkg.sub")} <span className="font-bold" style={{ color: GOLD_BRIGHT }}>HKD$ 3,000</span>. {t("pkg.sub2")}
           </p>
         </section>
 
@@ -156,67 +131,92 @@ export default function Packages() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {PACKAGES.map((pkg) => {
               const totalMap: Record<string, string> = {
-                tier1: pricing.mastersTotal,
-                tier2: pricing.bachelorTotal,
-                tier3: pricing.associateTotal,
-                tier4: pricing.diplomaTotal,
+                tier1: pricing.mastersTotal, tier2: pricing.bachelorTotal,
+                tier3: pricing.associateTotal, tier4: pricing.diplomaTotal,
               };
               const stage2Map: Record<string, string> = {
-                tier1: pricing.mastersStage2,
-                tier2: pricing.bachelorStage2,
-                tier3: pricing.associateStage2,
-                tier4: pricing.diplomaStage2,
+                tier1: pricing.mastersStage2, tier2: pricing.bachelorStage2,
+                tier3: pricing.associateStage2, tier4: pricing.diplomaStage2,
               };
               const stage3Map: Record<string, string> = {
-                tier1: pricing.mastersLastPayment,
-                tier2: pricing.bachelorLastPayment,
-                tier3: pricing.associateLastPayment,
-                tier4: pricing.diplomaLastPayment,
+                tier1: pricing.mastersLastPayment, tier2: pricing.bachelorLastPayment,
+                tier3: pricing.associateLastPayment, tier4: pricing.diplomaLastPayment,
               };
-              const total        = totalMap[pkg.tierKey];
-              const stage3Amount = stage3Map[pkg.tierKey];
-              const dynamicStage2 = stage2Map[pkg.tierKey];
+              const total          = totalMap[pkg.tierKey];
+              const stage3Amount   = stage3Map[pkg.tierKey];
+              const dynamicStage2  = stage2Map[pkg.tierKey];
+              const isHovered      = hoveredCard === pkg.tierKey;
+              const accentColor    = pkg.highlight ? GOLD_LIGHT : GOLD_BRIGHT;
+
+              const cardBg = pkg.highlight
+                ? "linear-gradient(160deg, rgba(196,169,110,0.18) 0%, rgba(162,137,89,0.09) 100%)"
+                : isHovered
+                  ? "linear-gradient(160deg, rgba(162,137,89,0.13) 0%, rgba(162,137,89,0.06) 100%)"
+                  : "linear-gradient(160deg, rgba(162,137,89,0.08) 0%, rgba(162,137,89,0.03) 100%)";
+
+              const cardBorder = pkg.highlight
+                ? isHovered ? "rgba(240,210,140,0.8)" : "rgba(240,210,140,0.55)"
+                : isHovered ? "rgba(196,169,110,0.6)" : "rgba(162,137,89,0.22)";
+
+              const cardShadow = pkg.highlight
+                ? isHovered
+                  ? "0 0 60px rgba(196,169,110,0.45), 0 20px 60px rgba(0,0,0,0.5)"
+                  : "0 0 40px rgba(162,137,89,0.25), 0 8px 32px rgba(0,0,0,0.3)"
+                : isHovered
+                  ? "0 0 36px rgba(162,137,89,0.3), 0 16px 48px rgba(0,0,0,0.45)"
+                  : "0 2px 12px rgba(0,0,0,0.2)";
 
               return (
                 <div key={pkg.tierKey}
-                  className="relative flex flex-col rounded-3xl border transition-all hover:scale-[1.01]"
+                  className="relative flex flex-col rounded-3xl border"
                   style={{
-                    background: pkg.bg,
-                    borderColor: pkg.border,
-                    boxShadow: pkg.highlight ? "0 0 50px rgba(162,137,89,0.15)" : "none",
-                  }}>
+                    background: cardBg,
+                    borderColor: cardBorder,
+                    boxShadow: cardShadow,
+                    transform: isHovered ? "translateY(-6px) scale(1.015)" : "translateY(0) scale(1)",
+                    transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={() => setHoveredCard(pkg.tierKey)}
+                  onMouseLeave={() => setHoveredCard(null)}>
 
                   {/* Most Popular badge */}
                   {pkg.badge && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
-                      style={{ background: GOLD, color: BG }}>
+                      style={{ background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: BG, boxShadow: "0 0 20px rgba(196,169,110,0.5)" }}>
                       <span>⭐</span> {t("pkg.popular")}
                     </div>
                   )}
 
                   <div className="p-7 pb-5">
                     {/* Title */}
-                    <h2 className="text-2xl font-bold mb-0.5" style={{ color: pkg.color }}>{t(`pkg.${pkg.tierKey}`)}</h2>
-                    <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-5" style={{ color: "rgba(162,137,89,0.4)" }}>
+                    <h2 className="text-2xl font-bold mb-0.5" style={{
+                      background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${accentColor} 70%)`,
+                      WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+                    }}>{t(`pkg.${pkg.tierKey}`)}</h2>
+                    <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-5" style={{ color: "rgba(162,137,89,0.45)" }}>
                       {t("pkg.fullService")}
                     </p>
 
                     {/* Total price */}
                     <div className="mb-5">
-                      <span className="text-4xl font-extrabold" style={{ color: pkg.color }}>{total}</span>
-                      <span className="text-sm ml-2" style={{ color: "rgba(162,137,89,0.45)" }}>{t("pkg.total")}</span>
+                      <span className="text-4xl font-extrabold" style={{
+                        background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${accentColor} 60%)`,
+                        WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+                      }}>{total}</span>
+                      <span className="text-sm ml-2" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.total")}</span>
                       <p className="text-[11px] mt-0.5" style={{ color: "rgba(162,137,89,0.35)" }}>{t("pkg.package")}</p>
                     </div>
 
                     {/* First payment chips */}
                     <div className="flex flex-col gap-1.5 mb-6">
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold self-start"
-                        style={{ background: "rgba(96,165,250,0.12)", color: "#93c5fd", border: "1px solid rgba(96,165,250,0.2)" }}>
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#60a5fa" }} />
+                        style={{ background: "rgba(162,137,89,0.14)", color: GOLD_BRIGHT, border: "1px solid rgba(196,169,110,0.35)" }}>
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: GOLD_BRIGHT }} />
                         {t("pkg.firstPay")}
                       </div>
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-medium self-start"
-                        style={{ background: "rgba(251,191,36,0.08)", color: "rgba(251,191,36,0.7)", border: "1px solid rgba(251,191,36,0.15)" }}>
+                        style={{ background: "rgba(162,137,89,0.08)", color: "rgba(196,169,110,0.7)", border: "1px solid rgba(162,137,89,0.2)" }}>
                         🔒 {t("pkg.nonRefund")}
                       </div>
                     </div>
@@ -225,8 +225,8 @@ export default function Packages() {
                     <ul className="space-y-2.5 mb-6">
                       {FEATURE_KEYS.map((f, fi) => (
                         <li key={fi} className="flex items-start gap-2.5 text-sm"
-                          style={{ color: f.bold ? pkg.color : GOLD_DIM, fontWeight: f.bold ? 700 : 400 }}>
-                          <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: pkg.color }}>
+                          style={{ color: f.bold ? accentColor : GOLD_DIM, fontWeight: f.bold ? 700 : 400 }}>
+                          <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: accentColor }}>
                             <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                           {t(f.key)}
@@ -235,10 +235,11 @@ export default function Packages() {
                     </ul>
 
                     {/* Payment Schedule */}
-                    <div className="rounded-xl p-4 mb-4 border" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(251,100,48,0.22)" }}>
+                    <div className="rounded-xl p-4 mb-4 border"
+                      style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(196,169,110,0.2)" }}>
                       <p className="text-[10px] font-bold tracking-[0.18em] uppercase mb-3 flex items-center gap-1.5"
-                        style={{ color: "rgba(251,100,48,0.85)" }}>
-                        <span>⭐</span> {t("pkg.balanceSchedule")}
+                        style={{ color: GOLD_BRIGHT }}>
+                        <span>✦</span> {t("pkg.balanceSchedule")}
                       </p>
                       <div className="space-y-2">
                         <div className="flex items-start justify-between gap-2">
@@ -247,18 +248,18 @@ export default function Packages() {
                             <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.stageApp")}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm font-bold" style={{ color: pkg.color }}>{dynamicStage2}</p>
+                            <p className="text-sm font-bold" style={{ color: accentColor }}>{dynamicStage2}</p>
                             <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.stage2note")}</p>
                           </div>
                         </div>
-                        <div className="border-t pt-2" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+                        <div className="border-t pt-2" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>{t("pkg.stage3")} –</p>
                               <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.stageSuccess")}</p>
                             </div>
                             <div className="text-right">
-                              <p className="text-sm font-bold" style={{ color: pkg.color }}>{stage3Amount}</p>
+                              <p className="text-sm font-bold" style={{ color: accentColor }}>{stage3Amount}</p>
                               <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.stage3note")}</p>
                             </div>
                           </div>
@@ -267,8 +268,9 @@ export default function Packages() {
                     </div>
 
                     {/* Per-card note */}
-                    <div className="rounded-xl px-3.5 py-3 mb-6 border" style={{ background: "rgba(251,191,36,0.04)", borderColor: "rgba(251,191,36,0.12)" }}>
-                      <p className="text-[11px] leading-relaxed" style={{ color: "rgba(251,191,36,0.55)" }}>
+                    <div className="rounded-xl px-3.5 py-3 mb-6 border"
+                      style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)" }}>
+                      <p className="text-[11px] leading-relaxed" style={{ color: "rgba(196,169,110,0.65)" }}>
                         💡 {t(pkg.cardNoteKey)}
                       </p>
                     </div>
@@ -277,11 +279,16 @@ export default function Packages() {
                   {/* CTA */}
                   <div className="px-7 pb-7 mt-auto">
                     <Link href="/sign-up"
-                      className="block w-full text-center py-4 rounded-2xl text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.02]"
+                      className="block w-full text-center py-4 rounded-2xl text-sm font-bold transition-all"
                       style={{
-                        background: pkg.highlight ? GOLD : "transparent",
-                        color: pkg.highlight ? BG : pkg.color,
-                        border: pkg.highlight ? "none" : `1.5px solid ${pkg.border}`,
+                        background: pkg.highlight
+                          ? `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`
+                          : isHovered ? "rgba(162,137,89,0.18)" : "rgba(162,137,89,0.08)",
+                        color: pkg.highlight ? BG : accentColor,
+                        border: pkg.highlight ? "none" : `1.5px solid ${isHovered ? "rgba(196,169,110,0.55)" : "rgba(162,137,89,0.25)"}`,
+                        boxShadow: pkg.highlight ? "0 4px 20px rgba(162,137,89,0.4)" : "none",
+                        transform: isHovered ? "scale(1.02)" : "scale(1)",
+                        transition: "all 0.2s ease",
                       }}>
                       {t("pkg.startWith")}
                     </Link>
@@ -292,8 +299,9 @@ export default function Packages() {
           </div>
 
           {/* After payment note */}
-          <div className="mt-12 rounded-2xl p-6 border text-center max-w-2xl mx-auto" style={{ background: "rgba(162,137,89,0.04)", borderColor: GOLD_FAINT }}>
-            <p className="text-base font-semibold mb-2" style={{ color: GOLD }}>{t("pkg.afterTitle")}</p>
+          <div className="mt-14 rounded-2xl p-7 border text-center max-w-2xl mx-auto"
+            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(196,169,110,0.25)", boxShadow: "0 0 30px rgba(162,137,89,0.1)" }}>
+            <p className="text-base font-semibold mb-2" style={{ color: GOLD_BRIGHT }}>{t("pkg.afterTitle")}</p>
             <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{t("pkg.afterSub")}</p>
           </div>
         </section>
