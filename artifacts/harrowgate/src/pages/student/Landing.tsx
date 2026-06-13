@@ -4,6 +4,113 @@ import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
 import { usePageSEO } from "../../hooks/usePageSEO";
 
+/* ── Hero canvas background — gold particle constellation ── */
+function HeroBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const frameRef = useRef<number>(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let W = 0, H = 0;
+    const PARTICLE_COUNT = 80;
+    const MAX_DIST = 180;
+    const GOLD_R = 162, GOLD_G = 137, GOLD_B = 89;
+
+    interface P { x: number; y: number; vx: number; vy: number; r: number; a: number; }
+    let particles: P[] = [];
+
+    function init() {
+      W = canvas!.width = canvas!.offsetWidth;
+      H = canvas!.height = canvas!.offsetHeight;
+      particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.28,
+        vy: (Math.random() - 0.5) * 0.18 - 0.06,
+        r: Math.random() * 1.8 + 0.5,
+        a: Math.random() * 0.55 + 0.15,
+      }));
+    }
+
+    function draw() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, W, H);
+
+      // Subtle radial glow at hero centre-left
+      const grd = ctx.createRadialGradient(W * 0.28, H * 0.45, 0, W * 0.28, H * 0.45, W * 0.55);
+      grd.addColorStop(0, `rgba(${GOLD_R},${GOLD_G},${GOLD_B},0.055)`);
+      grd.addColorStop(1, "transparent");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      // Connection lines
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MAX_DIST) {
+            const opacity = (1 - dist / MAX_DIST) * 0.18;
+            ctx.strokeStyle = `rgba(${GOLD_R},${GOLD_G},${GOLD_B},${opacity})`;
+            ctx.lineWidth = 0.6;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Particles
+      for (const p of particles) {
+        // Soft glow halo
+        const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 5);
+        halo.addColorStop(0, `rgba(${GOLD_R},${GOLD_G},${GOLD_B},${p.a * 0.4})`);
+        halo.addColorStop(1, "transparent");
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Core dot
+        ctx.fillStyle = `rgba(${GOLD_R},${GOLD_G},${GOLD_B},${p.a})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Move
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < -10) p.x = W + 10;
+        if (p.x > W + 10) p.x = -10;
+        if (p.y < -10) p.y = H + 10;
+        if (p.y > H + 10) p.y = -10;
+      }
+
+      frameRef.current = requestAnimationFrame(draw);
+    }
+
+    const ro = new ResizeObserver(() => { init(); });
+    ro.observe(canvas);
+    init();
+    draw();
+
+    return () => {
+      cancelAnimationFrame(frameRef.current);
+      ro.disconnect();
+    };
+  }, []);
+
+  return (
+    <canvas ref={canvasRef}
+      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0, display: "block" }} />
+  );
+}
+
 const BG = "#0b2213";
 const GOLD = "#a28959";
 const GOLD_BRIGHT = "#c4a96e";
@@ -289,10 +396,11 @@ export default function Landing() {
         </nav>
 
         {/* ── Hero — full-width two-column ── */}
-        <section className="min-h-[92vh] flex flex-col w-full px-6 lg:px-16 xl:px-24">
+        <section className="min-h-[92vh] flex flex-col w-full px-6 lg:px-16 xl:px-24" style={{ position: "relative", overflow: "hidden" }}>
+          <HeroBackground />
 
           {/* Top: two-column text + logo */}
-          <div className="flex-1 flex flex-col lg:flex-row items-start gap-10 lg:gap-0 pt-8">
+          <div className="flex-1 flex flex-col lg:flex-row items-start gap-10 lg:gap-0 pt-8" style={{ position: "relative", zIndex: 1 }}>
 
             {/* Left: text */}
             <div className="flex-1 flex flex-col items-start lg:pr-12">
@@ -353,12 +461,12 @@ export default function Landing() {
           </div>
 
           {/* Bottom: full-width stats */}
-          <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-4 w-full pb-3">
+          <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-4 w-full pb-3" style={{ position: "relative", zIndex: 1 }}>
             {STATS_VALUES.map((val, i) => <StatCard key={val} val={val} label={statsLabels[i]} />)}
           </div>
 
           {/* Scroll indicator — pinned to very bottom */}
-          <div className="flex flex-col items-center pb-3 pt-1 gap-1">
+          <div className="flex flex-col items-center pb-3 pt-1 gap-1" style={{ position: "relative", zIndex: 1 }}>
             <p className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: "rgba(162,137,89,0.4)" }}>Scroll</p>
             <div className="scroll-indicator flex flex-col items-center gap-1">
               <svg viewBox="0 0 20 12" fill="none" className="w-5 h-3" style={{ color: GOLD }}>
