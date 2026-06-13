@@ -289,7 +289,7 @@ export default function Landing() {
         </nav>
 
         {/* ── Hero — full-width two-column ── */}
-        <section className="min-h-[100vh] flex flex-col w-full px-6 lg:px-16 xl:px-24">
+        <section className="min-h-[92vh] flex flex-col w-full px-6 lg:px-16 xl:px-24">
 
           {/* Top: two-column text + logo */}
           <div className="flex-1 flex flex-col lg:flex-row items-start gap-10 lg:gap-0 pt-8">
@@ -353,12 +353,12 @@ export default function Landing() {
           </div>
 
           {/* Bottom: full-width stats */}
-          <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-4 w-full pb-6">
+          <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-4 w-full pb-3">
             {STATS_VALUES.map((val, i) => <StatCard key={val} val={val} label={statsLabels[i]} />)}
           </div>
 
           {/* Scroll indicator — pinned to very bottom */}
-          <div className="flex flex-col items-center pb-6 pt-3 gap-1">
+          <div className="flex flex-col items-center pb-3 pt-1 gap-1">
             <p className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: "rgba(162,137,89,0.4)" }}>Scroll</p>
             <div className="scroll-indicator flex flex-col items-center gap-1">
               <svg viewBox="0 0 20 12" fill="none" className="w-5 h-3" style={{ color: GOLD }}>
