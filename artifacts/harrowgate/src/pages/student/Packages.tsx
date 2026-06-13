@@ -35,8 +35,27 @@ const PACKAGES = [
   { tierKey: "tier4", badge: false, highlight: false, cardNoteKey: "pkg.note.tier4" },
 ];
 
+function LangOption({ l, lang, onSelect }: { l: typeof LANG_LIST[0]; lang: string; onSelect: () => void }) {
+  const [hov, setHov] = useState(false);
+  const active = l.code === lang;
+  return (
+    <button onClick={onSelect}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-left"
+      style={{
+        background: active ? "rgba(196,169,110,0.18)" : hov ? "rgba(162,137,89,0.12)" : "transparent",
+        color: active ? GOLD_LIGHT : hov ? GOLD_BRIGHT : "rgba(162,137,89,0.6)",
+        borderLeft: active || hov ? `2px solid ${active ? GOLD_BRIGHT : "rgba(162,137,89,0.4)"}` : "2px solid transparent",
+        transition: "all 0.18s ease",
+      }}>
+      <span className="text-base">{l.flag}</span> {l.name}
+    </button>
+  );
+}
+
 function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void }) {
   const [open, setOpen] = useState(false);
+  const [hov, setHov] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
@@ -47,25 +66,78 @@ function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <button onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium transition-all hover:opacity-80"
-        style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD_DIM, background: "rgba(162,137,89,0.07)" }}>
+        onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium"
+        style={{
+          borderColor: hov ? "rgba(196,169,110,0.6)" : "rgba(162,137,89,0.3)",
+          color: hov ? GOLD_BRIGHT : GOLD_DIM,
+          background: hov ? "rgba(162,137,89,0.14)" : "rgba(162,137,89,0.07)",
+          boxShadow: hov ? "0 0 14px rgba(162,137,89,0.2)" : "none",
+          transition: "all 0.2s ease",
+        }}>
         <span>{current?.flag}</span>
         <span className="hidden sm:inline">{current?.name}</span>
-        <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-2.5 h-2.5"><path d="M1 1l4 4 4-4" /></svg>
+        <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-2.5 h-2.5"
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}>
+          <path d="M1 1l4 4 4-4" />
+        </svg>
       </button>
       {open && (
         <div className="absolute top-full right-0 mt-1.5 rounded-xl border shadow-2xl z-50 overflow-hidden"
-          style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.2)", minWidth: 160 }}>
+          style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.25)", minWidth: 170 }}>
           {LANG_LIST.map((l) => (
-            <button key={l.code} onClick={() => { setLang(l.code); setOpen(false); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all hover:bg-[rgba(162,137,89,0.1)] text-left"
-              style={{ background: l.code === lang ? "rgba(162,137,89,0.12)" : "transparent", color: l.code === lang ? GOLD : "rgba(162,137,89,0.55)" }}>
-              <span className="text-base">{l.flag}</span> {l.name}
-            </button>
+            <LangOption key={l.code} l={l} lang={lang} onSelect={() => { setLang(l.code); setOpen(false); }} />
           ))}
         </div>
       )}
     </div>
+  );
+}
+
+function CTAButton({ highlight, label }: { highlight: boolean; label: string }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <Link href="/sign-up"
+      className="block w-full text-center py-4 rounded-2xl text-sm font-bold"
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        background: highlight
+          ? hov
+            ? `linear-gradient(135deg, #fff9e6, ${GOLD_LIGHT})`
+            : `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`
+          : hov ? "rgba(196,169,110,0.22)" : "rgba(162,137,89,0.08)",
+        color: highlight ? BG : hov ? GOLD_LIGHT : GOLD_BRIGHT,
+        border: highlight ? "none" : `1.5px solid ${hov ? "rgba(240,210,140,0.7)" : "rgba(162,137,89,0.25)"}`,
+        boxShadow: highlight
+          ? hov ? "0 6px 28px rgba(196,169,110,0.55), 0 2px 8px rgba(0,0,0,0.3)" : "0 4px 20px rgba(162,137,89,0.4)"
+          : hov ? "0 0 20px rgba(162,137,89,0.3)" : "none",
+        transform: hov ? "scale(1.03) translateY(-1px)" : "scale(1) translateY(0)",
+        transition: "all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        letterSpacing: hov ? "0.03em" : "0",
+      }}>
+      {label}
+    </Link>
+  );
+}
+
+function FeatureItem({ bold, accentColor, label }: { bold?: boolean; accentColor: string; label: string }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <li className="flex items-start gap-2.5 text-sm rounded-lg px-2 py-1 -mx-2"
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        color: bold ? accentColor : hov ? "#f0e8d0" : "rgba(212,197,162,0.88)",
+        fontWeight: bold ? 700 : 400,
+        background: hov ? "rgba(162,137,89,0.1)" : "transparent",
+        transition: "all 0.18s ease",
+        cursor: "default",
+      }}>
+      <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5"
+        style={{ color: hov ? GOLD_LIGHT : accentColor, transition: "color 0.18s ease" }}>
+        <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      {label}
+    </li>
   );
 }
 
@@ -223,15 +295,9 @@ export default function Packages() {
                     </div>
 
                     {/* Features */}
-                    <ul className="space-y-2.5 mb-6">
+                    <ul className="space-y-1 mb-6">
                       {FEATURE_KEYS.map((f, fi) => (
-                        <li key={fi} className="flex items-start gap-2.5 text-sm"
-                          style={{ color: f.bold ? accentColor : "rgba(212,197,162,0.88)", fontWeight: f.bold ? 700 : 400 }}>
-                          <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: accentColor }}>
-                            <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                          {t(f.key)}
-                        </li>
+                        <FeatureItem key={fi} bold={f.bold} accentColor={accentColor} label={t(f.key)} />
                       ))}
                     </ul>
 
@@ -279,20 +345,7 @@ export default function Packages() {
 
                   {/* CTA */}
                   <div className="px-7 pb-7 mt-auto">
-                    <Link href="/sign-up"
-                      className="block w-full text-center py-4 rounded-2xl text-sm font-bold transition-all"
-                      style={{
-                        background: pkg.highlight
-                          ? `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`
-                          : isHovered ? "rgba(162,137,89,0.18)" : "rgba(162,137,89,0.08)",
-                        color: pkg.highlight ? BG : accentColor,
-                        border: pkg.highlight ? "none" : `1.5px solid ${isHovered ? "rgba(196,169,110,0.55)" : "rgba(162,137,89,0.25)"}`,
-                        boxShadow: pkg.highlight ? "0 4px 20px rgba(162,137,89,0.4)" : "none",
-                        transform: isHovered ? "scale(1.02)" : "scale(1)",
-                        transition: "all 0.2s ease",
-                      }}>
-                      {t("pkg.startWith")}
-                    </Link>
+                    <CTAButton highlight={pkg.highlight} label={t("pkg.startWith")} />
                   </div>
                 </div>
               );
