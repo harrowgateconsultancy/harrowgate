@@ -289,10 +289,10 @@ export default function Landing() {
         </nav>
 
         {/* ── Hero — full-width two-column ── */}
-        <section className="min-h-[100vh] flex flex-col w-full px-6 lg:px-16 xl:px-24 pt-4">
+        <section className="min-h-[100vh] flex flex-col w-full px-6 lg:px-16 xl:px-24">
 
           {/* Top: two-column text + logo */}
-          <div className="flex-1 flex flex-col lg:flex-row items-center gap-10 lg:gap-0 py-4">
+          <div className="flex-1 flex flex-col lg:flex-row items-start gap-10 lg:gap-0 pt-8">
 
             {/* Left: text */}
             <div className="flex-1 flex flex-col items-start lg:pr-12">
@@ -339,8 +339,8 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Right: logo — as large as the column allows */}
-            <div className="hero-logo-right flex-shrink-0 flex items-center justify-center lg:w-[44%] w-full">
+            {/* Right: logo — fills the full height of the column, image centred */}
+            <div className="hero-logo-right flex-shrink-0 flex self-stretch items-center justify-center lg:w-[44%] w-full">
               <Link href="/sign-in" className="cursor-pointer block w-full">
                 <img src="/harrowgate-logo.png" alt="HARROWGATE"
                   className="w-full object-contain"
