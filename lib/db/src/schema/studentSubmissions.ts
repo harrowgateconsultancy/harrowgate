@@ -28,6 +28,7 @@ export const studentSubmissionsTable = pgTable("student_submissions", {
   sharedEmailPassword: text("shared_email_password"),
   customBankDetails: jsonb("custom_bank_details").$type<{ bankName: string; accountName: string; accountNumber: string; fps: string; additionalInfo: string } | null>(),
   programmeType: text("programme_type"),
+  agentCode: text("agent_code"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),

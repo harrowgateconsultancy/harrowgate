@@ -37,6 +37,7 @@ interface Agent {
   whatsappAvailable: string;
   idDocUrl: string | null;
   idDocName: string | null;
+  agentCode: string | null;
   status: string;
   createdAt: string;
 }
@@ -95,7 +96,12 @@ function AgentCard({ agent, onStatusChange }: { agent: Agent; onStatusChange: ()
             </p>
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {agent.agentCode && (
+            <span style={{ background: "rgba(162,137,89,0.18)", border: `1px solid rgba(162,137,89,0.5)`, borderRadius: 6, padding: "3px 10px", fontSize: 12, fontWeight: 700, color: GOLD, fontFamily: "monospace", letterSpacing: "0.06em" }}>
+              {agent.agentCode}
+            </span>
+          )}
           <StatusBadge status={agent.status} />
           <span style={{ color: GOLD, fontSize: 18, transition: "transform 0.2s", display: "inline-block", transform: open ? "rotate(90deg)" : "rotate(0deg)" }}>›</span>
         </div>

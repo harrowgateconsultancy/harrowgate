@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useSession } from "@clerk/react";
 import { COURSES, LEVEL_LABELS, getCoursesByLevel, type DegreeLevel } from "../../data/courses";
@@ -63,6 +63,15 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [agentCode, setAgentCode] = useState("");
+  const [approvedAgents, setApprovedAgents] = useState<{ agentCode: string; companyName: string; contactName: string }[]>([]);
+
+  useEffect(() => {
+    fetch(`${getApiBase()}/api/agents/approved`)
+      .then(r => r.ok ? r.json() : [])
+      .then(setApprovedAgents)
+      .catch(() => {});
+  }, []);
 
   const authHeaders = async (): Promise<Record<string, string>> => {
     const token = await session?.getToken();
@@ -136,6 +145,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
           preferredLevel: preferredLevel || null,
           preferredCourse: needsFreeText ? freeTextCourse.trim() : (course?.programme || null),
           preferredInstitution: needsFreeText ? null : (course?.institution || null),
+          agentCode: agentCode || null,
         }),
       });
       if (!res.ok) throw new Error("Failed");
@@ -534,6 +544,37 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
             })}
           </div>
         </div>
+
+        {/* Agent Code (optional) */}
+        {approvedAgents.length > 0 && (
+          <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
+            <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
+              <h2 className="text-base font-semibold" style={{ color: GOLD }}>Agent Referral <span className="font-normal text-xs ml-1" style={{ color: "rgba(162,137,89,0.45)" }}>(optional)</span></h2>
+              <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Were you referred by a HARROWGATE partner agent?</p>
+            </div>
+            <div className="px-6 py-5">
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Select Agent Code</label>
+              <select
+                value={agentCode}
+                onChange={e => setAgentCode(e.target.value)}
+                className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition-all"
+                style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: agentCode ? GOLD : "rgba(162,137,89,0.45)" }}
+              >
+                <option value="">— Not referred by an agent —</option>
+                {approvedAgents.map(a => (
+                  <option key={a.agentCode} value={a.agentCode}>
+                    {a.agentCode} · {a.companyName}
+                  </option>
+                ))}
+              </select>
+              {agentCode && (
+                <p className="text-xs mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>
+                  ✓ Agent code <strong style={{ color: GOLD }}>{agentCode}</strong> will be linked to your application.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="rounded-xl px-4 py-3 text-sm border" style={{ background: "rgba(248,113,113,0.07)", borderColor: "rgba(248,113,113,0.2)", color: "#f87171" }}>

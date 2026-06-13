@@ -14,6 +14,7 @@ export const agentsTable = pgTable("agents", {
   whatsappAvailable: text("whatsapp_available").notNull().default("no"),
   idDocUrl: text("id_doc_url"),
   idDocName: text("id_doc_name"),
+  agentCode: text("agent_code").unique(),
   status: text("status").notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
