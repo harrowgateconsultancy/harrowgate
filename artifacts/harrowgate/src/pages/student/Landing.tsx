@@ -400,7 +400,7 @@ export default function Landing() {
           <HeroBackground />
 
           {/* Top: two-column text + logo */}
-          <div className="flex-1 flex flex-col lg:flex-row items-start gap-10 lg:gap-0 pt-8" style={{ position: "relative", zIndex: 1 }}>
+          <div className="flex-1 flex flex-col lg:flex-row items-center gap-10 lg:gap-0" style={{ position: "relative", zIndex: 1 }}>
 
             {/* Left: text */}
             <div className="flex-1 flex flex-col items-start lg:pr-12">
