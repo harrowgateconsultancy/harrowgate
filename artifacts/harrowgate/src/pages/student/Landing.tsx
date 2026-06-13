@@ -4,10 +4,11 @@ import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
 import { usePageSEO } from "../../hooks/usePageSEO";
 
-/* ── Hero canvas background — gold particle constellation ── */
+/* ── Hong Kong Skyline Background ── */
 function HeroBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef<number>(0);
+  const tRef = useRef<number>(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -16,88 +17,206 @@ function HeroBackground() {
     if (!ctx) return;
 
     let W = 0, H = 0;
-    const PARTICLE_COUNT = 80;
-    const MAX_DIST = 180;
-    const GOLD_R = 162, GOLD_G = 137, GOLD_B = 89;
 
-    interface P { x: number; y: number; vx: number; vy: number; r: number; a: number; }
-    let particles: P[] = [];
+    // Each building: [xFrac, widthFrac, heightFrac, tipStyle]
+    // tipStyle: 0=flat, 1=pointed(spire), 2=antenna, 3=stepped
+    // heightFrac = height from ground as fraction of H * 0.65
+    type Tip = 0 | 1 | 2 | 3;
+    interface Bldg { x: number; w: number; h: number; tip: Tip; windows?: boolean; }
+
+    // Victoria Harbour skyline — HK Island (right-of-centre) + Kowloon (far left)
+    const LAYER_BG: Bldg[] = [
+      { x:.00, w:.05, h:.18, tip:0 }, { x:.06, w:.04, h:.22, tip:0 },
+      { x:.11, w:.03, h:.28, tip:0 }, { x:.15, w:.05, h:.20, tip:0 },
+      { x:.21, w:.04, h:.25, tip:0 }, { x:.26, w:.06, h:.30, tip:0 },
+      { x:.33, w:.04, h:.35, tip:0 }, { x:.38, w:.05, h:.28, tip:0 },
+      { x:.44, w:.04, h:.32, tip:0 }, { x:.49, w:.06, h:.38, tip:0 },
+      { x:.56, w:.04, h:.45, tip:0 }, { x:.61, w:.05, h:.40, tip:0 },
+      { x:.67, w:.04, h:.35, tip:0 }, { x:.72, w:.05, h:.28, tip:0 },
+      { x:.78, w:.04, h:.22, tip:0 }, { x:.83, w:.05, h:.18, tip:0 },
+      { x:.89, w:.06, h:.15, tip:0 }, { x:.96, w:.04, h:.12, tip:0 },
+    ];
+
+    const LAYER_MID: Bldg[] = [
+      // Kowloon side (left)
+      { x:.01, w:.03, h:.28, tip:2 }, { x:.045, w:.025, h:.32, tip:0 },
+      { x:.075, w:.03, h:.36, tip:2 }, { x:.11, w:.025, h:.30, tip:0 },
+      { x:.14, w:.02, h:.38, tip:1 },  // small spire
+      // HK Island — rising toward centre-right
+      { x:.18, w:.035, h:.42, tip:0 }, { x:.22, w:.03, h:.50, tip:2 },
+      { x:.26, w:.025, h:.55, tip:1 }, // Bank of China style
+      { x:.29, w:.04, h:.48, tip:0 },
+      { x:.34, w:.035, h:.62, tip:2 }, // tall with antenna
+      { x:.38, w:.04, h:.70, tip:0 },  // IFC 1 style
+      { x:.43, w:.035, h:.80, tip:2 }, // IFC 2 — tallest
+      { x:.47, w:.03, h:.65, tip:0 },
+      { x:.51, w:.04, h:.58, tip:2 },
+      { x:.56, w:.035, h:.52, tip:1 },
+      { x:.60, w:.04, h:.45, tip:0 },
+      { x:.65, w:.03, h:.38, tip:2 },
+      { x:.69, w:.035, h:.32, tip:0 },
+      { x:.73, w:.03, h:.28, tip:0 },
+      { x:.77, w:.04, h:.22, tip:0 },
+      { x:.82, w:.03, h:.18, tip:0 },
+      { x:.86, w:.04, h:.14, tip:0 },
+      { x:.91, w:.05, h:.12, tip:0 },
+      { x:.97, w:.03, h:.10, tip:0 },
+    ];
+
+    const LAYER_FG: Bldg[] = [
+      // Foreground accent buildings — densest around IFC area
+      { x:.03, w:.025, h:.35, tip:0, windows:true },
+      { x:.08, w:.02,  h:.40, tip:2, windows:true },
+      { x:.27, w:.02,  h:.44, tip:1, windows:true }, // Bank of China spire
+      { x:.36, w:.025, h:.55, tip:0, windows:true },
+      { x:.41, w:.03,  h:.72, tip:2, windows:true }, // IFC 1
+      { x:.45, w:.025, h:.88, tip:2, windows:true }, // IFC 2 — tallest
+      { x:.50, w:.02,  h:.60, tip:0, windows:true },
+      { x:.54, w:.025, h:.50, tip:2, windows:true },
+      { x:.58, w:.02,  h:.42, tip:0, windows:true },
+    ];
+
+    function drawBuilding(
+      b: Bldg, groundY: number, maxH: number,
+      fillColor: string, lineColor: string, opacity: number
+    ) {
+      const bx = b.x * W;
+      const bw = b.w * W;
+      const bh = b.h * maxH;
+      const top = groundY - bh;
+
+      ctx!.globalAlpha = opacity;
+      ctx!.fillStyle = fillColor;
+      ctx!.beginPath();
+
+      if (b.tip === 1) {
+        // Spire / pointed top
+        ctx!.moveTo(bx, groundY);
+        ctx!.lineTo(bx, top + bw * 0.6);
+        ctx!.lineTo(bx + bw / 2, top);
+        ctx!.lineTo(bx + bw, top + bw * 0.6);
+        ctx!.lineTo(bx + bw, groundY);
+      } else if (b.tip === 2) {
+        // Flat with thin antenna
+        ctx!.rect(bx, top, bw, bh);
+        ctx!.fill();
+        ctx!.fillRect(bx + bw * 0.45, top - bh * 0.12, bw * 0.1, bh * 0.12);
+        ctx!.globalAlpha = 0;
+      } else {
+        ctx!.rect(bx, top, bw, bh);
+      }
+      ctx!.fill();
+      ctx!.globalAlpha = 1;
+
+      // Window grid (foreground only)
+      if (b.windows) {
+        const rows = Math.floor(bh / 14);
+        const cols = Math.max(1, Math.floor(bw / 9));
+        ctx!.globalAlpha = opacity * 0.5;
+        ctx!.fillStyle = lineColor;
+        for (let r = 1; r < rows - 1; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (Math.random() > 0.35) {
+              ctx!.fillRect(
+                bx + 3 + c * (bw / cols),
+                top + 4 + r * 13,
+                Math.max(2, bw / cols - 4),
+                6
+              );
+            }
+          }
+        }
+        ctx!.globalAlpha = 1;
+      }
+    }
+
+    function render(t: number) {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, W, H);
+
+      const groundY = H * 0.82;
+      const maxH = H * 0.70;
+      const R = 162, G = 137, B = 89;
+
+      // Atmosphere glow above skyline
+      const atmo = ctx.createLinearGradient(0, groundY - maxH * 0.5, 0, groundY);
+      atmo.addColorStop(0, "transparent");
+      atmo.addColorStop(1, `rgba(${R},${G},${B},0.04)`);
+      ctx.fillStyle = atmo;
+      ctx.fillRect(0, 0, W, H);
+
+      // Far background layer — mountains / distant hills
+      drawBuilding({ x:0, w:0.22, h:0.18, tip:0 } as Bldg, groundY, maxH, `rgba(${R},${G},${B},0.05)`, "", 0.05);
+      drawBuilding({ x:0.18, w:0.35, h:0.25, tip:0 } as Bldg, groundY, maxH, `rgba(${R},${G},${B},0.05)`, "", 0.05);
+      drawBuilding({ x:0.50, w:0.30, h:0.22, tip:0 } as Bldg, groundY, maxH, `rgba(${R},${G},${B},0.05)`, "", 0.05);
+      drawBuilding({ x:0.78, w:0.22, h:0.18, tip:0 } as Bldg, groundY, maxH, `rgba(${R},${G},${B},0.05)`, "", 0.05);
+
+      // Layer 1 — distant buildings
+      for (const b of LAYER_BG) {
+        drawBuilding(b, groundY, maxH, `rgba(${R},${G},${B},0.16)`, `rgba(${R},${G},${B},0.10)`, 0.16);
+      }
+
+      // Layer 2 — mid buildings
+      for (const b of LAYER_MID) {
+        drawBuilding(b, groundY, maxH, `rgba(${R},${G},${B},0.24)`, `rgba(${R},${G},${B},0.14)`, 0.24);
+      }
+
+      // Layer 3 — foreground with windows
+      for (const b of LAYER_FG) {
+        drawBuilding(b, groundY, maxH, `rgba(${R},${G},${B},0.32)`, `rgba(${R},${G},${B},0.40)`, 0.32);
+      }
+
+      // Waterline — Victoria Harbour
+      ctx.strokeStyle = `rgba(${R},${G},${B},0.45)`;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(0, groundY);
+      ctx.lineTo(W, groundY);
+      ctx.stroke();
+
+      // Shimmering harbour reflection
+      const shimmerX = (Math.sin(t * 0.0012) * 0.5 + 0.5) * W;
+      const shimmer = ctx.createRadialGradient(shimmerX, groundY, 0, shimmerX, groundY, W * 0.45);
+      shimmer.addColorStop(0, `rgba(${R},${G},${B},0.22)`);
+      shimmer.addColorStop(0.4, `rgba(${R},${G},${B},0.08)`);
+      shimmer.addColorStop(1, "transparent");
+      ctx.fillStyle = shimmer;
+      ctx.fillRect(0, groundY, W, H - groundY);
+
+      // Water reflection gradient fade
+      const water = ctx.createLinearGradient(0, groundY, 0, H);
+      water.addColorStop(0, `rgba(${R},${G},${B},0.12)`);
+      water.addColorStop(1, "transparent");
+      ctx.fillStyle = water;
+      ctx.fillRect(0, groundY, W, H - groundY);
+
+      // Night sky glow — Victoria Peak / harbour city lights
+      const moon = ctx.createRadialGradient(W * 0.88, H * 0.12, 0, W * 0.88, H * 0.12, W * 0.28);
+      moon.addColorStop(0, `rgba(${R},${G},${B},0.08)`);
+      moon.addColorStop(1, "transparent");
+      ctx.fillStyle = moon;
+      ctx.fillRect(0, 0, W, H);
+
+      // Horizon glow behind skyline
+      const horizon = ctx.createLinearGradient(0, groundY - maxH * 0.3, 0, groundY);
+      horizon.addColorStop(0, "transparent");
+      horizon.addColorStop(1, `rgba(${R},${G},${B},0.08)`);
+      ctx.fillStyle = horizon;
+      ctx.fillRect(0, 0, W, H);
+
+      frameRef.current = requestAnimationFrame((ts) => { tRef.current = ts; render(ts); });
+    }
 
     function init() {
       W = canvas!.width = canvas!.offsetWidth;
       H = canvas!.height = canvas!.offsetHeight;
-      particles = Array.from({ length: PARTICLE_COUNT }, () => ({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.28,
-        vy: (Math.random() - 0.5) * 0.18 - 0.06,
-        r: Math.random() * 1.8 + 0.5,
-        a: Math.random() * 0.55 + 0.15,
-      }));
-    }
-
-    function draw() {
-      if (!ctx || !canvas) return;
-      ctx.clearRect(0, 0, W, H);
-
-      // Subtle radial glow at hero centre-left
-      const grd = ctx.createRadialGradient(W * 0.28, H * 0.45, 0, W * 0.28, H * 0.45, W * 0.55);
-      grd.addColorStop(0, `rgba(${GOLD_R},${GOLD_G},${GOLD_B},0.055)`);
-      grd.addColorStop(1, "transparent");
-      ctx.fillStyle = grd;
-      ctx.fillRect(0, 0, W, H);
-
-      // Connection lines
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < MAX_DIST) {
-            const opacity = (1 - dist / MAX_DIST) * 0.18;
-            ctx.strokeStyle = `rgba(${GOLD_R},${GOLD_G},${GOLD_B},${opacity})`;
-            ctx.lineWidth = 0.6;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Particles
-      for (const p of particles) {
-        // Soft glow halo
-        const halo = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 5);
-        halo.addColorStop(0, `rgba(${GOLD_R},${GOLD_G},${GOLD_B},${p.a * 0.4})`);
-        halo.addColorStop(1, "transparent");
-        ctx.fillStyle = halo;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Core dot
-        ctx.fillStyle = `rgba(${GOLD_R},${GOLD_G},${GOLD_B},${p.a})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Move
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < -10) p.x = W + 10;
-        if (p.x > W + 10) p.x = -10;
-        if (p.y < -10) p.y = H + 10;
-        if (p.y > H + 10) p.y = -10;
-      }
-
-      frameRef.current = requestAnimationFrame(draw);
     }
 
     const ro = new ResizeObserver(() => { init(); });
-    ro.observe(canvas);
+    ro.observe(canvas!);
     init();
-    draw();
+    frameRef.current = requestAnimationFrame((ts) => render(ts));
 
     return () => {
       cancelAnimationFrame(frameRef.current);
