@@ -25,6 +25,8 @@ import Finance from "@/pages/admin/Finance";
 import Staff from "@/pages/admin/Staff";
 import Pricing from "@/pages/admin/Pricing";
 import AdminSettings from "@/pages/admin/Settings";
+import AgentsPage from "@/pages/admin/Agents";
+import AgentSignup from "@/pages/agent/AgentSignup";
 import StaffLogin from "@/pages/staff/StaffLogin";
 import StaffDashboard from "@/pages/staff/StaffDashboard";
 import PrintView from "@/pages/print";
@@ -284,6 +286,9 @@ function ClerkProviderWithRoutes() {
             <Route path="/staff/login" component={StaffLogin} />
             <Route path="/staff" component={StaffDashboard} />
 
+            {/* Agent signup (public) */}
+            <Route path="/agent-signup" component={AgentSignup} />
+
             {/* Admin login (public) */}
             <Route path="/admin/login" component={AdminLogin} />
 
@@ -323,6 +328,9 @@ function ClerkProviderWithRoutes() {
                     </Route>
                     <Route path="/admin/settings">
                       <AdminOnlyGuard><AdminSettings /></AdminOnlyGuard>
+                    </Route>
+                    <Route path="/admin/agents">
+                      <AdminOnlyGuard><AgentsPage /></AdminOnlyGuard>
                     </Route>
                     <Route component={NotFound} />
                   </Switch>

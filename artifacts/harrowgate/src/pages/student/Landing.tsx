@@ -97,6 +97,11 @@ export default function Landing() {
                 style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>
                 Packages
               </Link>
+              <Link href="/agent-signup"
+                className="text-sm font-medium px-4 py-2 rounded-full border transition-all hover:opacity-80 hidden sm:inline-flex items-center gap-1.5"
+                style={{ borderColor: "rgba(162,137,89,0.35)", color: GOLD, background: "rgba(162,137,89,0.08)" }}>
+                Our Agents
+              </Link>
               <Link href="/sign-in"
                 className="text-sm font-medium px-4 py-2 rounded-full transition-all hover:opacity-80"
                 style={{ color: GOLD }}>

@@ -15,6 +15,7 @@ import settingsRouter from "./settings";
 import financeRouter from "./finance";
 import staffAuthRouter from "./staffAuth";
 import tasksRouter from "./tasks";
+import agentsRouter from "./agents";
 
 const router: IRouter = Router();
 
@@ -49,6 +50,7 @@ router.use("/admin/staff", (req: any, res: any, next: any) => {
 });
 
 // ── Route handlers (mounted once each) ──────────────────────────────────────
+router.use(agentsRouter);
 router.use(settingsRouter);
 router.use(adminSubmissionsRouter);
 router.use(id995aRouter);

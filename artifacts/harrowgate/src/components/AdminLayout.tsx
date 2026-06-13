@@ -21,6 +21,7 @@ const ALL_NAV_ITEMS = [
   { href: "/admin/staff",        label: "Staff & Tasks",icon: UserCog,        exact: false, roles: ["admin","manager","staff"] },
   { href: "/admin/pricing",      label: "Pricing",     icon: Tag,             exact: false, roles: ["admin"] },
   { href: "/admin/settings",     label: "Settings",    icon: Settings,        exact: false, roles: ["admin"] },
+  { href: "/admin/agents",       label: "Agents",      icon: Users,           exact: false, roles: ["admin"] },
 ];
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
