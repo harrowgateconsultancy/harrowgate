@@ -66,103 +66,130 @@ const clerkAppearance = {
     logoImageUrl: `${window.location.origin}${basePath}/harrowgate-logo.png`,
   },
   variables: {
-    colorPrimary: "#a28959",
-    colorForeground: "#e8d5b0",
-    colorMutedForeground: "rgba(232,213,176,0.5)",
+    colorPrimary: "#c4a96e",
+    colorForeground: "#f0e8d0",
+    colorMutedForeground: "rgba(212,197,162,0.6)",
     colorDanger: "#f87171",
-    colorBackground: "#0d2615",
-    colorInput: "rgba(162,137,89,0.1)",
-    colorInputForeground: "#e8d5b0",
-    colorNeutral: "rgba(162,137,89,0.3)",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-    borderRadius: "0.75rem",
+    colorBackground: "#0b2213",
+    colorInput: "rgba(162,137,89,0.12)",
+    colorInputForeground: "#f0e8d0",
+    colorNeutral: "rgba(162,137,89,0.35)",
+    fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    borderRadius: "999px",
   },
   elements: {
     rootBox: "w-full flex justify-center",
-    cardBox: "rounded-2xl w-[440px] max-w-full overflow-hidden",
+    cardBox: "w-[460px] max-w-full",
     card: "!shadow-none !border-0 !bg-transparent !rounded-none",
-    footer: "!shadow-none !border-0 !bg-transparent !rounded-none",
-    headerTitle: "text-[#a28959] font-bold",
-    headerSubtitle: "text-[rgba(162,137,89,0.7)]",
-    socialButtonsBlockButtonText: "text-[#f5e6d3] font-medium",
-    formFieldLabel: "text-[rgba(162,137,89,0.8)] text-xs font-semibold",
-    footerActionLink: "text-[#a28959] font-semibold hover:opacity-80",
-    footerActionText: "text-[rgba(162,137,89,0.6)]",
-    dividerText: "text-[rgba(162,137,89,0.5)]",
-    identityPreviewEditButton: "text-[#a28959]",
-    formFieldSuccessText: "text-[#a28959]",
-    alertText: "text-[#f5e6d3]",
-    logoBox: "flex justify-center",
-    logoImage: "h-10",
-    socialButtonsBlockButton: "border border-[rgba(162,137,89,0.25)] bg-[rgba(162,137,89,0.06)] hover:bg-[rgba(162,137,89,0.12)] rounded-xl",
-    formButtonPrimary: "bg-[#a28959] text-[#0b2213] font-semibold hover:opacity-90 rounded-xl",
-    formFieldInput: "bg-[rgba(162,137,89,0.08)] border border-[rgba(162,137,89,0.2)] text-[#f5e6d3] rounded-xl focus:border-[#a28959]",
-    footerAction: "bg-[rgba(162,137,89,0.05)]",
-    dividerLine: "bg-[rgba(162,137,89,0.15)]",
-    alert: "bg-[rgba(248,113,113,0.08)] border border-[rgba(248,113,113,0.2)]",
-    otpCodeFieldInput: "bg-[rgba(162,137,89,0.08)] border-[rgba(162,137,89,0.2)] text-[#f5e6d3] rounded-xl",
+    footer: "!shadow-none !border-0 !bg-[rgba(162,137,89,0.04)] !rounded-b-3xl",
+    headerTitle: "!text-[#c4a96e] !font-bold !text-2xl",
+    headerSubtitle: "!text-[rgba(212,197,162,0.7)]",
+    socialButtonsBlockButtonText: "!text-[#f0e8d0] !font-semibold",
+    socialButtonsBlockButtonArrow: "!text-[#c4a96e]",
+    formFieldLabel: "!text-[rgba(196,169,110,0.85)] !text-xs !font-semibold !tracking-wide",
+    footerActionLink: "!text-[#c4a96e] !font-bold hover:!opacity-80",
+    footerActionText: "!text-[rgba(212,197,162,0.6)]",
+    dividerText: "!text-[rgba(162,137,89,0.55)]",
+    identityPreviewEditButton: "!text-[#c4a96e]",
+    formFieldSuccessText: "!text-[#c4a96e]",
+    alertText: "!text-[#f0e8d0]",
+    logoBox: "!flex !justify-center !mb-1",
+    logoImage: "!h-14",
+    socialButtonsBlockButton: "!border !border-[rgba(196,169,110,0.35)] !bg-[rgba(162,137,89,0.08)] hover:!bg-[rgba(162,137,89,0.16)] hover:!border-[rgba(196,169,110,0.6)] !rounded-full !transition-all !shadow-none",
+    formButtonPrimary: "!rounded-full !font-bold !text-[#0b2213] !shadow-none hover:!opacity-95 !transition-all",
+    formFieldInput: "!bg-[rgba(162,137,89,0.09)] !border !border-[rgba(162,137,89,0.25)] !text-[#f0e8d0] !rounded-full focus:!border-[#c4a96e] focus:!ring-0 !placeholder-[rgba(162,137,89,0.4)] !transition-all",
+    footerAction: "!bg-[rgba(162,137,89,0.04)]",
+    dividerLine: "!bg-[rgba(162,137,89,0.18)]",
+    alert: "!bg-[rgba(248,113,113,0.08)] !border !border-[rgba(248,113,113,0.2)] !rounded-2xl",
+    otpCodeFieldInput: "!bg-[rgba(162,137,89,0.09)] !border-[rgba(162,137,89,0.25)] !text-[#f0e8d0] !rounded-2xl",
     formFieldRow: "gap-3",
     main: "gap-4",
+    internal: "gap-4",
   },
 };
 
-function SignInPage() {
+function AuthBackButton({ onClick }: { onClick: () => void }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full border"
+      style={{
+        color: hov ? "#f0d28c" : "#c4a96e",
+        borderColor: hov ? "rgba(240,210,140,0.6)" : "rgba(196,169,110,0.35)",
+        background: hov ? "rgba(162,137,89,0.16)" : "rgba(162,137,89,0.08)",
+        boxShadow: hov ? "0 0 14px rgba(162,137,89,0.25)" : "none",
+        transition: "all 0.2s ease",
+      }}
+    >
+      ← Back
+    </button>
+  );
+}
+
+function AuthPageShell({ children }: { children: React.ReactNode }) {
   const [, setLocation] = useLocation();
   return (
     <div
       className="flex flex-col min-h-[100dvh] px-4 py-8"
-      style={{ background: "#0f2d18" }}
+      style={{
+        background: "#0b2213",
+        backgroundImage: "radial-gradient(ellipse at 50% -10%, rgba(162,137,89,0.08) 0%, transparent 60%)",
+      }}
     >
-      <div className="flex items-center justify-between mb-6 max-w-lg mx-auto w-full">
-        <button
-          onClick={() => setLocation("/")}
-          className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
-          style={{ color: "rgba(31,125,83,0.6)" }}
-        >
-          ← Back
-        </button>
-        <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-10 object-contain" />
-        <div className="w-16" />
+      {/* Nav bar */}
+      <div className="flex items-center justify-between mb-8 max-w-lg mx-auto w-full">
+        <AuthBackButton onClick={() => setLocation("/")} />
+        <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-12 object-contain" />
+        <div className="w-24" />
       </div>
+
+      {/* Card wrapper */}
       <div className="flex flex-1 items-center justify-center">
-        <SignIn
-          routing="path"
-          path={`${basePath}/sign-in`}
-          signUpUrl={`${basePath}/sign-up`}
-          forceRedirectUrl={`${basePath}/portal`}
-        />
+        <div
+          className="w-full max-w-[480px] rounded-3xl p-1"
+          style={{
+            background: "linear-gradient(135deg, rgba(196,169,110,0.3) 0%, rgba(162,137,89,0.1) 50%, rgba(196,169,110,0.2) 100%)",
+            boxShadow: "0 0 60px rgba(162,137,89,0.2), 0 24px 80px rgba(0,0,0,0.5)",
+          }}
+        >
+          <div
+            className="rounded-[calc(1.5rem-4px)] overflow-hidden"
+            style={{ background: "#0b2213" }}
+          >
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function SignUpPage() {
-  const [, setLocation] = useLocation();
+function SignInPage() {
   return (
-    <div
-      className="flex flex-col min-h-[100dvh] px-4 py-8"
-      style={{ background: "#0f2d18" }}
-    >
-      <div className="flex items-center justify-between mb-6 max-w-lg mx-auto w-full">
-        <button
-          onClick={() => setLocation("/")}
-          className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
-          style={{ color: "rgba(31,125,83,0.6)" }}
-        >
-          ← Back
-        </button>
-        <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-10 object-contain" />
-        <div className="w-16" />
-      </div>
-      <div className="flex flex-1 items-center justify-center">
-        <SignUp
-          routing="path"
-          path={`${basePath}/sign-up`}
-          signInUrl={`${basePath}/sign-in`}
-          forceRedirectUrl={`${basePath}/portal`}
-        />
-      </div>
-    </div>
+    <AuthPageShell>
+      <SignIn
+        routing="path"
+        path={`${basePath}/sign-in`}
+        signUpUrl={`${basePath}/sign-up`}
+        forceRedirectUrl={`${basePath}/portal`}
+      />
+    </AuthPageShell>
+  );
+}
+
+function SignUpPage() {
+  return (
+    <AuthPageShell>
+      <SignUp
+        routing="path"
+        path={`${basePath}/sign-up`}
+        signInUrl={`${basePath}/sign-in`}
+        forceRedirectUrl={`${basePath}/portal`}
+      />
+    </AuthPageShell>
   );
 }
 
