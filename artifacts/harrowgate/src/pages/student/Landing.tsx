@@ -6,8 +6,12 @@ import { usePageSEO } from "../../hooks/usePageSEO";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
-const GOLD_DIM = "rgba(162,137,89,0.7)";
-const GOLD_FAINT = "rgba(162,137,89,0.12)";
+const GOLD_BRIGHT = "#c4a96e";
+const CREAM = "#d4c5a2";          // warm cream — high contrast body text
+const CREAM_DIM = "rgba(212,197,162,0.65)";  // secondary/caption text
+const GOLD_DIM = CREAM;           // legacy alias so existing refs stay cream
+const GOLD_FAINT = "rgba(162,137,89,0.15)";
+const LABEL_COLOR = "rgba(162,137,89,0.75)"; // section eyebrow labels
 
 /* ── Scroll-reveal (only for below-fold sections) ── */
 function useReveal() {
@@ -121,7 +125,7 @@ function StatCard({ val, label }: { val: string; label: string }) {
         transform: hovered ? "scale(1.07)" : "scale(1)",
       }}>
       <p className="text-3xl font-black mb-1" style={{ color: hovered ? "#c4a96e" : GOLD, transition: "color 0.25s" }}>{val}</p>
-      <p className="text-xs font-medium" style={{ color: "rgba(162,137,89,0.5)" }}>{label}</p>
+      <p className="text-xs font-medium" style={{ color: CREAM_DIM }}>{label}</p>
     </div>
   );
 }
@@ -266,7 +270,7 @@ export default function Landing() {
             <div className="hero-item-1 badge-pill inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border"
               style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.25)" }}>
               <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#4ade80" }} />
-              <p className="text-xs font-semibold tracking-[0.25em] uppercase" style={{ color: GOLD_DIM }}>{t("hero.badge")}</p>
+              <p className="text-xs font-semibold tracking-[0.25em] uppercase" style={{ color: LABEL_COLOR }}>{t("hero.badge")}</p>
             </div>
 
             <h1 className="hero-item-2 text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.08]"
@@ -315,7 +319,7 @@ export default function Landing() {
         {/* ── Services (scroll reveal) ── */}
         <section className="py-24" style={{ background: "rgba(0,0,0,0.22)" }}>
           <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
-            <Reveal idx={0} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.45)" }}>{t("services.title")}</p></Reveal>
+            <Reveal idx={0} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: LABEL_COLOR }}>{t("services.title")}</p></Reveal>
             <Reveal idx={1} visible={visible} setRef={setRef} delay={80}><h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>{t("services.heading")}</h2></Reveal>
             <Reveal idx={2} visible={visible} setRef={setRef} delay={140}><p className="text-center mb-14 text-base max-w-xl mx-auto" style={{ color: GOLD_DIM }}>{t("services.sub")}</p></Reveal>
             <div className="grid md:grid-cols-3 gap-5">
@@ -339,7 +343,7 @@ export default function Landing() {
         {/* ── How It Works ── */}
         <section id="how-it-works" className="py-24 w-full px-6 lg:px-12">
           <div className="max-w-[1800px] mx-auto">
-            <Reveal idx={10} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.45)" }}>{t("how.label")}</p></Reveal>
+            <Reveal idx={10} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: LABEL_COLOR }}>{t("how.label")}</p></Reveal>
             <Reveal idx={11} visible={visible} setRef={setRef} delay={80}><h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>{t("how.title")}</h2></Reveal>
             <Reveal idx={12} visible={visible} setRef={setRef} delay={140}><p className="text-center mb-16 text-base max-w-xl mx-auto" style={{ color: GOLD_DIM }}>{t("how.sub")}</p></Reveal>
 
@@ -373,7 +377,7 @@ export default function Landing() {
         {/* ── Packages CTA ── */}
         <section className="py-20 px-6" style={{ background: "rgba(162,137,89,0.025)" }}>
           <div className="max-w-4xl mx-auto text-center">
-            <Reveal idx={20} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "rgba(162,137,89,0.45)" }}>{t("pkg.badge")}</p></Reveal>
+            <Reveal idx={20} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: LABEL_COLOR }}>{t("pkg.badge")}</p></Reveal>
             <Reveal idx={21} visible={visible} setRef={setRef} delay={80}><h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: GOLD }}>{t("pricing.startJust")}</h2></Reveal>
             <Reveal idx={22} visible={visible} setRef={setRef} delay={130}><p className="text-base max-w-xl mx-auto mb-5" style={{ color: GOLD_DIM }}>{t("pricing.desc")}</p></Reveal>
             <Reveal idx={23} visible={visible} setRef={setRef} delay={180}>
@@ -383,7 +387,7 @@ export default function Landing() {
               <div className="flex flex-wrap gap-4 justify-center items-center mb-8">
                 {[{ lk: "pkg.tier1", cost: pricing.mastersTotal }, { lk: "pkg.tier2", cost: pricing.bachelorTotal }, { lk: "pkg.tier3", cost: pricing.associateTotal }, { lk: "pkg.tier4", cost: pricing.diplomaTotal }].map(p => (
                   <div key={p.lk} className="price-card rounded-2xl px-7 py-5 border text-center min-w-[160px] cursor-default" style={{ background: "rgba(162,137,89,0.05)", borderColor: GOLD_FAINT }}>
-                    <p className="text-xs font-medium mb-1.5" style={{ color: "rgba(162,137,89,0.5)" }}>{t(p.lk)}</p>
+                    <p className="text-xs font-medium mb-1.5" style={{ color: CREAM_DIM }}>{t(p.lk)}</p>
                     <p className="text-base font-bold" style={{ color: GOLD }}>{p.cost}</p>
                   </div>
                 ))}
@@ -403,7 +407,7 @@ export default function Landing() {
         {/* ── Testimonials ── */}
         <section className="py-24 px-6" style={{ background: "rgba(0,0,0,0.22)" }}>
           <div className="max-w-[1800px] mx-auto">
-            <Reveal idx={30} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.45)" }}>{t("testimonials.label")}</p></Reveal>
+            <Reveal idx={30} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: LABEL_COLOR }}>{t("testimonials.label")}</p></Reveal>
             <Reveal idx={31} visible={visible} setRef={setRef} delay={80}><h2 className="text-3xl md:text-4xl font-bold text-center mb-14" style={{ color: GOLD }}>{t("testimonials.title")}</h2></Reveal>
             <div className="grid md:grid-cols-3 gap-5">
               {testimonials.map((item, i) => (
@@ -413,7 +417,7 @@ export default function Landing() {
                     <p className="text-sm leading-relaxed flex-1" style={{ color: GOLD_DIM }}>{item.q}</p>
                     <div className="pt-2 border-t" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                       <p className="text-sm font-semibold" style={{ color: GOLD }}>{item.name}</p>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>{item.school}</p>
+                      <p className="text-xs mt-0.5" style={{ color: CREAM_DIM }}>{item.school}</p>
                     </div>
                   </div>
                 </Reveal>
@@ -427,7 +431,7 @@ export default function Landing() {
         {/* ── Final CTA ── */}
         <section className="py-28 text-center px-6">
           <div className="max-w-2xl mx-auto">
-            <Reveal idx={40} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase mb-6" style={{ color: "rgba(162,137,89,0.45)" }}>{t("cta.label")}</p></Reveal>
+            <Reveal idx={40} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase mb-6" style={{ color: LABEL_COLOR }}>{t("cta.label")}</p></Reveal>
             <Reveal idx={41} visible={visible} setRef={setRef} delay={80}>
               <h2 className="text-4xl md:text-5xl font-bold mb-5"
                 style={{ background: `linear-gradient(135deg, #c4a96e 0%, ${GOLD} 50%, rgba(162,137,89,0.6) 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
@@ -442,9 +446,9 @@ export default function Landing() {
               </Link>
             </Reveal>
             <Reveal idx={44} visible={visible} setRef={setRef} delay={260}>
-              <p className="mt-6 text-xs" style={{ color: "rgba(162,137,89,0.35)" }}>
+              <p className="mt-6 text-xs" style={{ color: CREAM_DIM }}>
                 {t("cta.hasAccount")}{" "}
-                <Link href="/sign-in" className="underline hover:opacity-80 transition-opacity" style={{ color: "rgba(162,137,89,0.55)" }}>{t("nav.signIn")}</Link>
+                <Link href="/sign-in" className="underline hover:opacity-80 transition-opacity" style={{ color: CREAM }}>{t("nav.signIn")}</Link>
               </p>
             </Reveal>
           </div>
@@ -455,12 +459,12 @@ export default function Landing() {
           <div className="max-w-[1800px] mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
               <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-14 object-contain" style={{ opacity: 0.45 }} />
-              <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
+              <p className="text-xs" style={{ color: CREAM_DIM }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
             </div>
             <div className="rounded-xl border px-5 py-4 text-center" style={{ borderColor: "rgba(162,137,89,0.1)", background: "rgba(162,137,89,0.03)" }}>
-              <p className="text-[11px] leading-relaxed" style={{ color: "rgba(162,137,89,0.4)" }}>
-                <span className="font-semibold" style={{ color: "rgba(162,137,89,0.6)" }}>Legal Notice:</span> HARROWGATE Consultancy is an education consultancy only. We are <span className="font-semibold">not</span> a licensed immigration service provider under the Immigration Service Providers (Regulation) Ordinance (Cap. 658). We do not provide immigration advice or legal advice. For immigration matters, please consult a provider registered with the{" "}
-                <a href="https://www.ispb.gov.hk" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-70" style={{ color: "rgba(162,137,89,0.55)" }}>Immigration Service Providers Board</a>.
+              <p className="text-[11px] leading-relaxed" style={{ color: CREAM_DIM }}>
+                <span className="font-semibold" style={{ color: CREAM }}>Legal Notice:</span> HARROWGATE Consultancy is an education consultancy only. We are <span className="font-semibold">not</span> a licensed immigration service provider under the Immigration Service Providers (Regulation) Ordinance (Cap. 658). We do not provide immigration advice or legal advice. For immigration matters, please consult a provider registered with the{" "}
+                <a href="https://www.ispb.gov.hk" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-70" style={{ color: CREAM }}>Immigration Service Providers Board</a>.
               </p>
             </div>
           </div>
