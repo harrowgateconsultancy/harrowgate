@@ -35,6 +35,7 @@ interface Agent {
   officeAddress: string;
   contactNumber: string;
   whatsappAvailable: string;
+  email: string | null;
   idDocUrl: string | null;
   idDocName: string | null;
   agentCode: string | null;
@@ -114,6 +115,7 @@ function AgentCard({ agent, onStatusChange }: { agent: Agent; onStatusChange: ()
             <Field label="Company Name" value={agent.companyName} />
             <Field label="Contact Name" value={agent.contactName} />
             <Field label="Office Address" value={agent.officeAddress} />
+            <Field label="Email Address" value={agent.email || "—"} />
             <Field label="Contact Number" value={`${agent.contactNumber}${agent.whatsappAvailable === "yes" ? " (WhatsApp ✓)" : ""}`} />
             <Field label="Username" value={`@${agent.username}`} mono />
             <div>

@@ -35,6 +35,7 @@ export default function AgentSignup() {
   const [bizReg, setBizReg] = useState<FileState>({ file: null, name: "" });
   const [contactName, setContactName] = useState("");
   const [officeAddress, setOfficeAddress] = useState("");
+  const [email, setEmail] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [whatsapp, setWhatsapp] = useState(false);
   const [idDoc, setIdDoc] = useState<FileState>({ file: null, name: "" });
@@ -51,7 +52,7 @@ export default function AgentSignup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!companyName || !contactName || !officeAddress || !contactNumber || !username || !password) {
+    if (!companyName || !contactName || !officeAddress || !email || !contactNumber || !username || !password) {
       setError("Please fill in all required fields.");
       return;
     }
@@ -81,6 +82,7 @@ export default function AgentSignup() {
           businessRegName: bizRegName,
           contactName,
           officeAddress,
+          email,
           contactNumber,
           whatsappAvailable: whatsapp ? "yes" : "no",
           idDocUrl,
@@ -288,9 +290,25 @@ export default function AgentSignup() {
               </div>
             </div>
 
-            {/* Q5 Contact Number + WhatsApp */}
+            {/* Q5 Email Address */}
             <div style={{ display: "flex", gap: 14 }}>
               <div style={questionStyle}>5</div>
+              <div style={{ flex: 1 }}>
+                <label style={labelStyle}>Email Address <span style={{ color: "#e05" }}>*</span></label>
+                <input
+                  style={inputStyle}
+                  type="email"
+                  placeholder="agent@company.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Q6 Contact Number + WhatsApp */}
+            <div style={{ display: "flex", gap: 14 }}>
+              <div style={questionStyle}>6</div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Contact Number <span style={{ color: "#e05" }}>*</span></label>
                 <input
@@ -315,9 +333,9 @@ export default function AgentSignup() {
               </div>
             </div>
 
-            {/* Q6 ID Card / Passport */}
+            {/* Q7 ID Card / Passport */}
             <div style={{ display: "flex", gap: 14 }}>
-              <div style={questionStyle}>6</div>
+              <div style={questionStyle}>7</div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>ID Card / Passport</label>
                 <input

@@ -26,7 +26,7 @@ router.post("/agents/register", async (req, res) => {
     const {
       username, password,
       companyName, businessRegUrl, businessRegName,
-      contactName, officeAddress, contactNumber, whatsappAvailable,
+      contactName, officeAddress, email, contactNumber, whatsappAvailable,
       idDocUrl, idDocName,
     } = req.body || {};
 
@@ -44,6 +44,7 @@ router.post("/agents/register", async (req, res) => {
       businessRegName: businessRegName || null,
       contactName,
       officeAddress,
+      email: email || null,
       contactNumber,
       whatsappAvailable: whatsappAvailable === "yes" ? "yes" : "no",
       idDocUrl: idDocUrl || null,
