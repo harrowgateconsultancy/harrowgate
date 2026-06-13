@@ -181,7 +181,7 @@ export default function AgentSignup() {
     <div style={{ minHeight: "100vh", background: BG, color: "#e8dcc8", fontFamily: "system-ui, sans-serif" }}>
       {/* Header */}
       <nav style={{ borderBottom: `1px solid rgba(162,137,89,0.15)`, background: "rgba(11,34,19,0.9)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 50 }}>
-        <div className="flex items-center justify-between px-6 py-3 max-w-4xl mx-auto">
+        <div className="flex items-center justify-between px-6 lg:px-10 py-3 w-full max-w-[1800px] mx-auto">
           <Link href="/">
             <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-16 object-contain cursor-pointer" />
           </Link>
@@ -191,7 +191,7 @@ export default function AgentSignup() {
         </div>
       </nav>
 
-      <div style={{ maxWidth: 640, margin: "0 auto", padding: "3rem 1.5rem 4rem" }}>
+      <div style={{ maxWidth: "min(760px, 100%)", margin: "0 auto", padding: "3rem 1.5rem 4rem" }}>
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <h1 style={{ color: GOLD, fontSize: 30, fontWeight: 700, marginBottom: 10, fontFamily: "Georgia, serif" }}>
             Agent Registration

@@ -88,7 +88,7 @@ export default function Landing() {
       <div style={{ position: "relative", zIndex: 1 }}>
         {/* Nav */}
         <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.85)", position: "sticky", top: 0, zIndex: 50 }}>
-          <div className="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
+          <div className="flex items-center justify-between px-6 lg:px-10 py-3 w-full max-w-[1800px] mx-auto">
             <img src="/harrowgate-logo.png" alt="HARROWGATE Consultancy" className="h-24 object-contain" />
             <div className="flex items-center gap-2">
               <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
@@ -117,7 +117,8 @@ export default function Landing() {
         </nav>
 
         {/* Hero */}
-        <section className="flex flex-col items-center justify-center px-6 pt-24 pb-20 text-center max-w-5xl mx-auto">
+        <section className="flex flex-col items-center justify-center px-6 lg:px-10 pt-24 pb-20 text-center w-full">
+          <div className="w-full max-w-[1200px] mx-auto flex flex-col items-center">
           <Link href="/sign-in">
             <div className="mb-8 cursor-pointer transition-transform hover:scale-105">
               <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-64 object-contain mx-auto" />
@@ -167,7 +168,7 @@ export default function Landing() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-2xl">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
             {STATS_VALUES.map((val, i) => (
               <div key={val} className="rounded-2xl p-4 text-center border"
                 style={{ background: "rgba(162,137,89,0.05)", borderColor: GOLD_FAINT }}>
@@ -176,11 +177,12 @@ export default function Landing() {
               </div>
             ))}
           </div>
+          </div>
         </section>
 
         {/* Services */}
         <section className="py-24" style={{ background: "rgba(0,0,0,0.2)", borderTop: `1px solid ${GOLD_FAINT}`, borderBottom: `1px solid ${GOLD_FAINT}` }}>
-          <div className="max-w-6xl mx-auto px-6">
+          <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
             <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
               {t("services.title")}
             </p>
@@ -208,7 +210,8 @@ export default function Landing() {
         </section>
 
         {/* How It Works */}
-        <section id="how-it-works" className="py-24 max-w-6xl mx-auto px-6">
+        <section id="how-it-works" className="py-24 w-full px-6 lg:px-12">
+          <div className="max-w-[1800px] mx-auto">
           <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
             {t("how.label")}
           </p>
@@ -246,6 +249,7 @@ export default function Landing() {
                 <p className="text-sm leading-relaxed flex-1" style={{ color: GOLD_DIM }}>{step.desc}</p>
               </div>
             ))}
+          </div>
           </div>
         </section>
 
@@ -285,7 +289,7 @@ export default function Landing() {
 
         {/* Testimonials */}
         <section className="py-24 px-6" style={{ background: "rgba(0,0,0,0.2)", borderTop: `1px solid ${GOLD_FAINT}`, borderBottom: `1px solid ${GOLD_FAINT}` }}>
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-[1800px] mx-auto">
             <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: "rgba(162,137,89,0.4)" }}>
               {t("testimonials.label")}
             </p>
@@ -335,8 +339,8 @@ export default function Landing() {
         </section>
 
         {/* Footer */}
-        <footer className="py-12 px-6 border-t" style={{ borderColor: GOLD_FAINT }}>
-          <div className="max-w-6xl mx-auto">
+        <footer className="py-12 px-6 lg:px-12 border-t" style={{ borderColor: GOLD_FAINT }}>
+          <div className="max-w-[1800px] mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
               <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-14 object-contain opacity-50" />
               <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>

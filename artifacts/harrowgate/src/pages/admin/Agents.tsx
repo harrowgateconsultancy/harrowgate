@@ -441,7 +441,7 @@ export default function AgentsPage() {
   };
 
   return (
-    <div style={{ padding: "2rem", maxWidth: 920, margin: "0 auto" }}>
+    <div style={{ padding: "2rem 2rem", maxWidth: 1400, width: "100%", margin: "0 auto", boxSizing: "border-box" }}>
       {/* Confirm Dialog */}
       {confirm && (
         <ConfirmDialog

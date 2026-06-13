@@ -513,7 +513,7 @@ export default function Finance() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
+    <div className="p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight" style={{ color: C.navyText }}>Finance</h1>

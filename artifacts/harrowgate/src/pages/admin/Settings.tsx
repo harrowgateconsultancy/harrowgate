@@ -103,7 +103,7 @@ export default function Settings() {
   if (adminRole !== "admin") return null;
 
   return (
-    <div className="p-6 lg:p-8 max-w-4xl mx-auto">
+    <div className="p-6 lg:p-8 max-w-[1000px] mx-auto w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
         <div>

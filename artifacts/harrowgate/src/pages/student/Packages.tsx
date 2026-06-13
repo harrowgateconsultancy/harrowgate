@@ -118,7 +118,7 @@ export default function Packages() {
       <div style={{ position: "relative", zIndex: 1 }}>
         {/* Nav */}
         <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.85)", position: "sticky", top: 0, zIndex: 50 }}>
-          <div className="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
+          <div className="flex items-center justify-between px-6 lg:px-10 py-3 w-full max-w-[1800px] mx-auto">
             <Link href="/">
               <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-20 object-contain cursor-pointer" />
             </Link>
@@ -152,7 +152,7 @@ export default function Packages() {
         </section>
 
         {/* Packages Grid */}
-        <section className="max-w-7xl mx-auto px-6 pb-20">
+        <section className="max-w-[1800px] mx-auto px-6 lg:px-12 pb-20">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {PACKAGES.map((pkg) => {
               const totalMap: Record<string, string> = {
@@ -299,8 +299,8 @@ export default function Packages() {
         </section>
 
         {/* Footer */}
-        <footer className="py-10 px-6 border-t" style={{ borderColor: GOLD_FAINT }}>
-          <div className="max-w-6xl mx-auto">
+        <footer className="py-10 px-6 lg:px-12 border-t" style={{ borderColor: GOLD_FAINT }}>
+          <div className="max-w-[1800px] mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-5">
               <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-12 object-contain opacity-50" />
               <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>

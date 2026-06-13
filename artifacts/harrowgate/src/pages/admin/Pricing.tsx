@@ -245,7 +245,7 @@ export default function Pricing() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-[1400px] mx-auto w-full">
 
       {/* Header */}
       <div className="mb-8">
