@@ -2,7 +2,7 @@ import { Router } from "express";
 import { scryptSync, randomBytes } from "crypto";
 import { db } from "@workspace/db";
 import { agentsTable } from "@workspace/db/schema";
-import { eq, count, inArray } from "drizzle-orm";
+import { eq, inArray, isNotNull } from "drizzle-orm";
 import { sendAgentEmail } from "../email";
 
 const router = Router();
@@ -14,10 +14,15 @@ function hashPassword(password: string): string {
 }
 
 async function generateAgentCode(): Promise<string> {
-  const [{ value }] = await db.select({ value: count() }).from(agentsTable)
-    .where(eq(agentsTable.status, "approved"));
-  const seq = Number(value) + 1;
-  return `HGT-${String(seq).padStart(3, "0")}`;
+  const rows = await db.select({ agentCode: agentsTable.agentCode })
+    .from(agentsTable)
+    .where(isNotNull(agentsTable.agentCode));
+  let maxSeq = 0;
+  for (const row of rows) {
+    const m = row.agentCode?.match(/HGT-(\d+)/);
+    if (m) maxSeq = Math.max(maxSeq, parseInt(m[1], 10));
+  }
+  return `HGT-${String(maxSeq + 1).padStart(3, "0")}`;
 }
 
 // Public: agent registration
