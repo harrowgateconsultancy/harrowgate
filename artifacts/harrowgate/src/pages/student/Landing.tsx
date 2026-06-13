@@ -545,33 +545,33 @@ export default function Landing() {
               {/* Feature pill 1 — Study & Build */}
               <div className="hero-item-4 inline-flex items-center gap-3 px-8 py-4 rounded-full mb-5 self-start"
                 style={{
-                  background: "linear-gradient(135deg, rgba(162,137,89,0.14) 0%, rgba(162,137,89,0.06) 100%)",
-                  border: "1.5px solid rgba(196,169,110,0.45)",
-                  boxShadow: "0 0 18px rgba(162,137,89,0.18), inset 0 1px 0 rgba(196,169,110,0.15)",
+                  background: "linear-gradient(135deg, rgba(196,169,110,0.28) 0%, rgba(162,137,89,0.14) 100%)",
+                  border: "1.5px solid rgba(240,210,140,0.7)",
+                  boxShadow: "0 0 32px rgba(196,169,110,0.45), 0 0 8px rgba(196,169,110,0.25), inset 0 1px 0 rgba(240,210,140,0.35)",
                 }}>
-                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 flex-shrink-0" style={{ color: GOLD_BRIGHT }}>
-                  <path d="M12 3L2 8l10 5 10-5-10-5z" fill="currentColor" opacity="0.9"/>
+                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 flex-shrink-0" style={{ color: "#f0d28c" }}>
+                  <path d="M12 3L2 8l10 5 10-5-10-5z" fill="currentColor" opacity="0.95"/>
                   <path d="M2 8v6M6 10.5v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M22 8v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
-                <p className="text-lg font-semibold tracking-wide" style={{ color: GOLD_BRIGHT }}>{t("hero.pr")}</p>
+                <p className="text-lg font-semibold tracking-wide" style={{ color: "#f0d28c" }}>{t("hero.pr")}</p>
               </div>
 
               {/* Feature pill 2 — Price proposition */}
               <div className="hero-item-5 inline-flex items-center gap-5 px-8 py-4 rounded-full mb-12 self-start"
                 style={{
-                  background: "linear-gradient(135deg, rgba(162,137,89,0.18) 0%, rgba(162,137,89,0.07) 100%)",
-                  border: "1.5px solid rgba(196,169,110,0.5)",
-                  boxShadow: "0 0 28px rgba(162,137,89,0.25), 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(196,169,110,0.2)",
+                  background: "linear-gradient(135deg, rgba(196,169,110,0.32) 0%, rgba(162,137,89,0.15) 100%)",
+                  border: "1.5px solid rgba(240,210,140,0.75)",
+                  boxShadow: "0 0 40px rgba(196,169,110,0.5), 0 0 12px rgba(196,169,110,0.3), inset 0 1px 0 rgba(240,210,140,0.4)",
                 }}>
                 <span style={{
                   fontSize: "1.65rem", fontWeight: 800, letterSpacing: "-0.01em",
-                  background: `linear-gradient(135deg, ${GOLD_BRIGHT} 0%, ${GOLD} 60%)`,
+                  background: "linear-gradient(135deg, #f5e09a 0%, #c4a96e 60%)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                   lineHeight: 1, whiteSpace: "nowrap",
                 }}>HKD$&nbsp;3,000</span>
-                <span style={{ width: "1px", height: "2rem", background: "rgba(162,137,89,0.35)", flexShrink: 0 }} />
-                <p className="text-base font-medium leading-snug" style={{ color: GOLD, maxWidth: "18rem" }}>
+                <span style={{ width: "1px", height: "2rem", background: "rgba(240,210,140,0.5)", flexShrink: 0 }} />
+                <p className="text-base font-medium leading-snug" style={{ color: "#e8d08a", maxWidth: "18rem" }}>
                   ✦ Full expert guidance from application to arrival — A to Z
                 </p>
               </div>
