@@ -523,13 +523,13 @@ export default function Landing() {
 
             {/* Left: text */}
             <div className="flex-1 flex flex-col items-start lg:pr-12">
-              <div className="hero-item-1 badge-pill inline-flex items-center gap-2 px-4 py-2 rounded-full mb-7 border"
+              <div className="hero-item-1 badge-pill inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full mb-10 border"
                 style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.25)" }}>
-                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#4ade80" }} />
-                <p className="text-xs font-semibold tracking-[0.25em] uppercase" style={{ color: LABEL_COLOR }}>{t("hero.badge")}</p>
+                <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ background: "#4ade80" }} />
+                <p className="text-sm font-semibold tracking-[0.22em] uppercase" style={{ color: LABEL_COLOR }}>{t("hero.badge")}</p>
               </div>
 
-              <h1 className="hero-item-2 text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight mb-6 leading-[1.06]"
+              <h1 className="hero-item-2 text-6xl md:text-7xl xl:text-8xl font-bold tracking-tight mb-8 leading-[1.05]"
                 style={{
                   background: `linear-gradient(135deg, #c4a96e 0%, ${GOLD} 45%, rgba(162,137,89,0.6) 100%)`,
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
@@ -538,32 +538,32 @@ export default function Landing() {
                 {t("hero.h1")}<br />{t("hero.h2")}
               </h1>
 
-              <p className="hero-item-3 text-lg md:text-xl leading-relaxed mb-7 max-w-xl" style={{ color: GOLD_DIM }}>
+              <p className="hero-item-3 text-xl md:text-2xl leading-relaxed mb-9 max-w-2xl" style={{ color: GOLD_DIM }}>
                 {t("hero.sub")}
               </p>
 
-              <div className="hero-item-4 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border mb-5"
+              <div className="hero-item-4 inline-flex items-center gap-3 px-6 py-3 rounded-full border mb-6"
                 style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
-                <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 flex-shrink-0" style={{ color: GOLD }}>
+                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 flex-shrink-0" style={{ color: GOLD }}>
                   <path d="M12 3L2 8l10 5 10-5-10-5z" fill="currentColor" opacity="0.9"/>
                   <path d="M2 8v6M6 10.5v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M22 8v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
-                <p className="text-sm font-medium" style={{ color: GOLD }}>{t("hero.pr")}</p>
+                <p className="text-base font-medium" style={{ color: GOLD }}>{t("hero.pr")}</p>
               </div>
 
-              <p className="hero-item-5 text-sm font-semibold px-6 py-3 rounded-full border mb-9 self-start"
+              <p className="hero-item-5 text-base font-semibold px-7 py-4 rounded-full border mb-12 self-start"
                 style={{ color: GOLD, borderColor: "rgba(162,137,89,0.3)", background: "rgba(162,137,89,0.08)" }}>
                 ✦ Pay only <span className="font-extrabold">HKD$ 3,000</span> and an expert will guide you from A–Z
               </p>
 
-              <div className="hero-item-6 flex flex-col sm:flex-row gap-4 items-start">
-                <Link href="/sign-up" className="shimmer-btn px-9 py-4 rounded-full text-base font-semibold"
+              <div className="hero-item-6 flex flex-col sm:flex-row gap-5 items-start">
+                <Link href="/sign-up" className="shimmer-btn px-11 py-5 rounded-full text-lg font-semibold"
                   style={{ color: BG, boxShadow: "0 8px 36px rgba(162,137,89,0.4)" }}>
                   {t("hero.cta1")}
                 </Link>
                 <a href="#how-it-works"
-                  className="px-9 py-4 rounded-full text-base font-semibold border transition-all hover:opacity-90 hover:bg-[rgba(162,137,89,0.08)]"
+                  className="px-11 py-5 rounded-full text-lg font-semibold border transition-all hover:opacity-90 hover:bg-[rgba(162,137,89,0.08)]"
                   style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD }}>
                   {t("hero.cta2")}
                 </a>
