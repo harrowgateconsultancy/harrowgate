@@ -88,7 +88,7 @@ export default function Landing() {
       <div style={{ position: "relative", zIndex: 1 }}>
         {/* Nav */}
         <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.85)", position: "sticky", top: 0, zIndex: 50 }}>
-          <div className="flex items-center justify-between px-6 lg:px-10 py-3 w-full max-w-[1800px] mx-auto">
+          <div className="flex items-center justify-between px-6 lg:px-10 xl:px-16 py-3 w-full">
             <img src="/harrowgate-logo.png" alt="HARROWGATE Consultancy" className="h-24 object-contain" />
             <div className="flex items-center gap-2">
               <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
