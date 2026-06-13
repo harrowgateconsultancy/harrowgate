@@ -93,18 +93,20 @@ const clerkAppearance = {
     identityPreviewEditButton: "!text-[#c4a96e]",
     formFieldSuccessText: "!text-[#c4a96e]",
     alertText: "!text-[#f0e8d0]",
-    logoBox: "!flex !justify-center !mb-1",
-    logoImage: "!h-14",
+    logoBox: "!flex !justify-center !mb-2 !pt-2",
+    logoImage: "!h-24",
     socialButtonsBlockButton: "!border !border-[rgba(196,169,110,0.35)] !bg-[rgba(162,137,89,0.08)] hover:!bg-[rgba(162,137,89,0.16)] hover:!border-[rgba(196,169,110,0.6)] !rounded-full !transition-all !shadow-none",
     formButtonPrimary: "!rounded-full !font-bold !text-[#0b2213] !shadow-none hover:!opacity-95 !transition-all",
     formFieldInput: "!bg-[rgba(162,137,89,0.09)] !border !border-[rgba(162,137,89,0.25)] !text-[#f0e8d0] !rounded-full focus:!border-[#c4a96e] focus:!ring-0 !placeholder-[rgba(162,137,89,0.4)] !transition-all",
-    footerAction: "!bg-[rgba(162,137,89,0.04)]",
+    footerAction: "!bg-[rgba(162,137,89,0.04)] !border-t !border-[rgba(162,137,89,0.1)]",
     dividerLine: "!bg-[rgba(162,137,89,0.18)]",
     alert: "!bg-[rgba(248,113,113,0.08)] !border !border-[rgba(248,113,113,0.2)] !rounded-2xl",
     otpCodeFieldInput: "!bg-[rgba(162,137,89,0.09)] !border-[rgba(162,137,89,0.25)] !text-[#f0e8d0] !rounded-2xl",
     formFieldRow: "gap-3",
     main: "gap-4",
     internal: "gap-4",
+    badge: "!hidden",
+    footer: "!shadow-none !border-0 !bg-[rgba(162,137,89,0.04)]",
   },
 };
 
@@ -129,38 +131,73 @@ function AuthBackButton({ onClick }: { onClick: () => void }) {
   );
 }
 
+function useHideClerkDevBadge() {
+  useEffect(() => {
+    const hide = (el: HTMLElement) => { el.style.setProperty("display", "none", "important"); };
+    const scan = () => {
+      // Hide exact "Development mode" badge elements (not their parents)
+      document.querySelectorAll<HTMLElement>("a, span, p, button").forEach((el) => {
+        const txt = el.textContent?.trim().toLowerCase() ?? "";
+        if (txt === "development mode" || txt === "development instance") {
+          hide(el);
+        }
+      });
+      // Also hide any wrapping div whose ONLY visible content is the badge
+      document.querySelectorAll<HTMLElement>("div, footer").forEach((el) => {
+        const txt = el.textContent?.trim().toLowerCase() ?? "";
+        if (txt === "development mode" || txt === "development instance") {
+          hide(el);
+        }
+      });
+      // Also hide by known Clerk attributes / link targets
+      document.querySelectorAll<HTMLElement>(
+        '[data-localization-key="badge__devMode"], a[href*="clerk.com/docs/deployments"]'
+      ).forEach(hide);
+    };
+    scan();
+    const obs = new MutationObserver(scan);
+    obs.observe(document.body, { childList: true, subtree: true, characterData: true });
+    return () => obs.disconnect();
+  }, []);
+}
+
 function AuthPageShell({ children }: { children: React.ReactNode }) {
   const [, setLocation] = useLocation();
+  useHideClerkDevBadge();
   return (
     <div
-      className="flex flex-col min-h-[100dvh] px-4 py-8"
+      className="relative flex min-h-[100dvh] items-center justify-center"
       style={{
         background: "#0b2213",
-        backgroundImage: "radial-gradient(ellipse at 50% -10%, rgba(162,137,89,0.08) 0%, transparent 60%)",
+        backgroundImage: "radial-gradient(ellipse at 50% 0%, rgba(162,137,89,0.1) 0%, transparent 65%)",
       }}
     >
-      {/* Nav bar */}
-      <div className="flex items-center justify-between mb-8 max-w-lg mx-auto w-full">
+      {/* Hide Clerk dev-mode badge via CSS fallback */}
+      <style>{`
+        [data-localization-key="badge__devMode"],
+        [class*="cl-badge"],
+        [class*="Badge__root"],
+        a[href*="clerk.com/docs/deployments"],
+        a[href*="clerk.dev"] { display: none !important; }
+      `}</style>
+      {/* Back button — fixed top-left */}
+      <div className="fixed top-5 left-5 z-50">
         <AuthBackButton onClick={() => setLocation("/")} />
-        <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-12 object-contain" />
-        <div className="w-24" />
       </div>
 
-      {/* Card wrapper */}
-      <div className="flex flex-1 items-center justify-center">
+      {/* Card — full width on mobile/tablet, constrained on large desktop */}
+      <div
+        className="w-full lg:max-w-[600px] lg:rounded-3xl lg:p-[2px] min-h-[100dvh] lg:min-h-0"
+        style={{
+          background: "linear-gradient(145deg, rgba(196,169,110,0.35) 0%, rgba(162,137,89,0.12) 50%, rgba(196,169,110,0.25) 100%)",
+          boxShadow: "0 0 80px rgba(162,137,89,0.22), 0 32px 80px rgba(0,0,0,0.55)",
+        }}
+      >
         <div
-          className="w-full max-w-[480px] rounded-3xl p-1"
-          style={{
-            background: "linear-gradient(135deg, rgba(196,169,110,0.3) 0%, rgba(162,137,89,0.1) 50%, rgba(196,169,110,0.2) 100%)",
-            boxShadow: "0 0 60px rgba(162,137,89,0.2), 0 24px 80px rgba(0,0,0,0.5)",
-          }}
+          className="w-full lg:rounded-[calc(1.5rem-2px)] overflow-hidden min-h-[100dvh] lg:min-h-0 flex flex-col justify-center"
+          style={{ background: "#0b2213" }}
         >
-          <div
-            className="rounded-[calc(1.5rem-4px)] overflow-hidden"
-            style={{ background: "#0b2213" }}
-          >
-            {children}
-          </div>
+          {children}
         </div>
       </div>
     </div>
