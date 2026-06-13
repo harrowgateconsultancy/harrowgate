@@ -542,20 +542,39 @@ export default function Landing() {
                 {t("hero.sub")}
               </p>
 
-              <div className="hero-item-4 inline-flex items-center gap-3 px-6 py-3 rounded-full border mb-6"
-                style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
-                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 flex-shrink-0" style={{ color: GOLD }}>
+              {/* Feature pill 1 — Study & Build */}
+              <div className="hero-item-4 inline-flex items-center gap-3 px-7 py-3.5 rounded-full mb-5 self-start"
+                style={{
+                  background: "linear-gradient(135deg, rgba(162,137,89,0.14) 0%, rgba(162,137,89,0.06) 100%)",
+                  border: "1.5px solid rgba(196,169,110,0.45)",
+                  boxShadow: "0 0 18px rgba(162,137,89,0.18), inset 0 1px 0 rgba(196,169,110,0.15)",
+                }}>
+                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 flex-shrink-0" style={{ color: GOLD_BRIGHT }}>
                   <path d="M12 3L2 8l10 5 10-5-10-5z" fill="currentColor" opacity="0.9"/>
                   <path d="M2 8v6M6 10.5v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M22 8v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
-                <p className="text-base font-medium" style={{ color: GOLD }}>{t("hero.pr")}</p>
+                <p className="text-base font-semibold tracking-wide" style={{ color: GOLD_BRIGHT }}>{t("hero.pr")}</p>
               </div>
 
-              <p className="hero-item-5 text-base font-semibold px-7 py-4 rounded-full border mb-12 self-start"
-                style={{ color: GOLD, borderColor: "rgba(162,137,89,0.3)", background: "rgba(162,137,89,0.08)" }}>
-                ✦ Pay only <span className="font-extrabold">HKD$ 3,000</span> and an expert will guide you from A–Z
-              </p>
+              {/* Feature pill 2 — Price proposition */}
+              <div className="hero-item-5 inline-flex items-center gap-4 px-7 py-4 rounded-2xl mb-12 self-start"
+                style={{
+                  background: "linear-gradient(135deg, rgba(162,137,89,0.18) 0%, rgba(162,137,89,0.07) 100%)",
+                  border: "1.5px solid rgba(196,169,110,0.5)",
+                  boxShadow: "0 0 28px rgba(162,137,89,0.25), 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(196,169,110,0.2)",
+                }}>
+                <span style={{
+                  fontSize: "1.6rem", fontWeight: 800, letterSpacing: "-0.01em",
+                  background: `linear-gradient(135deg, ${GOLD_BRIGHT} 0%, ${GOLD} 60%)`,
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+                  lineHeight: 1,
+                }}>HKD$&nbsp;3,000</span>
+                <span style={{ width: "1px", height: "2rem", background: "rgba(162,137,89,0.3)" }} />
+                <p className="text-sm font-medium leading-snug" style={{ color: GOLD, maxWidth: "15rem" }}>
+                  ✦ Full expert guidance from application to arrival — A to Z
+                </p>
+              </div>
 
               <div className="hero-item-6 flex flex-col sm:flex-row gap-5 items-start">
                 <Link href="/sign-up" className="shimmer-btn px-11 py-5 rounded-full text-lg font-semibold"
