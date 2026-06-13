@@ -61,9 +61,7 @@ const clerkAppearance = {
   theme: shadcn,
   cssLayerName: "clerk" as const,
   options: {
-    logoPlacement: "inside" as const,
-    logoLinkUrl: basePath || "/",
-    logoImageUrl: `${window.location.origin}${basePath}/harrowgate-logo.png`,
+    logoPlacement: "none" as const,
   },
   variables: {
     colorPrimary: "#c4a96e",
@@ -78,12 +76,12 @@ const clerkAppearance = {
     borderRadius: "999px",
   },
   elements: {
-    rootBox: "w-full flex justify-center",
-    cardBox: "w-[460px] max-w-full",
+    rootBox: "w-full",
+    cardBox: "w-full",
     card: "!shadow-none !border-0 !bg-transparent !rounded-none",
-    footer: "!shadow-none !border-0 !bg-[rgba(162,137,89,0.04)] !rounded-b-3xl",
-    headerTitle: "!text-[#c4a96e] !font-bold !text-2xl",
-    headerSubtitle: "!text-[rgba(212,197,162,0.7)]",
+    footer: "!shadow-none !border-0 !bg-[rgba(162,137,89,0.04)]",
+    headerTitle: "!hidden",
+    headerSubtitle: "!hidden",
     socialButtonsBlockButtonText: "!text-[#f0e8d0] !font-semibold",
     socialButtonsBlockButtonArrow: "!text-[#c4a96e]",
     formFieldLabel: "!text-[rgba(196,169,110,0.85)] !text-xs !font-semibold !tracking-wide",
@@ -93,8 +91,8 @@ const clerkAppearance = {
     identityPreviewEditButton: "!text-[#c4a96e]",
     formFieldSuccessText: "!text-[#c4a96e]",
     alertText: "!text-[#f0e8d0]",
-    logoBox: "!flex !justify-center !mb-2 !pt-2",
-    logoImage: "!h-24",
+    logoBox: "!hidden",
+    logoImage: "!hidden",
     socialButtonsBlockButton: "!border !border-[rgba(196,169,110,0.35)] !bg-[rgba(162,137,89,0.08)] hover:!bg-[rgba(162,137,89,0.16)] hover:!border-[rgba(196,169,110,0.6)] !rounded-full !transition-all !shadow-none",
     formButtonPrimary: "!rounded-full !font-bold !text-[#0b2213] !shadow-none hover:!opacity-95 !transition-all",
     formFieldInput: "!bg-[rgba(162,137,89,0.09)] !border !border-[rgba(162,137,89,0.25)] !text-[#f0e8d0] !rounded-full focus:!border-[#c4a96e] focus:!ring-0 !placeholder-[rgba(162,137,89,0.4)] !transition-all",
@@ -161,43 +159,77 @@ function useHideClerkDevBadge() {
   }, []);
 }
 
-function AuthPageShell({ children }: { children: React.ReactNode }) {
+function AuthPageShell({
+  children,
+  title,
+  subtitle,
+}: {
+  children: React.ReactNode;
+  title: string;
+  subtitle: string;
+}) {
   const [, setLocation] = useLocation();
   useHideClerkDevBadge();
   return (
     <div
-      className="relative flex min-h-[100dvh] items-center justify-center"
+      className="relative flex flex-col min-h-[100dvh]"
       style={{
         background: "#0b2213",
-        backgroundImage: "radial-gradient(ellipse at 50% 0%, rgba(162,137,89,0.1) 0%, transparent 65%)",
+        backgroundImage: "radial-gradient(ellipse at 50% -5%, rgba(162,137,89,0.13) 0%, transparent 60%)",
       }}
     >
-      {/* Hide Clerk dev-mode badge via CSS fallback */}
+      {/* CSS fallback for Clerk dev badge */}
       <style>{`
         [data-localization-key="badge__devMode"],
-        [class*="cl-badge"],
-        [class*="Badge__root"],
+        [class*="cl-badge"], [class*="Badge__root"],
         a[href*="clerk.com/docs/deployments"],
         a[href*="clerk.dev"] { display: none !important; }
       `}</style>
+
       {/* Back button — fixed top-left */}
       <div className="fixed top-5 left-5 z-50">
         <AuthBackButton onClick={() => setLocation("/")} />
       </div>
 
-      {/* Card — full width on mobile/tablet, constrained on large desktop */}
-      <div
-        className="w-full lg:max-w-[600px] lg:rounded-3xl lg:p-[2px] min-h-[100dvh] lg:min-h-0"
-        style={{
-          background: "linear-gradient(145deg, rgba(196,169,110,0.35) 0%, rgba(162,137,89,0.12) 50%, rgba(196,169,110,0.25) 100%)",
-          boxShadow: "0 0 80px rgba(162,137,89,0.22), 0 32px 80px rgba(0,0,0,0.55)",
-        }}
-      >
+      {/* Scrollable centred column */}
+      <div className="flex flex-col items-center justify-center flex-1 px-0 py-12">
+
+        {/* ── Logo above the card ── */}
+        <div className="flex flex-col items-center mb-6 px-4">
+          <img
+            src={`${basePath}/harrowgate-logo.png`}
+            alt="HARROWGATE"
+            className="h-28 w-auto object-contain mb-5"
+            style={{ filter: "drop-shadow(0 0 24px rgba(196,169,110,0.35))" }}
+          />
+          <h1
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-center"
+            style={{ color: "#c4a96e", fontFamily: "'SF Pro Display', -apple-system, sans-serif" }}
+          >
+            {title}
+          </h1>
+          <p
+            className="mt-2 text-sm sm:text-base text-center"
+            style={{ color: "rgba(212,197,162,0.65)" }}
+          >
+            {subtitle}
+          </p>
+        </div>
+
+        {/* ── Card ── */}
         <div
-          className="w-full lg:rounded-[calc(1.5rem-2px)] overflow-hidden min-h-[100dvh] lg:min-h-0 flex flex-col justify-center"
-          style={{ background: "#0b2213" }}
+          className="w-full xl:max-w-[680px] xl:rounded-3xl xl:p-[2px]"
+          style={{
+            background: "linear-gradient(145deg, rgba(196,169,110,0.32) 0%, rgba(162,137,89,0.1) 50%, rgba(196,169,110,0.22) 100%)",
+            boxShadow: "0 0 80px rgba(162,137,89,0.18), 0 32px 80px rgba(0,0,0,0.5)",
+          }}
         >
-          {children}
+          <div
+            className="w-full xl:rounded-[calc(1.5rem-2px)] overflow-hidden"
+            style={{ background: "#0b2213" }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>
@@ -206,7 +238,10 @@ function AuthPageShell({ children }: { children: React.ReactNode }) {
 
 function SignInPage() {
   return (
-    <AuthPageShell>
+    <AuthPageShell
+      title="Welcome to HARROWGATE"
+      subtitle="Sign in to access your student portal"
+    >
       <SignIn
         routing="path"
         path={`${basePath}/sign-in`}
@@ -219,7 +254,10 @@ function SignInPage() {
 
 function SignUpPage() {
   return (
-    <AuthPageShell>
+    <AuthPageShell
+      title="Start Your Application"
+      subtitle="Create your account to apply for a Hong Kong student visa"
+    >
       <SignUp
         routing="path"
         path={`${basePath}/sign-up`}
