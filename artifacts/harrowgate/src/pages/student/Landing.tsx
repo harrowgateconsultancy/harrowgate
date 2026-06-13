@@ -544,7 +544,11 @@ export default function Landing() {
 
               <div className="hero-item-4 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border mb-5"
                 style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
-                <span className="text-base">🏛️</span>
+                <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 flex-shrink-0" style={{ color: GOLD }}>
+                  <path d="M12 3L2 8l10 5 10-5-10-5z" fill="currentColor" opacity="0.9"/>
+                  <path d="M2 8v6M6 10.5v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M22 8v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
                 <p className="text-sm font-medium" style={{ color: GOLD }}>{t("hero.pr")}</p>
               </div>
 
