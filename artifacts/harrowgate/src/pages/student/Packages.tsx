@@ -73,6 +73,7 @@ export default function Packages() {
   const { lang, setLang, t, isRtl } = useLang();
   const pricing = usePricing();
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [hoveredNote, setHoveredNote] = useState(false);
 
   usePageSEO({
     title: "Service Packages & Pricing — Harrowgate Education Consultancy Hong Kong",
@@ -194,7 +195,7 @@ export default function Packages() {
                       background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${accentColor} 70%)`,
                       WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                     }}>{t(`pkg.${pkg.tierKey}`)}</h2>
-                    <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-5" style={{ color: "rgba(162,137,89,0.45)" }}>
+                    <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-5" style={{ color: "rgba(196,169,110,0.65)" }}>
                       {t("pkg.fullService")}
                     </p>
 
@@ -204,8 +205,8 @@ export default function Packages() {
                         background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${accentColor} 60%)`,
                         WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                       }}>{total}</span>
-                      <span className="text-sm ml-2" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.total")}</span>
-                      <p className="text-[11px] mt-0.5" style={{ color: "rgba(162,137,89,0.35)" }}>{t("pkg.package")}</p>
+                      <span className="text-sm ml-2" style={{ color: "rgba(196,169,110,0.7)" }}>{t("pkg.total")}</span>
+                      <p className="text-[11px] mt-0.5" style={{ color: "rgba(196,169,110,0.55)" }}>{t("pkg.package")}</p>
                     </div>
 
                     {/* First payment chips */}
@@ -225,7 +226,7 @@ export default function Packages() {
                     <ul className="space-y-2.5 mb-6">
                       {FEATURE_KEYS.map((f, fi) => (
                         <li key={fi} className="flex items-start gap-2.5 text-sm"
-                          style={{ color: f.bold ? accentColor : GOLD_DIM, fontWeight: f.bold ? 700 : 400 }}>
+                          style={{ color: f.bold ? accentColor : "rgba(212,197,162,0.88)", fontWeight: f.bold ? 700 : 400 }}>
                           <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 shrink-0 mt-0.5" style={{ color: accentColor }}>
                             <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
@@ -244,23 +245,23 @@ export default function Packages() {
                       <div className="space-y-2">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>{t("pkg.stage2")} –</p>
-                            <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.stageApp")}</p>
+                            <p className="text-xs font-semibold" style={{ color: "rgba(212,197,162,0.9)" }}>{t("pkg.stage2")} –</p>
+                            <p className="text-xs" style={{ color: "rgba(196,169,110,0.7)" }}>{t("pkg.stageApp")}</p>
                           </div>
                           <div className="text-right">
                             <p className="text-sm font-bold" style={{ color: accentColor }}>{dynamicStage2}</p>
-                            <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.stage2note")}</p>
+                            <p className="text-[10px]" style={{ color: "rgba(196,169,110,0.6)" }}>{t("pkg.stage2note")}</p>
                           </div>
                         </div>
-                        <div className="border-t pt-2" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                        <div className="border-t pt-2" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
                           <div className="flex items-start justify-between gap-2">
                             <div>
-                              <p className="text-xs font-semibold" style={{ color: GOLD_DIM }}>{t("pkg.stage3")} –</p>
-                              <p className="text-xs" style={{ color: "rgba(162,137,89,0.5)" }}>{t("pkg.stageSuccess")}</p>
+                              <p className="text-xs font-semibold" style={{ color: "rgba(212,197,162,0.9)" }}>{t("pkg.stage3")} –</p>
+                              <p className="text-xs" style={{ color: "rgba(196,169,110,0.7)" }}>{t("pkg.stageSuccess")}</p>
                             </div>
                             <div className="text-right">
                               <p className="text-sm font-bold" style={{ color: accentColor }}>{stage3Amount}</p>
-                              <p className="text-[10px]" style={{ color: "rgba(162,137,89,0.4)" }}>{t("pkg.stage3note")}</p>
+                              <p className="text-[10px]" style={{ color: "rgba(196,169,110,0.6)" }}>{t("pkg.stage3note")}</p>
                             </div>
                           </div>
                         </div>
@@ -269,8 +270,8 @@ export default function Packages() {
 
                     {/* Per-card note */}
                     <div className="rounded-xl px-3.5 py-3 mb-6 border"
-                      style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)" }}>
-                      <p className="text-[11px] leading-relaxed" style={{ color: "rgba(196,169,110,0.65)" }}>
+                      style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(196,169,110,0.22)" }}>
+                      <p className="text-[11px] leading-relaxed" style={{ color: "rgba(212,197,162,0.82)" }}>
                         💡 {t(pkg.cardNoteKey)}
                       </p>
                     </div>
@@ -300,9 +301,27 @@ export default function Packages() {
 
           {/* After payment note */}
           <div className="mt-14 rounded-2xl p-7 border text-center max-w-2xl mx-auto"
-            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(196,169,110,0.25)", boxShadow: "0 0 30px rgba(162,137,89,0.1)" }}>
-            <p className="text-base font-semibold mb-2" style={{ color: GOLD_BRIGHT }}>{t("pkg.afterTitle")}</p>
-            <p className="text-sm leading-relaxed" style={{ color: GOLD_DIM }}>{t("pkg.afterSub")}</p>
+            style={{
+              background: hoveredNote
+                ? "linear-gradient(135deg, rgba(196,169,110,0.18) 0%, rgba(162,137,89,0.09) 100%)"
+                : "linear-gradient(135deg, rgba(162,137,89,0.09) 0%, rgba(162,137,89,0.05) 100%)",
+              borderColor: hoveredNote ? "rgba(240,210,140,0.65)" : "rgba(196,169,110,0.3)",
+              boxShadow: hoveredNote
+                ? "0 0 50px rgba(196,169,110,0.35), 0 12px 40px rgba(0,0,0,0.4)"
+                : "0 0 24px rgba(162,137,89,0.12)",
+              transform: hoveredNote ? "translateY(-4px) scale(1.01)" : "translateY(0) scale(1)",
+              transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              cursor: "default",
+            }}
+            onMouseEnter={() => setHoveredNote(true)}
+            onMouseLeave={() => setHoveredNote(false)}>
+            <div className="flex justify-center mb-3">
+              <span className="text-2xl">✦</span>
+            </div>
+            <p className="text-lg font-bold mb-2"
+              style={{ color: hoveredNote ? GOLD_LIGHT : GOLD_BRIGHT }}>{t("pkg.afterTitle")}</p>
+            <p className="text-sm leading-relaxed"
+              style={{ color: hoveredNote ? "rgba(212,197,162,0.9)" : GOLD_DIM }}>{t("pkg.afterSub")}</p>
           </div>
         </section>
 
