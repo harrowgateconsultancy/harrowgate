@@ -188,6 +188,16 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AdminOnlyGuard({ children }: { children: React.ReactNode }) {
+  const [, setLocation] = useLocation();
+  const role = localStorage.getItem("admin_role") ?? "staff";
+  if (role !== "admin") {
+    setLocation("/admin");
+    return null;
+  }
+  return <>{children}</>;
+}
+
 function HomeRedirect() {
   return (
     <>
@@ -304,10 +314,16 @@ function ClerkProviderWithRoutes() {
                     <Route path="/admin/applications/new" component={ApplicationNew} />
                     <Route path="/admin/applications/:applicationId" component={ApplicationDetail} />
                     <Route path="/admin/applications" component={Applications} />
-                    <Route path="/admin/finance" component={Finance} />
+                    <Route path="/admin/finance">
+                      <AdminOnlyGuard><Finance /></AdminOnlyGuard>
+                    </Route>
                     <Route path="/admin/staff" component={Staff} />
-                    <Route path="/admin/pricing" component={Pricing} />
-                    <Route path="/admin/settings" component={AdminSettings} />
+                    <Route path="/admin/pricing">
+                      <AdminOnlyGuard><Pricing /></AdminOnlyGuard>
+                    </Route>
+                    <Route path="/admin/settings">
+                      <AdminOnlyGuard><AdminSettings /></AdminOnlyGuard>
+                    </Route>
                     <Route component={NotFound} />
                   </Switch>
                 </AdminLayout>
