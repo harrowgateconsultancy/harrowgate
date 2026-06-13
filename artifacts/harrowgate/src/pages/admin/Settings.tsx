@@ -23,6 +23,7 @@ interface StaffMember {
   username: string;
   email?: string | null;
   role: string;
+  plainPassword?: string | null;
   createdAt: string;
 }
 
@@ -87,6 +88,13 @@ export default function Settings() {
       setDeleteConfirm(null);
       await load();
     } finally { setDeleting(false); }
+  }
+
+  async function handlePasswordReset(id: number, newPass: string) {
+    await adminFetch(`${getApiBase()}/api/admin/staff/${id}/password`, {
+      method: "PATCH",
+      body: JSON.stringify({ password: newPass }),
+    });
   }
 
   const managers = accounts.filter(a => a.role === "manager");
@@ -165,7 +173,7 @@ export default function Settings() {
             ) : (
               <div className="space-y-3">
                 {managers.map(a => (
-                  <AccountRow key={a.id} account={a} onDelete={() => setDeleteConfirm(a)} C={C} />
+                  <AccountRow key={a.id} account={a} onDelete={() => setDeleteConfirm(a)} onPasswordReset={handlePasswordReset} C={C} />
                 ))}
               </div>
             )}
@@ -189,7 +197,7 @@ export default function Settings() {
             ) : (
               <div className="space-y-3">
                 {staff.map(a => (
-                  <AccountRow key={a.id} account={a} onDelete={() => setDeleteConfirm(a)} C={C} />
+                  <AccountRow key={a.id} account={a} onDelete={() => setDeleteConfirm(a)} onPasswordReset={handlePasswordReset} C={C} />
                 ))}
               </div>
             )}
@@ -353,36 +361,118 @@ export default function Settings() {
   );
 }
 
-function AccountRow({ account, onDelete, C }: { account: StaffMember; onDelete: () => void; C: any }) {
+function AccountRow({ account, onDelete, onPasswordReset, C }: {
+  account: StaffMember;
+  onDelete: () => void;
+  onPasswordReset: (id: number, newPass: string) => Promise<void>;
+  C: any;
+}) {
   const cfg = ROLE_CONFIG[account.role as "manager" | "staff"] ?? ROLE_CONFIG.staff;
+  const [showPass, setShowPass] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [newPass, setNewPass] = useState("");
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [currentPlain, setCurrentPlain] = useState(account.plainPassword ?? null);
+
+  async function handleReset(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newPass.trim()) return;
+    setSaving(true);
+    try {
+      await onPasswordReset(account.id, newPass.trim());
+      setCurrentPlain(newPass.trim());
+      setNewPass("");
+      setResetting(false);
+    } finally { setSaving(false); }
+  }
+
   return (
-    <div className="rounded-xl border p-4 flex items-center justify-between gap-3"
-      style={{ borderColor: C.n10 }}>
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-          style={{ background: cfg.bg }}>
-          <span className="text-sm font-bold" style={{ color: cfg.color }}>
-            {account.name.charAt(0).toUpperCase()}
+    <div className="rounded-xl border" style={{ borderColor: C.n10 }}>
+      <div className="p-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: cfg.bg }}>
+            <span className="text-sm font-bold" style={{ color: cfg.color }}>
+              {account.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-sm truncate" style={{ color: C.navyText }}>{account.name}</p>
+            <p className="text-xs mt-0.5 truncate" style={{ color: C.n45 }}>
+              @{account.username}{account.email ? ` · ${account.email}` : ""}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
+            style={{ background: cfg.bg, color: cfg.color }}>
+            {cfg.label}
           </span>
-        </div>
-        <div className="min-w-0">
-          <p className="font-semibold text-sm truncate" style={{ color: C.navyText }}>{account.name}</p>
-          <p className="text-xs mt-0.5 truncate" style={{ color: C.n45 }}>
-            @{account.username}{account.email ? ` · ${account.email}` : ""}
-          </p>
+          <button onClick={() => { setResetting(r => !r); setNewPass(""); }}
+            className="p-1.5 rounded-lg transition-all hover:opacity-80"
+            title="Reset password"
+            style={{ background: "rgba(162,137,89,0.08)", color: "#a28959" }}>
+            <Lock size={13} />
+          </button>
+          <button onClick={onDelete}
+            className="p-1.5 rounded-lg transition-all hover:opacity-80"
+            style={{ background: "rgba(248,113,113,0.08)", color: "#f87171" }}>
+            <Trash2 size={13} />
+          </button>
         </div>
       </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
-          style={{ background: cfg.bg, color: cfg.color }}>
-          {cfg.label}
-        </span>
-        <button onClick={onDelete}
-          className="p-1.5 rounded-lg transition-all hover:opacity-80"
-          style={{ background: "rgba(248,113,113,0.08)", color: "#f87171" }}>
-          <Trash2 size={13} />
-        </button>
+
+      {/* Password row */}
+      <div className="px-4 pb-3 flex items-center gap-2">
+        <span className="text-[11px] font-semibold shrink-0" style={{ color: C.n35 }}>Password:</span>
+        {currentPlain ? (
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-mono px-2 py-0.5 rounded"
+              style={{ background: C.n02, color: C.n60, letterSpacing: showPass ? "normal" : "0.1em" }}>
+              {showPass ? currentPlain : "•".repeat(Math.min(currentPlain.length, 12))}
+            </span>
+            <button onClick={() => setShowPass(v => !v)} className="opacity-50 hover:opacity-80">
+              {showPass ? <EyeOff size={12} style={{ color: C.n50 }} /> : <Eye size={12} style={{ color: C.n50 }} />}
+            </button>
+          </div>
+        ) : (
+          <span className="text-[11px] italic" style={{ color: C.n35 }}>Not recorded — reset to set one</span>
+        )}
       </div>
+
+      {/* Reset password form */}
+      {resetting && (
+        <form onSubmit={handleReset}
+          className="px-4 pb-4 pt-1 flex items-center gap-2 border-t"
+          style={{ borderColor: C.n10 }}>
+          <div className="relative flex-1">
+            <input
+              type={showNewPass ? "text" : "password"}
+              placeholder="New password"
+              value={newPass}
+              onChange={e => setNewPass(e.target.value)}
+              required
+              className="w-full px-3 py-2 pr-8 rounded-lg border text-xs outline-none"
+              style={{ borderColor: C.n20, color: C.navyText, background: C.n02 }}
+            />
+            <button type="button" onClick={() => setShowNewPass(v => !v)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-80">
+              {showNewPass ? <EyeOff size={12} style={{ color: C.n50 }} /> : <Eye size={12} style={{ color: C.n50 }} />}
+            </button>
+          </div>
+          <button type="submit" disabled={saving || !newPass.trim()}
+            className="px-3 py-2 rounded-lg text-xs font-semibold disabled:opacity-40 transition-all hover:opacity-90"
+            style={{ background: "rgba(162,137,89,0.12)", color: "#a28959" }}>
+            {saving ? "Saving…" : "Save"}
+          </button>
+          <button type="button" onClick={() => setResetting(false)}
+            className="px-3 py-2 rounded-lg text-xs"
+            style={{ color: C.n45 }}>
+            Cancel
+          </button>
+        </form>
+      )}
     </div>
   );
 }

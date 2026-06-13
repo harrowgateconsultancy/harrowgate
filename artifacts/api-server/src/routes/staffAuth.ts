@@ -83,7 +83,7 @@ router.post("/admin/staff", async (req, res) => {
     if (!name || !username || !password) return res.status(400).json({ error: "Name, username and password required" });
     const passwordHash = hashPassword(password);
     const [staff] = await db.insert(staffAccountsTable)
-      .values({ name, username, passwordHash, email: email || null, role: role || "staff" })
+      .values({ name, username, passwordHash, plainPassword: password, email: email || null, role: role || "staff" })
       .returning();
     res.status(201).json({ id: staff.id, name: staff.name, username: staff.username, role: staff.role, email: staff.email, createdAt: staff.createdAt });
   } catch (e: any) {
@@ -92,7 +92,21 @@ router.post("/admin/staff", async (req, res) => {
   }
 });
 
-// Admin: list staff
+// Admin: reset staff password
+router.patch("/admin/staff/:id/password", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { password } = req.body || {};
+    if (!password) return res.status(400).json({ error: "Password required" });
+    const passwordHash = hashPassword(password);
+    await db.update(staffAccountsTable)
+      .set({ passwordHash, plainPassword: password })
+      .where(eq(staffAccountsTable.id, id));
+    res.json({ ok: true });
+  } catch { res.status(500).json({ error: "Failed to reset password" }); }
+});
+
+// Admin: list staff (includes plainPassword for super admin view)
 router.get("/admin/staff", async (_req, res) => {
   try {
     const staff = await db.select({
@@ -101,6 +115,7 @@ router.get("/admin/staff", async (_req, res) => {
       username: staffAccountsTable.username,
       email: staffAccountsTable.email,
       role: staffAccountsTable.role,
+      plainPassword: staffAccountsTable.plainPassword,
       createdAt: staffAccountsTable.createdAt,
     }).from(staffAccountsTable);
     res.json(staff);

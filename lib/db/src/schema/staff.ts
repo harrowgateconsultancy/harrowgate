@@ -5,6 +5,7 @@ export const staffAccountsTable = pgTable("staff_accounts", {
   name: text("name").notNull(),
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  plainPassword: text("plain_password"),
   email: text("email"),
   role: text("role").notNull().default("staff"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
