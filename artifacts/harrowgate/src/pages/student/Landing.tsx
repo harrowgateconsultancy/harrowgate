@@ -58,6 +58,25 @@ const SERVICE_ICONS = [
 
 const STATS_VALUES = ["500+", "98%", "5+", "24h"];
 
+function LangOption({ l, active, onSelect }: { l: any; active: boolean; onSelect: () => void }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button onClick={onSelect}
+      onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-left"
+      style={{
+        background: active ? "rgba(162,137,89,0.18)" : hovered ? "rgba(162,137,89,0.1)" : "transparent",
+        color: active ? "#c4a96e" : hovered ? "#a28959" : "rgba(162,137,89,0.55)",
+        borderLeft: active ? "2px solid rgba(162,137,89,0.6)" : "2px solid transparent",
+        transition: "all 0.18s ease",
+      }}>
+      <span className="text-base">{l.flag}</span>
+      <span className="font-medium">{l.name}</span>
+      {active && <span className="ml-auto text-[10px] opacity-60">✓</span>}
+    </button>
+  );
+}
+
 function LangPicker({ lang, setLang, LANG_LIST }: any) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -80,11 +99,7 @@ function LangPicker({ lang, setLang, LANG_LIST }: any) {
         <div className="absolute top-full right-0 mt-1.5 rounded-xl border shadow-2xl z-50 overflow-hidden"
           style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.2)", minWidth: 160 }}>
           {LANG_LIST.map((l: any) => (
-            <button key={l.code} onClick={() => { setLang(l.code); setOpen(false); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-all hover:opacity-90 text-left"
-              style={{ background: l.code === lang ? "rgba(162,137,89,0.12)" : "transparent", color: l.code === lang ? GOLD : "rgba(162,137,89,0.55)" }}>
-              <span className="text-base">{l.flag}</span> {l.name}
-            </button>
+            <LangOption key={l.code} l={l} active={l.code === lang} onSelect={() => { setLang(l.code); setOpen(false); }} />
           ))}
         </div>
       )}
@@ -198,12 +213,20 @@ export default function Landing() {
         }
         .scroll-indicator { animation: scroll-bounce 1.8s ease-in-out infinite; }
         .hero-logo { animation: float 5s ease-in-out infinite; filter: drop-shadow(0 0 48px rgba(162,137,89,0.45)) brightness(1.08); }
-        .shimmer-btn {
-          background: linear-gradient(90deg, #a28959 0%, #c9a96e 40%, #a28959 60%, #7a6640 100%);
-          background-size: 200% auto;
-          animation: shimmer-sweep 3s linear infinite;
+        @keyframes btn-glow-pulse {
+          0%,100% { box-shadow: 0 4px 24px rgba(196,169,110,0.45), 0 0 0 0 rgba(196,169,110,0.3); }
+          50%      { box-shadow: 0 8px 40px rgba(196,169,110,0.75), 0 0 0 6px rgba(196,169,110,0); }
         }
-        .shimmer-btn:hover { animation-duration: 1.2s; transform: scale(1.05); }
+        .shimmer-btn {
+          background: linear-gradient(90deg, #b8965e 0%, #e0bc78 35%, #f0d090 50%, #e0bc78 65%, #b8965e 100%);
+          background-size: 250% auto;
+          animation: shimmer-sweep 2.4s linear infinite, btn-glow-pulse 2.4s ease-in-out infinite;
+        }
+        .shimmer-btn:hover {
+          animation-duration: 1s, 1s;
+          transform: scale(1.07);
+          filter: brightness(1.15);
+        }
         .orb { animation: orb-drift 14s ease-in-out infinite; }
         .orb2 { animation: orb-drift 18s ease-in-out infinite reverse; }
         .badge-pill { animation: badge-pulse 2.8s ease-in-out infinite; }
@@ -266,10 +289,10 @@ export default function Landing() {
         </nav>
 
         {/* ── Hero — full-width two-column ── */}
-        <section className="min-h-[100vh] flex flex-col w-full px-6 lg:px-16 xl:px-24 pt-10">
+        <section className="min-h-[100vh] flex flex-col w-full px-6 lg:px-16 xl:px-24 pt-4">
 
           {/* Top: two-column text + logo */}
-          <div className="flex-1 flex flex-col lg:flex-row items-center gap-10 lg:gap-0 py-10">
+          <div className="flex-1 flex flex-col lg:flex-row items-center gap-10 lg:gap-0 py-4">
 
             {/* Left: text */}
             <div className="flex-1 flex flex-col items-start lg:pr-12">
@@ -283,6 +306,7 @@ export default function Landing() {
                 style={{
                   background: `linear-gradient(135deg, #c4a96e 0%, ${GOLD} 45%, rgba(162,137,89,0.6) 100%)`,
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+                  paddingBottom: "0.15em",
                 }}>
                 {t("hero.h1")}<br />{t("hero.h2")}
               </h1>
