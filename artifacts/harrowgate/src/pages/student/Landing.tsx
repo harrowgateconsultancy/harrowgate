@@ -116,16 +116,18 @@ function StatCard({ val, label }: { val: string; label: string }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-      className="rounded-2xl p-5 text-center border cursor-default"
+      className="rounded-2xl text-center border cursor-default flex flex-col items-center justify-center"
       style={{
+        padding: "2rem 1.5rem",
+        minHeight: 120,
         background: hovered ? "rgba(162,137,89,0.1)" : "rgba(162,137,89,0.05)",
         borderColor: hovered ? "rgba(162,137,89,0.45)" : GOLD_FAINT,
         boxShadow: hovered ? "0 8px 32px rgba(162,137,89,0.2)" : "none",
         transition: "all 0.25s ease",
-        transform: hovered ? "scale(1.07)" : "scale(1)",
+        transform: hovered ? "scale(1.04)" : "scale(1)",
       }}>
-      <p className="text-3xl font-black mb-1" style={{ color: hovered ? "#c4a96e" : GOLD, transition: "color 0.25s" }}>{val}</p>
-      <p className="text-xs font-medium" style={{ color: CREAM_DIM }}>{label}</p>
+      <p className="text-4xl font-black mb-1.5" style={{ color: hovered ? "#c4a96e" : GOLD, transition: "color 0.25s" }}>{val}</p>
+      <p className="text-sm font-medium" style={{ color: CREAM_DIM }}>{label}</p>
     </div>
   );
 }
@@ -264,8 +266,10 @@ export default function Landing() {
         </nav>
 
         {/* ── Hero — full-width two-column ── */}
-        <section className="min-h-[90vh] flex flex-col justify-center w-full px-6 lg:px-16 xl:px-24 pt-10 pb-6">
-          <div className="w-full flex flex-col lg:flex-row items-center gap-10 lg:gap-0">
+        <section className="min-h-[100vh] flex flex-col w-full px-6 lg:px-16 xl:px-24 pt-10">
+
+          {/* Top: two-column text + logo */}
+          <div className="flex-1 flex flex-col lg:flex-row items-center gap-10 lg:gap-0 py-10">
 
             {/* Left: text */}
             <div className="flex-1 flex flex-col items-start lg:pr-12">
@@ -298,7 +302,7 @@ export default function Landing() {
                 ✦ Pay only <span className="font-extrabold">HKD$ 3,000</span> and an expert will guide you from A–Z
               </p>
 
-              <div className="hero-item-6 flex flex-col sm:flex-row gap-4 items-start mb-14">
+              <div className="hero-item-6 flex flex-col sm:flex-row gap-4 items-start">
                 <Link href="/sign-up" className="shimmer-btn px-9 py-4 rounded-full text-base font-semibold"
                   style={{ color: BG, boxShadow: "0 8px 36px rgba(162,137,89,0.4)" }}>
                   {t("hero.cta1")}
@@ -309,28 +313,28 @@ export default function Landing() {
                   {t("hero.cta2")}
                 </a>
               </div>
-
-              <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
-                {STATS_VALUES.map((val, i) => <StatCard key={val} val={val} label={statsLabels[i]} />)}
-              </div>
             </div>
 
-            {/* Right: logo */}
-            <div className="hero-logo-right flex-shrink-0 flex items-center justify-center lg:w-[44%]">
-              <Link href="/sign-in" className="cursor-pointer block">
+            {/* Right: logo — as large as the column allows */}
+            <div className="hero-logo-right flex-shrink-0 flex items-center justify-center lg:w-[44%] w-full">
+              <Link href="/sign-in" className="cursor-pointer block w-full">
                 <img src="/harrowgate-logo.png" alt="HARROWGATE"
                   className="w-full object-contain"
                   style={{
-                    maxWidth: 520,
                     animation: "float 5s ease-in-out 0.3s infinite",
-                    filter: "drop-shadow(0 0 60px rgba(162,137,89,0.65)) brightness(1.6)",
+                    filter: "drop-shadow(0 0 40px rgba(162,137,89,0.3))",
                   }} />
               </Link>
             </div>
           </div>
 
-          {/* Scroll indicator */}
-          <div className="flex flex-col items-center mt-12 gap-2">
+          {/* Bottom: full-width stats */}
+          <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-4 w-full pb-6">
+            {STATS_VALUES.map((val, i) => <StatCard key={val} val={val} label={statsLabels[i]} />)}
+          </div>
+
+          {/* Scroll indicator — pinned to very bottom */}
+          <div className="flex flex-col items-center pb-6 pt-3 gap-1">
             <p className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: "rgba(162,137,89,0.4)" }}>Scroll</p>
             <div className="scroll-indicator flex flex-col items-center gap-1">
               <svg viewBox="0 0 20 12" fill="none" className="w-5 h-3" style={{ color: GOLD }}>
