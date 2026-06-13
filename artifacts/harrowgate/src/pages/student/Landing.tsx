@@ -190,7 +190,12 @@ export default function Landing() {
           0%,100%{box-shadow:0 0 0 0 rgba(162,137,89,0.35)}
           50%{box-shadow:0 0 0 8px rgba(162,137,89,0)}
         }
-        .hero-logo { animation: float 5s ease-in-out infinite; filter: drop-shadow(0 0 36px rgba(162,137,89,0.22)); }
+        @keyframes scroll-bounce {
+          0%,100%{transform:translateY(0);opacity:0.8}
+          50%{transform:translateY(8px);opacity:0.4}
+        }
+        .scroll-indicator { animation: scroll-bounce 1.8s ease-in-out infinite; }
+        .hero-logo { animation: float 5s ease-in-out infinite; filter: drop-shadow(0 0 48px rgba(162,137,89,0.45)) brightness(1.08); }
         .shimmer-btn {
           background: linear-gradient(90deg, #a28959 0%, #c9a96e 40%, #a28959 60%, #7a6640 100%);
           background-size: 200% auto;
@@ -207,6 +212,7 @@ export default function Landing() {
         .hero-item-5 { animation: hero-fade-up 0.65s cubic-bezier(.22,.68,0,1.2) 0.45s both; }
         .hero-item-6 { animation: hero-fade-up 0.65s cubic-bezier(.22,.68,0,1.2) 0.55s both; }
         .hero-item-7 { animation: hero-fade-up 0.65s cubic-bezier(.22,.68,0,1.2) 0.65s both; }
+        .hero-logo-right { animation: hero-fade-up 0.5s cubic-bezier(.22,.68,0,1.2) 0s both; }
         .step-num { transition: color 0.3s, text-shadow 0.3s; }
         .step-card:hover .step-num { color: rgba(162,137,89,0.65) !important; text-shadow: 0 0 30px rgba(162,137,89,0.4); }
         .step-card { transition: transform 0.3s cubic-bezier(.22,.68,0,1.2), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease; }
@@ -257,59 +263,82 @@ export default function Landing() {
           </div>
         </nav>
 
-        {/* ── Hero (CSS animations, always visible) ── */}
-        <section className="flex flex-col items-center justify-center px-6 lg:px-10 pt-20 pb-20 text-center w-full">
-          <div className="w-full max-w-[1200px] mx-auto flex flex-col items-center">
+        {/* ── Hero — full-width two-column ── */}
+        <section className="min-h-[90vh] flex flex-col justify-center w-full px-6 lg:px-16 xl:px-24 pt-10 pb-6">
+          <div className="w-full flex flex-col lg:flex-row items-center gap-10 lg:gap-0">
 
-            <Link href="/sign-in">
-              <div className="hero-logo mb-8 cursor-pointer">
-                <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-64 object-contain mx-auto" />
+            {/* Left: text */}
+            <div className="flex-1 flex flex-col items-start lg:pr-12">
+              <div className="hero-item-1 badge-pill inline-flex items-center gap-2 px-4 py-2 rounded-full mb-7 border"
+                style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.25)" }}>
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#4ade80" }} />
+                <p className="text-xs font-semibold tracking-[0.25em] uppercase" style={{ color: LABEL_COLOR }}>{t("hero.badge")}</p>
               </div>
-            </Link>
 
-            <div className="hero-item-1 badge-pill inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 border"
-              style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.25)" }}>
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#4ade80" }} />
-              <p className="text-xs font-semibold tracking-[0.25em] uppercase" style={{ color: LABEL_COLOR }}>{t("hero.badge")}</p>
+              <h1 className="hero-item-2 text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight mb-6 leading-[1.06]"
+                style={{
+                  background: `linear-gradient(135deg, #c4a96e 0%, ${GOLD} 45%, rgba(162,137,89,0.6) 100%)`,
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+                }}>
+                {t("hero.h1")}<br />{t("hero.h2")}
+              </h1>
+
+              <p className="hero-item-3 text-lg md:text-xl leading-relaxed mb-7 max-w-xl" style={{ color: GOLD_DIM }}>
+                {t("hero.sub")}
+              </p>
+
+              <div className="hero-item-4 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border mb-5"
+                style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
+                <span className="text-base">🏛️</span>
+                <p className="text-sm font-medium" style={{ color: GOLD }}>{t("hero.pr")}</p>
+              </div>
+
+              <p className="hero-item-5 text-sm font-semibold px-6 py-3 rounded-full border mb-9 self-start"
+                style={{ color: GOLD, borderColor: "rgba(162,137,89,0.3)", background: "rgba(162,137,89,0.08)" }}>
+                ✦ Pay only <span className="font-extrabold">HKD$ 3,000</span> and an expert will guide you from A–Z
+              </p>
+
+              <div className="hero-item-6 flex flex-col sm:flex-row gap-4 items-start mb-14">
+                <Link href="/sign-up" className="shimmer-btn px-9 py-4 rounded-full text-base font-semibold"
+                  style={{ color: BG, boxShadow: "0 8px 36px rgba(162,137,89,0.4)" }}>
+                  {t("hero.cta1")}
+                </Link>
+                <a href="#how-it-works"
+                  className="px-9 py-4 rounded-full text-base font-semibold border transition-all hover:opacity-90 hover:bg-[rgba(162,137,89,0.08)]"
+                  style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD }}>
+                  {t("hero.cta2")}
+                </a>
+              </div>
+
+              <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+                {STATS_VALUES.map((val, i) => <StatCard key={val} val={val} label={statsLabels[i]} />)}
+              </div>
             </div>
 
-            <h1 className="hero-item-2 text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.08]"
-              style={{
-                background: `linear-gradient(135deg, #c4a96e 0%, ${GOLD} 45%, rgba(162,137,89,0.55) 100%)`,
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-              }}>
-              {t("hero.h1")}<br />{t("hero.h2")}
-            </h1>
-
-            <p className="hero-item-3 text-lg md:text-xl leading-relaxed mb-6 max-w-2xl" style={{ color: GOLD_DIM }}>
-              {t("hero.sub")}
-            </p>
-
-            <div className="hero-item-4 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border mb-6"
-              style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
-              <span className="text-base">🏛️</span>
-              <p className="text-sm font-medium" style={{ color: GOLD }}>{t("hero.pr")}</p>
-            </div>
-
-            <p className="hero-item-5 text-sm font-semibold px-6 py-3 rounded-full border mb-10"
-              style={{ color: GOLD, borderColor: "rgba(162,137,89,0.3)", background: "rgba(162,137,89,0.08)" }}>
-              ✦ Pay only <span className="font-extrabold">HKD$ 3,000</span> and an expert will guide you through the complete procedure from A–Z
-            </p>
-
-            <div className="hero-item-6 flex flex-col sm:flex-row gap-4 items-center mb-16">
-              <Link href="/sign-up" className="shimmer-btn px-9 py-4 rounded-full text-base font-semibold"
-                style={{ color: BG, boxShadow: "0 8px 36px rgba(162,137,89,0.4)" }}>
-                {t("hero.cta1")}
+            {/* Right: logo */}
+            <div className="hero-logo-right flex-shrink-0 flex items-center justify-center lg:w-[44%]">
+              <Link href="/sign-in" className="cursor-pointer block">
+                <img src="/harrowgate-logo.png" alt="HARROWGATE"
+                  className="w-full object-contain"
+                  style={{
+                    maxWidth: 520,
+                    animation: "float 5s ease-in-out 0.3s infinite",
+                    filter: "drop-shadow(0 0 60px rgba(162,137,89,0.65)) brightness(1.6)",
+                  }} />
               </Link>
-              <a href="#how-it-works"
-                className="px-9 py-4 rounded-full text-base font-semibold border transition-all hover:opacity-90 hover:bg-[rgba(162,137,89,0.08)]"
-                style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD }}>
-                {t("hero.cta2")}
-              </a>
             </div>
+          </div>
 
-            <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
-              {STATS_VALUES.map((val, i) => <StatCard key={val} val={val} label={statsLabels[i]} />)}
+          {/* Scroll indicator */}
+          <div className="flex flex-col items-center mt-12 gap-2">
+            <p className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: "rgba(162,137,89,0.4)" }}>Scroll</p>
+            <div className="scroll-indicator flex flex-col items-center gap-1">
+              <svg viewBox="0 0 20 12" fill="none" className="w-5 h-3" style={{ color: GOLD }}>
+                <path d="M1 1l9 9 9-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <svg viewBox="0 0 20 12" fill="none" className="w-5 h-3" style={{ color: "rgba(162,137,89,0.35)" }}>
+                <path d="M1 1l9 9 9-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
           </div>
         </section>
@@ -318,7 +347,7 @@ export default function Landing() {
 
         {/* ── Services (scroll reveal) ── */}
         <section className="py-24" style={{ background: "rgba(0,0,0,0.22)" }}>
-          <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
+          <div className="w-full px-6 lg:px-16 xl:px-24">
             <Reveal idx={0} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: LABEL_COLOR }}>{t("services.title")}</p></Reveal>
             <Reveal idx={1} visible={visible} setRef={setRef} delay={80}><h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>{t("services.heading")}</h2></Reveal>
             <Reveal idx={2} visible={visible} setRef={setRef} delay={140}><p className="text-center mb-14 text-base max-w-xl mx-auto" style={{ color: GOLD_DIM }}>{t("services.sub")}</p></Reveal>
@@ -341,8 +370,8 @@ export default function Landing() {
         <div className="gradient-divider" />
 
         {/* ── How It Works ── */}
-        <section id="how-it-works" className="py-24 w-full px-6 lg:px-12">
-          <div className="max-w-[1800px] mx-auto">
+        <section id="how-it-works" className="py-24 w-full px-6 lg:px-16 xl:px-24">
+          <div className="w-full">
             <Reveal idx={10} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: LABEL_COLOR }}>{t("how.label")}</p></Reveal>
             <Reveal idx={11} visible={visible} setRef={setRef} delay={80}><h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>{t("how.title")}</h2></Reveal>
             <Reveal idx={12} visible={visible} setRef={setRef} delay={140}><p className="text-center mb-16 text-base max-w-xl mx-auto" style={{ color: GOLD_DIM }}>{t("how.sub")}</p></Reveal>
@@ -405,8 +434,8 @@ export default function Landing() {
         <div className="gradient-divider" />
 
         {/* ── Testimonials ── */}
-        <section className="py-24 px-6" style={{ background: "rgba(0,0,0,0.22)" }}>
-          <div className="max-w-[1800px] mx-auto">
+        <section className="py-24 px-6 lg:px-16 xl:px-24" style={{ background: "rgba(0,0,0,0.22)" }}>
+          <div className="w-full">
             <Reveal idx={30} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: LABEL_COLOR }}>{t("testimonials.label")}</p></Reveal>
             <Reveal idx={31} visible={visible} setRef={setRef} delay={80}><h2 className="text-3xl md:text-4xl font-bold text-center mb-14" style={{ color: GOLD }}>{t("testimonials.title")}</h2></Reveal>
             <div className="grid md:grid-cols-3 gap-5">
@@ -455,8 +484,8 @@ export default function Landing() {
         </section>
 
         {/* Footer */}
-        <footer className="py-12 px-6 lg:px-12 border-t" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
-          <div className="max-w-[1800px] mx-auto">
+        <footer className="py-12 px-6 lg:px-16 xl:px-24 border-t" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+          <div className="w-full">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
               <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-14 object-contain" style={{ opacity: 0.45 }} />
               <p className="text-xs" style={{ color: CREAM_DIM }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
