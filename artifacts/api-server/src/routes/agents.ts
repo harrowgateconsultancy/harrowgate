@@ -2,7 +2,8 @@ import { Router } from "express";
 import { scryptSync, randomBytes } from "crypto";
 import { db } from "@workspace/db";
 import { agentsTable } from "@workspace/db/schema";
-import { eq, count } from "drizzle-orm";
+import { eq, count, inArray } from "drizzle-orm";
+import { sendAgentEmail } from "../email";
 
 const router = Router();
 
@@ -13,7 +14,6 @@ function hashPassword(password: string): string {
 }
 
 async function generateAgentCode(): Promise<string> {
-  // Count how many agents already have a code to determine sequence
   const [{ value }] = await db.select({ value: count() }).from(agentsTable)
     .where(eq(agentsTable.status, "approved"));
   const seq = Number(value) + 1;
@@ -95,7 +95,6 @@ router.patch("/admin/agents/:id/status", async (req, res) => {
     const updateValues: Record<string, any> = { status };
 
     if (status === "approved") {
-      // Fetch current agent to check if it already has a code
       const [current] = await db.select().from(agentsTable).where(eq(agentsTable.id, id));
       if (current && !current.agentCode) {
         updateValues.agentCode = await generateAgentCode();
@@ -110,6 +109,49 @@ router.patch("/admin/agents/:id/status", async (req, res) => {
     res.json({ ok: true, agentCode: updated.agentCode ?? null });
   } catch {
     res.status(500).json({ error: "Failed to update status" });
+  }
+});
+
+// Admin: delete a single agent
+router.delete("/admin/agents/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    await db.delete(agentsTable).where(eq(agentsTable.id, id));
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: "Failed to delete agent" });
+  }
+});
+
+// Admin: bulk delete agents
+router.delete("/admin/agents", async (req, res) => {
+  try {
+    const { ids } = req.body || {};
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: "ids array required" });
+    }
+    await db.delete(agentsTable).where(inArray(agentsTable.id, ids.map(Number)));
+    res.json({ ok: true, deleted: ids.length });
+  } catch {
+    res.status(500).json({ error: "Failed to delete agents" });
+  }
+});
+
+// Admin: send email to an agent
+router.post("/admin/agents/:id/email", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { subject, body } = req.body || {};
+    if (!subject || !body) return res.status(400).json({ error: "Subject and body required" });
+
+    const [agent] = await db.select().from(agentsTable).where(eq(agentsTable.id, id));
+    if (!agent) return res.status(404).json({ error: "Agent not found" });
+    if (!agent.email) return res.status(400).json({ error: "Agent has no email address" });
+
+    await sendAgentEmail({ to: agent.email, subject, body });
+    res.json({ ok: true });
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || "Failed to send email" });
   }
 });
 

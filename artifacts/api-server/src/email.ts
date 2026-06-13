@@ -719,3 +719,34 @@ function adminHtml(heading: string, intro: string, rows: [string, string][], cta
     </div>
   `;
 }
+
+// ── Send arbitrary email to an agent ───────────────────────────────────────
+export async function sendAgentEmail(opts: {
+  to: string;
+  subject: string;
+  body: string;
+}) {
+  const transport = createTransport();
+  if (!transport) throw new Error("Email credentials not configured");
+  await transport.sendMail({
+    from: `"HARROWGATE Consultancy" <${process.env.GMAIL_USER}>`,
+    to: opts.to,
+    subject: opts.subject,
+    text: opts.body,
+    html: `
+      <div style="font-family:Georgia,serif;background:#071a10;padding:0;margin:0">
+        <div style="max-width:560px;margin:0 auto;background:#0c2217;border:1px solid rgba(162,137,89,0.2);border-radius:12px;overflow:hidden">
+          <div style="padding:24px 32px;border-bottom:1px solid rgba(162,137,89,0.15)">
+            <p style="margin:0;color:#a28959;font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase">HARROWGATE Consultancy</p>
+          </div>
+          <div style="padding:28px 32px">
+            <div style="color:#c9b99a;font-size:15px;line-height:1.7;white-space:pre-wrap">${opts.body.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+          </div>
+          <div style="padding:16px 32px;text-align:center;border-top:1px solid rgba(162,137,89,0.1)">
+            <p style="margin:0;color:rgba(162,137,89,0.3);font-size:11px">HARROWGATE Consultancy · Hong Kong</p>
+          </div>
+        </div>
+      </div>
+    `,
+  });
+}
