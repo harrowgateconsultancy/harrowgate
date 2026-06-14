@@ -585,7 +585,7 @@ export default function Landing() {
                 }}>HKD$&nbsp;3,000</span>
                 <span style={{ width: "1px", height: "2rem", background: "rgba(240,210,140,0.5)", flexShrink: 0 }} />
                 <p className="text-base font-medium leading-snug" style={{ color: "#e8d08a", maxWidth: "18rem" }}>
-                  ✦ Full expert guidance from application to arrival — A to Z
+                  {t("hero.pricePill")}
                 </p>
               </div>
 
