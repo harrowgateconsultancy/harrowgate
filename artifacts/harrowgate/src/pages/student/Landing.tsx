@@ -397,6 +397,7 @@ export default function Landing() {
   const { setRef, visible } = useReveal();
   const [viewAllHov, setViewAllHov] = useState(false);
   const [signInHov, setSignInHov] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   usePageSEO({
     title: "Harrowgate Consultancy — Hong Kong Education & University Placement",
@@ -491,19 +492,21 @@ export default function Landing() {
 
       <div style={{ position: "relative", zIndex: 1 }}>
         {/* Nav */}
-        <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", background: "rgba(11,34,19,0.18)", position: "sticky", top: 0, zIndex: 50 }}>
-          <div className="flex items-center justify-between px-6 lg:px-10 xl:px-16 py-3 w-full">
+        <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", background: "rgba(11,34,19,0.92)", position: "sticky", top: 0, zIndex: 50 }}>
+          <div className="flex items-center justify-between px-5 lg:px-10 xl:px-16 py-3 w-full">
             <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
-              <img src="/harrowgate-logo.png" alt="HARROWGATE Consultancy" className="h-24 object-contain cursor-pointer"
+              <img src="/harrowgate-logo.png" alt="HARROWGATE Consultancy" className="h-16 sm:h-24 object-contain cursor-pointer"
                 style={{ transition: "opacity 0.2s, transform 0.2s" }}
                 onMouseEnter={e => { (e.target as HTMLImageElement).style.opacity = "0.82"; (e.target as HTMLImageElement).style.transform = "scale(1.04)"; }}
                 onMouseLeave={e => { (e.target as HTMLImageElement).style.opacity = "1"; (e.target as HTMLImageElement).style.transform = "scale(1)"; }} />
             </Link>
-            <div className="flex items-center gap-2">
+
+            {/* Desktop links */}
+            <div className="hidden sm:flex items-center gap-2">
               <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
-              <Link href="/packages" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border hidden sm:inline-flex items-center gap-1.5"
+              <Link href="/packages" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border inline-flex items-center gap-1.5"
                 style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>Packages</Link>
-              <Link href="/agent-signup" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border hidden sm:inline-flex items-center gap-1.5"
+              <Link href="/agent-signup" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border inline-flex items-center gap-1.5"
                 style={{ borderColor: "rgba(162,137,89,0.35)", color: GOLD, background: "rgba(162,137,89,0.08)" }}>Our Agents</Link>
               <Link
                 href="/sign-in"
@@ -522,6 +525,51 @@ export default function Landing() {
               <Link href="/sign-up" className="shimmer-btn text-sm font-semibold px-5 py-2.5 rounded-full"
                 style={{ color: BG, boxShadow: "0 4px 20px rgba(162,137,89,0.4)" }}>
                 {t("nav.getStarted")}
+              </Link>
+            </div>
+
+            {/* Mobile right side */}
+            <div className="flex sm:hidden items-center gap-2">
+              <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
+              <button
+                onClick={() => setMenuOpen(o => !o)}
+                aria-label="Menu"
+                className="flex flex-col justify-center items-center w-10 h-10 rounded-full border"
+                style={{ borderColor: "rgba(162,137,89,0.3)", background: "rgba(162,137,89,0.07)", gap: "5px" }}>
+                <span style={{ display: "block", width: "18px", height: "1.5px", background: GOLD, borderRadius: "2px", transition: "transform 0.25s, opacity 0.25s", transform: menuOpen ? "translateY(6.5px) rotate(45deg)" : "none" }} />
+                <span style={{ display: "block", width: "18px", height: "1.5px", background: GOLD, borderRadius: "2px", transition: "opacity 0.25s", opacity: menuOpen ? 0 : 1 }} />
+                <span style={{ display: "block", width: "18px", height: "1.5px", background: GOLD, borderRadius: "2px", transition: "transform 0.25s, opacity 0.25s", transform: menuOpen ? "translateY(-6.5px) rotate(-45deg)" : "none" }} />
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile dropdown menu */}
+          <div style={{
+            overflow: "hidden",
+            maxHeight: menuOpen ? "320px" : "0",
+            transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1)",
+            borderTop: menuOpen ? `1px solid ${GOLD_FAINT}` : "1px solid transparent",
+          }}>
+            <div className="flex flex-col px-5 py-4 gap-3">
+              <Link href="/packages" onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
+                style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
+                <span style={{ fontSize: "1rem" }}>📋</span> Packages
+              </Link>
+              <Link href="/agent-signup" onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
+                style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
+                <span style={{ fontSize: "1rem" }}>🤝</span> Our Agents
+              </Link>
+              <Link href="/sign-in" onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
+                style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
+                <span style={{ fontSize: "1rem" }}>🔑</span> {t("nav.signIn")}
+              </Link>
+              <Link href="/sign-up" onClick={() => setMenuOpen(false)}
+                className="shimmer-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold"
+                style={{ color: BG, boxShadow: "0 4px 20px rgba(162,137,89,0.4)" }}>
+                {t("nav.getStarted")} →
               </Link>
             </div>
           </div>
