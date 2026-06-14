@@ -77,11 +77,13 @@ const clerkAppearance = {
   },
   elements: {
     rootBox: "w-full",
-    cardBox: "w-full",
+    cardBox: "w-full !rounded-none",
     card: "!shadow-none !border-0 !bg-transparent !rounded-none",
-    footer: "!shadow-none !border-0 !bg-[rgba(162,137,89,0.04)]",
+    footer: "!shadow-none !border-0 !bg-[rgba(162,137,89,0.04)] !rounded-none",
+    footerPages: "!hidden",
     headerTitle: "!hidden",
     headerSubtitle: "!hidden",
+    header: "!hidden",
     socialButtonsBlockButtonText: "!text-[#f0e8d0] !font-semibold",
     socialButtonsBlockButtonArrow: "!text-[#c4a96e]",
     formFieldLabel: "!text-[rgba(196,169,110,0.85)] !text-xs !font-semibold !tracking-wide",
@@ -218,14 +220,14 @@ function AuthPageShell({
 
         {/* ── Card ── */}
         <div
-          className="w-full xl:max-w-[680px] xl:rounded-3xl xl:p-[2px]"
+          className="w-full sm:max-w-[640px] sm:rounded-3xl sm:p-[2px]"
           style={{
-            background: "linear-gradient(145deg, rgba(196,169,110,0.32) 0%, rgba(162,137,89,0.1) 50%, rgba(196,169,110,0.22) 100%)",
-            boxShadow: "0 0 80px rgba(162,137,89,0.18), 0 32px 80px rgba(0,0,0,0.5)",
+            background: "linear-gradient(145deg, rgba(196,169,110,0.38) 0%, rgba(162,137,89,0.12) 50%, rgba(196,169,110,0.28) 100%)",
+            boxShadow: "0 0 80px rgba(162,137,89,0.2), 0 32px 80px rgba(0,0,0,0.5)",
           }}
         >
           <div
-            className="w-full xl:rounded-[calc(1.5rem-2px)] overflow-hidden"
+            className="w-full sm:rounded-[calc(1.5rem-2px)] overflow-hidden"
             style={{ background: "#0b2213" }}
           >
             {children}
