@@ -619,20 +619,20 @@ export default function Landing() {
               </div>
 
               {/* Feature pill 2 — Price proposition */}
-              <div className="hero-item-5 inline-flex items-center gap-5 px-8 py-4 rounded-full mb-12 self-start"
+              <div className="hero-item-5 inline-flex items-center gap-4 px-6 py-4 rounded-2xl mb-12 self-stretch sm:self-start sm:rounded-full sm:px-8"
                 style={{
                   background: "linear-gradient(135deg, rgba(196,169,110,0.32) 0%, rgba(162,137,89,0.15) 100%)",
                   border: "1.5px solid rgba(240,210,140,0.75)",
                   boxShadow: "0 0 40px rgba(196,169,110,0.5), 0 0 12px rgba(196,169,110,0.3), inset 0 1px 0 rgba(240,210,140,0.4)",
                 }}>
                 <span style={{
-                  fontSize: "1.65rem", fontWeight: 800, letterSpacing: "-0.01em",
+                  fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.01em",
                   background: "linear-gradient(135deg, #f5e09a 0%, #c4a96e 60%)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                  lineHeight: 1, whiteSpace: "nowrap",
+                  lineHeight: 1, whiteSpace: "nowrap", flexShrink: 0,
                 }}>HKD$&nbsp;3,000</span>
-                <span style={{ width: "1px", height: "2rem", background: "rgba(240,210,140,0.5)", flexShrink: 0 }} />
-                <p className="text-base font-medium leading-snug" style={{ color: "#e8d08a", maxWidth: "18rem" }}>
+                <span style={{ width: "1px", alignSelf: "stretch", background: "rgba(240,210,140,0.5)", flexShrink: 0 }} />
+                <p className="text-sm font-medium leading-snug" style={{ color: "#e8d08a" }}>
                   {t("hero.pricePill")}
                 </p>
               </div>
@@ -650,8 +650,8 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Right: logo — fills the full height of the column, image centred */}
-            <div className="hero-logo-right flex-shrink-0 flex self-stretch items-center justify-center lg:w-[44%] w-full">
+            {/* Right: logo — desktop only */}
+            <div className="hero-logo-right flex-shrink-0 hidden lg:flex self-stretch items-center justify-center lg:w-[44%]">
               <Link href="/sign-in" className="cursor-pointer block w-full">
                 <img src="/harrowgate-logo.png" alt="HARROWGATE"
                   className="w-full object-contain"
@@ -664,7 +664,7 @@ export default function Landing() {
           </div>
 
           {/* Bottom: full-width stats */}
-          <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-4 w-full pb-3" style={{ position: "relative", zIndex: 1 }}>
+          <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 w-full pb-3" style={{ position: "relative", zIndex: 1 }}>
             {STATS_VALUES.map((val, i) => <StatCard key={val} val={val} label={statsLabels[i]} />)}
           </div>
 
