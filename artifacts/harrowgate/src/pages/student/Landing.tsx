@@ -634,8 +634,6 @@ export default function Landing() {
           </div>
         </section>
 
-        <div className="gradient-divider" />
-
         {/* ── Services (scroll reveal) ── */}
         <section className="py-24" style={{ background: "rgba(0,0,0,0.22)" }}>
           <div className="w-full px-6 lg:px-16 xl:px-24">
