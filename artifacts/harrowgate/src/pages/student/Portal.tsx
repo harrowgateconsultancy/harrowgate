@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { Link } from "wouter";
 import { useUser, useClerk, useSession } from "@clerk/react";
 import ApplyForm from "./ApplyForm";
 import PaymentPage from "./PaymentPage";
@@ -922,7 +923,9 @@ export default function Portal() {
       <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.92)", position: "sticky", top: isBeingWatched ? 37 : 0, zIndex: 50 }}>
         {/* Top row */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-2 sm:py-2.5 max-w-5xl mx-auto">
-          <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-10 sm:h-14 object-contain" />
+          <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
+            <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-10 sm:h-14 object-contain cursor-pointer hover:opacity-80 transition-opacity" />
+          </Link>
           <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Notification bell — shown when there are unread messages */}
             {submission && totalUnread > 0 && (

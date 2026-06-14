@@ -491,7 +491,7 @@ export default function Landing() {
         {/* Nav */}
         <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", background: "rgba(11,34,19,0.18)", position: "sticky", top: 0, zIndex: 50 }}>
           <div className="flex items-center justify-between px-6 lg:px-10 xl:px-16 py-3 w-full">
-            <Link href="/">
+            <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
               <img src="/harrowgate-logo.png" alt="HARROWGATE Consultancy" className="h-24 object-contain cursor-pointer"
                 style={{ transition: "opacity 0.2s, transform 0.2s" }}
                 onMouseEnter={e => { (e.target as HTMLImageElement).style.opacity = "0.82"; (e.target as HTMLImageElement).style.transform = "scale(1.04)"; }}

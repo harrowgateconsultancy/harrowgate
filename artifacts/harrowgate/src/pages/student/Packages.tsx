@@ -166,8 +166,8 @@ export default function Packages() {
         {/* Nav */}
         <nav style={{ borderBottom: `1px solid ${GOLD_FAINT}`, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", background: "rgba(11,34,19,0.18)", position: "sticky", top: 0, zIndex: 50 }}>
           <div className="flex items-center justify-between px-6 lg:px-10 xl:px-16 py-3 w-full">
-            <Link href="/">
-              <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-20 object-contain cursor-pointer" />
+            <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
+              <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-20 object-contain cursor-pointer hover:opacity-80 transition-opacity" />
             </Link>
             <div className="flex items-center gap-3">
               <LangPicker lang={lang} setLang={setLang} />
