@@ -395,6 +395,8 @@ export default function Landing() {
   const { lang, setLang, t, isRtl } = useLang();
   const pricing = usePricing();
   const { setRef, visible } = useReveal();
+  const [viewAllHov, setViewAllHov] = useState(false);
+  const [signInHov, setSignInHov] = useState(false);
 
   usePageSEO({
     title: "Harrowgate Consultancy — Hong Kong Education & University Placement",
@@ -503,7 +505,18 @@ export default function Landing() {
                 style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>Packages</Link>
               <Link href="/agent-signup" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border hidden sm:inline-flex items-center gap-1.5"
                 style={{ borderColor: "rgba(162,137,89,0.35)", color: GOLD, background: "rgba(162,137,89,0.08)" }}>Our Agents</Link>
-              <Link href="/sign-in" className="text-sm font-medium px-4 py-2 rounded-full transition-all hover:opacity-80" style={{ color: GOLD }}>
+              <Link
+                href="/sign-in"
+                onMouseEnter={() => setSignInHov(true)}
+                onMouseLeave={() => setSignInHov(false)}
+                className="text-sm font-semibold px-4 py-2 rounded-full border transition-all"
+                style={{
+                  color: signInHov ? "#f0d28c" : GOLD,
+                  borderColor: signInHov ? "rgba(196,169,110,0.55)" : "rgba(162,137,89,0.25)",
+                  background: signInHov ? "rgba(162,137,89,0.12)" : "rgba(162,137,89,0.04)",
+                  boxShadow: signInHov ? "0 0 16px rgba(162,137,89,0.3)" : "none",
+                  transition: "all 0.2s ease",
+                }}>
                 {t("nav.signIn")}
               </Link>
               <Link href="/sign-up" className="shimmer-btn text-sm font-semibold px-5 py-2.5 rounded-full"
@@ -701,8 +714,23 @@ export default function Landing() {
               </div>
             </Reveal>
             <Reveal idx={25} visible={visible} setRef={setRef} delay={260}>
-              <Link href="/packages" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold border transition-all hover:scale-105 hover:opacity-90"
-                style={{ borderColor: "rgba(162,137,89,0.35)", color: GOLD, background: "rgba(162,137,89,0.07)", boxShadow: "0 4px 20px rgba(162,137,89,0.1)" }}>
+              <Link
+                href="/packages"
+                onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
+                onMouseEnter={() => setViewAllHov(true)}
+                onMouseLeave={() => setViewAllHov(false)}
+                className="inline-flex items-center gap-3 px-12 py-5 rounded-full text-base font-bold border transition-all"
+                style={{
+                  borderColor: viewAllHov ? "rgba(196,169,110,0.8)" : "rgba(162,137,89,0.4)",
+                  color: viewAllHov ? "#f0d28c" : GOLD,
+                  background: viewAllHov ? "rgba(162,137,89,0.15)" : "rgba(162,137,89,0.07)",
+                  boxShadow: viewAllHov
+                    ? "0 0 40px rgba(196,169,110,0.5), 0 0 80px rgba(162,137,89,0.25), 0 8px 32px rgba(0,0,0,0.3)"
+                    : "0 4px 20px rgba(162,137,89,0.1)",
+                  transform: viewAllHov ? "scale(1.04)" : "scale(1)",
+                  transition: "all 0.25s ease",
+                  letterSpacing: "0.02em",
+                }}>
                 {t("pricing.viewAll")} →
               </Link>
             </Reveal>
