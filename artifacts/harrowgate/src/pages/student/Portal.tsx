@@ -12,7 +12,7 @@ import { COURSES, LEVEL_LABELS, type DegreeLevel } from "../../data/courses";
 import { io as socketIo } from "socket.io-client";
 
 const BG = "#0b2213";
-const _GOLD = "#13300a";
+const _GOLD = "#e8d9b8";
 
 function CoursesPanel() {
   const levels: DegreeLevel[] = ["masters", "bachelors", "associate"];
@@ -25,8 +25,8 @@ function CoursesPanel() {
     <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.1)" }}>
       <div className="px-5 py-4 border-b flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
         <div>
-          <h3 className="text-sm font-semibold" style={{ color: _GOLD }}>Available Courses</h3>
-          <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>Hong Kong universities & programmes — {COURSES.length} courses total</p>
+          <h3 className="text-base font-semibold" style={{ color: _GOLD }}>Available Courses</h3>
+          <p className="text-sm mt-0.5" style={{ color: "rgba(232,218,180,0.80)" }}>Hong Kong universities & programmes — {COURSES.length} courses total</p>
         </div>
         <div className="flex items-center gap-1.5 rounded-xl p-1" style={{ background: "rgba(0,0,0,0.2)" }}>
           {levels.map(l => (
@@ -47,17 +47,17 @@ function CoursesPanel() {
       </div>
       <div className="px-5 py-3 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
         {courses.length === 0 ? (
-          <p className="text-sm col-span-2 text-center py-4" style={{ color: "rgba(162,137,89,0.35)" }}>No courses match "{search}"</p>
+          <p className="text-sm col-span-2 text-center py-4" style={{ color: "rgba(232,218,180,0.75)" }}>No courses match "{search}"</p>
         ) : courses.map(c => (
           <div key={c.id} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 border"
             style={{ background: "rgba(162,137,89,0.03)", borderColor: "rgba(162,137,89,0.08)" }}>
             <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: _GOLD }} />
-            <span className="text-sm leading-snug" style={{ color: "rgba(162,137,89,0.75)" }}>{c.programme}</span>
+            <span className="text-base leading-snug" style={{ color: "rgba(232,218,180,0.92)" }}>{c.programme}</span>
           </div>
         ))}
       </div>
       <div className="px-5 py-3 border-t" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
-        <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>
+        <p className="text-sm" style={{ color: "rgba(232,218,180,0.70)" }}>
           Showing {courses.length} {LEVEL_LABELS[activeLevel].toLowerCase()} programmes in Hong Kong for 2026. Your advisor will help you choose.
         </p>
       </div>
@@ -355,7 +355,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
           <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg" style={{ background: "rgba(162,137,89,0.08)" }}>✉️</div>
           <div>
             <p className="text-sm font-semibold" style={{ color: _GOLD }}>Application Email</p>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.80)" }}>
               Your dedicated application email is being set up. You will be notified once it is ready.
             </p>
           </div>
@@ -372,18 +372,18 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
         <div className="w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl border overflow-hidden" style={{ background: "#0d1a3a", borderColor: "rgba(162,137,89,0.3)" }}>
           <div className="px-5 py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
             <p className="text-sm font-semibold" style={{ color: _GOLD }}>✉️ New Email</p>
-            <button onClick={() => setComposeOpen(false)} className="text-lg leading-none" style={{ color: "rgba(162,137,89,0.4)" }}>✕</button>
+            <button onClick={() => setComposeOpen(false)} className="text-lg leading-none" style={{ color: "rgba(232,218,180,0.80)" }}>✕</button>
           </div>
           {composeSent ? (
             <div className="px-5 py-10 text-center">
               <div className="text-3xl mb-3">✅</div>
               <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>Message sent!</p>
-              <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.45)" }}>Your email has been sent successfully.</p>
+              <p className="text-xs mt-1" style={{ color: "rgba(232,218,180,0.82)" }}>Your email has been sent successfully.</p>
             </div>
           ) : (
             <div className="px-5 py-4 space-y-3">
               <div>
-                <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.55)" }}>To</label>
+                <label className="block text-xs font-medium mb-1" style={{ color: "rgba(232,218,180,0.87)" }}>To</label>
                 <input
                   type="email" value={composeTo} onChange={e => setComposeTo(e.target.value)}
                   placeholder="recipient@example.com"
@@ -392,7 +392,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.55)" }}>Subject</label>
+                <label className="block text-xs font-medium mb-1" style={{ color: "rgba(232,218,180,0.87)" }}>Subject</label>
                 <input
                   type="text" value={composeSubject} onChange={e => setComposeSubject(e.target.value)}
                   placeholder="Subject"
@@ -401,7 +401,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.55)" }}>Message</label>
+                <label className="block text-xs font-medium mb-1" style={{ color: "rgba(232,218,180,0.87)" }}>Message</label>
                 <textarea
                   rows={7} value={composeBody} onChange={e => setComposeBody(e.target.value)}
                   placeholder="Write your message…"
@@ -412,7 +412,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
               <div className="flex gap-2 pt-1">
                 <button onClick={() => setComposeOpen(false)}
                   className="flex-1 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
-                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.5)", background: "transparent" }}>
+                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(232,218,180,0.85)", background: "transparent" }}>
                   Cancel
                 </button>
                 <button
@@ -443,7 +443,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
               <span className="text-xs px-1.5 py-0.5 rounded-full font-bold" style={{ background: "#13300a", color: "#255F38" }}>{unread}</span>
             )}
           </div>
-          <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.45)" }}>{submission.sharedEmail}</p>
+          <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(232,218,180,0.82)" }}>{submission.sharedEmail}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {open && (
@@ -460,14 +460,14 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                   onClick={e => { e.stopPropagation(); fetchInbox(true); }}
                   disabled={loading}
                   className="text-xs px-2.5 py-1 rounded-lg border transition-all hover:opacity-70 disabled:opacity-40"
-                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}
+                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(232,218,180,0.87)", background: "rgba(162,137,89,0.05)" }}
                 >
                   {loading ? "…" : "↻ Refresh"}
                 </button>
               )}
             </>
           )}
-          <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 transition-transform" style={{ color: "rgba(162,137,89,0.4)", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>
+          <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 transition-transform" style={{ color: "rgba(232,218,180,0.80)", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>
             <path d="M4.22 6.22a.75.75 0 011.06 0L8 8.94l2.72-2.72a.75.75 0 111.06 1.06l-3.25 3.25a.75.75 0 01-1.06 0L4.22 7.28a.75.75 0 010-1.06z"/>
           </svg>
         </div>
@@ -501,13 +501,13 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                 <button
                   onClick={() => setSelected(null)}
                   className="text-xs px-2.5 py-1 rounded-lg border transition-all hover:opacity-70"
-                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.55)", background: "rgba(162,137,89,0.05)" }}
+                  style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(232,218,180,0.87)", background: "rgba(162,137,89,0.05)" }}
                 >
                   ← Back
                 </button>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate" style={{ color: _GOLD }}>{selected.subject}</p>
-                  <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.45)" }}>{selected.from} · {new Date(selected.date).toLocaleString()}</p>
+                  <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(232,218,180,0.82)" }}>{selected.from} · {new Date(selected.date).toLocaleString()}</p>
                 </div>
               </div>
               <div className="overflow-y-auto flex-1 p-4">
@@ -524,7 +524,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                     }}
                   />
                 ) : (
-                  <pre className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: "rgba(162,137,89,0.8)", fontFamily: "inherit" }}>
+                  <pre className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: "rgba(232,218,180,0.93)", fontFamily: "inherit" }}>
                     {selected.text ?? "(No content)"}
                   </pre>
                 )}
@@ -536,7 +536,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
           {!selected && tab === "inbox" && (
             <div style={{ maxHeight: 420, overflowY: "auto" }}>
               {loading && (
-                <div className="px-5 py-8 flex items-center justify-center gap-2" style={{ color: "rgba(162,137,89,0.4)" }}>
+                <div className="px-5 py-8 flex items-center justify-center gap-2" style={{ color: "rgba(232,218,180,0.80)" }}>
                   <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity=".25"/><path d="M12 2a10 10 0 0110 10" strokeLinecap="round"/></svg>
                   <span className="text-sm">Loading inbox…</span>
                 </div>
@@ -548,7 +548,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                 </div>
               )}
               {!loading && !error && emails.length === 0 && (
-                <div className="px-5 py-8 text-center" style={{ color: "rgba(162,137,89,0.35)" }}>
+                <div className="px-5 py-8 text-center" style={{ color: "rgba(232,218,180,0.75)" }}>
                   <p className="text-sm">No emails yet</p>
                 </div>
               )}
@@ -567,7 +567,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                         <p className="text-sm truncate" style={{ color: email.seen ? "rgba(162,137,89,0.65)" : _GOLD, fontWeight: email.seen ? 400 : 600 }}>
                           {email.from.split(" <")[0]}
                         </p>
-                        <span className="text-xs shrink-0" style={{ color: "rgba(162,137,89,0.35)" }}>
+                        <span className="text-xs shrink-0" style={{ color: "rgba(232,218,180,0.75)" }}>
                           {new Date(email.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                         </span>
                       </div>
@@ -575,7 +575,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                         {email.subject}
                       </p>
                       {email.snippet && (
-                        <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.35)" }}>{email.snippet}</p>
+                        <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(232,218,180,0.75)" }}>{email.snippet}</p>
                       )}
                     </div>
                   </div>
@@ -588,13 +588,13 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
           {!selected && tab === "sent" && (
             <div style={{ maxHeight: 420, overflowY: "auto" }}>
               {outboxLoading && (
-                <div className="px-5 py-8 flex items-center justify-center gap-2" style={{ color: "rgba(162,137,89,0.4)" }}>
+                <div className="px-5 py-8 flex items-center justify-center gap-2" style={{ color: "rgba(232,218,180,0.80)" }}>
                   <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeOpacity=".25"/><path d="M12 2a10 10 0 0110 10" strokeLinecap="round"/></svg>
                   <span className="text-sm">Loading…</span>
                 </div>
               )}
               {!outboxLoading && outbox.length === 0 && (
-                <div className="px-5 py-8 text-center" style={{ color: "rgba(162,137,89,0.35)" }}>
+                <div className="px-5 py-8 text-center" style={{ color: "rgba(232,218,180,0.75)" }}>
                   <p className="text-sm">No sent emails yet</p>
                   <button onClick={handleCompose} className="mt-3 text-xs px-3 py-1.5 rounded-lg border" style={{ borderColor: "rgba(162,137,89,0.25)", color: _GOLD }}>
                     ✏️ Compose your first email
@@ -607,13 +607,13 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                     <span className="mt-1 text-sm">📤</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline justify-between gap-2">
-                        <p className="text-sm truncate font-medium" style={{ color: "rgba(162,137,89,0.75)" }}>To: {item.toAddress}</p>
-                        <span className="text-xs shrink-0" style={{ color: "rgba(162,137,89,0.35)" }}>
+                        <p className="text-sm truncate font-medium" style={{ color: "rgba(232,218,180,0.92)" }}>To: {item.toAddress}</p>
+                        <span className="text-xs shrink-0" style={{ color: "rgba(232,218,180,0.75)" }}>
                           {new Date(item.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                         </span>
                       </div>
-                      <p className="text-xs mt-0.5 truncate font-medium" style={{ color: "rgba(162,137,89,0.8)" }}>{item.subject}</p>
-                      <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.35)" }}>{item.body}</p>
+                      <p className="text-xs mt-0.5 truncate font-medium" style={{ color: "rgba(232,218,180,0.93)" }}>{item.subject}</p>
+                      <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(232,218,180,0.75)" }}>{item.body}</p>
                     </div>
                     <span className="text-xs px-2 py-0.5 rounded-full shrink-0" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>Sent</span>
                   </div>
@@ -879,7 +879,7 @@ export default function Portal() {
         <div className="text-center">
           <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-16 object-contain mx-auto mb-6 opacity-60" />
           <div className="w-6 h-6 rounded-full border-2 animate-spin mx-auto mb-3" style={{ borderColor: GOLD, borderTopColor: "transparent" }} />
-          <p className="text-sm" style={{ color: "rgba(162,137,89,0.5)" }}>Loading your portal…</p>
+          <p className="text-sm" style={{ color: "rgba(232,218,180,0.85)" }}>Loading your portal…</p>
         </div>
       </div>
     );
@@ -901,7 +901,7 @@ export default function Portal() {
           <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 max-w-5xl mx-auto">
             <div className="flex items-center gap-2.5">
               <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#f87171" }} />
-              <span className="text-xs sm:text-sm" style={{ color: "rgba(162,137,89,0.85)" }}>
+              <span className="text-xs sm:text-sm" style={{ color: "rgba(232,218,180,0.95)" }}>
                 Harrowgate support is viewing your screen to guide you through your application
               </span>
             </div>
@@ -950,7 +950,7 @@ export default function Portal() {
                 style={{ background: "rgba(162,137,89,0.2)", color: GOLD }}>
                 {(user?.firstName?.[0] || user?.primaryEmailAddress?.emailAddress?.[0] || "?").toUpperCase()}
               </div>
-              <span className="text-xs max-w-[120px] truncate" style={{ color: "rgba(162,137,89,0.55)" }}>
+              <span className="text-xs max-w-[120px] truncate" style={{ color: "rgba(232,218,180,0.87)" }}>
                 {user?.primaryEmailAddress?.emailAddress}
               </span>
             </div>
@@ -959,7 +959,7 @@ export default function Portal() {
               <button
                 onClick={() => setShowLangPicker(v => !v)}
                 className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border text-xs font-medium transition-all hover:opacity-80"
-                style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.6)", background: "rgba(162,137,89,0.05)" }}>
+                style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(232,218,180,0.88)", background: "rgba(162,137,89,0.05)" }}>
                 {LANG_LIST.find(l => l.code === lang)?.flag}
                 <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-2 h-2 ml-0.5"><path d="M1 1l4 4 4-4" /></svg>
               </button>
@@ -978,7 +978,7 @@ export default function Portal() {
             </div>
             <button onClick={() => signOut({ redirectUrl: BASE || "/" })}
               className="text-xs px-3 py-1.5 rounded-full border transition-all hover:opacity-80"
-              style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(162,137,89,0.6)" }}>
+              style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(232,218,180,0.88)" }}>
               {t("nav.signOut")}
             </button>
           </div>
@@ -1037,13 +1037,13 @@ export default function Portal() {
               <div className="p-4 sm:p-6">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div>
-                    <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-2" style={{ color: "rgba(162,137,89,0.4)" }}>
+                    <p className="text-sm font-semibold tracking-[0.25em] uppercase mb-2" style={{ color: "rgba(232,218,180,0.80)" }}>
                       {t("portal.title")}
                     </p>
-                    <h2 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: GOLD }}>
+                    <h2 className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: GOLD }}>
                       {t("portal.welcomeBack")}, {submission.name.split(" ")[0]}.
                     </h2>
-                    <p className="text-sm" style={{ color: "rgba(162,137,89,0.45)" }}>
+                    <p className="text-base" style={{ color: "rgba(232,218,180,0.82)" }}>
                       {t("portal.applied")} {new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                     </p>
                   </div>
@@ -1057,7 +1057,7 @@ export default function Portal() {
                     )}
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
                       style={{ borderColor: "rgba(162,137,89,0.18)", background: "rgba(162,137,89,0.05)" }}>
-                      <span className="text-xs" style={{ color: "rgba(162,137,89,0.4)" }}>{t("portal.ref")}</span>
+                      <span className="text-xs" style={{ color: "rgba(232,218,180,0.80)" }}>{t("portal.ref")}</span>
                       <span className="text-sm font-bold tracking-widest font-mono" style={{ color: GOLD }}>
                         STU{submission.passportNumber.slice(-4).toUpperCase()}
                       </span>
@@ -1072,7 +1072,7 @@ export default function Portal() {
                     </div>
                     <div>
                       <p className="text-xs font-semibold mb-1" style={{ color: GOLD }}>{t("portal.consultant")}</p>
-                      <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.65)" }}>{submission.adminNotes}</p>
+                      <p className="text-sm leading-relaxed" style={{ color: "rgba(232,218,180,0.90)" }}>{submission.adminNotes}</p>
                     </div>
                   </div>
                 )}
@@ -1102,7 +1102,7 @@ export default function Portal() {
               <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.12)" }}>
                 <div className="text-5xl mb-4">⏳</div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>{t("s.underReview")}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.6)" }}>{t("s.underReviewSub")}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(232,218,180,0.88)" }}>{t("s.underReviewSub")}</p>
               </div>
             )}
 
@@ -1187,7 +1187,7 @@ export default function Portal() {
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.mockCompleted")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.mockCompletedSub")}</p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>{t("s.awaitingNext")}</p>
-                <p className="text-sm mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>{t("s.teamInTouch")}</p>
+                <p className="text-sm mt-2" style={{ color: "rgba(232,218,180,0.87)" }}>{t("s.teamInTouch")}</p>
               </div>
             )}
 
@@ -1203,7 +1203,7 @@ export default function Portal() {
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.pay2Confirmed")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.pay2ConfirmedSub")}</p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>{t("s.awaitingUniInterview")}</p>
-                <p className="text-sm mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>{t("s.uniCoordinating")}</p>
+                <p className="text-sm mt-2" style={{ color: "rgba(232,218,180,0.87)" }}>{t("s.uniCoordinating")}</p>
               </div>
             )}
 
@@ -1255,9 +1255,9 @@ export default function Portal() {
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
                 <div className="text-5xl mb-4">🎓</div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>{t("s.uniInterviewCompleted")}</h3>
-                <p className="text-sm mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>{t("s.uniInterviewCompletedSub")}</p>
+                <p className="text-sm mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>{t("s.uniInterviewCompletedSub")}</p>
                 <div className="mt-5 px-6 py-5 rounded-2xl border" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
-                  <p className="text-sm" style={{ color: "rgba(162,137,89,0.55)" }}>{t("s.teamInTouch")}</p>
+                  <p className="text-sm" style={{ color: "rgba(232,218,180,0.87)" }}>{t("s.teamInTouch")}</p>
                 </div>
               </div>
             )}
@@ -1348,7 +1348,7 @@ export default function Portal() {
                     </div>
                   ) : (
                     <div className="rounded-2xl border px-5 py-4" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
-                      <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.6)" }}>{t("portal.processing")}</p>
+                      <p className="text-sm leading-relaxed" style={{ color: "rgba(232,218,180,0.88)" }}>{t("portal.processing")}</p>
                     </div>
                   )}
                 </div>
@@ -1380,7 +1380,7 @@ export default function Portal() {
                   <div className="px-5 py-4 border-b flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
                     <div>
                       <h3 className="text-sm font-semibold" style={{ color: GOLD }}>{t("journey.cardTitle")}</h3>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>{t("journey.cardSub")}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.80)" }}>{t("journey.cardSub")}</p>
                     </div>
                     <span className="text-xs font-semibold px-3 py-1.5 rounded-full shrink-0" style={{ background: "rgba(162,137,89,0.08)", color: GOLD }}>
                       {currentStep} / 8
@@ -1503,7 +1503,7 @@ export default function Portal() {
               <div className="px-5 py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
                 <div>
                   <h3 className="text-sm font-semibold" style={{ color: GOLD }}>{t("portal.progress")}</h3>
-                  <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.4)" }}>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.80)" }}>
                     {t("portal.ref")} <span className="font-mono font-semibold">STU{submission.passportNumber.slice(-4).toUpperCase()}</span>
                   </p>
                 </div>
@@ -1571,7 +1571,7 @@ export default function Portal() {
               <div className="px-6 py-5 grid grid-cols-1 sm:grid-cols-3 gap-5">
                 {([[t("portal.fullName"), submission.name], [t("portal.dob"), submission.dateOfBirth], [t("portal.passport"), submission.passportNumber]] as [string, string][]).map(([l, v]) => (
                   <div key={l}>
-                    <p className="text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.45)" }}>{l}</p>
+                    <p className="text-xs font-medium mb-1" style={{ color: "rgba(232,218,180,0.82)" }}>{l}</p>
                     <p className="text-sm font-semibold" style={{ color: GOLD }}>{v}</p>
                   </div>
                 ))}

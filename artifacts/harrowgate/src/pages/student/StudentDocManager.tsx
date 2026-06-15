@@ -116,7 +116,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
       <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
         <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
           <h3 className="text-base font-semibold" style={{ color: GOLD }}>Your Documents</h3>
-          <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Click a document to preview it · Use Replace to swap a file</p>
+          <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.82)" }}>Click a document to preview it · Use Replace to swap a file</p>
         </div>
         <div className="px-6 py-5 space-y-3">
           {DOC_SLOTS.map(slot => {
@@ -151,7 +151,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
                     {DOC_SLOTS.indexOf(slot) + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium" style={{ color: "rgba(162,137,89,0.55)" }}>{slot.label}</p>
+                    <p className="text-xs font-medium" style={{ color: "rgba(232,218,180,0.87)" }}>{slot.label}</p>
                     {doc && <p className="text-sm font-semibold truncate mt-0.5" style={{ color: GOLD }}>{doc.fileName}</p>}
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -205,7 +205,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
                     ) : (
                       <div className="flex flex-col items-center justify-center py-8 gap-3">
                         <span className="text-4xl">📎</span>
-                        <p className="text-sm" style={{ color: "rgba(162,137,89,0.5)" }}>Preview not available</p>
+                        <p className="text-sm" style={{ color: "rgba(232,218,180,0.85)" }}>Preview not available</p>
                         <a href={viewUrl(doc)} target="_blank" rel="noopener noreferrer"
                           className="text-xs px-4 py-2 rounded-full border" style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>
                           Open file ↗

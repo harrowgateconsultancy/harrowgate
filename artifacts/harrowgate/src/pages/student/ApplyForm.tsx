@@ -186,7 +186,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
       <button
         onClick={() => setLocation("/")}
         className="inline-flex items-center gap-1.5 text-sm mb-8 transition-opacity hover:opacity-70"
-        style={{ color: "rgba(162,137,89,0.45)" }}
+        style={{ color: "rgba(232,218,180,0.82)" }}
       >
         <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
           <path fillRule="evenodd" d="M9.78 12.78a.75.75 0 01-1.06 0L4.47 8.53a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L6.06 8l3.72 3.72a.75.75 0 010 1.06z" clipRule="evenodd" />
@@ -196,11 +196,11 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
 
       {/* Header */}
       <div className="mb-8">
-        <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-3" style={{ color: "rgba(162,137,89,0.4)" }}>
+        <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-3" style={{ color: "rgba(232,218,180,0.80)" }}>
           Student Portal
         </p>
         <h1 className="text-3xl font-bold mb-3" style={{ color: GOLD }}>Start Your Application</h1>
-        <p className="text-sm leading-relaxed" style={{ color: "rgba(162,137,89,0.55)" }}>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(232,218,180,0.87)" }}>
           Complete the form below to begin your Hong Kong student visa application.<br />
           Fields marked <span style={{ color: GOLD }}>*</span> are required.
         </p>
@@ -217,7 +217,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
             </div>
             <p className="text-xs font-semibold" style={{ color: requiredFilled ? "#4ade80" : GOLD }}>Details</p>
           </div>
-          <p className="text-xs pl-7" style={{ color: "rgba(162,137,89,0.4)" }}>
+          <p className="text-xs pl-7" style={{ color: "rgba(232,218,180,0.80)" }}>
             {requiredFilled ? "Complete" : "Name, DOB & passport"}
           </p>
         </div>
@@ -230,7 +230,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
             </div>
             <p className="text-xs font-semibold" style={{ color: courseSelected ? "#4ade80" : GOLD }}>Course</p>
           </div>
-          <p className="text-xs pl-7" style={{ color: "rgba(162,137,89,0.4)" }}>
+          <p className="text-xs pl-7" style={{ color: "rgba(232,218,180,0.80)" }}>
             {courseSelected ? "Preference saved" : "Degree & course"}
           </p>
         </div>
@@ -243,7 +243,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
             </div>
             <p className="text-xs font-semibold" style={{ color: allRequiredUploaded ? "#4ade80" : GOLD }}>Documents</p>
           </div>
-          <p className="text-xs pl-7" style={{ color: "rgba(162,137,89,0.4)" }}>
+          <p className="text-xs pl-7" style={{ color: "rgba(232,218,180,0.80)" }}>
             {allRequiredUploaded ? "All required docs uploaded" : `${uploadedRequired}/${requiredDocs} required`}
           </p>
         </div>
@@ -255,11 +255,11 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
         <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
           <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
             <h2 className="text-base font-semibold" style={{ color: GOLD }}>Personal Information</h2>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Enter your details exactly as they appear on your passport</p>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.82)" }}>Enter your details exactly as they appear on your passport</p>
           </div>
           <div className="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Surname (Family Name) *</label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>Surname (Family Name) *</label>
               <input
                 type="text" value={surname} onChange={e => setSurname(e.target.value)}
                 placeholder="e.g. CHAN" required
@@ -268,7 +268,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Given Name(s) *</label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>Given Name(s) *</label>
               <input
                 type="text" value={givenName} onChange={e => setGivenName(e.target.value)}
                 placeholder="e.g. TAI MAN" required
@@ -277,7 +277,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Date of Birth *</label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>Date of Birth *</label>
               <input
                 type="date" value={dob} onChange={e => setDob(e.target.value)} required
                 className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition-all"
@@ -285,7 +285,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Passport Number *</label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>Passport Number *</label>
               <input
                 type="text" value={passport} onChange={e => setPassport(e.target.value.toUpperCase())}
                 placeholder="e.g. A12345678" required
@@ -294,13 +294,13 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Email Address</label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>Email Address</label>
               <input
                 type="email" value={user?.primaryEmailAddress?.emailAddress || ""} readOnly
                 className="w-full rounded-xl px-4 py-3 text-sm outline-none border"
-                style={{ background: "rgba(162,137,89,0.03)", borderColor: "rgba(162,137,89,0.1)", color: "rgba(162,137,89,0.55)", cursor: "not-allowed" }}
+                style={{ background: "rgba(162,137,89,0.03)", borderColor: "rgba(162,137,89,0.1)", color: "rgba(232,218,180,0.87)", cursor: "not-allowed" }}
               />
-              <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.35)" }}>Taken from your account — cannot be changed here</p>
+              <p className="text-xs mt-1" style={{ color: "rgba(232,218,180,0.75)" }}>Taken from your account — cannot be changed here</p>
             </div>
           </div>
         </div>
@@ -309,13 +309,13 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
         <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
           <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
             <h2 className="text-base font-semibold" style={{ color: GOLD }}>Course Preference *</h2>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Select your preferred degree level, then choose a course</p>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.82)" }}>Select your preferred degree level, then choose a course</p>
           </div>
           <div className="px-6 py-6 space-y-6">
 
             {/* Step 1: Degree level */}
             <div>
-              <p className="text-xs font-semibold mb-3" style={{ color: "rgba(162,137,89,0.65)" }}>Step 1 — Degree Level *</p>
+              <p className="text-xs font-semibold mb-3" style={{ color: "rgba(232,218,180,0.90)" }}>Step 1 — Degree Level *</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-wrap">
                 {DEGREE_LEVELS.map(level => {
                   const isSelected = preferredLevel === level.value;
@@ -342,7 +342,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                           {level.label}
                         </span>
                       </div>
-                      <p className="text-xs pl-6" style={{ color: "rgba(162,137,89,0.4)" }}>{level.description}</p>
+                      <p className="text-xs pl-6" style={{ color: "rgba(232,218,180,0.80)" }}>{level.description}</p>
                     </button>
                   );
                 })}
@@ -355,7 +355,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                 {needsFreeText ? (
                   /* Free-text input for Diploma / Others */
                   <div>
-                    <p className="text-xs font-semibold mb-3" style={{ color: "rgba(162,137,89,0.65)" }}>
+                    <p className="text-xs font-semibold mb-3" style={{ color: "rgba(232,218,180,0.90)" }}>
                       Step 2 — Describe Your Preferred Course *
                     </p>
                     <textarea
@@ -382,13 +382,13 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                 ) : (
                   /* Searchable course list for Associate / Bachelor / Master */
                   <div>
-                    <p className="text-xs font-semibold mb-3" style={{ color: "rgba(162,137,89,0.65)" }}>
-                      Step 2 — Preferred Course * <span style={{ color: "rgba(162,137,89,0.35)", fontWeight: 400 }}>({LEVEL_LABELS[preferredLevel]})</span>
+                    <p className="text-xs font-semibold mb-3" style={{ color: "rgba(232,218,180,0.90)" }}>
+                      Step 2 — Preferred Course * <span style={{ color: "rgba(232,218,180,0.75)", fontWeight: 400 }}>({LEVEL_LABELS[preferredLevel]})</span>
                     </p>
 
                     {/* Search box */}
                     <div className="relative mb-3">
-                      <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "rgba(162,137,89,0.4)" }}>
+                      <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "rgba(232,218,180,0.80)" }}>
                         <path fillRule="evenodd" d="M9.965 11.026a5 5 0 111.06-1.06l2.755 2.754a.75.75 0 11-1.06 1.06l-2.755-2.754zM10.5 7a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0z" clipRule="evenodd" />
                       </svg>
                       <input
@@ -404,7 +404,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                           type="button"
                           onClick={() => { setCourseSearch(""); setPreferredCourseId(""); }}
                           className="absolute right-3 top-1/2 -translate-y-1/2"
-                          style={{ color: "rgba(162,137,89,0.4)" }}
+                          style={{ color: "rgba(232,218,180,0.80)" }}
                         >
                           <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
                             <path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z" />
@@ -417,7 +417,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                     <div className="rounded-xl border overflow-y-auto"
                       style={{ borderColor: "rgba(162,137,89,0.15)", background: "rgba(0,0,0,0.15)", maxHeight: "320px" }}>
                       {filteredCourses.length === 0 ? (
-                        <div className="px-4 py-8 text-center text-sm" style={{ color: "rgba(162,137,89,0.35)" }}>
+                        <div className="px-4 py-8 text-center text-sm" style={{ color: "rgba(232,218,180,0.75)" }}>
                           No courses match your search
                         </div>
                       ) : (
@@ -468,7 +468,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
         <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
           <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
             <h2 className="text-base font-semibold" style={{ color: GOLD }}>Supporting Documents</h2>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Upload your documents below (PDF, JPG, PNG — max 20 MB each). Items marked * are required.</p>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.82)" }}>Upload your documents below (PDF, JPG, PNG — max 20 MB each). Items marked * are required.</p>
           </div>
           <div className="px-6 py-6 space-y-5">
             {DOC_CONFIG.map((cfg, i) => {
@@ -485,12 +485,12 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                         {cfg.label}{cfg.required && <span className="ml-1" style={{ color: GOLD }}>*</span>}
                       </p>
                       {!cfg.required && (
-                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(162,137,89,0.07)", color: "rgba(162,137,89,0.45)" }}>
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(162,137,89,0.07)", color: "rgba(232,218,180,0.82)" }}>
                           Optional
                         </span>
                       )}
                     </div>
-                    <p className="text-xs mb-2" style={{ color: "rgba(162,137,89,0.4)" }}>{cfg.hint}</p>
+                    <p className="text-xs mb-2" style={{ color: "rgba(232,218,180,0.80)" }}>{cfg.hint}</p>
                     {doc.url ? (
                       <div className="flex items-center gap-3 rounded-xl px-4 py-2.5 border" style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)" }}>
                         <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0" style={{ color: GOLD }}>
@@ -499,7 +499,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                         <span className="text-sm flex-1 truncate" style={{ color: GOLD }}>{doc.name}</span>
                         <button type="button" onClick={() => { setDocs(prev => { const n = [...prev]; n[i] = emptyUpload(); return n; }); }}
                           className="text-xs px-3 py-1 rounded-full border transition-all hover:opacity-80"
-                          style={{ borderColor: "rgba(162,137,89,0.25)", color: "rgba(162,137,89,0.55)" }}>
+                          style={{ borderColor: "rgba(162,137,89,0.25)", color: "rgba(232,218,180,0.87)" }}>
                           Remove
                         </button>
                       </div>
@@ -549,11 +549,11 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
         {approvedAgents.length > 0 && (
           <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
             <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
-              <h2 className="text-base font-semibold" style={{ color: GOLD }}>Agent Referral <span className="font-normal text-xs ml-1" style={{ color: "rgba(162,137,89,0.45)" }}>(optional)</span></h2>
-              <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Were you referred by a HARROWGATE partner agent?</p>
+              <h2 className="text-base font-semibold" style={{ color: GOLD }}>Agent Referral <span className="font-normal text-xs ml-1" style={{ color: "rgba(232,218,180,0.82)" }}>(optional)</span></h2>
+              <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.82)" }}>Were you referred by a HARROWGATE partner agent?</p>
             </div>
             <div className="px-6 py-5">
-              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>Select Agent Code</label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>Select Agent Code</label>
               <select
                 value={agentCode}
                 onChange={e => setAgentCode(e.target.value)}
@@ -568,7 +568,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
                 ))}
               </select>
               {agentCode && (
-                <p className="text-xs mt-2" style={{ color: "rgba(162,137,89,0.55)" }}>
+                <p className="text-xs mt-2" style={{ color: "rgba(232,218,180,0.87)" }}>
                   ✓ Agent code <strong style={{ color: GOLD }}>{agentCode}</strong> will be linked to your application.
                 </p>
               )}
