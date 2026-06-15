@@ -762,22 +762,29 @@ export async function sendInvoiceToStudentEmail(opts: {
   schedule: Array<{ no: number; label: string; amount: number }>;
   remarks: string[];
   total: number;
+  highlightedPayment?: number | null;
 }) {
   const transport = createTransport();
   if (!transport) throw new Error("Email credentials not configured (GMAIL_USER / GMAIL_APP_PASSWORD missing).");
-  const itemRows = opts.items.map(it => `
-    <tr>
-      <td style="border:1px solid #ccc;padding:8px 10px;text-align:center;font-size:12px">${it.no}</td>
-      <td style="border:1px solid #ccc;padding:8px 10px;font-size:12px;line-height:1.5">${it.description}</td>
-      <td style="border:1px solid #ccc;padding:8px 10px;text-align:center;font-size:12px">${it.qty}</td>
-      <td style="border:1px solid #ccc;padding:8px 10px;text-align:right;font-size:12px;font-weight:600">HKD$ ${it.amount.toLocaleString("en-HK")}</td>
-    </tr>`).join("");
-  const scheduleRows = opts.schedule.map(r => `
-    <tr>
-      <td style="padding:5px 8px;font-size:11px;color:#555">${r.no}.</td>
-      <td style="padding:5px 8px;font-size:11px">${r.label}</td>
-      <td style="padding:5px 8px;font-size:11px;font-weight:600;text-align:right">HKD$ ${r.amount.toLocaleString("en-HK")}</td>
-    </tr>`).join("");
+  const itemRows = opts.items.map(it => {
+    const due = opts.highlightedPayment === it.no;
+    return `
+    <tr style="${due ? "background:#fff0f0;" : ""}">
+      <td style="border:1px solid ${due ? "#dc2626" : "#ccc"};padding:8px 10px;text-align:center;font-size:12px;${due ? "color:#dc2626;font-weight:800;" : ""}">${it.no}</td>
+      <td style="border:1px solid ${due ? "#dc2626" : "#ccc"};padding:8px 10px;font-size:12px;line-height:1.5">${it.description}${due ? ' <span style="display:inline-block;margin-left:8px;background:#dc2626;color:#fff;font-size:9px;font-weight:800;padding:1px 6px;border-radius:3px;vertical-align:middle">AMOUNT DUE</span>' : ""}</td>
+      <td style="border:1px solid ${due ? "#dc2626" : "#ccc"};padding:8px 10px;text-align:center;font-size:12px">${it.qty}</td>
+      <td style="border:1px solid ${due ? "#dc2626" : "#ccc"};padding:8px 10px;text-align:right;font-size:${due ? "14px" : "12px"};font-weight:${due ? "900" : "600"};${due ? "color:#dc2626;" : ""}">HKD$ ${it.amount.toLocaleString("en-HK")}</td>
+    </tr>`;
+  }).join("");
+  const scheduleRows = opts.schedule.map(r => {
+    const due = opts.highlightedPayment === r.no;
+    return `
+    <tr style="${due ? "background:#fff0f0;" : ""}">
+      <td style="padding:5px 8px;font-size:11px;${due ? "color:#dc2626;font-weight:800;" : "color:#555;"}">${r.no}.</td>
+      <td style="padding:5px 8px;font-size:11px;${due ? "color:#dc2626;font-weight:800;" : ""}">${r.label}${due ? ' <span style="font-size:9px;color:#dc2626;font-weight:800">← DUE NOW</span>' : ""}</td>
+      <td style="padding:5px 8px;font-size:${due ? "13px" : "11px"};font-weight:${due ? "900" : "600"};text-align:right;${due ? "color:#dc2626;" : ""}">HKD$ ${r.amount.toLocaleString("en-HK")}</td>
+    </tr>`;
+  }).join("");
   const remarkRows = opts.remarks.map((r, i) => `<p style="margin:4px 0;font-size:11px;line-height:1.6;color:#333"><strong>${i+1})</strong> ${r}</p>`).join("");
 
   await transport.sendMail({

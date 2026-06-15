@@ -149,9 +149,10 @@ function SendStatus({ status, onClear }: { status: "idle" | "sending" | "sent" |
 /* ═══════════════════════════════════════════════════
    INVOICE PREVIEW
 ═══════════════════════════════════════════════════ */
-function InvoicePreview({ invoiceNo, date, clientName, clientAddress, degreeLabel, items, schedule, remarks }: {
+function InvoicePreview({ invoiceNo, date, clientName, clientAddress, degreeLabel, items, schedule, remarks, highlightedPayment }: {
   invoiceNo: string; date: string; clientName: string; clientAddress: string;
   degreeLabel: string; items: LineItem[]; schedule: PayScheduleRow[]; remarks: string[];
+  highlightedPayment?: 1 | 2 | 3 | null;
 }) {
   const total = items.reduce((s, i) => s + i.amount * i.qty, 0);
   return (
@@ -198,14 +199,20 @@ function InvoicePreview({ invoiceNo, date, clientName, clientAddress, degreeLabe
           </tr>
         </thead>
         <tbody>
-          {items.map(item => (
-            <tr key={item.no} style={{ verticalAlign: "top" }}>
-              <td style={{ border: "1px solid #aaa", padding: "8px 10px", textAlign: "center" }}>{item.no}</td>
-              <td style={{ border: "1px solid #aaa", padding: "8px 10px", lineHeight: 1.55 }}>{item.description}</td>
-              <td style={{ border: "1px solid #aaa", padding: "8px 10px", textAlign: "center" }}>{item.qty}</td>
-              <td style={{ border: "1px solid #aaa", padding: "8px 10px", textAlign: "right", fontWeight: 600 }}>{item.amount.toLocaleString("en-HK")}</td>
-            </tr>
-          ))}
+          {items.map(item => {
+            const due = highlightedPayment === item.no;
+            return (
+              <tr key={item.no} style={{ verticalAlign: "top", background: due ? "#fff0f0" : undefined }}>
+                <td style={{ border: due ? "1px solid #dc2626" : "1px solid #aaa", padding: "8px 10px", textAlign: "center", fontWeight: due ? 800 : undefined, color: due ? "#dc2626" : undefined }}>{item.no}</td>
+                <td style={{ border: due ? "1px solid #dc2626" : "1px solid #aaa", padding: "8px 10px", lineHeight: 1.55 }}>
+                  {item.description}
+                  {due && <span style={{ display: "inline-block", marginLeft: 10, background: "#dc2626", color: "#fff", fontSize: "8pt", fontWeight: 800, padding: "1px 7px", borderRadius: 3, letterSpacing: "0.05em", verticalAlign: "middle" }}>AMOUNT DUE</span>}
+                </td>
+                <td style={{ border: due ? "1px solid #dc2626" : "1px solid #aaa", padding: "8px 10px", textAlign: "center" }}>{item.qty}</td>
+                <td style={{ border: due ? "1px solid #dc2626" : "1px solid #aaa", padding: "8px 10px", textAlign: "right", fontWeight: due ? 900 : 600, color: due ? "#dc2626" : undefined, fontSize: due ? "12pt" : undefined }}>{item.amount.toLocaleString("en-HK")}</td>
+              </tr>
+            );
+          })}
           <tr style={{ background: "#f5f5f5" }}>
             <td colSpan={3} style={{ border: "1px solid #aaa", padding: "8px 10px", textAlign: "right", fontWeight: 800, fontSize: "11pt" }}>TOTAL</td>
             <td style={{ border: "1px solid #aaa", padding: "8px 10px", textAlign: "right", fontWeight: 900, fontSize: "11pt" }}>{total.toLocaleString("en-HK")}</td>
@@ -218,13 +225,19 @@ function InvoicePreview({ invoiceNo, date, clientName, clientAddress, degreeLabe
         <p style={{ fontWeight: 800, fontSize: "11pt", marginBottom: 8, borderBottom: "1.5px solid #0b2213", paddingBottom: 4 }}>Payment Schedule:</p>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "10pt" }}>
           <tbody>
-            {schedule.map(row => (
-              <tr key={row.no}>
-                <td style={{ padding: "4px 8px", width: 32, textAlign: "center", color: "#555" }}>{row.no}.</td>
-                <td style={{ padding: "4px 8px" }}>{row.label}</td>
-                <td style={{ padding: "4px 8px", textAlign: "right", fontWeight: 600, width: 140 }}>HKD$ {row.amount.toLocaleString("en-HK")}</td>
-              </tr>
-            ))}
+            {schedule.map(row => {
+              const due = highlightedPayment === row.no;
+              return (
+                <tr key={row.no} style={{ background: due ? "#fff0f0" : undefined }}>
+                  <td style={{ padding: "4px 8px", width: 32, textAlign: "center", color: due ? "#dc2626" : "#555", fontWeight: due ? 800 : undefined }}>{row.no}.</td>
+                  <td style={{ padding: "4px 8px", color: due ? "#dc2626" : undefined, fontWeight: due ? 800 : undefined }}>
+                    {row.label}
+                    {due && <span style={{ marginLeft: 8, fontSize: "8pt", color: "#dc2626", fontWeight: 800 }}>← DUE NOW</span>}
+                  </td>
+                  <td style={{ padding: "4px 8px", textAlign: "right", fontWeight: due ? 900 : 600, width: 140, color: due ? "#dc2626" : undefined, fontSize: due ? "11pt" : undefined }}>HKD$ {row.amount.toLocaleString("en-HK")}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -340,6 +353,7 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
   const [items, setItems] = useState<LineItem[]>(() => makeItemsFromPricing(DEFAULT_PRICING, "masters"));
   const [schedule, setSchedule] = useState<PayScheduleRow[]>(() => makeScheduleFromPricing(DEFAULT_PRICING, "masters"));
   const [remarks, setRemarks] = useState<string[]>([...DEFAULT_REMARKS]);
+  const [highlightedPayment, setHighlightedPayment] = useState<1 | 2 | 3 | null>(null);
   const [sendStatus, setSendStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   const today = fmtDate(new Date());
@@ -375,7 +389,7 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
     try {
       const res = await adminFetch(`${getApiBase()}/api/admin/invoice/send-invoice`, {
         method: "POST",
-        body: JSON.stringify({ studentEmail: selected.email, studentName: selected.name, invoiceNo, date: today, degreeType: degreeLabel, items, schedule, remarks: remarks.filter(r => r.trim()), total }),
+        body: JSON.stringify({ studentEmail: selected.email, studentName: selected.name, invoiceNo, date: today, degreeType: degreeLabel, items, schedule, remarks: remarks.filter(r => r.trim()), total, highlightedPayment }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -390,6 +404,7 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
     setItems(makeItemsFromPricing(DEFAULT_PRICING, "masters"));
     setSchedule(makeScheduleFromPricing(DEFAULT_PRICING, "masters"));
     setRemarks([...DEFAULT_REMARKS]);
+    setHighlightedPayment(null);
     setSendStatus("idle");
   }
 
@@ -397,7 +412,7 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
     <div className="grid grid-cols-1 xl:grid-cols-[440px_1fr] gap-6">
       {/* Hidden print target */}
       <div id="invoice-print-root" style={{ display: "none" }}>
-        <InvoicePreview invoiceNo={invoiceNo} date={today} clientName={selected?.name ?? ""} clientAddress={clientAddress} degreeLabel={degreeLabel} items={items} schedule={schedule} remarks={remarks.filter(r => r.trim())} />
+        <InvoicePreview invoiceNo={invoiceNo} date={today} clientName={selected?.name ?? ""} clientAddress={clientAddress} degreeLabel={degreeLabel} items={items} schedule={schedule} remarks={remarks.filter(r => r.trim())} highlightedPayment={highlightedPayment} />
       </div>
       <style>{`@media print { body > * { display: none !important; } #invoice-print-root { display: block !important; } #invoice-print-root * { display: revert !important; } }`}</style>
 
@@ -467,11 +482,37 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
           )}
         </div>
 
-        {/* 3. Line items */}
+        {/* 3. Payment due stage */}
+        <div className="bg-card border border-border rounded-lg p-4">
+          <h2 className="text-xs font-semibold text-foreground mb-3 flex items-center gap-2">
+            <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[9px] font-bold">3</span>
+            Payment Stage
+            <span className="text-[10px] text-muted-foreground font-normal ml-1">— highlights the row student must pay now</span>
+          </h2>
+          <div className="flex rounded-lg border border-border overflow-hidden">
+            {([null, 1, 2, 3] as const).map((stage, i) => {
+              const labels: Record<string, string> = { null: "None", "1": "1st Deposit", "2": "2nd Payment", "3": "3rd Payment" };
+              const active = highlightedPayment === stage;
+              return (
+                <button key={String(stage)} onClick={() => setHighlightedPayment(stage)}
+                  className={`flex-1 py-2 text-xs font-semibold transition-colors ${active ? "bg-red-600 text-white" : "text-muted-foreground hover:bg-accent"} ${i > 0 ? "border-l border-border" : ""}`}>
+                  {labels[String(stage)]}
+                </button>
+              );
+            })}
+          </div>
+          {highlightedPayment && (
+            <p className="mt-2 text-[10px] text-red-600 font-medium">
+              ● Payment {highlightedPayment} row will be highlighted red &amp; bold in the invoice
+            </p>
+          )}
+        </div>
+
+        {/* 4. Line items */}
         <div className="bg-card border border-border rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xs font-semibold text-foreground flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[9px] font-bold">3</span>
+              <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[9px] font-bold">4</span>
               Line Items
             </h2>
             <button onClick={syncSchedule} className="text-[10px] text-primary hover:underline">Sync schedule ↓</button>
@@ -498,10 +539,10 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
           </div>
         </div>
 
-        {/* 4. Payment schedule */}
+        {/* 5. Payment schedule */}
         <div className="bg-card border border-border rounded-lg p-4">
           <h2 className="text-xs font-semibold text-foreground mb-3 flex items-center gap-2">
-            <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[9px] font-bold">4</span>
+            <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[9px] font-bold">5</span>
             Payment Schedule
           </h2>
           <div className="space-y-1.5">
@@ -521,7 +562,7 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
         <div className="bg-card border border-border rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xs font-semibold text-foreground flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[9px] font-bold">5</span>
+              <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[9px] font-bold">6</span>
               Remarks
             </h2>
             <button onClick={addRemark} className="flex items-center gap-1 text-[10px] text-primary hover:underline">
@@ -550,7 +591,7 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
           <p className="text-xs text-muted-foreground">{selected ? `${invoiceNo} · ${selected.name}` : "Select a client"}</p>
         </div>
         <div className="border border-border rounded-xl overflow-hidden shadow-sm bg-white" style={{ minHeight: 600 }}>
-          <InvoicePreview invoiceNo={invoiceNo} date={today} clientName={selected?.name ?? ""} clientAddress={clientAddress} degreeLabel={degreeLabel} items={items} schedule={schedule} remarks={remarks.filter(r => r.trim())} />
+          <InvoicePreview invoiceNo={invoiceNo} date={today} clientName={selected?.name ?? ""} clientAddress={clientAddress} degreeLabel={degreeLabel} items={items} schedule={schedule} remarks={remarks.filter(r => r.trim())} highlightedPayment={highlightedPayment} />
         </div>
       </div>
     </div>
