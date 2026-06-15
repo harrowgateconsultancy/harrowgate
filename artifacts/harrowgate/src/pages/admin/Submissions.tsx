@@ -920,8 +920,8 @@ export default function Submissions() {
       {!isDetailPage && (<>
         <div className="mb-6 sm:mb-8">
           <div className="mb-4">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: GOLD }}>Student Submissions</h1>
-            <p className="text-sm" style={{ color: C.textMid }}>{submissions.length} total · {pendingCount} requiring action</p>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: "#f0d28c" }}>Student Submissions</h1>
+            <p className="text-sm" style={{ color: "rgba(162,137,89,0.75)" }}>{submissions.length} total · {pendingCount} requiring action</p>
           </div>
           <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {pendingCount > 0 && (
@@ -1151,7 +1151,7 @@ export default function Submissions() {
           {filterKeys.map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className="px-4 py-1.5 rounded-full text-xs font-semibold border transition-all shrink-0"
-              style={filter === f ? { background: GOLD, color: C.card, borderColor: GOLD } : { background: "transparent", color: C.textMid, borderColor: C.border }}>
+              style={filter === f ? { background: GOLD, color: "#0b2213", borderColor: GOLD } : { background: "transparent", color: "#c4a96e", borderColor: C.borderMed }}>
               {f === "all" ? "All" : (statusConfig[f]?.label || f)}
               {f !== "all" && <span className="ml-1.5 opacity-50">{submissions.filter(s => s.status === f).length}</span>}
             </button>
@@ -1163,7 +1163,7 @@ export default function Submissions() {
           <div className="flex items-center justify-between mb-4 px-1">
             <button onClick={toggleSelectAll}
               className="flex items-center gap-2 text-xs font-medium transition-opacity hover:opacity-70"
-              style={{ color: C.textMid }}>
+              style={{ color: "#c4a96e" }}>
               <div className="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
                 style={{
                   borderColor: selectedIds.size === filtered.length && filtered.length > 0 ? GOLD : C.borderMed,
@@ -1242,7 +1242,7 @@ export default function Submissions() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                      <span className="text-sm font-semibold" style={{ color: GOLD }}>{s.name}</span>
+                      <span className="text-sm font-semibold" style={{ color: "#f0d28c" }}>{s.name}</span>
                       {hasAction && (
                         <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
                           style={{ background: "rgba(251,146,60,0.1)", color: "#fb923c" }}>
@@ -1256,9 +1256,9 @@ export default function Submissions() {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-xs flex-wrap" style={{ color: C.textFaint }}>
+                    <div className="flex items-center gap-3 text-xs flex-wrap" style={{ color: "rgba(162,137,89,0.68)" }}>
                       {s.email && <span className="truncate max-w-[180px]">{s.email}</span>}
-                      <span className="font-mono">{s.passportNumber}</span>
+                      <span className="font-mono" style={{ color: "#c4a96e" }}>{s.passportNumber}</span>
                       <span>{docCount} doc{docCount !== 1 ? "s" : ""}</span>
                       <span>{new Date(s.createdAt).toLocaleDateString("en-GB")}</span>
                     </div>
@@ -1303,7 +1303,7 @@ export default function Submissions() {
                     {sc.label}
                   </span>
                   <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5"
-                    style={{ color: C.textFaint }}>
+                    style={{ color: "rgba(162,137,89,0.50)" }}>
                     <path fillRule="evenodd" d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z" clipRule="evenodd" />
                   </svg>
                 </div>
