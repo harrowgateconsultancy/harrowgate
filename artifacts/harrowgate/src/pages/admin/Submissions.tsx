@@ -1395,7 +1395,7 @@ export default function Submissions() {
                   onClick={() => openLiveView(selected.id)}
                   title="Live View — mirror student's portal"
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all hover:opacity-80"
-                  style={{ borderColor: C.borderMed, color: "#1F7D53", background: C.muted }}
+                  style={{ borderColor: "rgba(162,137,89,0.35)", color: "#c4a96e", background: "rgba(162,137,89,0.08)" }}
                 >
                   <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5"><circle cx="8" cy="8" r="2.5"/><path fillRule="evenodd" d="M8 2C4.5 2 1.5 4.5 0 8c1.5 3.5 4.5 6 8 6s6.5-2.5 8-6c-1.5-3.5-4.5-6-8-6zm0 10a4 4 0 110-8 4 4 0 010 8z" clipRule="evenodd"/></svg>
                   Live View
@@ -1421,12 +1421,12 @@ export default function Submissions() {
             {/* ── Tab navigation ── */}
             <div className="flex border-b shrink-0" style={{ borderColor: C.borderFaint, background: C.subtle }}>
               {([
-                { id: "overview",  label: "Overview",  icon: "📋" },
-                { id: "documents", label: "Docs",      icon: "📁" },
-                { id: "workflow",  label: "Workflow",  icon: "⚡" },
-                { id: "messages",  label: "Messages",  icon: "💬" },
-                { id: "settings",  label: "Settings",  icon: "🔧" },
-              ] as { id: string; label: string; icon: string }[]).map(tab => {
+                { id: "overview",  label: "Overview",  svg: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg> },
+                { id: "documents", label: "Docs",      svg: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3M5 7h6M5 10h6M5 13h3"/></svg> },
+                { id: "workflow",  label: "Workflow",  svg: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="13" r="1.5"/><circle cx="13" cy="8" r="1.5"/><path d="M4.5 8h7M8 4.5v7"/></svg> },
+                { id: "messages",  label: "Messages",  svg: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M2 3h12a1 1 0 011 1v7a1 1 0 01-1 1H5l-3 2V4a1 1 0 011-1z"/></svg> },
+                { id: "settings",  label: "Settings",  svg: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.22 3.22l1.41 1.41M11.37 11.37l1.41 1.41M3.22 12.78l1.41-1.41M11.37 4.63l1.41-1.41"/></svg> },
+              ] as { id: string; label: string; svg: React.ReactNode }[]).map(tab => {
                 const isActive = detailTab === tab.id;
                 const badge =
                   tab.id === "documents" ? (selected.documents.length || null) :
@@ -1437,11 +1437,11 @@ export default function Submissions() {
                   <button key={tab.id}
                     onClick={() => setDetailTab(tab.id as typeof detailTab)}
                     className="relative flex-1 flex flex-col items-center py-2.5 gap-0.5 text-xs font-medium transition-colors"
-                    style={{ color: isActive ? GOLD : C.textFaint, borderBottom: `2px solid ${isActive ? GOLD : "transparent"}` }}>
-                    <span className="text-sm leading-none">{tab.icon}</span>
+                    style={{ color: isActive ? "#f0d28c" : C.textFaint, borderBottom: `2px solid ${isActive ? "#f0d28c" : "transparent"}` }}>
+                    <span className="leading-none">{tab.svg}</span>
                     <span className="leading-none">{tab.label}</span>
                     {(badge && badge > 0) ? (
-                      <span className="absolute top-1 right-2 text-[9px] font-bold px-1 rounded-full leading-4" style={{ background: GOLD, color: C.card }}>{badge}</span>
+                      <span className="absolute top-1 right-2 text-[9px] font-bold px-1 rounded-full leading-4" style={{ background: "#f0d28c", color: C.card }}>{badge}</span>
                     ) : dot ? (
                       <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full" style={{ background: "#fb923c" }} />
                     ) : null}
@@ -1543,25 +1543,33 @@ export default function Submissions() {
                 {(selected.interviewZoomLink || selected.interviewDateTime || selected.uniInterviewLink || selected.uniInterviewDateTime || selected.additionalDocsRequestNote || selected.adminNotes) && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.border }}>
                     <div className="px-4 py-3 border-b" style={{ borderColor: C.borderFaint }}>
-                      <p className="text-sm font-semibold" style={{ color: GOLD }}>📋 Application History</p>
+                      <p className="flex items-center gap-2 text-sm font-semibold" style={{ color: GOLD }}>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="2" y="1" width="12" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h3"/></svg>
+                        Application History
+                      </p>
                     </div>
                     <div className="px-4 py-4 space-y-4">
 
                       {/* Mock Interview */}
                       {(selected.interviewZoomLink || selected.interviewDateTime) && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#c4a96e" }}>🎥 Mock Interview</p>
+                          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#c4a96e" }}>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="4" width="10" height="8" rx="1.5"/><path d="M11 7l4-2v6l-4-2"/></svg>
+                            Mock Interview
+                          </p>
                           <div className="space-y-1.5">
                             {selected.interviewDateTime && (
                               <div className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
-                                <span>📅</span><span>{selected.interviewDateTime}</span>
+                                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="2" width="14" height="13" rx="1.5"/><path d="M5 1v2M11 1v2M1 6h14"/></svg>
+                                <span>{selected.interviewDateTime}</span>
                               </div>
                             )}
                             {selected.interviewZoomLink && (
                               <a href={selected.interviewZoomLink} target="_blank" rel="noopener noreferrer"
                                 className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm hover:opacity-80 transition-opacity truncate"
                                 style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
-                                <span>🔗</span><span className="truncate">{selected.interviewZoomLink}</span>
+                                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M6.5 9.5a4.24 4.24 0 005.99.01l2-2a4.24 4.24 0 00-6-6L7 3"/><path d="M9.5 6.5a4.24 4.24 0 00-5.99-.01l-2 2a4.24 4.24 0 006 6L9 13"/></svg>
+                                <span className="truncate">{selected.interviewZoomLink}</span>
                               </a>
                             )}
                           </div>
@@ -1571,20 +1579,23 @@ export default function Submissions() {
                       {/* University Interview */}
                       {(selected.uniInterviewLink || selected.uniInterviewDateTime) && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#c4a96e" }}>
-                            🏫 University Interview{selected.uniInterviewPlatform ? ` · ${selected.uniInterviewPlatform === "zoom" ? "Zoom" : "Teams"}` : ""}
+                          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#c4a96e" }}>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 14V7l6-5 6 5v7"/><path d="M6 14v-4h4v4"/><path d="M1 7h14"/></svg>
+                            University Interview{selected.uniInterviewPlatform ? ` · ${selected.uniInterviewPlatform === "zoom" ? "Zoom" : "Teams"}` : ""}
                           </p>
                           <div className="space-y-1.5">
                             {selected.uniInterviewDateTime && (
                               <div className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
-                                <span>📅</span><span>{selected.uniInterviewDateTime}</span>
+                                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="2" width="14" height="13" rx="1.5"/><path d="M5 1v2M11 1v2M1 6h14"/></svg>
+                                <span>{selected.uniInterviewDateTime}</span>
                               </div>
                             )}
                             {selected.uniInterviewLink && (
                               <a href={selected.uniInterviewLink} target="_blank" rel="noopener noreferrer"
                                 className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm hover:opacity-80 transition-opacity truncate"
                                 style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
-                                <span>🔗</span><span className="truncate">{selected.uniInterviewLink}</span>
+                                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M6.5 9.5a4.24 4.24 0 005.99.01l2-2a4.24 4.24 0 00-6-6L7 3"/><path d="M9.5 6.5a4.24 4.24 0 00-5.99-.01l-2 2a4.24 4.24 0 006 6L9 13"/></svg>
+                                <span className="truncate">{selected.uniInterviewLink}</span>
                               </a>
                             )}
                           </div>
@@ -1594,7 +1605,10 @@ export default function Submissions() {
                       {/* Additional Docs Request */}
                       {selected.additionalDocsRequestNote && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#f97316" }}>📎 Additional Docs Requested</p>
+                          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#f97316" }}>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M10.5 2.5a2.5 2.5 0 013.54 3.54L5.5 14.55a3.5 3.5 0 01-4.95-4.95L9 1.1"/></svg>
+                            Additional Docs Requested
+                          </p>
                           <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.15)", color: "#fb923c" }}>
                             {selected.additionalDocsRequestNote}
                           </div>
@@ -1604,7 +1618,10 @@ export default function Submissions() {
                       {/* Admin notes read-only preview */}
                       {selected.adminNotes && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: C.textSec }}>📝 Last Note to Student</p>
+                          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: C.textSec }}>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="2" y="1" width="12" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h3"/></svg>
+                            Last Note to Student
+                          </p>
                           <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: C.muted, borderColor: C.border, color: C.textDark }}>
                             {selected.adminNotes}
                           </div>
@@ -1642,9 +1659,10 @@ export default function Submissions() {
                 {/* Save Notes */}
                 <button onClick={() => updateStatus.mutate({ id: selected.id, status: selected.status, adminNotes: notes })}
                   disabled={updateStatus.isPending}
-                  className="w-full py-2.5 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-50"
-                  style={{ borderColor: C.border, color: C.textMid }}>
-                  Save Notes
+                  className="w-full py-2.5 rounded-xl text-xs font-semibold border transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{ borderColor: "rgba(162,137,89,0.40)", color: "#c4a96e", background: "rgba(162,137,89,0.08)" }}>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5"><path d="M2 10V13h11V10"/><path d="M8 1v8M5 6l3 3 3-3"/></svg>
+                  {updateStatus.isPending ? "Saving…" : "Save Notes"}
                 </button>
                 </div>)}
 

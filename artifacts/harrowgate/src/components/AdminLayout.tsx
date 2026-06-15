@@ -7,9 +7,9 @@ import { AdminThemeProvider, useAdminTheme } from "@/contexts/AdminThemeContext"
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function getRoleDisplay(role: string) {
-  if (role === "admin")   return { label: "Super Admin",  color: "#1F7D53", bg: "rgba(31,125,83,0.12)" };
-  if (role === "manager") return { label: "Manager",      color: "#1F7D53", bg: "rgba(31,125,83,0.12)" };
-  return                         { label: "Staff",        color: "#60a5fa", bg: "rgba(96,165,250,0.12)"  };
+  if (role === "admin")   return { label: "Super Admin",  color: "#f0d28c", bg: "rgba(162,137,89,0.15)" };
+  if (role === "manager") return { label: "Manager",      color: "#c4a96e", bg: "rgba(162,137,89,0.12)" };
+  return                         { label: "Staff",        color: "#a28959", bg: "rgba(162,137,89,0.10)"  };
 }
 
 const ALL_NAV_ITEMS = [
