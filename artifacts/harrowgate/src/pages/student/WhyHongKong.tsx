@@ -411,19 +411,24 @@ export default function WhyHongKong() {
       </nav>
 
       {/* ── Hero ── */}
-      <section style={{ position: "relative", overflow: "hidden", padding: "5rem 1.5rem 4rem" }}>
+      <section style={{ position: "relative", overflow: "hidden", padding: "4rem 0 4rem" }}>
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
           <div style={{ position: "absolute", top: "-20%", left: "50%", transform: "translateX(-50%)", width: "900px", height: "600px", background: "radial-gradient(ellipse, rgba(162,137,89,0.09) 0%, transparent 70%)" }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, rgba(162,137,89,0.3) 30%, rgba(162,137,89,0.3) 70%, transparent)` }} />
         </div>
 
-        <div className="max-w-4xl mx-auto text-center" style={{ position: "relative", zIndex: 1 }}>
-          <Link href="/" className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase mb-8"
-            style={{ color: GOLD_DIM, letterSpacing: "0.2em" }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
-            {t("whyhk.back")}
+        {/* BACK — top-left */}
+        <div className="px-5 lg:px-10 xl:px-16" style={{ position: "relative", zIndex: 2, marginBottom: "2rem" }}>
+          <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase"
+            style={{ color: GOLD_DIM, letterSpacing: "0.18em", transition: "color 0.2s" }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
+            onMouseEnter={e => (e.currentTarget.style.color = GOLD_BRIGHT)}
+            onMouseLeave={e => (e.currentTarget.style.color = GOLD_DIM)}>
+            ← BACK
           </Link>
+        </div>
 
+        <div className="max-w-5xl mx-auto text-center px-5 lg:px-10" style={{ position: "relative", zIndex: 1 }}>
           <div className="fade-up inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border mb-8"
             style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.25)", animationDelay: "0ms" }}>
             <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ background: "#4ade80" }} />
@@ -464,8 +469,8 @@ export default function WhyHongKong() {
       </section>
 
       {/* ── Quick Stats ── */}
-      <section style={{ background: "rgba(0,0,0,0.2)", padding: "3rem 1.5rem", borderTop: `1px solid ${GOLD_FAINT}`, borderBottom: `1px solid ${GOLD_FAINT}` }}>
-        <div className="max-w-5xl mx-auto">
+      <section style={{ background: "rgba(0,0,0,0.2)", padding: "3rem 0", borderTop: `1px solid ${GOLD_FAINT}`, borderBottom: `1px solid ${GOLD_FAINT}` }}>
+        <div className="max-w-screen-xl mx-auto px-5 lg:px-10 xl:px-16">
           <p style={{ textAlign: "center", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: "1.75rem" }}>
             {t("whyhk.glance")}
           </p>
@@ -476,8 +481,8 @@ export default function WhyHongKong() {
       </section>
 
       {/* ── Advantages ── */}
-      <section style={{ padding: "5rem 1.5rem" }}>
-        <div className="max-w-6xl mx-auto">
+      <section style={{ padding: "5rem 0" }}>
+        <div className="max-w-screen-xl mx-auto px-5 lg:px-10 xl:px-16">
           <div className="text-center mb-12">
             <p style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: "0.75rem" }}>
               {t("whyhk.reasons")}
@@ -531,9 +536,9 @@ export default function WhyHongKong() {
       {/* ── CTA ── */}
       <section style={{
         background: "rgba(0,0,0,0.25)", borderTop: `1px solid ${GOLD_FAINT}`,
-        padding: "5rem 1.5rem",
+        padding: "5rem 0",
       }}>
-        <div className="max-w-2xl mx-auto text-center">
+        <div className="max-w-2xl mx-auto text-center px-5 lg:px-10">
           <p style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: "1rem" }}>
             {t("whyhk.cta.label")}
           </p>
