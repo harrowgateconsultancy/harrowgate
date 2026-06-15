@@ -966,13 +966,24 @@ export default function Portal() {
               {showLangPicker && (
                 <div className="absolute top-full right-0 mt-1.5 rounded-xl border shadow-2xl z-[100] overflow-hidden"
                   style={{ background: "#0a1f0e", borderColor: "rgba(162,137,89,0.2)", minWidth: 152 }}>
-                  {LANG_LIST.map(l => (
-                    <button key={l.code} onClick={() => { setLang(l.code); setShowLangPicker(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 text-xs transition-all hover:opacity-90"
-                      style={{ background: l.code === lang ? "rgba(162,137,89,0.12)" : "transparent", color: l.code === lang ? GOLD : "rgba(162,137,89,0.55)" }}>
-                      <span className="text-sm">{l.flag}</span> {l.name}
-                    </button>
-                  ))}
+                  {LANG_LIST.map(l => {
+                    const isSel = l.code === lang;
+                    return (
+                      <button key={l.code} onClick={() => { setLang(l.code); setShowLangPicker(false); }}
+                        className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-medium transition-all"
+                        onMouseEnter={e => { if (!isSel) { (e.currentTarget as HTMLButtonElement).style.background = "rgba(196,169,110,0.15)"; (e.currentTarget as HTMLButtonElement).style.color = "#f0d28c"; } }}
+                        onMouseLeave={e => { if (!isSel) { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; (e.currentTarget as HTMLButtonElement).style.color = "rgba(232,218,180,0.65)"; } }}
+                        style={{
+                          background: isSel ? "rgba(196,169,110,0.2)" : "transparent",
+                          color: isSel ? "#f0d28c" : "rgba(232,218,180,0.65)",
+                          fontWeight: isSel ? 700 : 500,
+                          borderLeft: isSel ? "2px solid #c4a96e" : "2px solid transparent",
+                        }}>
+                        <span className="text-sm">{l.flag}</span> {l.name}
+                        {isSel && <svg viewBox="0 0 10 8" fill="none" className="w-2.5 h-2.5 ml-auto shrink-0"><path d="M1 4l2.5 2.5L9 1" stroke="#f0d28c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
