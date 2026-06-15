@@ -1368,7 +1368,7 @@ export default function Portal() {
                           <p className="text-sm font-bold" style={{ color: "#f0d28c" }}>🇭🇰 {t("portal.immigRef")}</p>
                           <p className="text-xs mt-0.5" style={{ color: "rgba(240,210,140,0.5)" }}>{t("portal.immigRefSub")}</p>
                         </div>
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.35)" }}><svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5"><path d="M2 7l3.5 3.5 6.5-7" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(196,169,110,0.5)" }}><svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5"><path d="M2 7l3.5 3.5 6.5-7" stroke="#f0d28c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                       </div>
                       <div className="px-5 py-5">
                         <p className="font-mono text-3xl font-bold tracking-widest" style={{ color: "#f0d28c", letterSpacing: "0.12em" }}>{submission.immigrationRefNumber}</p>
