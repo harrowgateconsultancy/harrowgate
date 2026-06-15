@@ -51,43 +51,51 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   offer_letter_pending:            { label: "Offer Letter Sent",      color: "#c4a96e",   bg: "rgba(162,137,89,0.10)" },
   final_payment_received:          { label: "Final Receipt Received", color: "#c4a96e",   bg: "rgba(162,137,89,0.12)"  },
   final_payment_confirmed:         { label: "Final Payment Done",     color: "#f0d28c",   bg: "rgba(162,137,89,0.12)"  },
-  visa_issued:                     { label: "e-Visa Issued 🎉",       color: "#f0d28c",   bg: "rgba(162,137,89,0.12)"  },
+  visa_issued:                     { label: "e-Visa Issued",          color: "#f0d28c",   bg: "rgba(162,137,89,0.12)"  },
   rejected:                        { label: "Rejected",              color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
-const nextActions: Record<string, { label: string; nextStatus: string; color: string; icon: string }[]> = {
+const IC = {
+  check:    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  clip:     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M10.5 2.5a2.5 2.5 0 013.54 3.54L5.5 14.55a3.5 3.5 0 01-4.95-4.95L9 1.1" strokeLinecap="round"/></svg>,
+  x:        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 shrink-0"><path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round"/></svg>,
+  card:     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 7h14"/></svg>,
+  undo:     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M4 7H10a4 4 0 010 8H6" strokeLinecap="round"/><path d="M4 4L1 7l3 3" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+};
+
+const nextActions: Record<string, { label: string; nextStatus: string; color: string; icon: React.ReactNode }[]> = {
   pending: [
-    { label: "Approve",                   nextStatus: "approved",        color: "#f0d28c", icon: "✅" },
-    { label: "Request Additional Docs",   nextStatus: "docs_requested",  color: "#fb923c", icon: "📎" },
-    { label: "Reject",                    nextStatus: "rejected",        color: "#f87171", icon: "✕" },
+    { label: "Approve",                   nextStatus: "approved",        color: "#f0d28c", icon: IC.check },
+    { label: "Request Additional Docs",   nextStatus: "docs_requested",  color: "#fb923c", icon: IC.clip  },
+    { label: "Reject",                    nextStatus: "rejected",        color: "#f87171", icon: IC.x     },
   ],
   approved: [
-    { label: "Request Payment",           nextStatus: "payment_pending", color: "#fb923c", icon: "💳" },
+    { label: "Request Payment",           nextStatus: "payment_pending", color: "#fb923c", icon: IC.card  },
   ],
   docs_requested: [
-    { label: "Approve",                   nextStatus: "approved",        color: "#f0d28c", icon: "✅" },
-    { label: "Reject",                    nextStatus: "rejected",        color: "#f87171", icon: "✕" },
+    { label: "Approve",                   nextStatus: "approved",        color: "#f0d28c", icon: IC.check },
+    { label: "Reject",                    nextStatus: "rejected",        color: "#f87171", icon: IC.x     },
   ],
   rejected: [
-    { label: "Unreject — Move to Pending", nextStatus: "pending",        color: "#d97706", icon: "↩" },
+    { label: "Unreject — Move to Pending", nextStatus: "pending",        color: "#d97706", icon: IC.undo  },
   ],
   payment_received: [
-    { label: "Confirm Payment & Acknowledge", nextStatus: "acknowledged", color: "#c4a96e", icon: "✅" },
+    { label: "Confirm Payment & Acknowledge", nextStatus: "acknowledged", color: "#c4a96e", icon: IC.check },
   ],
   interview_arranged: [],
   interview_completed: [
-    { label: "Request 2nd Payment", nextStatus: "second_payment_pending", color: "#fb923c", icon: "💳" },
+    { label: "Request 2nd Payment", nextStatus: "second_payment_pending", color: "#fb923c", icon: IC.card },
   ],
   second_payment_pending: [],
   second_payment_received: [
-    { label: "Confirm 2nd Payment", nextStatus: "second_payment_confirmed", color: "#f0d28c", icon: "✅" },
+    { label: "Confirm 2nd Payment", nextStatus: "second_payment_confirmed", color: "#f0d28c", icon: IC.check },
   ],
   second_payment_confirmed: [],
   university_interview_arranged: [],
   university_interview_completed: [],
   offer_letter_pending: [],
   final_payment_received: [
-    { label: "Confirm Final Payment", nextStatus: "final_payment_confirmed", color: "#f0d28c", icon: "✅" },
+    { label: "Confirm Final Payment", nextStatus: "final_payment_confirmed", color: "#f0d28c", icon: IC.check },
   ],
   final_payment_confirmed: [],
   visa_issued: [],
@@ -97,7 +105,11 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
 
 function isImage(f: string, m?: string | null) { return m?.startsWith("image/") || /\.(jpe?g|png|gif|webp)$/i.test(f); }
 function isPdf(f: string, m?: string | null) { return m === "application/pdf" || /\.pdf$/i.test(f); }
-function fileIcon(f: string, m?: string | null) { return isPdf(f, m) ? "📄" : isImage(f, m) ? "🖼️" : "📎"; }
+function fileIcon(f: string, m?: string | null): React.ReactNode {
+  if (isPdf(f, m))   return <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3M5 9h6M5 12h3"/></svg>;
+  if (isImage(f, m)) return <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="2" width="14" height="12" rx="1.5"/><circle cx="5.5" cy="6.5" r="1.5"/><path d="M1 11l4-4 3 3 2-2 5 5"/></svg>;
+  return               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M10.5 2.5a2.5 2.5 0 013.54 3.54L5.5 14.55a3.5 3.5 0 01-4.95-4.95L9 1.1" strokeLinecap="round"/></svg>;
+}
 function calcAge(dob: string): number | null {
   if (!dob) return null;
   const born = new Date(dob);
@@ -182,7 +194,7 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
     <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: pending.length > 0 ? "rgba(251,146,60,0.35)" : C.border }}>
       <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: pending.length > 0 ? "rgba(251,146,60,0.2)" : C.borderFaint }}>
         <div className="flex items-center gap-2">
-          <span>📤</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0" style={{ color: pending.length > 0 ? "#fb923c" : "#a28959" }}><path d="M2 10V13h11V10" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 9V1M5 4l3-3 3 3" strokeLinecap="round" strokeLinejoin="round"/></svg>
           <p className="text-sm font-semibold" style={{ color: pending.length > 0 ? "#fb923c" : GOLD }}>Student Outbox</p>
           {pending.length > 0 && (
             <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(251,146,60,0.18)", color: "#fb923c" }}>
@@ -224,14 +236,14 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
                     disabled={approveMutation.isPending || rejectMutation.isPending}
                     className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all hover:opacity-80 disabled:opacity-40"
                     style={{ background: "rgba(162,137,89,0.15)", color: "#f0d28c", border: "1px solid rgba(162,137,89,0.25)" }}>
-                    {approveMutation.isPending ? "Sending…" : "✓ Approve & Send"}
+                    {approveMutation.isPending ? "Sending…" : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5 inline-block mr-1"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Approve & Send</>}
                   </button>
                   <button
                     onClick={() => { if (!rejectMutation.isPending) rejectMutation.mutate(item.id); }}
                     disabled={approveMutation.isPending || rejectMutation.isPending}
-                    className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all hover:opacity-80 disabled:opacity-40"
+                    className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all hover:opacity-80 disabled:opacity-40 flex items-center gap-1"
                     style={{ background: "rgba(248,113,113,0.08)", color: "#f87171", border: "1px solid rgba(248,113,113,0.2)" }}>
-                    ✕ Discard
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5 shrink-0"><path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round"/></svg>Discard
                   </button>
                 </div>
               )}
@@ -247,10 +259,10 @@ export default function Submissions() {
   const { isDark } = useAdminTheme();
 
   const C = {
-    card: "#0c1410",
-    subtle: "#111812",
-    muted: "rgba(162,137,89,0.05)",
-    softBlue: "#0e1510",
+    card: "#0f2d18",
+    subtle: "#163320",
+    muted: "rgba(162,137,89,0.06)",
+    softBlue: "#163320",
     border: "rgba(162,137,89,0.12)",
     borderFaint: "rgba(162,137,89,0.08)",
     borderMed: "rgba(162,137,89,0.22)",
@@ -913,20 +925,23 @@ export default function Submissions() {
           </div>
           <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {pendingCount > 0 && (
-              <div className="px-4 py-2 rounded-full text-sm font-semibold" style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
-                ⚡ {pendingCount} need{pendingCount !== 1 ? "" : "s"} your attention
+              <div className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold" style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M9 2L4 9h5l-2 5 7-7H9l2-5z" strokeLinejoin="round"/></svg>
+                {pendingCount} need{pendingCount !== 1 ? "" : "s"} your attention
               </div>
             )}
             {!soundEnabled ? (
               <button onClick={() => { unlockAudio(); setSoundEnabled(true); localStorage.setItem("admin_sound_enabled", "true"); }}
                 className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
                 style={{ borderColor: C.borderMed, color: C.textSec, background: C.muted }}>
-                🔔 Enable Sound Alerts
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M8 14a1 1 0 002 0H6a1 1 0 002 0z"/><path d="M8 2a5 5 0 00-5 5v3l-1 1h12l-1-1V7a5 5 0 00-5-5z"/></svg>
+                Enable Sound Alerts
               </button>
             ) : (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
                 style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}>
-                🔔 Sound alerts on
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M8 14a1 1 0 002 0H6a1 1 0 002 0z"/><path d="M8 2a5 5 0 00-5 5v3l-1 1h12l-1-1V7a5 5 0 00-5-5z"/></svg>
+                Sound alerts on
               </div>
             )}
             <button onClick={() => setShowCourses(true)}
@@ -938,12 +953,14 @@ export default function Submissions() {
             <button onClick={() => setShowPricing(v => !v)}
               className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
               style={{ borderColor: showPricing ? C.textFaint : C.borderMed, color: GOLD, background: showPricing ? C.muted : C.subtle }}>
-              💰 Pricing
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6h2a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3H9" strokeLinecap="round"/></svg>
+              Pricing
             </button>
             <button onClick={() => setShowTrash(v => !v)}
               className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
               style={{ borderColor: showTrash ? "rgba(248,113,113,0.35)" : C.borderMed, color: showTrash ? "#f87171" : C.textMuted, background: showTrash ? "rgba(248,113,113,0.08)" : C.subtle }}>
-              🗑 Trash
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M3 5h10M6 5V3h4v2M13 5l-1 8H4L3 5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Trash
             </button>
             <button onClick={() => { localStorage.removeItem("admin_token"); window.location.href = "/admin/login"; }}
               className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
@@ -970,7 +987,7 @@ export default function Submissions() {
             <div className="px-6 py-4 border-b flex items-center justify-between gap-3" style={{ borderColor: C.border }}>
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
-                  style={{ background: C.subtle, color: GOLD }}>💰</div>
+                  style={{ background: C.subtle, color: GOLD }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6h2a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3H9" strokeLinecap="round"/></svg></div>
                 <div>
                   <p className="text-sm font-bold" style={{ color: GOLD }}>Package Pricing</p>
                   <p className="text-xs" style={{ color: C.textMuted }}>
@@ -1056,7 +1073,7 @@ export default function Submissions() {
               <button onClick={savePricing} disabled={pricingSaving}
                 className="flex items-center gap-2 text-xs font-bold px-5 py-2.5 rounded-xl border transition-all hover:opacity-80 disabled:opacity-40"
                 style={{ borderColor: pricingSaved ? "rgba(162,137,89,0.40)" : C.borderMed, color: pricingSaved ? "#f0d28c" : GOLD, background: pricingSaved ? "rgba(162,137,89,0.08)" : C.muted }}>
-                {pricingSaving ? "Saving…" : pricingSaved ? "✓ Saved" : "💾 Save Pricing"}
+                {pricingSaving ? "Saving…" : pricingSaved ? <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5 inline-block mr-1"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Saved</> : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1"><path d="M2 11V13h11V11M8 1v8M5 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round"/></svg>Save Pricing</>}
               </button>
             </div>
           </div>
@@ -1067,7 +1084,7 @@ export default function Submissions() {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: "rgba(248,113,113,0.1)", color: "#f87171" }}>🗑</div>
+                style={{ background: "rgba(248,113,113,0.1)", color: "#f87171" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M3 5h10M6 5V3h4v2M13 5l-1 8H4L3 5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
               <div>
                 <p className="text-sm font-bold" style={{ color: "#f87171" }}>Trash</p>
                 <p className="text-xs" style={{ color: "#ef4444" }}>
@@ -1077,7 +1094,7 @@ export default function Submissions() {
               <button onClick={loadTrash} disabled={trashLoading}
                 className="ml-auto text-xs font-medium px-3 py-1.5 rounded-full border transition-all hover:opacity-80 disabled:opacity-40"
                 style={{ borderColor: "rgba(248,113,113,0.2)", color: "#ef4444" }}>
-                {trashLoading ? "Loading…" : "↻ Refresh"}
+                {trashLoading ? "Loading…" : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1"><path d="M14 8A6 6 0 112 8" strokeLinecap="round"/><path d="M14 4v4h-4" strokeLinecap="round" strokeLinejoin="round"/></svg>Refresh</>}
               </button>
             </div>
 
@@ -1087,7 +1104,7 @@ export default function Submissions() {
 
             {!trashLoading && trashItems.length === 0 && (
               <div className="text-center py-16 rounded-2xl border" style={{ borderColor: "rgba(248,113,113,0.1)", background: "rgba(248,113,113,0.02)" }}>
-                <p className="text-3xl mb-3">🗑</p>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-12 h-12 mx-auto mb-3" style={{ color: "#ef4444", opacity: 0.4 }}><path d="M4 7h16M9 7V4h6v3M19 7l-1 12H6L5 7" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 <p className="text-sm font-semibold" style={{ color: "#ef4444" }}>Trash is empty</p>
               </div>
             )}
@@ -1111,9 +1128,9 @@ export default function Submissions() {
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <button onClick={() => restoreFromTrash(item.id)}
-                      className="text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all hover:opacity-80"
+                      className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all hover:opacity-80"
                       style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#f0d28c" }}>
-                      ↩ Restore
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M4 7H10a4 4 0 010 8H6" strokeLinecap="round"/><path d="M4 4L1 7l3 3" strokeLinecap="round" strokeLinejoin="round"/></svg>Restore
                     </button>
                     <button onClick={() => setPermDeleteConfirmId(item.id)}
                       className="text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all hover:opacity-80"
@@ -1166,12 +1183,12 @@ export default function Submissions() {
                 <button onClick={handleBulkExport}
                   className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all hover:opacity-80"
                   style={{ background: C.muted, borderColor: C.borderMed, color: GOLD }}>
-                  ↓ Export
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 10V13h11V10" strokeLinecap="round"/><path d="M8 1v8M5 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round"/></svg>Export
                 </button>
                 <button onClick={() => setDeleteConfirmOpen(true)}
                   className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all hover:opacity-80"
                   style={{ background: "rgba(248,113,113,0.06)", borderColor: "rgba(248,113,113,0.22)", color: "#f87171" }}>
-                  🗑 Move to Trash
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M3 5h10M6 5V3h4v2M13 5l-1 8H4L3 5" strokeLinecap="round" strokeLinejoin="round"/></svg>Move to Trash
                 </button>
               </div>
             )}
@@ -1181,7 +1198,7 @@ export default function Submissions() {
         {isLoading && <div className="text-center py-20"><div className="w-8 h-8 rounded-full border-2 animate-spin mx-auto mb-3" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /></div>}
         {!isLoading && filtered.length === 0 && (
           <div className="text-center py-20 rounded-2xl border" style={{ borderColor: C.borderFaint }}>
-            <p className="text-4xl mb-3">📭</p>
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-12 h-12 mx-auto mb-3" style={{ color: "#a28959", opacity: 0.3 }}><rect x="4" y="8" width="40" height="32" rx="3"/><path d="M4 18l20 12 20-12"/><path d="M4 30h8M36 30h8" strokeLinecap="round"/></svg>
             <p className="text-sm" style={{ color: C.textFaint }}>No submissions</p>
           </div>
         )}
@@ -1227,15 +1244,15 @@ export default function Submissions() {
                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                       <span className="text-sm font-semibold" style={{ color: GOLD }}>{s.name}</span>
                       {hasAction && (
-                        <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                        <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
                           style={{ background: "rgba(251,146,60,0.1)", color: "#fb923c" }}>
-                          ⚡ Action needed
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3 shrink-0"><path d="M9 2L4 9h5l-2 5 7-7H9l2-5z" strokeLinejoin="round"/></svg>Action needed
                         </span>
                       )}
                       {s.additionalDocsRequested && (
-                        <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                        <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
                           style={{ background: "rgba(251,146,60,0.08)", color: "#fb923c" }}>
-                          📎 Docs Requested
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3 shrink-0"><path d="M10.5 2.5a2.5 2.5 0 013.54 3.54L5.5 14.55a3.5 3.5 0 01-4.95-4.95L9 1.1" strokeLinecap="round"/></svg>Docs Requested
                         </span>
                       )}
                     </div>
@@ -1253,7 +1270,7 @@ export default function Submissions() {
                       onClick={e => e.stopPropagation()}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shrink-0 transition-all hover:opacity-80"
                       style={{ borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e", background: "rgba(162,137,89,0.06)" }}>
-                      💳 Receipt ↗
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 7h14"/></svg>Receipt
                     </a>
                   )}
                   {(() => {
@@ -1261,13 +1278,13 @@ export default function Submissions() {
                     if (state === "added") return (
                       <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 border"
                         style={{ borderColor: "rgba(162,137,89,0.25)", color: "#f0d28c", background: "rgba(162,137,89,0.08)" }}>
-                        ✓ Added
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Added
                       </span>
                     );
                     if (state === "exists") return (
                       <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 border"
                         style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}>
-                        ✓ In Clients
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>In Clients
                       </span>
                     );
                     return (
@@ -1276,7 +1293,7 @@ export default function Submissions() {
                         disabled={state === "adding"}
                         className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border shrink-0 transition-all hover:opacity-80 disabled:opacity-50"
                         style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD, background: "rgba(162,137,89,0.07)" }}>
-                        {state === "adding" ? "…" : "👤 Add to Clients"}
+                        {state === "adding" ? "…" : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.31 2.69-5 6-5s6 1.69 6 5" strokeLinecap="round"/></svg>Add to Clients</>}
                       </button>
                     );
                   })()}
@@ -1473,7 +1490,7 @@ export default function Submissions() {
                       <iframe src={viewUrl(previewDoc)} className="w-full rounded-xl" style={{ height: 420, border: "none" }} title={previewDoc.fileName} />
                     ) : (
                       <div className="flex flex-col items-center justify-center py-12 gap-4">
-                        <span className="text-5xl">📎</span>
+                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-12 h-12" style={{ color: "#a28959", opacity: 0.4 }}><path d="M31 7.5a7.5 7.5 0 0110.6 10.6L16 43.7A10.5 10.5 0 011.4 29L27 4" strokeLinecap="round"/></svg>
                         <a href={downloadUrl(previewDoc)} download={previewDoc.fileName}
                           className="px-5 py-2 rounded-full text-sm font-semibold" style={{ background: GOLD, color: C.card }}>
                           ↓ Download to view
@@ -1529,7 +1546,7 @@ export default function Submissions() {
                       style={{ background: C.muted, borderColor: C.borderMed, color: GOLD }}>
                       {uploadingDoc
                         ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin inline-block" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Uploading…</>
-                        : <>📎 Choose file…</>}
+                        : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M10.5 2.5a2.5 2.5 0 013.54 3.54L5.5 14.55a3.5 3.5 0 01-4.95-4.95L9 1.1" strokeLinecap="round"/></svg>Choose file…</>}
                     </button>
                     <input ref={adminFileRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
                       onChange={e => { const f = e.target.files?.[0]; if (f) handleAdminUpload(f); }} />
@@ -1672,7 +1689,7 @@ export default function Submissions() {
                 {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
                     <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: C.border }}>
-                      <span>✉️</span>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.08)", color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg></div>
                       <div>
                         <p className="text-sm font-semibold" style={{ color: GOLD }}>Shared Application Email</p>
                         <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>Gmail account shared between you and the student for HK university applications</p>
@@ -1742,7 +1759,7 @@ export default function Submissions() {
                 {!["pending","rejected"].includes(selected.status) && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
                     <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: C.border }}>
-                      <span>🎓</span>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.08)", color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M8 2L1 6l7 4 7-4-7-4z" strokeLinejoin="round"/><path d="M3 8v4c0 1.1 2.24 2 5 2s5-.9 5-2V8" strokeLinecap="round"/></svg></div>
                       <div>
                         <p className="text-sm font-semibold" style={{ color: GOLD }}>Programme Type</p>
                         <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>Assign a programme level — filters the payment amounts shown to this student.</p>
@@ -1751,8 +1768,8 @@ export default function Submissions() {
                     <div className="px-4 py-4 space-y-3">
                       {selected.programmeType && (
                         <div className="rounded-xl px-4 py-2 border" style={{ background: C.muted, borderColor: "rgba(162,137,89,0.20)" }}>
-                          <p className="text-xs font-semibold" style={{ color: "#f0d28c" }}>
-                            ✓ Currently assigned: {
+                          <p className="text-xs font-semibold flex items-center gap-1" style={{ color: "#f0d28c" }}>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Currently assigned: {
                               selected.programmeType === "masters" ? "Master's Degree"
                               : selected.programmeType === "bachelor" ? "Bachelor's Degree"
                               : selected.programmeType === "associate" ? "Associate Degree"
@@ -1801,7 +1818,7 @@ export default function Submissions() {
                 {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
                     <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: C.border }}>
-                      <span>🏦</span>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.08)", color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M2 14h12M3 14V8M6 14V8M10 14V8M13 14V8M8 2l6 4H2l6-4z" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                       <div>
                         <p className="text-sm font-semibold" style={{ color: GOLD }}>Dedicated Bank Account</p>
                         <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>Override the global bank details for this student. Shown on their payment page immediately.</p>
@@ -1810,7 +1827,7 @@ export default function Submissions() {
                     <div className="px-4 py-4 space-y-3">
                       {selected.customBankDetails && (selected.customBankDetails.bankName || selected.customBankDetails.accountNumber) && (
                         <div className="rounded-xl px-4 py-3 border space-y-1.5" style={{ background: C.muted, borderColor: "rgba(162,137,89,0.20)" }}>
-                          <p className="text-xs font-semibold mb-2" style={{ color: "#f0d28c" }}>✓ Custom account active</p>
+                          <p className="text-xs font-semibold mb-2 flex items-center gap-1" style={{ color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Custom account active</p>
                           {selected.customBankDetails.bankName && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Bank</span><span className="font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.bankName}</span></div>}
                           {selected.customBankDetails.accountName && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Account Name</span><span className="font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.accountName}</span></div>}
                           {selected.customBankDetails.accountNumber && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Account No.</span><span className="font-mono font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.accountNumber}</span></div>}
@@ -1868,7 +1885,7 @@ export default function Submissions() {
                 {/* Empty state when no workflow panels apply */}
                 {!["acknowledged","interview_arranged","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
                   <div className="rounded-2xl border px-5 py-10 text-center" style={{ background: "rgba(31,125,83,0.03)", borderColor: C.borderFaint }}>
-                    <p className="text-2xl mb-2">⏳</p>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-8 h-8 mx-auto mb-2" style={{ color: "#a28959", opacity: 0.35 }}><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     <p className="text-sm font-medium" style={{ color: C.textMuted }}>No workflow actions yet</p>
                     <p className="text-xs mt-1.5" style={{ color: C.textFaint }}>Actions will appear here as the application progresses past the payment stage.</p>
                   </div>
@@ -1877,9 +1894,9 @@ export default function Submissions() {
                 {selected.status === "acknowledged" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.18)" }}>
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>🎥 Mock Interview</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M1 4.5a1 1 0 011-1h8a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1v-7z"/><path d="M11 7l4-2.5v7L11 9"/></svg>Mock Interview</p>
                       {inviteSent === selected.id && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}>✓ Invite sent</span>
+                        <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Invite sent</span>
                       )}
                     </div>
                     <div className="px-4 py-4">
@@ -1888,13 +1905,13 @@ export default function Submissions() {
                           <button onClick={() => setInterviewForm({ zoomLink: "", dateTime: "", notes: "" })}
                             className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
                             style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e" }}>
-                            🎥 Schedule Mock Interview
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M1 4.5a1 1 0 011-1h8a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1v-7z"/><path d="M11 7l4-2.5v7L11 9"/></svg>Schedule Mock Interview
                           </button>
                           <button onClick={() => { if (confirm("Skip the mock interview and proceed directly to 2nd payment?")) updateStatus.mutate({ id: selected.id, status: "interview_completed", adminNotes: notes }); }}
                             disabled={updateStatus.isPending}
-                            className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                            className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
                             style={{ background: C.muted, borderColor: C.border, color: C.textSec }}>
-                            ⏭ Skip Mock Interview
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip Mock Interview
                           </button>
                         </div>
                       ) : (
@@ -1927,7 +1944,7 @@ export default function Submissions() {
                             <button onClick={handleSendInvite} disabled={sendingInvite || !interviewForm.zoomLink || !interviewForm.dateTime}
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
                               style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(162,137,89,0.30)", color: "#c4a96e" }}>
-                              {sendingInvite ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Zoom Invite"}
+                              {sendingInvite ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} /> Sending…</> : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Send Zoom Invite</>}
                             </button>
                             <button onClick={() => setInterviewForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
@@ -1945,31 +1962,31 @@ export default function Submissions() {
                 {selected.status === "interview_arranged" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
                     <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>🎥 Mock Interview — Arranged</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M1 4.5a1 1 0 011-1h8a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1v-7z"/><path d="M11 7l4-2.5v7L11 9"/></svg>Mock Interview — Arranged</p>
                     </div>
                     <div className="px-4 py-4 space-y-3">
                       {selected.interviewDateTime && (
                         <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
-                          📅 {selected.interviewDateTime}
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1.5 align-middle shrink-0"><rect x="1" y="2" width="14" height="13" rx="1.5"/><path d="M1 6h14M5 2v4M11 2v4" strokeLinecap="round"/></svg>{selected.interviewDateTime}
                         </div>
                       )}
                       {selected.interviewZoomLink && (
                         <a href={selected.interviewZoomLink} target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm truncate hover:opacity-80 transition-opacity"
                           style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
-                          🔗 {selected.interviewZoomLink}
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M6 3H3a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1v-3M10 2h4v4M14 2l-6 6" strokeLinecap="round" strokeLinejoin="round"/></svg>{selected.interviewZoomLink}
                         </a>
                       )}
                       <button onClick={handleCompleteInterview}
                         className="w-full py-3 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 flex items-center justify-center gap-2"
                         style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
-                        ✅ Confirm Interview Completed
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Confirm Interview Completed
                       </button>
                       <button onClick={() => { if (confirm("Skip the mock interview and proceed to 2nd payment stage?")) updateStatus.mutate({ id: selected.id, status: "interview_completed", adminNotes: notes }); }}
                         disabled={updateStatus.isPending}
-                        className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                        className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
                         style={{ background: C.muted, borderColor: C.border, color: C.textSec }}>
-                        ⏭ Skip Mock Interview
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip Mock Interview
                       </button>
                     </div>
                   </div>
@@ -1979,7 +1996,7 @@ export default function Submissions() {
                 {selected.status === "second_payment_received" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
                     <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>💳 2nd Payment Receipt Received</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 7h14"/></svg>2nd Payment Receipt Received</p>
                     </div>
                     <div className="px-4 py-3">
                       <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>
@@ -1993,9 +2010,9 @@ export default function Submissions() {
                 {selected.status === "second_payment_confirmed" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>🏫 University Interview</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M1 13h14M3 13V5M6 13V5M10 13V5M13 13V5M8 1l6 4H2l6-4z" strokeLinecap="round" strokeLinejoin="round"/></svg>University Interview</p>
                       {uniInviteSent === selected.id && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}>✓ Invite sent</span>
+                        <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Invite sent</span>
                       )}
                     </div>
                     <div className="px-4 py-4">
@@ -2004,13 +2021,13 @@ export default function Submissions() {
                           <button onClick={() => setUniInterviewForm({ platform: "zoom", link: "", dateTime: "", notes: "" })}
                             className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
                             style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e" }}>
-                            🏫 Schedule University Interview
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M1 13h14M3 13V5M6 13V5M10 13V5M13 13V5M8 1l6 4H2l6-4z" strokeLinecap="round" strokeLinejoin="round"/></svg>Schedule University Interview
                           </button>
                           <button onClick={() => { if (confirm("Skip the university interview and proceed directly to offer letter stage?")) updateStatus.mutate({ id: selected.id, status: "university_interview_completed", adminNotes: notes }); }}
                             disabled={updateStatus.isPending}
-                            className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
+                            className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
                             style={{ background: C.muted, borderColor: C.border, color: C.textSec }}>
-                            ⏭ Skip University Interview
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip University Interview
                           </button>
                         </div>
                       ) : (
@@ -2026,7 +2043,7 @@ export default function Submissions() {
                                     borderColor: uniInterviewForm.platform === p ? "rgba(162,137,89,0.40)" : "rgba(162,137,89,0.12)",
                                     color: "#c4a96e",
                                   }}>
-                                  {p === "zoom" ? "🎥 Zoom" : "💼 Teams"}
+                                  {p === "zoom" ? <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1"><path d="M1 4.5a1 1 0 011-1h8a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1v-7z"/><path d="M11 7l4-2.5v7L11 9"/></svg>Zoom</> : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M6 8h4M8 6v4" strokeLinecap="round"/></svg>Teams</>}
                                 </button>
                               ))}
                             </div>
@@ -2059,7 +2076,7 @@ export default function Submissions() {
                             <button onClick={handleSendUniInvite} disabled={sendingUniInvite || !uniInterviewForm.link || !uniInterviewForm.dateTime}
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
                               style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(162,137,89,0.30)", color: "#c4a96e" }}>
-                              {sendingUniInvite ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Interview Invite"}
+                              {sendingUniInvite ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} /> Sending…</> : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Send Interview Invite</>}
                             </button>
                             <button onClick={() => setUniInterviewForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
@@ -2077,9 +2094,9 @@ export default function Submissions() {
                 {selected.status === "university_interview_completed" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#0f2d18", borderColor: "#1F7D53" }}>
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "rgba(31,125,83,0.18)", borderColor: "rgba(31,125,83,0.35)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>🎓 Upload Offer Letter</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c8aa7c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M8 2L1 6l7 4 7-4-7-4z" strokeLinejoin="round"/><path d="M3 8v4c0 1.1 2.24 2 5 2s5-.9 5-2V8" strokeLinecap="round"/></svg>Upload Offer Letter</p>
                       {offerLetterSent === selected.id && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(31,125,83,0.25)", color: "#1F7D53" }}>✓ Sent to student</span>
+                        <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(31,125,83,0.25)", color: "#1F7D53" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Sent to student</span>
                       )}
                     </div>
                     <div className="px-4 py-4 space-y-3">
@@ -2091,7 +2108,7 @@ export default function Submissions() {
                         style={{ background: "rgba(31,125,83,0.10)", borderColor: "#1F7D53", borderStyle: "dashed", color: "#c8aa7c" }}>
                         {offerLetterUploading
                           ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#1F7D53", borderTopColor: "transparent" }} /> Uploading…</>
-                          : <>📄 Choose Offer Letter File…</>}
+                          : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3"/></svg>Choose Offer Letter File…</>}
                       </button>
                       <input ref={offerLetterFileRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                         onChange={e => { const f = e.target.files?.[0]; if (f) handleUploadOfferLetter(f); }} />
@@ -2103,7 +2120,7 @@ export default function Submissions() {
                 {selected.status === "offer_letter_pending" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#0f2d18", borderColor: "#1F7D53" }}>
                     <div className="px-4 py-3 border-b" style={{ background: "rgba(31,125,83,0.18)", borderColor: "rgba(31,125,83,0.35)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>🎓 Offer Letter Sent</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c8aa7c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M8 2L1 6l7 4 7-4-7-4z" strokeLinejoin="round"/><path d="M3 8v4c0 1.1 2.24 2 5 2s5-.9 5-2V8" strokeLinecap="round"/></svg>Offer Letter Sent</p>
                     </div>
                     <div className="px-4 py-3">
                       <p className="text-xs font-medium" style={{ color: "rgba(31,125,83,0.80)" }}>
@@ -2117,7 +2134,7 @@ export default function Submissions() {
                 {selected.status === "final_payment_received" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
                     <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>💳 Final Payment Receipt Received</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 7h14"/></svg>Final Payment Receipt Received</p>
                     </div>
                     <div className="px-4 py-3">
                       <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>
@@ -2132,7 +2149,7 @@ export default function Submissions() {
                   <>
                     <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
                       <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                        <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>✅ Final Payment Confirmed</p>
+                        <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Final Payment Confirmed</p>
                       </div>
                       <div className="px-4 py-3">
                         <p className="text-xs" style={{ color: "rgba(162,137,89,0.50)" }}>
@@ -2143,7 +2160,7 @@ export default function Submissions() {
                     {/* Immigration Reference Number */}
                     <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
                       <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
-                        <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>🇭🇰 Immigration Reference Number</p>
+                        <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="2" width="14" height="12" rx="1.5"/><path d="M4 6h8M4 9h5" strokeLinecap="round"/></svg>Immigration Reference Number</p>
                         <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Assign the official EOEN-XXXXXXX-XX reference number visible to the student</p>
                       </div>
                       <div className="px-4 py-4 space-y-3">
@@ -2175,7 +2192,7 @@ export default function Submissions() {
                     <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
                       <button className="w-full px-4 py-3 flex items-center justify-between" onClick={() => setId995aOpen(v => !v)}>
                         <div className="flex items-center gap-2">
-                          <span className="text-base">🇭🇰</span>
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0" style={{ color: GOLD }}><rect x="1" y="2" width="14" height="12" rx="1.5"/><path d="M4 6h8M4 9h5" strokeLinecap="round"/></svg>
                           <span className="text-sm font-semibold" style={{ color: GOLD }}>ID995A — Hong Kong Immigration Form</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -2198,9 +2215,9 @@ export default function Submissions() {
                     {selected.status === "final_payment_confirmed" && (
                       <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.25)" }}>
                         <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                          <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>🛂 Upload e-Visa (HK Immigration)</p>
+                          <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="2" width="14" height="12" rx="1.5"/><path d="M4 6h8M4 9h5" strokeLinecap="round"/><path d="M11 8l2 2-2 2" strokeLinecap="round" strokeLinejoin="round"/></svg>Upload e-Visa (HK Immigration)</p>
                           {eVisaSent === selected.id && (
-                            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}>✓ Sent to student</span>
+                            <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Sent to student</span>
                           )}
                         </div>
                         <div className="px-4 py-4 space-y-3">
@@ -2212,7 +2229,7 @@ export default function Submissions() {
                             style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#f0d28c", borderStyle: "dashed" }}>
                             {eVisaUploading
                               ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#f0d28c", borderTopColor: "transparent" }} /> Uploading…</>
-                              : <>🛂 Choose e-Visa File…</>}
+                              : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="2" width="14" height="12" rx="1.5"/><path d="M4 6h8M4 9h5" strokeLinecap="round"/></svg>Choose e-Visa File…</>}
                           </button>
                           <input ref={eVisaFileRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png"
                             onChange={e => { const f = e.target.files?.[0]; if (f) handleUploadEVisa(f); }} />
@@ -2224,7 +2241,7 @@ export default function Submissions() {
                     {selected.status === "visa_issued" && (
                       <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.30)" }}>
                         <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                          <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>🎉 e-Visa Issued to Student</p>
+                          <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4 shrink-0"><circle cx="8" cy="8" r="6"/><path d="M5 8l2 2 4-4" strokeLinecap="round" strokeLinejoin="round"/></svg>e-Visa Issued to Student</p>
                         </div>
                         <div className="px-4 py-3">
                           <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>
@@ -2241,7 +2258,7 @@ export default function Submissions() {
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
                     <button className="w-full px-4 py-3 flex items-center justify-between" onClick={() => setLettersOpen(v => !v)}>
                       <div className="flex items-center gap-2">
-                        <span className="text-base">✉️</span>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0" style={{ color: GOLD }}><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>
                         <span className="text-sm font-semibold" style={{ color: GOLD }}>Immigration Letters</span>
                         {lettersData?.generatedAt && (
                           <span className="text-xs px-2 py-0.5 rounded-full font-medium ml-1" style={{ background: "rgba(162,137,89,0.12)", color: "#f0d28c" }}>Generated</span>
@@ -2302,7 +2319,11 @@ export default function Submissions() {
                           className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-50"
                           style={{ background: "#e2e8f0", borderColor: C.borderMed, color: GOLD }}
                         >
-                          {generatingLetters ? "⏳ Generating letters via AI…" : lettersData ? "🔄 Regenerate All 4 Letters" : "✨ Generate All 4 Letters"}
+                          {generatingLetters
+                            ? <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1.5 animate-spin"><circle cx="8" cy="8" r="6" strokeOpacity="0.25"/><path d="M8 2a6 6 0 016 6" strokeLinecap="round"/></svg>Generating letters via AI…</>
+                            : lettersData
+                              ? <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1.5"><path d="M14 8A6 6 0 112 8" strokeLinecap="round"/><path d="M14 4v4h-4" strokeLinecap="round" strokeLinejoin="round"/></svg>Regenerate All 4 Letters</>
+                              : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1.5"><path d="M8 2v12M2 8h12" strokeLinecap="round"/></svg>Generate All 4 Letters</>}
                         </button>
 
                         {/* Generated letters */}
@@ -2354,24 +2375,26 @@ export default function Submissions() {
                 {selected.status === "university_interview_arranged" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
                     <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>🏫 University Interview — Arranged</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M1 13h14M3 13V5M6 13V5M10 13V5M13 13V5M8 1l6 4H2l6-4z" strokeLinecap="round" strokeLinejoin="round"/></svg>University Interview — Arranged</p>
                     </div>
                     <div className="px-4 py-4 space-y-3">
                       {selected.uniInterviewPlatform && (
                         <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
-                          {selected.uniInterviewPlatform === "teams" ? "💼 Microsoft Teams" : "🎥 Zoom"}
+                          {selected.uniInterviewPlatform === "teams"
+                            ? <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1.5 align-middle"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M6 8h4M8 6v4" strokeLinecap="round"/></svg>Microsoft Teams</>
+                            : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1.5 align-middle"><path d="M1 4.5a1 1 0 011-1h8a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1v-7z"/><path d="M11 7l4-2.5v7L11 9"/></svg>Zoom</>}
                         </div>
                       )}
                       {selected.uniInterviewDateTime && (
                         <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
-                          📅 {selected.uniInterviewDateTime}
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1.5 align-middle shrink-0"><rect x="1" y="2" width="14" height="13" rx="1.5"/><path d="M1 6h14M5 2v4M11 2v4" strokeLinecap="round"/></svg>{selected.uniInterviewDateTime}
                         </div>
                       )}
                       {selected.uniInterviewLink && (
                         <a href={selected.uniInterviewLink} target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm truncate hover:opacity-80 transition-opacity"
                           style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
-                          🔗 {selected.uniInterviewLink}
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M6 3H3a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1v-3M10 2h4v4M14 2l-6 6" strokeLinecap="round" strokeLinejoin="round"/></svg>{selected.uniInterviewLink}
                         </a>
                       )}
                       <p className="text-xs text-center py-1" style={{ color: "rgba(240,210,140,0.45)" }}>
@@ -2385,7 +2408,7 @@ export default function Submissions() {
                 {selected.status !== "rejected" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#0f2d18", borderColor: "rgba(31,125,83,0.55)" }}>
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "rgba(31,125,83,0.15)", borderColor: "rgba(31,125,83,0.30)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>📎 Additional Documents</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c8aa7c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>Additional Documents</p>
                       {selected.additionalDocsRequested && (
                         <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#1F7D53", color: "#255F38" }}>Pending student response</span>
                       )}
@@ -2403,7 +2426,7 @@ export default function Submissions() {
                         <button onClick={() => setAdditionalDocsForm({ note: "" })}
                           className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
                           style={{ background: "rgba(31,125,83,0.10)", borderColor: "rgba(31,125,83,0.45)", color: "#c8aa7c" }}>
-                          📎 {selected.additionalDocsRequested ? "Send Another Request" : "Request Additional Documents"}
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>{selected.additionalDocsRequested ? "Send Another Request" : "Request Additional Documents"}
                         </button>
                       ) : (
                         <div className="space-y-3">
@@ -2419,7 +2442,7 @@ export default function Submissions() {
                             <button onClick={handleRequestAdditionalDocs} disabled={sendingAdditionalDocs}
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
                               style={{ background: "#1F7D53", borderColor: "#8a7245", color: "#255F38" }}>
-                              {sendingAdditionalDocs ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#255F38", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Request"}
+                              {sendingAdditionalDocs ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#255F38", borderTopColor: "transparent" }} /> Sending…</> : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Send Request</>}
                             </button>
                             <button onClick={() => setAdditionalDocsForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
@@ -2440,7 +2463,7 @@ export default function Submissions() {
                 {selected.status !== "rejected" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#255F38", borderColor: "rgba(31,125,83,0.45)" }}>
                     <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "rgba(31,125,83,0.12)", borderColor: "rgba(31,125,83,0.25)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#c8aa7c" }}>✉️ Message Student</p>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c8aa7c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Message Student</p>
                       {messageSent === selected.id && !messageForm && (
                         <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(31,125,83,0.22)", color: "#1F7D53" }}>✓ Sent</span>
                       )}
@@ -2474,7 +2497,7 @@ export default function Submissions() {
                                     <a key={i} href={`${getApiBase()}/api/storage/objects/${att.fileUrl}`} target="_blank" rel="noopener noreferrer"
                                       className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-medium hover:opacity-80 transition-opacity"
                                       style={{ borderColor: "rgba(31,125,83,0.35)", color: "#c8aa7c", background: "rgba(31,125,83,0.10)" }}>
-                                      📎 {att.fileName}
+                                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3 shrink-0 inline-block mr-0.5"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>{att.fileName}
                                     </a>
                                   ))}
                                 </div>
@@ -2487,7 +2510,7 @@ export default function Submissions() {
                         <button onClick={() => setMessageForm({ subject: "Message from HARROWGATE", body: "", attachments: [] })}
                           className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
                           style={{ background: "rgba(31,125,83,0.10)", borderColor: "rgba(31,125,83,0.40)", color: "#c8aa7c" }}>
-                          ✉️ Compose New Message
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Compose New Message
                         </button>
                       ) : (
                         <div className="space-y-2">
@@ -2506,7 +2529,7 @@ export default function Submissions() {
                               {messageForm.attachments.map((att, i) => (
                                 <div key={i} className="flex items-center gap-1 px-2 py-1 rounded-lg border text-xs"
                                   style={{ borderColor: "rgba(31,125,83,0.25)", color: "#1F7D53", background: "rgba(31,125,83,0.07)" }}>
-                                  📎 {att.fileName}
+                                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3 shrink-0 inline-block mr-0.5"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>{att.fileName}
                                   <button onClick={() => setMessageForm(f => f ? { ...f, attachments: f.attachments.filter((_, j) => j !== i) } : f)}
                                     className="ml-1 hover:opacity-70" style={{ color: "#f87171" }}>✕</button>
                                 </div>
@@ -2517,12 +2540,12 @@ export default function Submissions() {
                             <button onClick={handleSendMessage} disabled={sendingMessage || !messageForm.body.trim()}
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
                               style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(162,137,89,0.30)", color: "#c4a96e" }}>
-                              {sendingMessage ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Message"}
+                              {sendingMessage ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} /> Sending…</> : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Send Message</>}
                             </button>
                             <button onClick={() => { msgAttachmentRef.current?.click(); }} disabled={uploadingMsgAttachment}
                               className="px-3 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70 disabled:opacity-40"
                               style={{ borderColor: "rgba(162,137,89,0.18)", color: "#c4a96e" }}>
-                              {uploadingMsgAttachment ? "…" : "📎"}
+                              {uploadingMsgAttachment ? "…" : <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>}
                             </button>
                             <button onClick={() => setMessageForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
@@ -2550,7 +2573,7 @@ export default function Submissions() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}>
           <div className="rounded-2xl border overflow-hidden max-w-sm w-full mx-4" style={{ background: C.card, borderColor: "rgba(248,113,113,0.3)" }}>
             <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(248,113,113,0.12)" }}>
-              <p className="text-base font-bold" style={{ color: "#f87171" }}>🗑 Move {selectedIds.size} Profile{selectedIds.size !== 1 ? "s" : ""} to Trash?</p>
+              <p className="text-base font-bold flex items-center gap-2" style={{ color: "#f87171" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9" strokeLinecap="round" strokeLinejoin="round"/></svg>Move {selectedIds.size} Profile{selectedIds.size !== 1 ? "s" : ""} to Trash?</p>
             </div>
             <div className="px-6 py-5">
               <p className="text-sm mb-6 leading-relaxed" style={{ color: C.textSec }}>
@@ -2567,7 +2590,7 @@ export default function Submissions() {
                   style={{ background: "rgba(248,113,113,0.08)", borderColor: "rgba(248,113,113,0.3)", color: "#f87171" }}>
                   {deletingSelected
                     ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#f87171", borderTopColor: "transparent" }} /> Moving…</>
-                    : `🗑 Move to Trash`}
+                    : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9" strokeLinecap="round" strokeLinejoin="round"/></svg>Move to Trash</>}
                 </button>
               </div>
             </div>
@@ -2580,7 +2603,7 @@ export default function Submissions() {
         <div className="fixed inset-0 z-[110] flex items-center justify-center" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(6px)" }}>
           <div className="rounded-2xl border overflow-hidden max-w-sm w-full mx-4" style={{ background: C.card, borderColor: "rgba(248,113,113,0.5)" }}>
             <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(248,113,113,0.18)" }}>
-              <p className="text-base font-bold" style={{ color: "#f87171" }}>⚠️ Permanently Delete?</p>
+              <p className="text-base font-bold flex items-center gap-2" style={{ color: "#f87171" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M8 3v5M8 10v2" strokeLinecap="round"/><path d="M1.5 13L8 2l6.5 11H1.5z" strokeLinejoin="round"/></svg>Permanently Delete?</p>
             </div>
             <div className="px-6 py-5">
               <p className="text-sm mb-6 leading-relaxed" style={{ color: C.textSec }}>
@@ -2878,7 +2901,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
           <button onClick={handleSave} disabled={saving}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border font-medium transition-all hover:opacity-80 disabled:opacity-40"
             style={{ borderColor: "rgba(162,137,89,0.30)", color: "#f0d28c", background: "rgba(162,137,89,0.06)" }}>
-            {saving ? "Saving…" : saved ? "✓ Saved" : "💾 Save"}
+            {saving ? "Saving…" : saved ? "✓ Saved" : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1"><path d="M3 1h8l3 3v10a1 1 0 01-1 1H3a1 1 0 01-1-1V2a1 1 0 011-1z"/><path d="M10 1v4H5V1M4 9h8" strokeLinecap="round" strokeLinejoin="round"/></svg>Save</>}
           </button>
         </div>
       </div>
@@ -2920,7 +2943,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
         <button onClick={handleSave} disabled={saving}
           className="text-xs px-4 py-2 rounded-lg border font-semibold transition-all hover:opacity-80 disabled:opacity-40"
           style={{ borderColor: "rgba(162,137,89,0.30)", color: "#f0d28c", background: "rgba(162,137,89,0.06)" }}>
-          {saving ? "Saving…" : saved ? "✓ Saved" : "💾 Save All Changes"}
+          {saving ? "Saving…" : saved ? "✓ Saved" : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1"><path d="M3 1h8l3 3v10a1 1 0 01-1 1H3a1 1 0 01-1-1V2a1 1 0 011-1z"/><path d="M10 1v4H5V1M4 9h8" strokeLinecap="round" strokeLinejoin="round"/></svg>Save All Changes</>}
         </button>
       </div>
     </div>

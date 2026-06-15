@@ -334,7 +334,7 @@ export default function Pricing() {
                 {/* Payment schedule */}
                 <div className="rounded-xl bg-muted border border-border p-4 mb-4">
                   <p className="text-[10px] font-bold tracking-widest uppercase text-foreground mb-3 flex items-center gap-1.5">
-                    <span style={{ color: tier.color }}>★</span> Balance Payment Schedule
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0" style={{ color: tier.color }}><path d="M8 2l1.8 3.6L14 6.5l-3 2.9.7 4.1L8 11.4l-3.7 1.9.7-4.1-3-2.9 4.2-.9z" strokeLinejoin="round"/></svg>Balance Payment Schedule
                   </p>
 
                   {/* First payment — fixed */}
@@ -382,7 +382,10 @@ export default function Pricing() {
                   {/* Balance indicator */}
                   <div className={`mt-3 pt-3 border-t border-border flex items-center justify-between gap-2 text-[11px] font-semibold`}
                     style={{ color: ok ? "#f0d28c" : "#f87171" }}>
-                    <span>{ok ? "✓ Amounts balance" : "⚠ Don't balance"}</span>
+                    <span className="flex items-center gap-1.5">{ok
+                      ? <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Amounts balance</>
+                      : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M8 2L1 14h14L8 2z" strokeLinejoin="round"/><path d="M8 7v3M8 12v.5" strokeLinecap="round"/></svg>Don't balance</>
+                    }</span>
                     <span className="font-mono">
                       3k + {fmtNum(stage2Num)} + {fmtNum(stage3Num)} = {fmtNum(computedSum)}
                     </span>
@@ -392,7 +395,7 @@ export default function Pricing() {
                 {/* Per-card note */}
                 <div className="rounded-xl bg-muted border border-border px-3.5 py-3 mb-5">
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    💡 {tier.note}
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0 inline-block mr-1 align-middle"><circle cx="8" cy="8" r="6"/><path d="M8 7v4M8 5.5v.5" strokeLinecap="round"/></svg>{tier.note}
                   </p>
                 </div>
 

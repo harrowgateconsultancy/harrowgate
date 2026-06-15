@@ -79,14 +79,14 @@
   --card-foreground: 222 47% 11%;
   --card-border: 214 32% 91%;
   
-  /* Sidebar — near-black with gold accents */
-  --sidebar: 145 14% 8%;
-  --sidebar-foreground: 42 30% 80%;
-  --sidebar-border: 145 10% 6%;
+  /* Sidebar — matches student portal #0b2213 */
+  --sidebar: 141 51% 9%;
+  --sidebar-foreground: 42 35% 80%;
+  --sidebar-border: 141 45% 7%;
   --sidebar-primary: 44 54% 54%;
-  --sidebar-primary-foreground: 145 14% 8%;
-  --sidebar-accent: 145 12% 12%;
-  --sidebar-accent-foreground: 42 40% 88%;
+  --sidebar-primary-foreground: 141 51% 9%;
+  --sidebar-accent: 141 40% 13%;
+  --sidebar-accent-foreground: 42 45% 90%;
   --sidebar-ring: 44 54% 54%;
   
   --popover: 0 0% 100%;
@@ -135,13 +135,13 @@
   --card-foreground: 210 40% 98%;
   --card-border: 220 64% 20%;
   
-  --sidebar: 145 12% 6%;
-  --sidebar-foreground: 42 28% 76%;
-  --sidebar-border: 145 10% 5%;
+  --sidebar: 141 51% 8%;
+  --sidebar-foreground: 42 32% 78%;
+  --sidebar-border: 141 45% 6%;
   --sidebar-primary: 44 54% 54%;
-  --sidebar-primary-foreground: 145 12% 6%;
-  --sidebar-accent: 145 12% 10%;
-  --sidebar-accent-foreground: 42 38% 86%;
+  --sidebar-primary-foreground: 141 51% 8%;
+  --sidebar-accent: 141 40% 11%;
+  --sidebar-accent-foreground: 42 42% 88%;
   --sidebar-ring: 44 54% 54%;
   
   --popover: 220 64% 16%;

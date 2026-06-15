@@ -111,7 +111,7 @@ function EmailModal({ agent, onClose }: { agent: Agent; onClose: () => void }) {
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <div>
-            <p style={{ margin: 0, color: GOLD, fontWeight: 700, fontSize: 16 }}>✉ Send Email</p>
+            <p style={{ margin: 0, color: GOLD, fontWeight: 700, fontSize: 16, display: "flex", alignItems: "center", gap: 7 }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 15, height: 15, flexShrink: 0 }}><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Send Email</p>
             <p style={{ margin: "4px 0 0", color: "#9a8a6a", fontSize: 13 }}>
               To: <strong style={{ color: "#c9b99a" }}>{agent.email || "—"}</strong> ({agent.companyName})
             </p>
@@ -121,7 +121,7 @@ function EmailModal({ agent, onClose }: { agent: Agent; onClose: () => void }) {
 
         {sent ? (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
-            <p style={{ fontSize: 32, margin: "0 0 12px" }}>✅</p>
+            <div style={{ margin: "0 0 12px", display: "flex", justifyContent: "center" }}><svg viewBox="0 0 48 48" fill="none" stroke="#c4a96e" strokeWidth="2.5" style={{ width: 48, height: 48 }}><circle cx="24" cy="24" r="20"/><path d="M15 24l6 6 12-12" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
             <p style={{ color: "#c4a96e", fontWeight: 600, margin: "0 0 4px" }}>Email sent successfully!</p>
             <p style={{ color: "#9a8a6a", fontSize: 13, margin: "0 0 20px" }}>Your message has been delivered to {agent.email}.</p>
             <button onClick={onClose} style={{ background: "rgba(162,137,89,0.12)", border: `1px solid ${BORDER}`, color: GOLD, borderRadius: 8, padding: "8px 24px", cursor: "pointer", fontSize: 13 }}>
@@ -228,8 +228,8 @@ function AgentCard({
           onClick={() => setOpen(v => !v)}
           style={{ flex: 1, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, textAlign: "left", padding: 0, minWidth: 0 }}
         >
-          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(162,137,89,0.1)", border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
-            🏢
+          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(162,137,89,0.1)", border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#a28959" }}>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 18, height: 18 }}><rect x="2" y="3" width="16" height="15" rx="1.5"/><path d="M7 18V12h6v6"/><path d="M6 7h2M12 7h2M6 10h2M12 10h2"/></svg>
           </div>
           <div style={{ minWidth: 0, flex: 1 }}>
             <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: "#e8dcc8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{agent.companyName}</p>
@@ -252,18 +252,18 @@ function AgentCard({
             <button
               title={`Email ${agent.email}`}
               onClick={e => { e.stopPropagation(); onEmail(agent); }}
-              style={{ background: "rgba(162,137,89,0.08)", border: `1px solid ${BORDER}`, borderRadius: 7, padding: "5px 10px", color: GOLD, fontSize: 13, cursor: "pointer" }}
+              style={{ background: "rgba(162,137,89,0.08)", border: `1px solid ${BORDER}`, borderRadius: 7, padding: "5px 10px", color: GOLD, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center" }}
             >
-              ✉
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14 }}><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>
             </button>
           )}
           {/* Delete quick action */}
           <button
             title="Delete agent"
             onClick={e => { e.stopPropagation(); onDelete(agent); }}
-            style={{ background: "rgba(220,80,80,0.08)", border: "1px solid rgba(220,80,80,0.25)", borderRadius: 7, padding: "5px 10px", color: "#e07070", fontSize: 13, cursor: "pointer" }}
+            style={{ background: "rgba(220,80,80,0.08)", border: "1px solid rgba(220,80,80,0.25)", borderRadius: 7, padding: "5px 10px", color: "#e07070", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center" }}
           >
-            🗑
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14 }}><path d="M3 5h10M6 5V3h4v2M13 5l-1 8H4L3 5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
           <span
             onClick={() => setOpen(v => !v)}
@@ -303,13 +303,15 @@ function AgentCard({
             {agent.businessRegUrl ? (
               <a href={fileDownloadUrl(agent.businessRegUrl)} target="_blank" rel="noreferrer"
                 style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(162,137,89,0.08)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "7px 14px", color: GOLD, fontSize: 13, textDecoration: "none" }}>
-                📎 {agent.businessRegName || "Business Registration"}
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14, flexShrink: 0 }}><path d="M10.5 2.5a2.5 2.5 0 013.54 3.54L5.5 14.55a3.5 3.5 0 01-4.95-4.95L9 1.1" strokeLinecap="round"/></svg>
+                {agent.businessRegName || "Business Registration"}
               </a>
             ) : <span style={{ color: "#5a4a2a", fontSize: 13 }}>No business registration attached</span>}
             {agent.idDocUrl ? (
               <a href={fileDownloadUrl(agent.idDocUrl)} target="_blank" rel="noreferrer"
                 style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(162,137,89,0.08)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "7px 14px", color: GOLD, fontSize: 13, textDecoration: "none" }}>
-                🪪 {agent.idDocName || "ID / Passport"}
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14, flexShrink: 0 }}><rect x="1" y="3" width="14" height="10" rx="1.5"/><circle cx="5.5" cy="7" r="1.5"/><path d="M9 7h4M9 10h2"/></svg>
+                {agent.idDocName || "ID / Passport"}
               </a>
             ) : <span style={{ color: "#5a4a2a", fontSize: 13 }}>No ID document attached</span>}
           </div>
@@ -318,14 +320,14 @@ function AgentCard({
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             {agent.status !== "approved" && (
               <button onClick={() => updateStatus("approved")} disabled={updating}
-                style={{ background: "rgba(34,160,80,0.15)", border: "1px solid rgba(34,160,80,0.4)", color: "#c4a96e", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                ✓ Approve
+                style={{ background: "rgba(34,160,80,0.15)", border: "1px solid rgba(34,160,80,0.4)", color: "#c4a96e", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 14, height: 14, flexShrink: 0 }}><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Approve
               </button>
             )}
             {agent.status !== "rejected" && (
               <button onClick={() => updateStatus("rejected")} disabled={updating}
-                style={{ background: "rgba(220,50,50,0.1)", border: "1px solid rgba(220,50,50,0.35)", color: "#e07070", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                ✗ Reject
+                style={{ background: "rgba(220,50,50,0.1)", border: "1px solid rgba(220,50,50,0.35)", color: "#e07070", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 14, height: 14, flexShrink: 0 }}><path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round"/></svg>Reject
               </button>
             )}
             {agent.status !== "pending" && (
@@ -337,13 +339,13 @@ function AgentCard({
             <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
               {agent.email && (
                 <button onClick={() => onEmail(agent)}
-                  style={{ background: "rgba(162,137,89,0.1)", border: `1px solid ${BORDER}`, color: GOLD, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                  ✉ Send Email
+                  style={{ background: "rgba(162,137,89,0.1)", border: `1px solid ${BORDER}`, color: GOLD, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14, flexShrink: 0 }}><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Send Email
                 </button>
               )}
               <button onClick={() => onDelete(agent)}
-                style={{ background: "rgba(220,80,80,0.1)", border: "1px solid rgba(220,80,80,0.3)", color: "#e07070", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                🗑 Delete Agent
+                style={{ background: "rgba(220,80,80,0.1)", border: "1px solid rgba(220,80,80,0.3)", color: "#e07070", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14, flexShrink: 0 }}><path d="M3 5h10M6 5V3h4v2M13 5l-1 8H4L3 5" strokeLinecap="round" strokeLinejoin="round"/></svg>Delete Agent
               </button>
             </div>
           </div>
@@ -493,14 +495,15 @@ export default function AgentsPage() {
               onClick={deleteSelected}
               style={{ background: "rgba(220,80,80,0.12)", border: "1px solid rgba(220,80,80,0.4)", color: "#e07070", borderRadius: 20, padding: "6px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
             >
-              🗑 Delete {selected.size} selected
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14, flexShrink: 0 }}><path d="M3 5h10M6 5V3h4v2M13 5l-1 8H4L3 5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              Delete {selected.size} selected
             </button>
           )}
           <button
             onClick={load}
-            style={{ background: "none", border: `1px solid ${BORDER}`, borderRadius: 20, padding: "6px 14px", color: "#9a8a6a", fontSize: 13, cursor: "pointer" }}
+            style={{ background: "none", border: `1px solid ${BORDER}`, borderRadius: 20, padding: "6px 14px", color: "#9a8a6a", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
           >
-            ↻ Refresh
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, flexShrink: 0 }}><path d="M14 8A6 6 0 112 8" strokeLinecap="round"/><path d="M14 4v4h-4" strokeLinecap="round" strokeLinejoin="round"/></svg>Refresh
           </button>
         </div>
       </div>
