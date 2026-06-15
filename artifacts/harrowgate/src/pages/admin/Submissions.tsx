@@ -310,6 +310,7 @@ export default function Submissions() {
   const [settingRef, setSettingRef] = useState(false);
   const [refSetSuccess, setRefSetSuccess] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [addedToClients, setAddedToClients] = useState<Record<number, "adding" | "added" | "exists">>({});
   const [deletingSelected, setDeletingSelected] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [megaSyncing, setMegaSyncing] = useState(false);
@@ -739,6 +740,18 @@ export default function Submissions() {
   const toggleSelect = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  };
+
+  const handleAddToClients = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setAddedToClients(prev => ({ ...prev, [id]: "adding" }));
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${id}/add-to-clients`, { method: "POST" });
+      const data = await res.json();
+      setAddedToClients(prev => ({ ...prev, [id]: data.created ? "added" : "exists" }));
+    } catch {
+      setAddedToClients(prev => { const n = { ...prev }; delete n[id]; return n; });
+    }
   };
 
   const toggleSelectAll = () => {
@@ -1243,6 +1256,30 @@ export default function Submissions() {
                       💳 Receipt ↗
                     </a>
                   )}
+                  {(() => {
+                    const state = addedToClients[s.id];
+                    if (state === "added") return (
+                      <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 border"
+                        style={{ borderColor: "rgba(74,222,128,0.25)", color: "#4ade80", background: "rgba(74,222,128,0.07)" }}>
+                        ✓ Added
+                      </span>
+                    );
+                    if (state === "exists") return (
+                      <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 border"
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}>
+                        ✓ In Clients
+                      </span>
+                    );
+                    return (
+                      <button
+                        onClick={e => handleAddToClients(s.id, e)}
+                        disabled={state === "adding"}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border shrink-0 transition-all hover:opacity-80 disabled:opacity-50"
+                        style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD, background: "rgba(162,137,89,0.07)" }}>
+                        {state === "adding" ? "…" : "👤 Add to Clients"}
+                      </button>
+                    );
+                  })()}
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold shrink-0"
                     style={{ color: sc.color, background: sc.bg }}>
                     <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: sc.color }} />

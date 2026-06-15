@@ -599,4 +599,41 @@ router.post("/admin/student-submissions/:id/outbox/:emailId/reject", async (req:
   }
 });
 
+// Add a submission to the clients table (upsert by email or passport)
+router.post("/admin/student-submissions/:id/add-to-clients", async (req: any, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+
+    // Check if already exists by email (preferred) or passport number
+    let existing: { id: number }[] = [];
+    if (submission.email) {
+      existing = await db.select({ id: clientsTable.id })
+        .from(clientsTable).where(eq(clientsTable.email, submission.email)).limit(1);
+    }
+    if (!existing.length) {
+      existing = await db.select({ id: clientsTable.id })
+        .from(clientsTable).where(eq(clientsTable.passportNumber, submission.passportNumber)).limit(1);
+    }
+    if (existing.length) {
+      return res.json({ created: false, clientId: existing[0].id });
+    }
+
+    const [client] = await db.insert(clientsTable).values({
+      name: submission.name,
+      email: submission.email,
+      passportNumber: submission.passportNumber,
+      dateOfBirth: submission.dateOfBirth,
+      nationality: (submission as any).nationality ?? "—",
+    }).returning();
+
+    res.status(201).json({ created: true, clientId: client.id });
+  } catch (err) {
+    console.error("[add-to-clients]", err);
+    res.status(500).json({ error: "Failed to add to clients" });
+  }
+});
+
 export default router;
