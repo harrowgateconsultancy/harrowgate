@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Printer, RotateCcw, Send, CheckCircle, AlertCircle, Plus, Trash2, Receipt, FileText } from "lucide-react";
 import { useListClients } from "@workspace/api-client-react";
+import { useAdminTheme } from "../../contexts/AdminThemeContext";
 import { usePricing, DEFAULT_PRICING, type PricingConfig } from "../../hooks/usePricing";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -138,11 +139,16 @@ function ClientSelector({ clients, isLoading, selectedId, onSelect }: {
    STATUS TOAST
 ═══════════════════════════════════════════════════ */
 function SendStatus({ status, onClear }: { status: "idle" | "sending" | "sent" | "error"; msg?: string; onClear: () => void }) {
+  const { isDark } = useAdminTheme();
   if (status === "idle" || status === "sending") return null;
+  const ok = status === "sent";
+  const style: React.CSSProperties = ok
+    ? { background: isDark ? "rgba(52,211,153,0.10)" : "#f0fdf4", color: isDark ? "rgba(110,231,183,0.90)" : "#166534", border: `1px solid ${isDark ? "rgba(52,211,153,0.25)" : "#bbf7d0"}` }
+    : { background: isDark ? "rgba(248,113,113,0.10)" : "#fef2f2", color: isDark ? "#fca5a5" : "#991b1b", border: `1px solid ${isDark ? "rgba(248,113,113,0.25)" : "#fecaca"}` };
   return (
-    <div className={`flex items-center gap-2 px-4 py-2.5 rounded text-sm font-medium ${status === "sent" ? "bg-green-50 text-green-800 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
-      {status === "sent" ? <CheckCircle size={15} /> : <AlertCircle size={15} />}
-      <span>{status === "sent" ? "Email sent successfully!" : "Failed to send — check email credentials in Settings."}</span>
+    <div className="flex items-center gap-2 px-4 py-2.5 rounded text-sm font-medium" style={style}>
+      {ok ? <CheckCircle size={15} /> : <AlertCircle size={15} />}
+      <span>{ok ? "Email sent successfully!" : "Failed to send — check email credentials in Settings."}</span>
       <button onClick={onClear} className="ml-auto text-xs opacity-60 hover:opacity-100">✕</button>
     </div>
   );

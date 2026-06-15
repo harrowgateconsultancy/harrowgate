@@ -1,8 +1,24 @@
 import { useState, useEffect, useCallback } from "react";
+import { useAdminTheme } from "../../contexts/AdminThemeContext";
 
 const GOLD = "#a28959";
 const CARD = "#0c2217";
 const BORDER = "rgba(162,137,89,0.2)";
+
+function useAgentColors() {
+  const { isDark } = useAdminTheme();
+  return {
+    isDark,
+    card:    isDark ? CARD      : "#ffffff",
+    bdr:     isDark ? BORDER    : "rgba(0,0,0,0.09)",
+    bdrFaint:isDark ? "rgba(162,137,89,0.12)" : "rgba(0,0,0,0.06)",
+    text:    isDark ? "#e8dcc8" : "#0d1a3a",
+    textMid: isDark ? "#9a8a6a" : "rgba(0,0,0,0.52)",
+    textFaint:isDark ? "#5a4a2a" : "rgba(0,0,0,0.32)",
+    inputBg: isDark ? "rgba(255,255,255,0.04)" : "#f5f7f5",
+    subtleBg:isDark ? "rgba(162,137,89,0.04)" : "rgba(0,0,0,0.02)",
+  };
+}
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -47,15 +63,16 @@ function ConfirmDialog({
 }: {
   message: string; onConfirm: () => void; onCancel: () => void; danger?: boolean;
 }) {
+  const C = useAgentColors();
   return (
     <div style={{
       position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000,
       display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
     }}>
-      <div style={{ background: "#0c2217", border: `1px solid ${danger ? "rgba(220,80,80,0.4)" : BORDER}`, borderRadius: 14, padding: 28, maxWidth: 400, width: "100%" }}>
-        <p style={{ margin: "0 0 24px", color: "#e8dcc8", fontSize: 15, lineHeight: 1.5 }}>{message}</p>
+      <div style={{ background: C.card, border: `1px solid ${danger ? "rgba(220,80,80,0.4)" : C.bdr}`, borderRadius: 14, padding: 28, maxWidth: 400, width: "100%" }}>
+        <p style={{ margin: "0 0 24px", color: C.text, fontSize: 15, lineHeight: 1.5 }}>{message}</p>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button onClick={onCancel} style={{ background: "none", border: `1px solid ${BORDER}`, color: "#9a8a6a", borderRadius: 8, padding: "8px 20px", cursor: "pointer", fontSize: 13 }}>
+          <button onClick={onCancel} style={{ background: "none", border: `1px solid ${C.bdr}`, color: C.textMid, borderRadius: 8, padding: "8px 20px", cursor: "pointer", fontSize: 13 }}>
             Cancel
           </button>
           <button onClick={onConfirm} style={{ background: danger ? "rgba(220,80,80,0.15)" : "rgba(162,137,89,0.15)", border: `1px solid ${danger ? "rgba(220,80,80,0.5)" : GOLD}`, color: danger ? "#e07070" : GOLD, borderRadius: 8, padding: "8px 20px", cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
@@ -69,6 +86,7 @@ function ConfirmDialog({
 
 // ── Email Compose Modal ─────────────────────────────────────────────────────
 function EmailModal({ agent, onClose }: { agent: Agent; onClose: () => void }) {
+  const C = useAgentColors();
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
@@ -97,8 +115,8 @@ function EmailModal({ agent, onClose }: { agent: Agent; onClose: () => void }) {
   };
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", background: "rgba(255,255,255,0.04)", border: `1px solid ${BORDER}`,
-    borderRadius: 8, padding: "10px 14px", color: "#e8dcc8", fontSize: 14, outline: "none",
+    width: "100%", background: C.inputBg, border: `1px solid ${C.bdr}`,
+    borderRadius: 8, padding: "10px 14px", color: C.text, fontSize: 14, outline: "none",
     boxSizing: "border-box",
   };
 
@@ -107,35 +125,35 @@ function EmailModal({ agent, onClose }: { agent: Agent; onClose: () => void }) {
       position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 1000,
       display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
     }}>
-      <div style={{ background: "#0c2217", border: `1px solid ${BORDER}`, borderRadius: 14, padding: 28, maxWidth: 520, width: "100%" }}>
+      <div style={{ background: C.card, border: `1px solid ${C.bdr}`, borderRadius: 14, padding: 28, maxWidth: 520, width: "100%" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
           <div>
             <p style={{ margin: 0, color: GOLD, fontWeight: 700, fontSize: 16, display: "flex", alignItems: "center", gap: 7 }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 15, height: 15, flexShrink: 0 }}><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Send Email</p>
-            <p style={{ margin: "4px 0 0", color: "#9a8a6a", fontSize: 13 }}>
-              To: <strong style={{ color: "#c9b99a" }}>{agent.email || "—"}</strong> ({agent.companyName})
+            <p style={{ margin: "4px 0 0", color: C.textMid, fontSize: 13 }}>
+              To: <strong style={{ color: C.text }}>{agent.email || "—"}</strong> ({agent.companyName})
             </p>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "#9a8a6a", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: C.textMid, fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
         </div>
 
         {sent ? (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
             <div style={{ margin: "0 0 12px", display: "flex", justifyContent: "center" }}><svg viewBox="0 0 48 48" fill="none" stroke="#c4a96e" strokeWidth="2.5" style={{ width: 48, height: 48 }}><circle cx="24" cy="24" r="20"/><path d="M15 24l6 6 12-12" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
             <p style={{ color: "#c4a96e", fontWeight: 600, margin: "0 0 4px" }}>Email sent successfully!</p>
-            <p style={{ color: "#9a8a6a", fontSize: 13, margin: "0 0 20px" }}>Your message has been delivered to {agent.email}.</p>
-            <button onClick={onClose} style={{ background: "rgba(162,137,89,0.12)", border: `1px solid ${BORDER}`, color: GOLD, borderRadius: 8, padding: "8px 24px", cursor: "pointer", fontSize: 13 }}>
+            <p style={{ color: C.textMid, fontSize: 13, margin: "0 0 20px" }}>Your message has been delivered to {agent.email}.</p>
+            <button onClick={onClose} style={{ background: "rgba(162,137,89,0.12)", border: `1px solid ${C.bdr}`, color: GOLD, borderRadius: 8, padding: "8px 24px", cursor: "pointer", fontSize: 13 }}>
               Close
             </button>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
-              <label style={{ display: "block", fontSize: 12, color: "#9a8a6a", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>Subject</label>
+              <label style={{ display: "block", fontSize: 12, color: C.textMid, fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>Subject</label>
               <input style={inputStyle} type="text" placeholder="e.g. Your Agent Application Status" value={subject} onChange={e => setSubject(e.target.value)} autoFocus />
             </div>
             <div>
-              <label style={{ display: "block", fontSize: 12, color: "#9a8a6a", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>Message</label>
+              <label style={{ display: "block", fontSize: 12, color: C.textMid, fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>Message</label>
               <textarea
                 style={{ ...inputStyle, resize: "vertical", minHeight: 160 }}
                 placeholder="Write your message here…"
@@ -145,7 +163,7 @@ function EmailModal({ agent, onClose }: { agent: Agent; onClose: () => void }) {
             </div>
             {error && <p style={{ margin: 0, color: "#e07070", fontSize: 13 }}>{error}</p>}
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", paddingTop: 4 }}>
-              <button onClick={onClose} style={{ background: "none", border: `1px solid ${BORDER}`, color: "#9a8a6a", borderRadius: 8, padding: "9px 20px", cursor: "pointer", fontSize: 13 }}>
+              <button onClick={onClose} style={{ background: "none", border: `1px solid ${C.bdr}`, color: C.textMid, borderRadius: 8, padding: "9px 20px", cursor: "pointer", fontSize: 13 }}>
                 Cancel
               </button>
               <button
@@ -189,6 +207,7 @@ function AgentCard({
   onDelete: (agent: Agent) => void;
   onEmail: (agent: Agent) => void;
 }) {
+  const C = useAgentColors();
   const [open, setOpen] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [updating, setUpdating] = useState(false);
@@ -208,8 +227,8 @@ function AgentCard({
 
   return (
     <div style={{
-      background: selected ? "rgba(162,137,89,0.06)" : CARD,
-      border: `1px solid ${selected ? "rgba(162,137,89,0.45)" : BORDER}`,
+      background: selected ? "rgba(162,137,89,0.06)" : C.card,
+      border: `1px solid ${selected ? "rgba(162,137,89,0.45)" : C.bdr}`,
       borderRadius: 12, overflow: "hidden", marginBottom: 10,
       transition: "border-color 0.15s, background 0.15s",
     }}>
@@ -228,12 +247,12 @@ function AgentCard({
           onClick={() => setOpen(v => !v)}
           style={{ flex: 1, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, textAlign: "left", padding: 0, minWidth: 0 }}
         >
-          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(162,137,89,0.1)", border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#a28959" }}>
+          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(162,137,89,0.1)", border: `1px solid ${C.bdr}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#a28959" }}>
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 18, height: 18 }}><rect x="2" y="3" width="16" height="15" rx="1.5"/><path d="M7 18V12h6v6"/><path d="M6 7h2M12 7h2M6 10h2M12 10h2"/></svg>
           </div>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: "#e8dcc8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{agent.companyName}</p>
-            <p style={{ margin: "2px 0 0", fontSize: 12, color: "#9a8a6a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{agent.companyName}</p>
+            <p style={{ margin: "2px 0 0", fontSize: 12, color: C.textMid, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {agent.contactName}{agent.email ? ` · ${agent.email}` : ""}
             </p>
           </div>
@@ -252,7 +271,7 @@ function AgentCard({
             <button
               title={`Email ${agent.email}`}
               onClick={e => { e.stopPropagation(); onEmail(agent); }}
-              style={{ background: "rgba(162,137,89,0.08)", border: `1px solid ${BORDER}`, borderRadius: 7, padding: "5px 10px", color: GOLD, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center" }}
+              style={{ background: "rgba(162,137,89,0.08)", border: `1px solid ${C.bdr}`, borderRadius: 7, padding: "5px 10px", color: GOLD, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center" }}
             >
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14 }}><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>
             </button>
@@ -276,7 +295,7 @@ function AgentCard({
 
       {/* Expanded details */}
       {open && (
-        <div style={{ borderTop: `1px solid ${BORDER}`, padding: "18px 22px" }}>
+        <div style={{ borderTop: `1px solid ${C.bdr}`, padding: "18px 22px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 14, marginBottom: 18 }}>
             <Field label="Company Name" value={agent.companyName} />
             <Field label="Contact Name" value={agent.contactName} />
@@ -285,12 +304,12 @@ function AgentCard({
             <Field label="Contact Number" value={`${agent.contactNumber}${agent.whatsappAvailable === "yes" ? " · WhatsApp ✓" : ""}`} />
             <Field label="Username" value={`@${agent.username}`} mono />
             <div>
-              <p style={{ margin: "0 0 4px", fontSize: 11, color: "#9a8a6a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Password</p>
+              <p style={{ margin: "0 0 4px", fontSize: 11, color: C.textMid, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Password</p>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontFamily: "monospace", fontSize: 14, color: "#e8dcc8" }}>
+                <span style={{ fontFamily: "monospace", fontSize: 14, color: C.text }}>
                   {showPass ? (agent.plainPassword ?? "—") : "••••••••"}
                 </span>
-                <button onClick={() => setShowPass(v => !v)} style={{ background: "none", border: `1px solid ${BORDER}`, borderRadius: 5, color: GOLD, fontSize: 11, padding: "2px 8px", cursor: "pointer" }}>
+                <button onClick={() => setShowPass(v => !v)} style={{ background: "none", border: `1px solid ${C.bdr}`, borderRadius: 5, color: GOLD, fontSize: 11, padding: "2px 8px", cursor: "pointer" }}>
                   {showPass ? "Hide" : "Reveal"}
                 </button>
               </div>
@@ -302,18 +321,18 @@ function AgentCard({
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
             {agent.businessRegUrl ? (
               <a href={fileDownloadUrl(agent.businessRegUrl)} target="_blank" rel="noreferrer"
-                style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(162,137,89,0.08)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "7px 14px", color: GOLD, fontSize: 13, textDecoration: "none" }}>
+                style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(162,137,89,0.08)", border: `1px solid ${C.bdr}`, borderRadius: 8, padding: "7px 14px", color: GOLD, fontSize: 13, textDecoration: "none" }}>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14, flexShrink: 0 }}><path d="M10.5 2.5a2.5 2.5 0 013.54 3.54L5.5 14.55a3.5 3.5 0 01-4.95-4.95L9 1.1" strokeLinecap="round"/></svg>
                 {agent.businessRegName || "Business Registration"}
               </a>
-            ) : <span style={{ color: "#5a4a2a", fontSize: 13 }}>No business registration attached</span>}
+            ) : <span style={{ color: C.textFaint, fontSize: 13 }}>No business registration attached</span>}
             {agent.idDocUrl ? (
               <a href={fileDownloadUrl(agent.idDocUrl)} target="_blank" rel="noreferrer"
-                style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(162,137,89,0.08)", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "7px 14px", color: GOLD, fontSize: 13, textDecoration: "none" }}>
+                style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(162,137,89,0.08)", border: `1px solid ${C.bdr}`, borderRadius: 8, padding: "7px 14px", color: GOLD, fontSize: 13, textDecoration: "none" }}>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14, flexShrink: 0 }}><rect x="1" y="3" width="14" height="10" rx="1.5"/><circle cx="5.5" cy="7" r="1.5"/><path d="M9 7h4M9 10h2"/></svg>
                 {agent.idDocName || "ID / Passport"}
               </a>
-            ) : <span style={{ color: "#5a4a2a", fontSize: 13 }}>No ID document attached</span>}
+            ) : <span style={{ color: C.textFaint, fontSize: 13 }}>No ID document attached</span>}
           </div>
 
           {/* Status controls + Email + Delete */}
@@ -332,14 +351,14 @@ function AgentCard({
             )}
             {agent.status !== "pending" && (
               <button onClick={() => updateStatus("pending")} disabled={updating}
-                style={{ background: "rgba(162,137,89,0.1)", border: `1px solid ${BORDER}`, color: GOLD, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                style={{ background: "rgba(162,137,89,0.1)", border: `1px solid ${C.bdr}`, color: GOLD, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                 Reset to Pending
               </button>
             )}
             <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
               {agent.email && (
                 <button onClick={() => onEmail(agent)}
-                  style={{ background: "rgba(162,137,89,0.1)", border: `1px solid ${BORDER}`, color: GOLD, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                  style={{ background: "rgba(162,137,89,0.1)", border: `1px solid ${C.bdr}`, color: GOLD, borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
                   <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14, flexShrink: 0 }}><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Send Email
                 </button>
               )}
@@ -356,16 +375,18 @@ function AgentCard({
 }
 
 function Field({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  const C = useAgentColors();
   return (
     <div>
-      <p style={{ margin: "0 0 4px", fontSize: 11, color: "#9a8a6a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</p>
-      <p style={{ margin: 0, fontSize: 14, color: "#e8dcc8", fontFamily: mono ? "monospace" : undefined, wordBreak: "break-all" }}>{value || "—"}</p>
+      <p style={{ margin: "0 0 4px", fontSize: 11, color: C.textMid, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</p>
+      <p style={{ margin: 0, fontSize: 14, color: C.text, fontFamily: mono ? "monospace" : undefined, wordBreak: "break-all" }}>{value || "—"}</p>
     </div>
   );
 }
 
 // ── Main Page ───────────────────────────────────────────────────────────────
 export default function AgentsPage() {
+  const C = useAgentColors();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
@@ -464,7 +485,7 @@ export default function AgentsPage() {
         <h1 style={{ color: GOLD, fontSize: 26, fontWeight: 700, margin: "0 0 6px", fontFamily: "Georgia, serif" }}>
           Agent Applications
         </h1>
-        <p style={{ color: "#9a8a6a", fontSize: 14, margin: 0 }}>
+        <p style={{ color: C.textMid, fontSize: 14, margin: 0 }}>
           {agents.length} agent{agents.length !== 1 ? "s" : ""} registered · {counts.pending} pending review
         </p>
       </div>
@@ -478,9 +499,9 @@ export default function AgentsPage() {
             onClick={() => setFilter(f)}
             style={{
               background: filter === f ? "rgba(162,137,89,0.15)" : "transparent",
-              border: `1px solid ${filter === f ? GOLD : BORDER}`,
+              border: `1px solid ${filter === f ? GOLD : C.bdr}`,
               borderRadius: 20, padding: "6px 14px",
-              color: filter === f ? GOLD : "#9a8a6a",
+              color: filter === f ? GOLD : C.textMid,
               fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "capitalize",
             }}
           >
@@ -501,7 +522,7 @@ export default function AgentsPage() {
           )}
           <button
             onClick={load}
-            style={{ background: "none", border: `1px solid ${BORDER}`, borderRadius: 20, padding: "6px 14px", color: "#9a8a6a", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+            style={{ background: "none", border: `1px solid ${C.bdr}`, borderRadius: 20, padding: "6px 14px", color: C.textMid, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
           >
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, flexShrink: 0 }}><path d="M14 8A6 6 0 112 8" strokeLinecap="round"/><path d="M14 4v4h-4" strokeLinecap="round" strokeLinejoin="round"/></svg>Refresh
           </button>
@@ -510,14 +531,14 @@ export default function AgentsPage() {
 
       {/* Select-all bar (shown when there are results) */}
       {filtered.length > 0 && (
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "6px 16px", background: "rgba(162,137,89,0.04)", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "6px 16px", background: C.subtleBg, borderRadius: 8, border: `1px solid ${C.bdrFaint}` }}>
           <input
             type="checkbox"
             checked={allFilteredSelected}
             onChange={toggleSelectAll}
             style={{ width: 15, height: 15, accentColor: GOLD, cursor: "pointer" }}
           />
-          <span style={{ fontSize: 12, color: "#9a8a6a" }}>
+          <span style={{ fontSize: 12, color: C.textMid }}>
             {allFilteredSelected ? "Deselect all" : `Select all ${filtered.length} ${filter === "all" ? "agents" : filter}`}
           </span>
           {someSelected && (
@@ -530,9 +551,9 @@ export default function AgentsPage() {
 
       {/* Agent list */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: "4rem", color: "#9a8a6a", fontSize: 14 }}>Loading agents…</div>
+        <div style={{ textAlign: "center", padding: "4rem", color: C.textMid, fontSize: 14 }}>Loading agents…</div>
       ) : filtered.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "4rem", color: "#5a4a2a", fontSize: 14 }}>
+        <div style={{ textAlign: "center", padding: "4rem", color: C.textFaint, fontSize: 14 }}>
           {agents.length === 0 ? "No agent applications yet." : `No ${filter} applications.`}
         </div>
       ) : (

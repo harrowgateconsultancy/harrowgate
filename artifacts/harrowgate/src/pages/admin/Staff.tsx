@@ -18,7 +18,7 @@ const PRIORITIES = [
   { value: "urgent", label: "Urgent", color: "#f87171", bg: "rgba(248,113,113,0.1)" },
 ];
 const STATUSES = [
-  { value: "pending",     label: "To Do",       color: "rgba(13,26,58,0.4)" },
+  { value: "pending",     label: "To Do",       color: "rgba(162,137,89,0.65)" },
   { value: "in_progress", label: "In Progress", color: "#fb923c" },
   { value: "done",        label: "Done",        color: "#f0d28c" },
 ];

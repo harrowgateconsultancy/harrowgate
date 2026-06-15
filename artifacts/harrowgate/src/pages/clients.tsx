@@ -2,8 +2,10 @@ import { useListClients } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
+import { useAdminTheme } from "@/contexts/AdminThemeContext";
 
 export default function Clients() {
+  const { isDark } = useAdminTheme();
   const { data: clients, isLoading } = useListClients();
   const [search, setSearch] = useState("");
 
@@ -82,7 +84,10 @@ export default function Clients() {
                   </td>
                   <td className="px-5 py-3.5 text-muted-foreground hidden sm:table-cell">{client.email}</td>
                   <td className="px-5 py-3.5 hidden md:table-cell">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                      style={isDark
+                        ? { background: "rgba(162,137,89,0.10)", color: "rgba(196,169,110,0.85)" }
+                        : { background: "#dbeafe", color: "#1d4ed8", border: "1px solid #bfdbfe" }}>
                       {client.nationality}
                     </span>
                   </td>

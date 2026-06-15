@@ -2,6 +2,7 @@ import { useListApplications } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { useAdminTheme } from "@/contexts/AdminThemeContext";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All Statuses" },
@@ -13,14 +14,37 @@ const STATUS_OPTIONS = [
   { value: "submitted", label: "Submitted" },
 ];
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  draft: { label: "Draft", color: "bg-muted text-muted-foreground" },
-  documents_uploaded: { label: "Docs Uploaded", color: "bg-blue-100 text-blue-800" },
-  ai_processing: { label: "AI Processing", color: "bg-yellow-100 text-yellow-800" },
-  ai_processed: { label: "AI Processed", color: "bg-purple-100 text-purple-800" },
-  ready_to_print: { label: "Ready to Print", color: "bg-green-100 text-green-800" },
-  submitted: { label: "Submitted", color: "bg-slate-100 text-slate-700" },
+const STATUS_LABELS: Record<string, { label: string }> = {
+  draft:              { label: "Draft" },
+  documents_uploaded: { label: "Docs Uploaded" },
+  ai_processing:      { label: "AI Processing" },
+  ai_processed:       { label: "AI Processed" },
+  ready_to_print:     { label: "Ready to Print" },
+  submitted:          { label: "Submitted" },
 };
+
+function getStatusStyle(status: string, isDark: boolean): React.CSSProperties {
+  const dark: Record<string, React.CSSProperties> = {
+    draft:              { background: "rgba(162,137,89,0.10)", color: "rgba(162,137,89,0.70)" },
+    documents_uploaded: { background: "rgba(96,165,250,0.12)", color: "rgba(147,197,253,0.85)" },
+    ai_processing:      { background: "rgba(251,191,36,0.12)", color: "rgba(252,211,77,0.85)" },
+    ai_processed:       { background: "rgba(167,139,250,0.12)", color: "rgba(196,181,253,0.85)" },
+    ready_to_print:     { background: "rgba(52,211,153,0.12)", color: "rgba(110,231,183,0.85)" },
+    submitted:          { background: "rgba(148,163,184,0.10)", color: "rgba(203,213,225,0.70)" },
+  };
+  const light: Record<string, React.CSSProperties> = {
+    draft:              { background: "rgba(0,0,0,0.06)", color: "rgba(0,0,0,0.50)" },
+    documents_uploaded: { background: "#dbeafe", color: "#1d4ed8" },
+    ai_processing:      { background: "#fef9c3", color: "#854d0e" },
+    ai_processed:       { background: "#f3e8ff", color: "#6b21a8" },
+    ready_to_print:     { background: "#dcfce7", color: "#166534" },
+    submitted:          { background: "#f1f5f9", color: "#475569" },
+  };
+  const map = isDark ? dark : light;
+  return map[status] ?? (isDark
+    ? { background: "rgba(162,137,89,0.08)", color: "rgba(162,137,89,0.65)" }
+    : { background: "rgba(0,0,0,0.06)", color: "rgba(0,0,0,0.45)" });
+}
 
 const APP_TYPE_LABELS: Record<string, string> = {
   student_visa: "Student Visa",
@@ -29,6 +53,7 @@ const APP_TYPE_LABELS: Record<string, string> = {
 };
 
 export default function Applications() {
+  const { isDark } = useAdminTheme();
   const [statusFilter, setStatusFilter] = useState("");
   const [, navigate] = useLocation();
   const { data: applications, isLoading } = useListApplications(
@@ -110,7 +135,8 @@ export default function Applications() {
                   </td>
                   <td className="px-5 py-3.5 text-muted-foreground hidden sm:table-cell">{app.documentCount ?? 0}</td>
                   <td className="px-5 py-3.5">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_LABELS[app.status]?.color ?? ""}`}>
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                      style={getStatusStyle(app.status, isDark)}>
                       {STATUS_LABELS[app.status]?.label ?? app.status}
                     </span>
                   </td>

@@ -17,15 +17,39 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Printer, Sparkles, Trash2, CheckCircle, ChevronDown, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import DropZone from "@/components/DropZone";
+import { useAdminTheme } from "@/contexts/AdminThemeContext";
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  draft: { label: "Draft", color: "bg-muted text-muted-foreground" },
-  documents_uploaded: { label: "Documents Uploaded", color: "bg-blue-100 text-blue-800" },
-  ai_processing: { label: "AI Processing", color: "bg-yellow-100 text-yellow-800" },
-  ai_processed: { label: "AI Processed", color: "bg-purple-100 text-purple-800" },
-  ready_to_print: { label: "Ready to Print", color: "bg-green-100 text-green-800" },
-  submitted: { label: "Submitted", color: "bg-slate-100 text-slate-700" },
+const STATUS_LABELS: Record<string, { label: string }> = {
+  draft:              { label: "Draft" },
+  documents_uploaded: { label: "Documents Uploaded" },
+  ai_processing:      { label: "AI Processing" },
+  ai_processed:       { label: "AI Processed" },
+  ready_to_print:     { label: "Ready to Print" },
+  submitted:          { label: "Submitted" },
 };
+
+function getStatusStyle(status: string, isDark: boolean): React.CSSProperties {
+  const dark: Record<string, React.CSSProperties> = {
+    draft:              { background: "rgba(162,137,89,0.10)", color: "rgba(162,137,89,0.70)" },
+    documents_uploaded: { background: "rgba(96,165,250,0.12)", color: "rgba(147,197,253,0.85)" },
+    ai_processing:      { background: "rgba(251,191,36,0.12)", color: "rgba(252,211,77,0.85)" },
+    ai_processed:       { background: "rgba(167,139,250,0.12)", color: "rgba(196,181,253,0.85)" },
+    ready_to_print:     { background: "rgba(52,211,153,0.12)", color: "rgba(110,231,183,0.85)" },
+    submitted:          { background: "rgba(148,163,184,0.10)", color: "rgba(203,213,225,0.70)" },
+  };
+  const light: Record<string, React.CSSProperties> = {
+    draft:              { background: "rgba(0,0,0,0.06)", color: "rgba(0,0,0,0.50)" },
+    documents_uploaded: { background: "#dbeafe", color: "#1d4ed8" },
+    ai_processing:      { background: "#fef9c3", color: "#854d0e" },
+    ai_processed:       { background: "#f3e8ff", color: "#6b21a8" },
+    ready_to_print:     { background: "#dcfce7", color: "#166534" },
+    submitted:          { background: "#f1f5f9", color: "#475569" },
+  };
+  const map = isDark ? dark : light;
+  return map[status] ?? (isDark
+    ? { background: "rgba(162,137,89,0.08)", color: "rgba(162,137,89,0.65)" }
+    : { background: "rgba(0,0,0,0.06)", color: "rgba(0,0,0,0.45)" });
+}
 
 const STATUS_TRANSITIONS: Record<string, string[]> = {
   draft: ["documents_uploaded", "ai_processed", "ready_to_print", "submitted"],
@@ -227,6 +251,7 @@ function FormField({
 }
 
 export default function ApplicationDetail() {
+  const { isDark } = useAdminTheme();
   const params = useParams<{ applicationId: string }>();
   const applicationId = Number(params.applicationId);
   const queryClient = useQueryClient();
@@ -373,7 +398,7 @@ export default function ApplicationDetail() {
   if (isLoading) return <div className="p-8 text-center"><div className="h-6 w-40 bg-muted animate-pulse rounded mx-auto" /></div>;
   if (!application) return <div className="p-8 text-center text-muted-foreground">Application not found. <Link href="/admin/applications" className="text-primary">Go back</Link></div>;
 
-  const statusInfo = STATUS_LABELS[application.status] ?? { label: application.status, color: "bg-muted text-muted-foreground" };
+  const statusInfo = STATUS_LABELS[application.status] ?? { label: application.status };
   const availableTransitions = STATUS_TRANSITIONS[application.status] ?? [];
   const uploadedByType: Record<string, NonNullable<typeof documents>> = {};
   (documents ?? []).forEach(doc => {
@@ -408,7 +433,8 @@ export default function ApplicationDetail() {
 
       {/* Status Bar */}
       <div className="bg-card border border-card-border rounded-lg p-3 mb-5 flex flex-wrap items-center gap-2">
-        <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${statusInfo.color}`}>{statusInfo.label}</span>
+        <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
+          style={getStatusStyle(application.status, isDark)}>{statusInfo.label}</span>
         {availableTransitions.map(s => (
           <button
             key={s}
