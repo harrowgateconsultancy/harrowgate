@@ -247,23 +247,23 @@ export default function Submissions() {
   const { isDark } = useAdminTheme();
 
   const C = {
-    card: "#0f2d18",
-    subtle: "#255F38",
-    muted: "rgba(31,125,83,0.10)",
-    softBlue: "#163320",
-    border: "rgba(31,125,83,0.15)",
-    borderFaint: "rgba(31,125,83,0.09)",
-    borderMed: "rgba(31,125,83,0.32)",
+    card: "#0c1410",
+    subtle: "#111812",
+    muted: "rgba(162,137,89,0.05)",
+    softBlue: "#0e1510",
+    border: "rgba(162,137,89,0.12)",
+    borderFaint: "rgba(162,137,89,0.08)",
+    borderMed: "rgba(162,137,89,0.22)",
     text: "#a28959",
     textSec: "#b09a6e",
     textMid: "rgba(162,137,89,0.85)",
     textMuted: "rgba(162,137,89,0.60)",
-    textFaint: "rgba(162,137,89,0.45)",
+    textFaint: "rgba(162,137,89,0.40)",
     textDark: "#c8aa7c",
-    inputBg: "rgba(162,137,89,0.07)",
+    inputBg: "rgba(162,137,89,0.06)",
   };
   const GOLD = "#a28959";
-  const BG = "#255F38";
+  const BG = "#111812";
 
   const qc = useQueryClient();
   const [, setLocation] = useLocation();

@@ -79,14 +79,14 @@
   --card-foreground: 222 47% 11%;
   --card-border: 214 32% 91%;
   
-  /* Sidebar uses deep green */
-  --sidebar: 145 60% 11%;
-  --sidebar-foreground: 210 40% 98%;
-  --sidebar-border: 145 60% 7%;
+  /* Sidebar — near-black with gold accents */
+  --sidebar: 145 14% 8%;
+  --sidebar-foreground: 42 30% 80%;
+  --sidebar-border: 145 10% 6%;
   --sidebar-primary: 44 54% 54%;
-  --sidebar-primary-foreground: 145 60% 11%;
-  --sidebar-accent: 145 43% 16%;
-  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-primary-foreground: 145 14% 8%;
+  --sidebar-accent: 145 12% 12%;
+  --sidebar-accent-foreground: 42 40% 88%;
   --sidebar-ring: 44 54% 54%;
   
   --popover: 0 0% 100%;
@@ -135,13 +135,13 @@
   --card-foreground: 210 40% 98%;
   --card-border: 220 64% 20%;
   
-  --sidebar: 145 60% 8%;
-  --sidebar-foreground: 210 40% 98%;
-  --sidebar-border: 145 60% 5%;
+  --sidebar: 145 12% 6%;
+  --sidebar-foreground: 42 28% 76%;
+  --sidebar-border: 145 10% 5%;
   --sidebar-primary: 44 54% 54%;
-  --sidebar-primary-foreground: 145 60% 8%;
-  --sidebar-accent: 145 43% 13%;
-  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-primary-foreground: 145 12% 6%;
+  --sidebar-accent: 145 12% 10%;
+  --sidebar-accent-foreground: 42 38% 86%;
   --sidebar-ring: 44 54% 54%;
   
   --popover: 220 64% 16%;
