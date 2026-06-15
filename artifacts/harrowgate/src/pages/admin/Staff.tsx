@@ -9,8 +9,7 @@ function adminFetch(url: string, opts?: RequestInit) {
   return fetch(url, { ...opts, headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(opts?.headers ?? {}) } });
 }
 
-const NAVY = "#0d1a3a";
-const GOLD = "#1F7D53";
+const GOLD = "#a28959";
 
 const PRIORITIES = [
   { value: "low",    label: "Low",    color: "#f0d28c", bg: "rgba(162,137,89,0.10)" },
