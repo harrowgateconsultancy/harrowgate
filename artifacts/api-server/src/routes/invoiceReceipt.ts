@@ -10,6 +10,7 @@ router.post("/admin/invoice/send-invoice", async (req, res) => {
     await sendInvoiceToStudentEmail({ studentEmail, studentName, invoiceNo, date, degreeType, items, schedule, remarks, total, highlightedPayment, phone, contactEmail });
     res.json({ ok: true });
   } catch (err: any) {
+    console.error("[invoice/send-invoice] Email error:", err?.message ?? err);
     res.status(500).json({ error: err?.message ?? "Failed to send invoice email." });
   }
 });
@@ -21,6 +22,7 @@ router.post("/admin/invoice/send-receipt", async (req, res) => {
     await sendReceiptToStudentEmail({ studentEmail, studentName, receiptNo, date, amountPaid, paymentMethod, reference, notes, degreeType });
     res.json({ ok: true });
   } catch (err: any) {
+    console.error("[invoice/send-receipt] Email error:", err?.message ?? err);
     res.status(500).json({ error: err?.message ?? "Failed to send receipt email." });
   }
 });

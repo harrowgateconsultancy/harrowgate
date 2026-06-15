@@ -415,11 +415,11 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[440px_1fr] gap-6">
-      {/* Hidden print target */}
-      <div id="invoice-print-root" style={{ display: "none" }}>
+      {/* Hidden print target — off-screen so flex/grid layouts stay intact */}
+      <div id="invoice-print-root" style={{ position: "fixed", left: "-9999px", top: 0, width: "210mm", visibility: "hidden" }}>
         <InvoicePreview invoiceNo={invoiceNo} date={today} clientName={selected?.name ?? ""} clientAddress={clientAddress} degreeLabel={degreeLabel} items={items} schedule={schedule} remarks={remarks.filter(r => r.trim())} highlightedPayment={highlightedPayment} phone={phone} contactEmail={contactEmail} />
       </div>
-      <style>{`@media print { body > * { display: none !important; } #invoice-print-root { display: block !important; } #invoice-print-root * { display: revert !important; } }`}</style>
+      <style>{`@media print { body * { visibility: hidden; } #invoice-print-root { visibility: visible !important; position: fixed !important; left: 0 !important; top: 0 !important; width: 100% !important; } #invoice-print-root * { visibility: visible !important; } }`}</style>
 
       {/* ── Left config ── */}
       <div className="space-y-4">
@@ -661,10 +661,10 @@ function ReceiptTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[440px_1fr] gap-6">
-      <div id="receipt-print-root" style={{ display: "none" }}>
+      <div id="receipt-print-root" style={{ position: "fixed", left: "-9999px", top: 0, width: "210mm", visibility: "hidden" }}>
         <ReceiptPreview receiptNo={receiptNo} date={displayDate} clientName={selected?.name ?? ""} degreeLabel={degreeLabel} amountPaid={amountPaid} paymentMethod={paymentMethod} reference={reference} notes={notes} />
       </div>
-      <style>{`@media print { body > * { display: none !important; } #receipt-print-root { display: block !important; } #receipt-print-root * { display: revert !important; } }`}</style>
+      <style>{`@media print { body * { visibility: hidden; } #receipt-print-root { visibility: visible !important; position: fixed !important; left: 0 !important; top: 0 !important; width: 100% !important; } #receipt-print-root * { visibility: visible !important; } }`}</style>
 
       {/* ── Left config ── */}
       <div className="space-y-4">
