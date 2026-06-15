@@ -898,7 +898,7 @@ export default function Portal() {
       {/* Screen share banner */}
       {isBeingWatched && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 9998, background: "rgba(13,26,58,0.97)", borderBottom: "1px solid rgba(162,137,89,0.3)", backdropFilter: "blur(8px)" }}>
-          <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 max-w-5xl mx-auto">
+          <div className="flex items-center justify-between px-6 lg:px-10 xl:px-16 py-2.5">
             <div className="flex items-center gap-2.5">
               <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#f87171" }} />
               <span className="text-xs sm:text-sm" style={{ color: "rgba(232,218,180,0.95)" }}>
@@ -922,7 +922,7 @@ export default function Portal() {
       {/* Nav + Tab bar */}
       <nav style={{ borderBottom: "1px solid rgba(162,137,89,0.12)", backdropFilter: "blur(12px)", background: "rgba(11,34,19,0.92)", position: "sticky", top: isBeingWatched ? 37 : 0, zIndex: 50 }}>
         {/* Top row */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-2 sm:py-2.5 max-w-5xl mx-auto">
+        <div className="flex items-center justify-between px-6 lg:px-10 xl:px-16 py-2 sm:py-2.5">
           <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
             <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-10 sm:h-14 object-contain cursor-pointer hover:opacity-80 transition-opacity" />
           </Link>
@@ -986,34 +986,46 @@ export default function Portal() {
 
         {/* Tab bar — only when a submission exists */}
         {submission && (
-          <div className="flex border-t max-w-5xl mx-auto" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
+          <div className="flex border-t px-6 lg:px-10 xl:px-16" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
             {([
-              { id: "home",      label: "Overview",  icon: "⬜" },
-              { id: "progress",  label: "Progress",  icon: "⬜" },
-              { id: "documents", label: "Documents", icon: "⬜" },
+              { id: "home",      label: "Overview"  },
+              { id: "progress",  label: "Progress"  },
+              { id: "documents", label: "Documents" },
               { id: "messages",  label: "Messages",  badge: totalUnread },
-            ] as { id: "home"|"progress"|"documents"|"messages"; label: string; icon?: string; badge?: number }[]).map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className="flex-1 relative flex items-center justify-center gap-1.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all"
-                style={{
-                  color: activeTab === tab.id ? GOLD : "rgba(162,137,89,0.38)",
-                  borderBottom: `2px solid ${activeTab === tab.id ? GOLD : "transparent"}`,
-                  background: activeTab === tab.id ? "rgba(162,137,89,0.05)" : "transparent",
-                }}>
-                {tab.label}
-                {tab.badge != null && tab.badge > 0 && (
-                  <span className="ml-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
-                    style={{ background: GOLD, color: "#255F38" }}>
-                    {tab.badge > 9 ? "9+" : tab.badge}
-                  </span>
-                )}
-              </button>
-            ))}
+            ] as { id: "home"|"progress"|"documents"|"messages"; label: string; badge?: number }[]).map(tab => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                  className="relative flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold tracking-wide transition-all"
+                  style={{
+                    color: isActive ? "#f0d28c" : "rgba(232,218,180,0.55)",
+                    borderBottom: `2px solid ${isActive ? "#c4a96e" : "transparent"}`,
+                    background: isActive
+                      ? "linear-gradient(180deg, rgba(196,169,110,0.10) 0%, rgba(196,169,110,0.04) 100%)"
+                      : "transparent",
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    fontSize: "0.72rem",
+                  }}>
+                  {tab.label}
+                  {tab.badge != null && tab.badge > 0 && (
+                    <span className="min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-black flex items-center justify-center"
+                      style={{ background: "#c4a96e", color: "#0b2213" }}>
+                      {tab.badge > 9 ? "9+" : tab.badge}
+                    </span>
+                  )}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full"
+                      style={{ background: "linear-gradient(90deg, transparent, #f0d28c, transparent)" }} />
+                  )}
+                </button>
+              );
+            })}
           </div>
         )}
       </nav>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-5 sm:py-8">
+      <main className="w-full px-6 lg:px-10 xl:px-16 py-5 sm:py-8">
         {submission === null && <ApplyForm user={user} onSubmitted={fetchSubmission} />}
 
         {submission && (
