@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { DEFAULT_PRICING, type PricingConfig } from "../../hooks/usePricing";
+import { useAdminTheme } from "../../contexts/AdminThemeContext";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
@@ -12,17 +13,28 @@ function adminFetch(url: string, opts?: RequestInit) {
 function fmtNum(n: number) { return n.toLocaleString("en-HK"); }
 
 const FIRST_PAYMENT = 3000;
+const GOLD   = "#a28959";
+const GOLD_B = "#c4a96e";
+const GOLD_L = "#f0d28c";
 
-const GOLD       = "#a28959";
-const GOLD_B     = "#c4a96e";
-const GOLD_L     = "#f0d28c";
-const CARD       = "#0f2d18";
-const BORDER     = "rgba(162,137,89,0.12)";
-const BORDER_MED = "rgba(162,137,89,0.30)";
-const BORDER_STR = "rgba(196,169,110,0.55)";
-const MUTED      = "rgba(162,137,89,0.06)";
-const TEXT_FAINT = "rgba(162,137,89,0.45)";
-const TEXT_MID   = "rgba(162,137,89,0.70)";
+function useColors() {
+  const { isDark } = useAdminTheme();
+  return {
+    isDark,
+    card:      isDark ? "#0f2d18"               : "#ffffff",
+    border:    isDark ? "rgba(162,137,89,0.12)" : "rgba(0,0,0,0.08)",
+    borderMed: isDark ? "rgba(162,137,89,0.30)" : "rgba(0,0,0,0.14)",
+    borderStr: isDark ? "rgba(196,169,110,0.55)": "rgba(162,137,89,0.40)",
+    muted:     isDark ? "rgba(162,137,89,0.06)" : "rgba(0,0,0,0.03)",
+    tFaint:    isDark ? "rgba(162,137,89,0.45)" : "rgba(0,0,0,0.38)",
+    tMid:      isDark ? "rgba(162,137,89,0.68)" : "rgba(0,0,0,0.55)",
+    tHead:     isDark ? GOLD_L                  : "#0f2d18",
+    tBody:     isDark ? GOLD_B                  : "#1a3d20",
+    inputBg:   isDark ? "rgba(162,137,89,0.07)" : "#f5f7f5",
+    inputText: isDark ? GOLD_L                  : "#0f2d18",
+    accentBg:  isDark ? "rgba(162,137,89,0.08)" : "rgba(162,137,89,0.08)",
+  } as const;
+}
 
 const SHARED_FEATURES: { text: string; bold?: boolean }[] = [
   { text: "1st semester tuition fee inclusive (paid by students)", bold: true },
@@ -81,13 +93,8 @@ const DEFAULT_BANK: BankDetails = { bankName: "", accountName: "", accountNumber
 function parseDraft(v: string): number { return parseInt(v.replace(/[^0-9]/g, ""), 10) || 0; }
 function sumOk(d: TierDraft): boolean { return parseDraft(d.total) === FIRST_PAYMENT + parseDraft(d.stage2) + parseDraft(d.stage3); }
 
-const inputStyle: React.CSSProperties = {
-  background: "rgba(162,137,89,0.07)",
-  borderColor: BORDER_MED,
-  color: GOLD_L,
-};
-
 export default function Pricing() {
+  const C = useColors();
   const qc = useQueryClient();
   const [pricing, setPricing] = useState<PricingConfig>(DEFAULT_PRICING);
   const [drafts, setDrafts] = useState<Record<string, TierDraft>>({});
@@ -99,6 +106,8 @@ export default function Pricing() {
   const [bankSaving, setBankSaving] = useState(false);
   const [bankSaved, setBankSaved] = useState(false);
   const [bankError, setBankError] = useState<string | null>(null);
+
+  const inputStyle: React.CSSProperties = { background: C.inputBg, borderColor: C.borderMed, color: C.inputText };
 
   useEffect(() => {
     fetch(`${getApiBase()}/api/settings/pricing`)
@@ -177,8 +186,8 @@ export default function Pricing() {
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight mb-0.5" style={{ color: GOLD_L, letterSpacing: "-0.01em" }}>Package Pricing</h1>
-        <p className="text-xs" style={{ color: TEXT_FAINT }}>
+        <h1 className="text-2xl font-bold tracking-tight mb-0.5" style={{ color: C.tHead, letterSpacing: "-0.01em" }}>Package Pricing</h1>
+        <p className="text-xs" style={{ color: C.tFaint }}>
           Edit package totals and payment stage amounts. Changes apply immediately to the public pricing page.
         </p>
       </div>
@@ -199,14 +208,14 @@ export default function Pricing() {
             <div key={tier.id}
               className="relative flex flex-col rounded-2xl overflow-hidden"
               style={{
-                background: CARD,
-                border: `1.5px solid ${tier.badge ? BORDER_STR : BORDER_MED}`,
+                background: C.card,
+                border: `1.5px solid ${tier.badge ? C.borderStr : C.borderMed}`,
                 boxShadow: tier.badge
-                  ? `0 0 0 1px rgba(196,169,110,0.12), 0 4px 32px rgba(162,137,89,0.12)`
-                  : `0 2px 16px rgba(0,0,0,0.18)`,
+                  ? `0 0 0 1px ${C.muted}, 0 4px 32px rgba(162,137,89,0.10)`
+                  : `0 2px 16px rgba(0,0,0,0.08)`,
               }}>
 
-              {/* Gold top bar */}
+              {/* Gold shimmer top bar */}
               <div className="h-px w-full" style={{ background: tier.badge
                 ? `linear-gradient(to right, transparent, ${GOLD_B}, transparent)`
                 : `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
@@ -215,7 +224,7 @@ export default function Pricing() {
               {tier.badge && (
                 <div className="flex justify-center pt-4 pb-1">
                   <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase"
-                    style={{ background: "rgba(196,169,110,0.15)", color: GOLD_L, border: `1px solid ${BORDER_STR}` }}>
+                    style={{ background: "rgba(196,169,110,0.12)", color: C.tHead, border: `1px solid ${C.borderStr}` }}>
                     ✦ Most Popular
                   </span>
                 </div>
@@ -225,15 +234,15 @@ export default function Pricing() {
 
                 {/* Tier header */}
                 <div className="mb-5">
-                  <h2 className="text-base font-bold" style={{ color: GOLD_L }}>{tier.label}</h2>
-                  <p className="text-[10px] font-semibold tracking-widest uppercase mt-0.5" style={{ color: TEXT_FAINT }}>
+                  <h2 className="text-base font-bold" style={{ color: C.tHead }}>{tier.label}</h2>
+                  <p className="text-[10px] font-semibold tracking-widest uppercase mt-0.5" style={{ color: C.tFaint }}>
                     Full Service Package
                   </p>
                 </div>
 
                 {/* Total price input */}
                 <div className="mb-5">
-                  <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: TEXT_FAINT }}>
+                  <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: C.tFaint }}>
                     Total Package Price (HKD$)
                   </label>
                   <div className="relative">
@@ -241,7 +250,7 @@ export default function Pricing() {
                     <input type="number" value={d.total}
                       onChange={e => updateDraft(tier.id, "total", e.target.value)}
                       className="w-full pl-10 pr-3 py-2.5 rounded-xl text-xl font-extrabold border-2 outline-none transition-all"
-                      style={{ ...inputStyle, borderColor: ok ? BORDER_MED : "rgba(248,113,113,0.50)" }} />
+                      style={{ ...inputStyle, borderColor: ok ? C.borderMed : "rgba(248,113,113,0.50)" }} />
                   </div>
                 </div>
 
@@ -249,7 +258,7 @@ export default function Pricing() {
                 <ul className="space-y-1.5 mb-5">
                   {tier.features.map((f, fi) => (
                     <li key={fi} className="flex items-start gap-2 text-xs"
-                      style={{ color: f.bold ? GOLD_B : TEXT_MID, fontWeight: f.bold ? 600 : 400 }}>
+                      style={{ color: f.bold ? GOLD_B : C.tMid, fontWeight: f.bold ? 600 : 400 }}>
                       <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: f.bold ? GOLD_B : GOLD }}>
                         <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
@@ -259,7 +268,7 @@ export default function Pricing() {
                 </ul>
 
                 {/* Payment schedule */}
-                <div className="rounded-xl border p-4 mb-4" style={{ background: "rgba(162,137,89,0.04)", borderColor: BORDER }}>
+                <div className="rounded-xl border p-4 mb-4" style={{ background: C.muted, borderColor: C.border }}>
                   <p className="text-[10px] font-bold tracking-widest uppercase mb-3 flex items-center gap-1.5" style={{ color: GOLD_B }}>
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0">
                       <path d="M8 2l1.8 3.6L14 6.5l-3 2.9.7 4.1L8 11.4l-3.7 1.9.7-4.1-3-2.9 4.2-.9z" strokeLinejoin="round"/>
@@ -267,22 +276,20 @@ export default function Pricing() {
                     Balance Payment Schedule
                   </p>
 
-                  {/* First payment */}
-                  <div className="flex items-center justify-between mb-3 pb-3 border-b" style={{ borderColor: BORDER }}>
+                  <div className="flex items-center justify-between mb-3 pb-3 border-b" style={{ borderColor: C.border }}>
                     <div>
-                      <p className="text-xs font-semibold" style={{ color: GOLD_B }}>First Payment</p>
-                      <p className="text-[11px]" style={{ color: TEXT_FAINT }}>non-refundable consultancy fee</p>
+                      <p className="text-xs font-semibold" style={{ color: C.tBody }}>First Payment</p>
+                      <p className="text-[11px]" style={{ color: C.tFaint }}>non-refundable consultancy fee</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold" style={{ color: GOLD_L }}>HK$3,000</p>
-                      <p className="text-[10px]" style={{ color: TEXT_FAINT }}>fixed</p>
+                      <p className="text-sm font-bold" style={{ color: C.tHead }}>HK$3,000</p>
+                      <p className="text-[10px]" style={{ color: C.tFaint }}>fixed</p>
                     </div>
                   </div>
 
-                  {/* Stage 2 */}
                   <div className="mb-3">
-                    <p className="text-xs font-semibold mb-0.5" style={{ color: GOLD_B }}>Stage 2 — Application</p>
-                    <p className="text-[11px] mb-1.5" style={{ color: TEXT_FAINT }}>due before first submission</p>
+                    <p className="text-xs font-semibold mb-0.5" style={{ color: C.tBody }}>Stage 2 — Application</p>
+                    <p className="text-[11px] mb-1.5" style={{ color: C.tFaint }}>due before first submission</p>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold" style={{ color: GOLD }}>HK$</span>
                       <input type="number" value={d.stage2}
@@ -292,10 +299,9 @@ export default function Pricing() {
                     </div>
                   </div>
 
-                  {/* Stage 3 */}
                   <div>
-                    <p className="text-xs font-semibold mb-0.5" style={{ color: GOLD_B }}>Stage 3 — Success Fee</p>
-                    <p className="text-[11px] mb-1.5" style={{ color: TEXT_FAINT }}>within 7 days of offer letter</p>
+                    <p className="text-xs font-semibold mb-0.5" style={{ color: C.tBody }}>Stage 3 — Success Fee</p>
+                    <p className="text-[11px] mb-1.5" style={{ color: C.tFaint }}>within 7 days of offer letter</p>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold" style={{ color: GOLD }}>HK$</span>
                       <input type="number" value={d.stage3}
@@ -305,9 +311,8 @@ export default function Pricing() {
                     </div>
                   </div>
 
-                  {/* Balance indicator */}
                   <div className="mt-3 pt-3 border-t flex items-center justify-between gap-2 text-[11px] font-semibold"
-                    style={{ borderColor: BORDER, color: ok ? GOLD_B : "#f87171" }}>
+                    style={{ borderColor: C.border, color: ok ? GOLD_B : "#f87171" }}>
                     <span className="flex items-center gap-1.5">
                       {ok
                         ? <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Amounts balance</>
@@ -320,8 +325,8 @@ export default function Pricing() {
                 </div>
 
                 {/* Per-card note */}
-                <div className="rounded-xl border px-3.5 py-3 mb-4" style={{ background: "rgba(162,137,89,0.03)", borderColor: BORDER }}>
-                  <p className="text-[11px] leading-relaxed flex items-start gap-1.5" style={{ color: TEXT_MID }}>
+                <div className="rounded-xl border px-3.5 py-3 mb-4" style={{ background: C.muted, borderColor: C.border }}>
+                  <p className="text-[11px] leading-relaxed flex items-start gap-1.5" style={{ color: C.tMid }}>
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: GOLD }}>
                       <circle cx="8" cy="8" r="6"/><path d="M8 7v4M8 5.5v.5" strokeLinecap="round"/>
                     </svg>
@@ -344,9 +349,9 @@ export default function Pricing() {
                 <button onClick={() => saveCard(tier)} disabled={isSaving || !ok}
                   className="mt-auto w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 border"
                   style={{
-                    background: isSaved ? "rgba(162,137,89,0.12)" : "rgba(162,137,89,0.08)",
-                    color: isSaved ? GOLD_L : GOLD_B,
-                    borderColor: isSaved ? BORDER_STR : BORDER_MED,
+                    background: isSaved ? "rgba(162,137,89,0.12)" : C.accentBg,
+                    color: isSaved ? C.tHead : GOLD_B,
+                    borderColor: isSaved ? C.borderStr : C.borderMed,
                   }}>
                   {isSaving ? (
                     <><span className="w-3.5 h-3.5 rounded-full border-2 animate-spin" style={{ borderColor: GOLD_B, borderTopColor: "transparent" }} /> Saving…</>
@@ -364,8 +369,8 @@ export default function Pricing() {
       </div>
 
       {/* Footer note */}
-      <div className="mt-5 rounded-xl border px-5 py-4" style={{ background: "rgba(162,137,89,0.04)", borderColor: BORDER }}>
-        <p className="text-xs leading-relaxed" style={{ color: TEXT_MID }}>
+      <div className="mt-5 rounded-xl border px-5 py-4" style={{ background: C.muted, borderColor: C.border }}>
+        <p className="text-xs leading-relaxed" style={{ color: C.tMid }}>
           <span className="font-semibold" style={{ color: GOLD_B }}>Note:</span>{" "}
           Amounts must balance — Total must equal HK$3,000 (first payment) + Stage 2 + Stage 3.
           Changes take effect immediately on the public packages page. Each card saves independently.
@@ -375,20 +380,20 @@ export default function Pricing() {
       {/* Bank Details */}
       <div className="mt-10">
         <div className="mb-5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: MUTED, border: `1px solid ${BORDER_MED}` }}>
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: C.muted, border: `1px solid ${C.borderMed}` }}>
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4" style={{ color: GOLD_B }}>
               <path d="M2 14V7M6 14V7M10 14V7M14 14V7M1 7h14M8 2l7 5H1l7-5z" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-bold" style={{ color: GOLD_L }}>Payment Bank Details</h2>
-            <p className="text-xs" style={{ color: TEXT_FAINT }}>
+            <h2 className="text-lg font-bold" style={{ color: C.tHead }}>Payment Bank Details</h2>
+            <p className="text-xs" style={{ color: C.tFaint }}>
               Displayed on the student portal payment page. Update whenever account details change.
             </p>
           </div>
         </div>
 
-        <div className="rounded-2xl border overflow-hidden" style={{ background: CARD, borderColor: BORDER_MED }}>
+        <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
           <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${GOLD_B}, transparent)` }} />
           <div className="p-6 grid md:grid-cols-2 gap-5">
             {([
@@ -398,22 +403,22 @@ export default function Pricing() {
               { key: "fps",           label: "FPS ID / Phone", placeholder: "e.g. 60606457" },
             ] as { key: keyof BankDetails; label: string; placeholder: string }[]).map(({ key, label, placeholder }) => (
               <div key={key}>
-                <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: TEXT_FAINT }}>{label}</label>
+                <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: C.tFaint }}>{label}</label>
                 <input type="text" value={bankDetails[key]}
                   onChange={e => { setBankDetails(prev => ({ ...prev, [key]: e.target.value })); setBankSaved(false); }}
                   placeholder={placeholder}
                   className="w-full px-3 py-2.5 rounded-xl border text-sm outline-none transition-all placeholder:opacity-30"
-                  style={{ ...inputStyle, borderColor: BORDER_MED }} />
+                  style={inputStyle} />
               </div>
             ))}
 
             <div className="md:col-span-2">
-              <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: TEXT_FAINT }}>Additional Info (optional)</label>
+              <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: C.tFaint }}>Additional Info (optional)</label>
               <textarea rows={2} value={bankDetails.additionalInfo}
                 onChange={e => { setBankDetails(prev => ({ ...prev, additionalInfo: e.target.value })); setBankSaved(false); }}
                 placeholder="e.g. Please include your full name in the payment reference."
                 className="w-full px-3 py-2.5 rounded-xl border text-sm outline-none transition-all resize-none placeholder:opacity-30"
-                style={{ ...inputStyle, borderColor: BORDER_MED }} />
+                style={inputStyle} />
             </div>
           </div>
 
@@ -429,9 +434,9 @@ export default function Pricing() {
             <button onClick={saveBankDetails} disabled={bankSaving}
               className="ml-auto flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-40 hover:opacity-90 border"
               style={{
-                background: bankSaved ? "rgba(162,137,89,0.12)" : "rgba(162,137,89,0.08)",
-                color: bankSaved ? GOLD_L : GOLD_B,
-                borderColor: bankSaved ? BORDER_STR : BORDER_MED,
+                background: bankSaved ? "rgba(162,137,89,0.12)" : C.accentBg,
+                color: bankSaved ? C.tHead : GOLD_B,
+                borderColor: bankSaved ? C.borderStr : C.borderMed,
               }}>
               {bankSaving ? (
                 <><span className="w-3.5 h-3.5 rounded-full border-2 animate-spin" style={{ borderColor: GOLD_B, borderTopColor: "transparent" }} />Saving…</>

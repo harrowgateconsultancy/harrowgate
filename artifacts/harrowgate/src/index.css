@@ -126,15 +126,16 @@
 }
 
 .dark {
-  --background: 220 64% 12%;
-  --foreground: 210 40% 98%;
-  
-  --border: 220 64% 20%;
-  
-  --card: 220 64% 16%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 220 64% 20%;
-  
+  /* Dark Forest Green — matches student portal theme */
+  --background: 141 60% 7%;
+  --foreground: 42 65% 88%;
+
+  --border: 141 42% 14%;
+
+  --card: 141 50% 12%;
+  --card-foreground: 42 65% 88%;
+  --card-border: 141 42% 18%;
+
   --sidebar: 141 51% 8%;
   --sidebar-foreground: 42 32% 78%;
   --sidebar-border: 141 45% 6%;
@@ -143,27 +144,27 @@
   --sidebar-accent: 141 40% 11%;
   --sidebar-accent-foreground: 42 42% 88%;
   --sidebar-ring: 44 54% 54%;
-  
-  --popover: 220 64% 16%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 220 64% 20%;
-  
+
+  --popover: 141 50% 12%;
+  --popover-foreground: 42 65% 88%;
+  --popover-border: 141 42% 18%;
+
   --primary: 44 54% 54%;
-  --primary-foreground: 220 64% 16%;
-  
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  
-  --muted: 220 64% 20%;
-  --muted-foreground: 215 20.2% 65.1%;
-  
-  --accent: 220 64% 20%;
-  --accent-foreground: 210 40% 98%;
-  
+  --primary-foreground: 141 60% 7%;
+
+  --secondary: 141 40% 15%;
+  --secondary-foreground: 42 65% 88%;
+
+  --muted: 141 40% 14%;
+  --muted-foreground: 42 28% 52%;
+
+  --accent: 141 40% 14%;
+  --accent-foreground: 42 65% 88%;
+
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 40% 98%;
-  
-  --input: 220 64% 20%;
+
+  --input: 141 40% 14%;
   --ring: 44 54% 54%;
 }
 
