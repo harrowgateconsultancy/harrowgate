@@ -1505,13 +1505,13 @@ export default function Portal() {
                                                 borderColor: isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.25)" : "rgba(162,137,89,0.35)",
                                               }}>
                                               <p className="text-sm font-bold" style={{ color: isUpcoming ? "rgba(232,218,180,0.45)" : isCurrent ? GOLD : "#f0d28c" }}>{displayAmount}</p>
-                                              <p className="text-xs mt-0.5" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>{t(tier.labelKey)}</p>
+                                              <p className="text-xs mt-0.5" style={{ color: isUpcoming ? "rgba(232,218,180,0.45)" : "rgba(232,218,180,0.75)" }}>{t(tier.labelKey)}</p>
                                             </div>
                                           );
                                         });
                                       })()}
                                     </div>
-                                    <p className="text-xs" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>
+                                    <p className="text-xs" style={{ color: isUpcoming ? "rgba(232,218,180,0.4)" : "rgba(232,218,180,0.65)" }}>
                                       * {t((step as any).tierNoteKey)}
                                     </p>
                                   </div>
