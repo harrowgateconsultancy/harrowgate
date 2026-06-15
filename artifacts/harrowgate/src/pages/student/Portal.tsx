@@ -1432,12 +1432,12 @@ export default function Portal() {
                                   className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all"
                                   style={{
                                     background: isDone ? "rgba(162,137,89,0.15)" : isCurrent ? "rgba(162,137,89,0.18)" : "rgba(162,137,89,0.04)",
-                                    border: `1.5px solid ${isDone ? "rgba(74,222,128,0.45)" : isCurrent ? GOLD : "rgba(162,137,89,0.12)"}`,
-                                    color: isDone ? "#4ade80" : isCurrent ? GOLD : "rgba(162,137,89,0.25)",
+                                    border: `1.5px solid ${isDone ? "rgba(162,137,89,0.45)" : isCurrent ? GOLD : "rgba(162,137,89,0.12)"}`,
+                                    color: isDone ? "#f0d28c" : isCurrent ? GOLD : "rgba(232,218,180,0.45)",
                                     boxShadow: isCurrent ? "0 0 14px rgba(162,137,89,0.2)" : "none",
                                   }}>
                                   {isDone ? (
-                                    <svg viewBox="0 0 14 14" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                                    <svg viewBox="0 0 14 14" fill="none" stroke="#f0d28c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
                                       <polyline points="2,7 5.5,10.5 12,3.5" />
                                     </svg>
                                   ) : step.num}
@@ -1447,21 +1447,21 @@ export default function Portal() {
                               <div
                                 className="flex-1 rounded-xl px-4 py-3 border transition-all"
                                 style={{
-                                  background: isCurrent ? "rgba(162,137,89,0.07)" : isDone ? "rgba(74,222,128,0.04)" : "rgba(162,137,89,0.02)",
-                                  borderColor: isCurrent ? "rgba(162,137,89,0.28)" : isDone ? "rgba(74,222,128,0.18)" : "rgba(162,137,89,0.07)",
+                                  background: isCurrent ? "rgba(162,137,89,0.07)" : isDone ? "rgba(162,137,89,0.06)" : "rgba(162,137,89,0.02)",
+                                  borderColor: isCurrent ? "rgba(162,137,89,0.28)" : isDone ? "rgba(162,137,89,0.25)" : "rgba(162,137,89,0.07)",
                                   boxShadow: isCurrent ? "0 2px 16px rgba(162,137,89,0.08)" : "none",
                                 }}>
                                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                                  <p className="text-sm font-semibold" style={{ color: isCurrent ? GOLD : isDone ? "#4ade80" : "rgba(162,137,89,0.28)" }}>
+                                  <p className="text-sm font-semibold" style={{ color: isCurrent ? GOLD : isDone ? "#f0d28c" : "rgba(232,218,180,0.45)" }}>
                                     {t(step.labelKey)}
                                     {isCurrent && <span className="ml-2 text-xs font-normal px-2 py-0.5 rounded-full" style={{ background: "rgba(162,137,89,0.12)", color: GOLD }}>{t("journey.current")}</span>}
                                   </p>
                                   {step.amount && (
                                     <span className="text-sm font-bold px-3 py-1 rounded-lg shrink-0"
                                       style={{
-                                        background: isUpcoming ? "rgba(162,137,89,0.05)" : isCurrent ? "rgba(162,137,89,0.15)" : "rgba(74,222,128,0.08)",
-                                        color: isUpcoming ? "rgba(162,137,89,0.3)" : isCurrent ? GOLD : "#4ade80",
-                                        border: `1px solid ${isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.3)" : "rgba(74,222,128,0.2)"}`,
+                                        background: isUpcoming ? "rgba(162,137,89,0.05)" : isCurrent ? "rgba(162,137,89,0.15)" : "rgba(162,137,89,0.12)",
+                                        color: isUpcoming ? "rgba(232,218,180,0.45)" : isCurrent ? GOLD : "#f0d28c",
+                                        border: `1px solid ${isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.3)" : "rgba(162,137,89,0.35)"}`,
                                       }}>
                                       {step.amount}
                                       {step.noteKey && <span className="ml-1 text-xs font-normal opacity-70">({t(step.noteKey)})</span>}
@@ -1501,10 +1501,10 @@ export default function Portal() {
                                           return (
                                             <div key={tier.labelKey} className="flex flex-col items-center px-3 py-2 rounded-lg border text-center"
                                               style={{
-                                                background: isUpcoming ? "rgba(162,137,89,0.03)" : isCurrent ? "rgba(162,137,89,0.1)" : "rgba(74,222,128,0.06)",
-                                                borderColor: isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.25)" : "rgba(74,222,128,0.2)",
+                                                background: isUpcoming ? "rgba(162,137,89,0.03)" : isCurrent ? "rgba(162,137,89,0.1)" : "rgba(162,137,89,0.12)",
+                                                borderColor: isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.25)" : "rgba(162,137,89,0.35)",
                                               }}>
-                                              <p className="text-sm font-bold" style={{ color: isUpcoming ? "rgba(162,137,89,0.28)" : isCurrent ? GOLD : "#4ade80" }}>{displayAmount}</p>
+                                              <p className="text-sm font-bold" style={{ color: isUpcoming ? "rgba(232,218,180,0.45)" : isCurrent ? GOLD : "#f0d28c" }}>{displayAmount}</p>
                                               <p className="text-xs mt-0.5" style={{ color: isUpcoming ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.45)" }}>{t(tier.labelKey)}</p>
                                             </div>
                                           );
@@ -1553,11 +1553,11 @@ export default function Portal() {
                       <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
                         style={{
                           background: step.done ? "rgba(162,137,89,0.15)" : step.current ? "rgba(162,137,89,0.14)" : "rgba(162,137,89,0.04)",
-                          border: `1.5px solid ${step.done ? "rgba(74,222,128,0.4)" : step.current ? "rgba(162,137,89,0.35)" : "rgba(162,137,89,0.1)"}`,
+                          border: `1.5px solid ${step.done ? "rgba(162,137,89,0.45)" : step.current ? "rgba(162,137,89,0.35)" : "rgba(162,137,89,0.1)"}`,
                           boxShadow: step.current ? "0 0 10px rgba(162,137,89,0.15)" : "none",
                         }}>
                         {step.done ? (
-                          <svg viewBox="0 0 14 14" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                          <svg viewBox="0 0 14 14" fill="none" stroke="#f0d28c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
                             <polyline points="2,7 5.5,10.5 12,3.5" />
                           </svg>
                         ) : step.current ? (
@@ -1567,13 +1567,13 @@ export default function Portal() {
                         )}
                       </div>
                       {i < arr.length - 1 && (
-                        <div className="w-px flex-1 my-1" style={{ background: step.done ? "rgba(74,222,128,0.2)" : "rgba(162,137,89,0.07)", minHeight: 20 }} />
+                        <div className="w-px flex-1 my-1" style={{ background: step.done ? "rgba(196,169,110,0.3)" : "rgba(162,137,89,0.07)", minHeight: 20 }} />
                       )}
                     </div>
                     <div className="pb-5 flex-1 min-w-0 pt-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-sm font-semibold leading-tight"
-                          style={{ color: step.done ? "#4ade80" : step.current ? GOLD : "rgba(162,137,89,0.28)" }}>
+                          style={{ color: step.done ? "#f0d28c" : step.current ? GOLD : "rgba(232,218,180,0.45)" }}>
                           {step.label}
                         </p>
                         {step.current && (
@@ -1583,7 +1583,7 @@ export default function Portal() {
                         )}
                       </div>
                       <p className="text-xs mt-0.5 leading-relaxed"
-                        style={{ color: step.done ? "rgba(74,222,128,0.5)" : step.current ? "rgba(162,137,89,0.55)" : "rgba(162,137,89,0.25)" }}>
+                        style={{ color: step.done ? "rgba(240,210,140,0.55)" : step.current ? "rgba(232,218,180,0.6)" : "rgba(232,218,180,0.35)" }}>
                         {step.note}
                       </p>
                     </div>
