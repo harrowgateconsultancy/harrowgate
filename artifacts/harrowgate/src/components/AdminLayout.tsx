@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FileText, Menu, X, Bell, TrendingUp, UserCog, Tag, Sun, Moon, Settings, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Menu, X, Bell, TrendingUp, UserCog, Tag, Sun, Moon, Settings, LogOut, Shield, Receipt } from "lucide-react";
 import { useState } from "react";
 import { AdminThemeProvider, useAdminTheme } from "@/contexts/AdminThemeContext";
 
@@ -18,6 +18,7 @@ const ALL_NAV_ITEMS = [
   { href: "/admin/applications", label: "Applications",icon: FileText,        exact: false, roles: ["admin","manager","staff"] },
   { href: "/admin/submissions",  label: "Submissions", icon: Bell,            exact: false, roles: ["admin","manager","staff"] },
   { href: "/admin/finance",      label: "Finance",     icon: TrendingUp,      exact: false, roles: ["admin"] },
+  { href: "/admin/invoice",      label: "Invoice",     icon: Receipt,         exact: false, roles: ["admin","manager"] },
   { href: "/admin/staff",        label: "Staff & Tasks",icon: UserCog,        exact: false, roles: ["admin","manager","staff"] },
   { href: "/admin/pricing",      label: "Pricing",     icon: Tag,             exact: false, roles: ["admin"] },
   { href: "/admin/settings",     label: "Settings",    icon: Settings,        exact: false, roles: ["admin"] },
