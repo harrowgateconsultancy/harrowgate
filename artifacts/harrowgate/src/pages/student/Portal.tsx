@@ -90,22 +90,22 @@ export type Submission = {
 
 const statusMap: Record<string, { color: string; bg: string }> = {
   pending:                       { color: GOLD,        bg: "rgba(162,137,89,0.12)" },
-  approved:                      { color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  approved:                      { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   docs_requested:                { color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
   payment_pending:               { color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
   payment_received:              { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
-  acknowledged:                  { color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  interview_arranged:            { color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
-  interview_completed:           { color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  acknowledged:                  { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
+  interview_arranged:            { color: "#f0d28c",   bg: "rgba(167,139,250,0.12)" },
+  interview_completed:           { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   second_payment_pending:        { color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
   second_payment_received:       { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
-  second_payment_confirmed:      { color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  university_interview_arranged: { color: "#38bdf8",   bg: "rgba(56,189,248,0.12)" },
-  university_interview_completed:{ color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  second_payment_confirmed:      { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
+  university_interview_arranged: { color: "#f0d28c",   bg: "rgba(56,189,248,0.12)" },
+  university_interview_completed:{ color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   offer_letter_pending:          { color: "#fb923c",   bg: "rgba(251,146,60,0.12)"  },
   final_payment_received:        { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
-  final_payment_confirmed:       { color: "#4ade80",   bg: "rgba(74,222,128,0.12)"  },
-  visa_issued:                   { color: "#34d399",   bg: "rgba(52,211,153,0.12)"  },
+  final_payment_confirmed:       { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)"  },
+  visa_issued:                   { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)"  },
   rejected:                      { color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
@@ -376,7 +376,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
           </div>
           {composeSent ? (
             <div className="px-5 py-10 text-center">
-              <div className="flex items-center justify-center mb-3"><div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 24 24" fill="none" className="w-7 h-7"><circle cx="12" cy="12" r="9" stroke="#4ade80" strokeWidth="1.8"/><path d="M7.5 12l3 3 6-6" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
+              <div className="flex items-center justify-center mb-3"><div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 24 24" fill="none" className="w-7 h-7"><circle cx="12" cy="12" r="9" stroke="#4ade80" strokeWidth="1.8"/><path d="M7.5 12l3 3 6-6" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
               <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>Message sent!</p>
               <p className="text-xs mt-1" style={{ color: "rgba(232,218,180,0.82)" }}>Your email has been sent successfully.</p>
             </div>
@@ -617,7 +617,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                       <p className="text-xs mt-0.5 truncate font-medium" style={{ color: "rgba(232,218,180,0.93)" }}>{item.subject}</p>
                       <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(232,218,180,0.75)" }}>{item.body}</p>
                     </div>
-                    <span className="text-xs px-2 py-0.5 rounded-full shrink-0" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>Sent</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full shrink-0" style={{ background: "rgba(162,137,89,0.12)", color: "#c4a96e" }}>Sent</span>
                   </div>
                 </div>
               ))}
@@ -1010,8 +1010,8 @@ export default function Portal() {
               return (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                   className="relative flex items-center justify-center gap-2 px-6 py-3 font-bold tracking-wide transition-all group"
-                  onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "#f0d28c"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(196,169,110,0.08)"; } }}
-                  onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "rgba(232,218,180,0.55)"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; } }}
+                  onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "#f0d28c"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(196,169,110,0.08)"; (e.currentTarget as HTMLButtonElement).style.textShadow = "0 0 18px rgba(240,210,140,0.55)"; } }}
+                  onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "rgba(232,218,180,0.55)"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; (e.currentTarget as HTMLButtonElement).style.textShadow = "none"; } }}
                   style={{
                     color: isActive ? "#ffffff" : "rgba(232,218,180,0.55)",
                     borderBottom: `2px solid ${isActive ? "#f0d28c" : "transparent"}`,
@@ -1135,7 +1135,7 @@ export default function Portal() {
             {submission.status === "approved" && (
               <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
                 <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(240,210,140,0.12)", border: "1px solid rgba(196,169,110,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 4l3 9h9l-7.5 5.5 3 9L24 22l-7.5 5.5 3-9L12 13h9L24 4z" stroke="#f0d28c" strokeWidth="2" strokeLinejoin="round"/><path d="M8 36l2-6M40 36l-2-6M14 42l4-4M34 42l-4-4" stroke="#c4a96e" strokeWidth="2" strokeLinecap="round"/></svg></div></div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: "#4ade80" }}>{t("s.approvedTitle")}</h3>
+                <h3 className="text-xl font-bold mb-3" style={{ color: "#f0d28c" }}>{t("s.approvedTitle")}</h3>
                 <p className="text-base leading-relaxed mb-2" style={{ color: "rgba(74,222,128,0.75)" }}>{t("s.approvedSub")}</p>
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(74,222,128,0.55)" }}>{t("s.approvedNote")}</p>
               </div>
@@ -1159,17 +1159,17 @@ export default function Portal() {
             {/* ── ACKNOWLEDGED ── */}
             {submission.status === "acknowledged" && !showTimeline && (
               <div className="mt-6 rounded-2xl p-8 text-center border" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#4ade80" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.payReceived")}</h3>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#4ade80" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#f0d28c" }}>{t("s.payReceived")}</h3>
                 <p className="text-sm mb-6" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.payReceivedSub")}</p>
                 <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border mb-6" style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)" }}>
                   <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(74,222,128,0.5)" }}>{t("s.ackCodeLabel")}</p>
-                  <p className="text-3xl font-bold tracking-widest font-mono" style={{ color: "#4ade80" }}>STU{submission.passportNumber.slice(-4).toUpperCase()}</p>
+                  <p className="text-3xl font-bold tracking-widest font-mono" style={{ color: "#f0d28c" }}>STU{submission.passportNumber.slice(-4).toUpperCase()}</p>
                   <p className="text-xs mt-1" style={{ color: "rgba(74,222,128,0.4)" }}>{t("s.ackCodeNote")}</p>
                 </div>
                 <button onClick={() => { setShowTimeline(true); setActiveTab("progress"); }}
                   className="px-8 py-3 rounded-full text-sm font-semibold border transition-all hover:opacity-80"
-                  style={{ borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
+                  style={{ borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c", background: "rgba(162,137,89,0.08)" }}>
                   View Progress →
                 </button>
               </div>
@@ -1178,27 +1178,27 @@ export default function Portal() {
             {/* ── INTERVIEW ARRANGED ── */}
             {submission.status === "interview_arranged" && (
               <div className="mt-6 rounded-2xl p-8 border" style={{ background: "rgba(167,139,250,0.04)", borderColor: "rgba(167,139,250,0.2)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><rect x="2" y="11" width="30" height="26" rx="4" stroke="#a78bfa" strokeWidth="2.5"/><path d="M32 19l12-6v22l-12-6" stroke="#a78bfa" strokeWidth="2.5" strokeLinejoin="round"/></svg></div></div>
-                <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#a78bfa" }}>{t("s.mockScheduled")}</h3>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.12)", border: "1px solid rgba(162,137,89,0.35)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><rect x="2" y="11" width="30" height="26" rx="4" stroke="#c4a96e" strokeWidth="2.5"/><path d="M32 19l12-6v22l-12-6" stroke="#c4a96e" strokeWidth="2.5" strokeLinejoin="round"/></svg></div></div>
+                <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#f0d28c" }}>{t("s.mockScheduled")}</h3>
                 <p className="text-sm text-center mb-6" style={{ color: "rgba(167,139,250,0.65)" }}>{t("s.mockScheduledSub")}</p>
                 <div className="rounded-2xl border p-5 mb-6" style={{ background: "rgba(167,139,250,0.06)", borderColor: "rgba(167,139,250,0.2)" }}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {submission.interviewDateTime && (
                       <div>
                         <p className="text-xs font-medium mb-1" style={{ color: "rgba(167,139,250,0.5)" }}>{t("s.dateTime")}</p>
-                        <p className="text-sm font-semibold" style={{ color: "#a78bfa" }}>{submission.interviewDateTime}</p>
+                        <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>{submission.interviewDateTime}</p>
                       </div>
                     )}
                     <div>
                       <p className="text-xs font-medium mb-1" style={{ color: "rgba(167,139,250,0.5)" }}>{t("s.platform")}</p>
-                      <p className="text-sm font-semibold" style={{ color: "#a78bfa" }}>Zoom</p>
+                      <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>Zoom</p>
                     </div>
                   </div>
                 </div>
                 {submission.interviewZoomLink && (
                   <a href={submission.interviewZoomLink} target="_blank" rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-base font-semibold transition-all hover:opacity-90"
-                    style={{ background: "#a78bfa", color: "#0f2d18" }}>
+                    style={{ background: "#c4a96e", color: "#0b2213" }}>
                     <svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 shrink-0"><rect x="1" y="5" width="12" height="10" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M13 8l5-2v8l-5-2" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> {t("s.joinZoom")}
                   </a>
                 )}
@@ -1208,8 +1208,8 @@ export default function Portal() {
             {/* ── INTERVIEW COMPLETED ── */}
             {submission.status === "interview_completed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#4ade80" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.mockCompleted")}</h3>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#4ade80" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#f0d28c" }}>{t("s.mockCompleted")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.mockCompletedSub")}</p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>{t("s.awaitingNext")}</p>
                 <p className="text-sm mt-2" style={{ color: "rgba(232,218,180,0.87)" }}>{t("s.teamInTouch")}</p>
@@ -1224,8 +1224,8 @@ export default function Portal() {
             {/* ── 2ND PAYMENT CONFIRMED ── */}
             {submission.status === "second_payment_confirmed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#4ade80" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.pay2Confirmed")}</h3>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#4ade80" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
+                <h3 className="text-xl font-bold mb-2" style={{ color: "#f0d28c" }}>{t("s.pay2Confirmed")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.pay2ConfirmedSub")}</p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>{t("s.awaitingUniInterview")}</p>
                 <p className="text-sm mt-2" style={{ color: "rgba(232,218,180,0.87)" }}>{t("s.uniCoordinating")}</p>
@@ -1236,26 +1236,26 @@ export default function Portal() {
             {submission.status === "university_interview_arranged" && (() => {
               const isTeams = submission.uniInterviewPlatform === "teams";
               const platformLabel = isTeams ? "Microsoft Teams" : "Zoom";
-              const platformColor = isTeams ? "#6264a7" : "#2d8cff";
+              const platformColor = isTeams ? "#6264a7" : "#c4a96e";
               const platformIcon = isTeams
-                ? <svg viewBox="0 0 48 48" fill="none" className="w-8 h-8"><rect x="6" y="12" width="24" height="24" rx="4" stroke="#6264a7" strokeWidth="2.5"/><rect x="22" y="18" width="14" height="12" rx="3" stroke="#6264a7" strokeWidth="2.5"/><path d="M22 20l8-4v16l-8-4" stroke="#6264a7" strokeWidth="2" strokeLinejoin="round"/></svg>
-                : <svg viewBox="0 0 48 48" fill="none" className="w-8 h-8"><rect x="2" y="11" width="30" height="26" rx="4" stroke="#38bdf8" strokeWidth="2.5"/><path d="M32 19l12-6v22l-12-6" stroke="#38bdf8" strokeWidth="2.5" strokeLinejoin="round"/></svg>;
+                ? <svg viewBox="0 0 48 48" fill="none" className="w-8 h-8"><rect x="6" y="12" width="24" height="24" rx="4" stroke="#c4a96e" strokeWidth="2.5"/><rect x="22" y="18" width="14" height="12" rx="3" stroke="#c4a96e" strokeWidth="2.5"/><path d="M22 20l8-4v16l-8-4" stroke="#6264a7" strokeWidth="2" strokeLinejoin="round"/></svg>
+                : <svg viewBox="0 0 48 48" fill="none" className="w-8 h-8"><rect x="2" y="11" width="30" height="26" rx="4" stroke="#c4a96e" strokeWidth="2.5"/><path d="M32 19l12-6v22l-12-6" stroke="#c4a96e" strokeWidth="2.5" strokeLinejoin="round"/></svg>;
               return (
-                <div className="mt-6 rounded-2xl p-8 border" style={{ background: "rgba(56,189,248,0.04)", borderColor: "rgba(56,189,248,0.2)" }}>
-                  <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: isTeams ? "rgba(98,100,167,0.12)" : "rgba(56,189,248,0.12)", border: `1px solid ${isTeams ? "rgba(98,100,167,0.3)" : "rgba(56,189,248,0.3)"}` }}>{platformIcon}</div></div>
-                  <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#38bdf8" }}>{t("s.uniScheduled")}</h3>
-                  <p className="text-sm text-center mb-6" style={{ color: "rgba(56,189,248,0.65)" }}>{t("s.uniScheduledSub")}</p>
-                  <div className="rounded-2xl border p-5 mb-6" style={{ background: "rgba(56,189,248,0.06)", borderColor: "rgba(56,189,248,0.2)" }}>
+                <div className="mt-6 rounded-2xl p-8 border" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.35)" }}>
+                  <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: isTeams ? "rgba(162,137,89,0.12)" : "rgba(56,189,248,0.12)", border: `1px solid ${isTeams ? "rgba(162,137,89,0.35)" : "rgba(56,189,248,0.3)"}` }}>{platformIcon}</div></div>
+                  <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#f0d28c" }}>{t("s.uniScheduled")}</h3>
+                  <p className="text-sm text-center mb-6" style={{ color: "rgba(240,210,140,0.65)" }}>{t("s.uniScheduledSub")}</p>
+                  <div className="rounded-2xl border p-5 mb-6" style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.35)" }}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {submission.uniInterviewDateTime && (
                         <div>
                           <p className="text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.5)" }}>{t("s.dateTime")}</p>
-                          <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>{submission.uniInterviewDateTime}</p>
+                          <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>{submission.uniInterviewDateTime}</p>
                         </div>
                       )}
                       <div>
                         <p className="text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.5)" }}>{t("s.platform")}</p>
-                        <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>{platformLabel}</p>
+                        <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>{platformLabel}</p>
                       </div>
                     </div>
                   </div>
@@ -1268,9 +1268,9 @@ export default function Portal() {
                   )}
                   <button onClick={handleCompleteUni} disabled={completingUni}
                     className="w-full py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
-                    style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.25)", color: "#4ade80" }}>
+                    style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                     {completingUni
-                      ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#4ade80", borderTopColor: "transparent" }} /> {t("s.updatingUni")}</>
+                      ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#f0d28c", borderTopColor: "transparent" }} /> {t("s.updatingUni")}</>
                       : t("s.uniCompletedBtn")}
                   </button>
                 </div>
@@ -1280,7 +1280,7 @@ export default function Portal() {
             {/* ── UNIVERSITY INTERVIEW COMPLETED ── */}
             {submission.status === "university_interview_completed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#4ade80" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#4ade80" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>{t("s.uniInterviewCompleted")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>{t("s.uniInterviewCompletedSub")}</p>
                 <div className="mt-5 px-6 py-5 rounded-2xl border" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
@@ -1320,40 +1320,40 @@ export default function Portal() {
               const eVisaDoc = submission.documents.find(d => d.documentType === "evisa");
               return (
                 <div className="mt-6 space-y-4">
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(74,222,128,0.25)" }}>
-                    <div className="px-6 py-5 border-b text-center" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.25)" }}>
+                    <div className="px-6 py-5 border-b text-center" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
                       <div className="flex items-center justify-center mb-3"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(240,210,140,0.12)", border: "1px solid rgba(196,169,110,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 4l3 9h9l-7.5 5.5 3 9L24 22l-7.5 5.5 3-9L12 13h9L24 4z" stroke="#f0d28c" strokeWidth="2" strokeLinejoin="round"/><path d="M8 36l2-6M40 36l-2-6M14 42l4-4M34 42l-4-4" stroke="#c4a96e" strokeWidth="2" strokeLinecap="round"/></svg></div></div>
-                      <h3 className="text-xl font-bold mb-1" style={{ color: "#4ade80" }}>{t("s.congratulations")}</h3>
-                      <p className="text-sm" style={{ color: "rgba(74,222,128,0.6)" }}>{t("s.congratulationsSub")}</p>
+                      <h3 className="text-xl font-bold mb-1" style={{ color: "#f0d28c" }}>{t("s.congratulations")}</h3>
+                      <p className="text-sm" style={{ color: "rgba(240,210,140,0.65)" }}>{t("s.congratulationsSub")}</p>
                     </div>
                     <div className="px-6 py-5 space-y-3">
                       {offerDoc ? (
                         <div className="flex gap-3">
                           <button onClick={() => handleOfferLetterView(submission.id, offerDoc.id)}
                             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
-                            style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)", color: "#4ade80" }}>
+                            style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                             <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z" stroke="currentColor" strokeWidth="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg> {t("s.viewLetter")}
                           </button>
                           <button onClick={() => handleOfferLetterDownload(submission.id, offerDoc.id, offerDoc.fileName)}
                             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
-                            style={{ background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.35)", color: "#4ade80" }}>
+                            style={{ background: "rgba(162,137,89,0.12)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                             <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M10 3v10m0 0l-3.5-3.5M10 13l3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 15v1a1 1 0 001 1h12a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> {t("s.downloadLetter")}
                           </button>
                         </div>
                       ) : (
-                        <p className="text-center text-sm" style={{ color: "rgba(74,222,128,0.45)" }}>{t("s.offerNotAvailable")}</p>
+                        <p className="text-center text-sm" style={{ color: "rgba(240,210,140,0.5)" }}>{t("s.offerNotAvailable")}</p>
                       )}
                       {eVisaDoc && (
-                        <div className="flex gap-3 pt-3 border-t" style={{ borderColor: "rgba(52,211,153,0.15)" }}>
+                        <div className="flex gap-3 pt-3 border-t" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
                           <button onClick={() => handleOfferLetterView(submission.id, eVisaDoc.id)}
                             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
-                            style={{ background: "rgba(52,211,153,0.06)", borderColor: "rgba(52,211,153,0.22)", color: "#34d399" }}>
+                            style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                             <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" strokeWidth="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.3"/></svg>
                             {t("s.eVisaView")}
                           </button>
                           <button onClick={() => handleOfferLetterDownload(submission.id, eVisaDoc.id, eVisaDoc.fileName)}
                             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
-                            style={{ background: "rgba(52,211,153,0.1)", borderColor: "rgba(52,211,153,0.35)", color: "#34d399" }}>
+                            style={{ background: "rgba(162,137,89,0.12)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                             <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                             {t("s.eVisaDownload")}
                           </button>
@@ -1362,17 +1362,17 @@ export default function Portal() {
                     </div>
                   </div>
                   {submission.immigrationRefNumber ? (
-                    <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.3)" }}>
-                      <div className="px-5 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(74,222,128,0.15)" }}>
+                    <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.35)" }}>
+                      <div className="px-5 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
                         <div className="flex-1">
-                          <p className="text-sm font-bold" style={{ color: "#4ade80" }}>🇭🇰 {t("portal.immigRef")}</p>
-                          <p className="text-xs mt-0.5" style={{ color: "rgba(74,222,128,0.5)" }}>{t("portal.immigRefSub")}</p>
+                          <p className="text-sm font-bold" style={{ color: "#f0d28c" }}>🇭🇰 {t("portal.immigRef")}</p>
+                          <p className="text-xs mt-0.5" style={{ color: "rgba(240,210,140,0.5)" }}>{t("portal.immigRefSub")}</p>
                         </div>
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.35)" }}><svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5"><path d="M2 7l3.5 3.5 6.5-7" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.35)" }}><svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5"><path d="M2 7l3.5 3.5 6.5-7" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                       </div>
                       <div className="px-5 py-5">
-                        <p className="font-mono text-3xl font-bold tracking-widest" style={{ color: "#4ade80", letterSpacing: "0.12em" }}>{submission.immigrationRefNumber}</p>
-                        <p className="text-xs mt-2" style={{ color: "rgba(74,222,128,0.45)" }}>{t("portal.processing")}</p>
+                        <p className="font-mono text-3xl font-bold tracking-widest" style={{ color: "#f0d28c", letterSpacing: "0.12em" }}>{submission.immigrationRefNumber}</p>
+                        <p className="text-xs mt-2" style={{ color: "rgba(240,210,140,0.45)" }}>{t("portal.processing")}</p>
                       </div>
                     </div>
                   ) : (
@@ -1431,7 +1431,7 @@ export default function Portal() {
                                 <div
                                   className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all"
                                   style={{
-                                    background: isDone ? "rgba(74,222,128,0.15)" : isCurrent ? "rgba(162,137,89,0.18)" : "rgba(162,137,89,0.04)",
+                                    background: isDone ? "rgba(162,137,89,0.15)" : isCurrent ? "rgba(162,137,89,0.18)" : "rgba(162,137,89,0.04)",
                                     border: `1.5px solid ${isDone ? "rgba(74,222,128,0.45)" : isCurrent ? GOLD : "rgba(162,137,89,0.12)"}`,
                                     color: isDone ? "#4ade80" : isCurrent ? GOLD : "rgba(162,137,89,0.25)",
                                     boxShadow: isCurrent ? "0 0 14px rgba(162,137,89,0.2)" : "none",
@@ -1552,7 +1552,7 @@ export default function Portal() {
                     <div className="flex flex-col items-center" style={{ width: 32, flexShrink: 0 }}>
                       <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
                         style={{
-                          background: step.done ? "rgba(74,222,128,0.15)" : step.current ? "rgba(162,137,89,0.14)" : "rgba(162,137,89,0.04)",
+                          background: step.done ? "rgba(162,137,89,0.15)" : step.current ? "rgba(162,137,89,0.14)" : "rgba(162,137,89,0.04)",
                           border: `1.5px solid ${step.done ? "rgba(74,222,128,0.4)" : step.current ? "rgba(162,137,89,0.35)" : "rgba(162,137,89,0.1)"}`,
                           boxShadow: step.current ? "0 0 10px rgba(162,137,89,0.15)" : "none",
                         }}>
@@ -1704,20 +1704,20 @@ export default function Portal() {
               const offerDoc = submission.documents.find(d => d.documentType === "offer_letter");
               if (!offerDoc) return null;
               return (
-                <div className="mb-4 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(74,222,128,0.2)" }}>
-                  <div className="px-5 py-3.5 border-b flex items-center gap-2" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
-                    <span style={{ color: "#4ade80" }}><svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M5 3h7l4 4v10a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5"/><path d="M12 3v4h4M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></span>
-                    <h3 className="text-sm font-semibold" style={{ color: "#4ade80" }}>Offer Letter</h3>
+                <div className="mb-4 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.2)" }}>
+                  <div className="px-5 py-3.5 border-b flex items-center gap-2" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
+                    <span style={{ color: "#c4a96e" }}><svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M5 3h7l4 4v10a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5"/><path d="M12 3v4h4M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></span>
+                    <h3 className="text-sm font-semibold" style={{ color: "#c4a96e" }}>Offer Letter</h3>
                   </div>
                   <div className="px-5 py-4 flex gap-3">
                     <button onClick={() => handleOfferLetterView(submission.id, offerDoc.id)}
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90"
-                      style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)", color: "#4ade80" }}>
+                      style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                       <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z" stroke="currentColor" strokeWidth="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg> {t("s.viewLetter")}
                     </button>
                     <button onClick={() => handleOfferLetterDownload(submission.id, offerDoc.id, offerDoc.fileName)}
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90"
-                      style={{ background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.35)", color: "#4ade80" }}>
+                      style={{ background: "rgba(162,137,89,0.12)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                       <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M10 3v10m0 0l-3.5-3.5M10 13l3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 15v1a1 1 0 001 1h12a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> {t("s.downloadLetter")}
                     </button>
                   </div>
@@ -1730,8 +1730,8 @@ export default function Portal() {
               const eVisaDoc = submission.documents.find(d => d.documentType === "evisa");
               if (!eVisaDoc) return null;
               return (
-                <div className="mb-4 rounded-2xl border overflow-hidden" style={{ background: "rgba(52,211,153,0.04)", borderColor: "rgba(52,211,153,0.3)" }}>
-                  <div className="px-6 py-5 border-b text-center" style={{ borderColor: "rgba(52,211,153,0.12)" }}>
+                <div className="mb-4 rounded-2xl border overflow-hidden" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.35)" }}>
+                  <div className="px-6 py-5 border-b text-center" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
                     <div className="flex items-center justify-center mb-3">
                       <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(196,169,110,0.18) 0%, rgba(162,137,89,0.08) 100%)", border: "1px solid rgba(196,169,110,0.35)" }}>
                         <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-9 h-9">
@@ -1747,18 +1747,18 @@ export default function Portal() {
                         </svg>
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold mb-1" style={{ color: "#34d399" }}>{t("s.eVisaTitle")}</h3>
-                    <p className="text-sm" style={{ color: "rgba(52,211,153,0.6)" }}>{t("s.eVisaSub")}</p>
+                    <h3 className="text-xl font-bold mb-1" style={{ color: "#f0d28c" }}>{t("s.eVisaTitle")}</h3>
+                    <p className="text-sm" style={{ color: "rgba(240,210,140,0.65)" }}>{t("s.eVisaSub")}</p>
                   </div>
                   <div className="px-6 py-5 flex gap-3">
                     <button onClick={() => handleOfferLetterView(submission.id, eVisaDoc.id)}
                       className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
-                      style={{ background: "rgba(52,211,153,0.06)", borderColor: "rgba(52,211,153,0.22)", color: "#34d399" }}>
+                      style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                       <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z" stroke="currentColor" strokeWidth="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg> {t("s.eVisaView")}
                     </button>
                     <button onClick={() => handleOfferLetterDownload(submission.id, eVisaDoc.id, eVisaDoc.fileName)}
                       className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
-                      style={{ background: "rgba(52,211,153,0.1)", borderColor: "rgba(52,211,153,0.35)", color: "#34d399" }}>
+                      style={{ background: "rgba(162,137,89,0.12)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                       <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       {t("s.eVisaDownload")}
                     </button>
@@ -1819,7 +1819,7 @@ export default function Portal() {
                   <div key={msg.id} className={`flex gap-2.5 ${msg.fromAdmin ? "" : "flex-row-reverse"}`}>
                     <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold mt-0.5"
                       style={{
-                        background: msg.fromAdmin ? "rgba(96,165,250,0.15)" : "rgba(74,222,128,0.15)",
+                        background: msg.fromAdmin ? "rgba(96,165,250,0.15)" : "rgba(162,137,89,0.15)",
                         color: msg.fromAdmin ? "#60a5fa" : "#4ade80",
                       }}>
                       {msg.fromAdmin ? "H" : (submission.name[0] || "Y")}
@@ -1827,7 +1827,7 @@ export default function Portal() {
                     <div className={`max-w-[78%] rounded-2xl px-4 py-3 ${msg.fromAdmin ? "rounded-tl-sm" : "rounded-tr-sm"}`}
                       style={{
                         background: msg.fromAdmin ? "rgba(96,165,250,0.08)" : "rgba(74,222,128,0.08)",
-                        border: `1px solid ${msg.fromAdmin ? "rgba(96,165,250,0.15)" : "rgba(74,222,128,0.15)"}`,
+                        border: `1px solid ${msg.fromAdmin ? "rgba(96,165,250,0.15)" : "rgba(162,137,89,0.15)"}`,
                       }}>
                       <div className="flex items-center justify-between gap-3 mb-1.5">
                         <span className="text-xs font-semibold" style={{ color: msg.fromAdmin ? "#60a5fa" : "#4ade80" }}>
