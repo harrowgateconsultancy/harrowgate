@@ -750,3 +750,134 @@ export async function sendAgentEmail(opts: {
     `,
   });
 }
+
+// ── Send invoice to student ──────────────────────────────────────────────────
+export async function sendInvoiceToStudentEmail(opts: {
+  studentEmail: string;
+  studentName: string;
+  invoiceNo: string;
+  date: string;
+  degreeType: string;
+  items: Array<{ no: number; description: string; qty: number; amount: number }>;
+  schedule: Array<{ no: number; label: string; amount: number }>;
+  remarks: string[];
+  total: number;
+}) {
+  const transport = createTransport();
+  if (!transport) throw new Error("Email credentials not configured (GMAIL_USER / GMAIL_APP_PASSWORD missing).");
+  const itemRows = opts.items.map(it => `
+    <tr>
+      <td style="border:1px solid #ccc;padding:8px 10px;text-align:center;font-size:12px">${it.no}</td>
+      <td style="border:1px solid #ccc;padding:8px 10px;font-size:12px;line-height:1.5">${it.description}</td>
+      <td style="border:1px solid #ccc;padding:8px 10px;text-align:center;font-size:12px">${it.qty}</td>
+      <td style="border:1px solid #ccc;padding:8px 10px;text-align:right;font-size:12px;font-weight:600">HKD$ ${it.amount.toLocaleString("en-HK")}</td>
+    </tr>`).join("");
+  const scheduleRows = opts.schedule.map(r => `
+    <tr>
+      <td style="padding:5px 8px;font-size:11px;color:#555">${r.no}.</td>
+      <td style="padding:5px 8px;font-size:11px">${r.label}</td>
+      <td style="padding:5px 8px;font-size:11px;font-weight:600;text-align:right">HKD$ ${r.amount.toLocaleString("en-HK")}</td>
+    </tr>`).join("");
+  const remarkRows = opts.remarks.map((r, i) => `<p style="margin:4px 0;font-size:11px;line-height:1.6;color:#333"><strong>${i+1})</strong> ${r}</p>`).join("");
+
+  await transport.sendMail({
+    from: `"HARROWGATE Consultancy" <${process.env.GMAIL_USER}>`,
+    to: opts.studentEmail,
+    subject: `Invoice ${opts.invoiceNo} — HARROWGATE Consultancy`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:680px;margin:0 auto;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden">
+        <div style="background:#0b2213;padding:20px 32px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <p style="margin:0;color:#f0d28c;font-size:22px;font-weight:900;letter-spacing:2px">INVOICE</p>
+            <p style="margin:4px 0 0;color:rgba(162,137,89,0.6);font-size:11px;letter-spacing:2px">HARROWGATE CONSULTANCY</p>
+          </div>
+          <div style="text-align:right;color:rgba(162,137,89,0.7);font-size:11px;line-height:1.8">
+            <p style="margin:0">P: +852 6159 0422</p>
+            <p style="margin:0">harrowgateconsultancy@gmail.com</p>
+          </div>
+        </div>
+        <div style="padding:24px 32px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:20px">
+            <div style="font-size:12px;line-height:2"><strong>Bill to:</strong> ${opts.studentName}<br><strong>Degree:</strong> ${opts.degreeType}</div>
+            <div style="text-align:right;font-size:12px;line-height:2"><strong>Invoice No:</strong> ${opts.invoiceNo}<br><strong>Date:</strong> ${opts.date}</div>
+          </div>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:0">
+            <thead>
+              <tr style="background:#0b2213;color:#f0d28c">
+                <th style="border:1px solid #555;padding:8px 10px;text-align:center;font-size:11px;width:36px">NO</th>
+                <th style="border:1px solid #555;padding:8px 10px;text-align:left;font-size:11px">Description</th>
+                <th style="border:1px solid #555;padding:8px 10px;text-align:center;font-size:11px;width:44px">QTY</th>
+                <th style="border:1px solid #555;padding:8px 10px;text-align:right;font-size:11px;width:130px">AMOUNT HKD$</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemRows}
+              <tr style="background:#f5f5f5">
+                <td colspan="3" style="border:1px solid #ccc;padding:8px 10px;text-align:right;font-weight:800;font-size:12px">TOTAL</td>
+                <td style="border:1px solid #ccc;padding:8px 10px;text-align:right;font-weight:900;font-size:13px">HKD$ ${opts.total.toLocaleString("en-HK")}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top:20px">
+            <p style="font-weight:800;font-size:12px;border-bottom:1.5px solid #0b2213;padding-bottom:4px;margin-bottom:8px">Payment Schedule:</p>
+            <table style="width:100%"><tbody>${scheduleRows}</tbody></table>
+          </div>
+          <div style="margin-top:20px">
+            <p style="font-weight:800;font-size:12px;border-bottom:1.5px solid #0b2213;padding-bottom:4px;margin-bottom:8px">Remarks:</p>
+            ${remarkRows}
+          </div>
+        </div>
+        <div style="padding:14px 32px;background:#f9f9f9;border-top:1px solid #eee;text-align:center">
+          <p style="margin:0;font-size:11px;color:#888">HARROWGATE Consultancy · Hong Kong · harrowgateconsultancy@gmail.com</p>
+        </div>
+      </div>`,
+  });
+}
+
+// ── Send receipt to student ──────────────────────────────────────────────────
+export async function sendReceiptToStudentEmail(opts: {
+  studentEmail: string;
+  studentName: string;
+  receiptNo: string;
+  date: string;
+  amountPaid: number;
+  paymentMethod: string;
+  reference: string;
+  notes: string;
+  degreeType: string;
+}) {
+  const transport = createTransport();
+  if (!transport) throw new Error("Email credentials not configured (GMAIL_USER / GMAIL_APP_PASSWORD missing).");
+  await transport.sendMail({
+    from: `"HARROWGATE Consultancy" <${process.env.GMAIL_USER}>`,
+    to: opts.studentEmail,
+    subject: `Payment Receipt ${opts.receiptNo} — HARROWGATE Consultancy`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden">
+        <div style="background:#0b2213;padding:20px 32px;text-align:center">
+          <p style="margin:0;color:#f0d28c;font-size:20px;font-weight:900;letter-spacing:2px">OFFICIAL RECEIPT</p>
+          <p style="margin:4px 0 0;color:rgba(162,137,89,0.5);font-size:11px;letter-spacing:2px">HARROWGATE CONSULTANCY</p>
+        </div>
+        <div style="padding:28px 32px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:24px;font-size:12px;line-height:2">
+            <div><strong>Received from:</strong> ${opts.studentName}<br><strong>Degree:</strong> ${opts.degreeType}</div>
+            <div style="text-align:right"><strong>Receipt No:</strong> ${opts.receiptNo}<br><strong>Date:</strong> ${opts.date}</div>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <tbody>
+              <tr style="background:#f9f9f9"><td style="border:1px solid #ccc;padding:10px 14px;color:#666;width:40%">Amount Paid</td><td style="border:1px solid #ccc;padding:10px 14px;font-weight:700;font-size:16px;color:#0b2213">HKD$ ${opts.amountPaid.toLocaleString("en-HK")}</td></tr>
+              <tr><td style="border:1px solid #ccc;padding:10px 14px;color:#666">Payment Method</td><td style="border:1px solid #ccc;padding:10px 14px;font-weight:600">${opts.paymentMethod}</td></tr>
+              ${opts.reference ? `<tr style="background:#f9f9f9"><td style="border:1px solid #ccc;padding:10px 14px;color:#666">Reference / TXN ID</td><td style="border:1px solid #ccc;padding:10px 14px;font-weight:600">${opts.reference}</td></tr>` : ""}
+              ${opts.notes ? `<tr><td style="border:1px solid #ccc;padding:10px 14px;color:#666">Notes</td><td style="border:1px solid #ccc;padding:10px 14px">${opts.notes}</td></tr>` : ""}
+            </tbody>
+          </table>
+          <div style="margin-top:24px;padding:14px 16px;background:#f0fff4;border:1px solid #a7f3d0;border-radius:8px;font-size:12px;color:#065f46">
+            ✅ This receipt confirms that your payment of <strong>HKD$ ${opts.amountPaid.toLocaleString("en-HK")}</strong> has been received by HARROWGATE Consultancy. Please keep this for your records.
+          </div>
+        </div>
+        <div style="padding:14px 32px;background:#f9f9f9;border-top:1px solid #eee;text-align:center">
+          <p style="margin:0;font-size:11px;color:#888">HARROWGATE Consultancy · Hong Kong · harrowgateconsultancy@gmail.com</p>
+        </div>
+      </div>`,
+  });
+}

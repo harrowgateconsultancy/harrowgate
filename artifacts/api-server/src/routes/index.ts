@@ -16,6 +16,7 @@ import financeRouter from "./finance";
 import staffAuthRouter from "./staffAuth";
 import tasksRouter from "./tasks";
 import agentsRouter from "./agents";
+import invoiceReceiptRouter from "./invoiceReceipt";
 
 const router: IRouter = Router();
 
@@ -59,5 +60,6 @@ router.use(studentExportRouter);
 router.use(financeRouter);
 router.use(staffAuthRouter);   // covers both /staff/login (public) and /admin/staff (protected above)
 router.use(tasksRouter);
+router.use(invoiceReceiptRouter);
 
 export default router;
