@@ -352,7 +352,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
     return (
       <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.15)" }}>
         <div className="px-5 py-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg" style={{ background: "rgba(162,137,89,0.08)" }}>✉️</div>
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.08)", color: "#c4a96e" }}><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M2 7l8 5 8-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
           <div>
             <p className="text-sm font-semibold" style={{ color: _GOLD }}>Application Email</p>
             <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.80)" }}>
@@ -371,12 +371,12 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
         <div className="w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl border overflow-hidden" style={{ background: "#0d1a3a", borderColor: "rgba(162,137,89,0.3)" }}>
           <div className="px-5 py-4 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
-            <p className="text-sm font-semibold" style={{ color: _GOLD }}>✉️ New Email</p>
+            <p className="text-sm font-semibold flex items-center gap-2" style={{ color: _GOLD }}><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M2 7l8 5 8-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>New Email</p>
             <button onClick={() => setComposeOpen(false)} className="text-lg leading-none" style={{ color: "rgba(232,218,180,0.80)" }}>✕</button>
           </div>
           {composeSent ? (
             <div className="px-5 py-10 text-center">
-              <div className="text-3xl mb-3">✅</div>
+              <div className="flex items-center justify-center mb-3"><div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 24 24" fill="none" className="w-7 h-7"><circle cx="12" cy="12" r="9" stroke="#4ade80" strokeWidth="1.8"/><path d="M7.5 12l3 3 6-6" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
               <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>Message sent!</p>
               <p className="text-xs mt-1" style={{ color: "rgba(232,218,180,0.82)" }}>Your email has been sent successfully.</p>
             </div>
@@ -420,7 +420,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                   disabled={composeSending || !composeTo.trim() || !composeSubject.trim() || !composeBody.trim()}
                   className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80 disabled:opacity-40"
                   style={{ background: _GOLD, color: "#255F38" }}>
-                  {composeSending ? "Sending…" : "Send ✉️"}
+                  {composeSending ? "Sending…" : <span className="flex items-center gap-1.5">Send <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M10 13V3m0 0l-3.5 3.5M10 3l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 15v1a1 1 0 001 1h12a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></span>}
                 </button>
               </div>
             </div>
@@ -435,7 +435,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
         className="w-full px-5 py-4 flex items-center gap-3 text-left transition-colors hover:bg-white/[0.02]"
         onClick={handleToggle}
       >
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-lg" style={{ background: "rgba(162,137,89,0.1)" }}>✉️</div>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.1)", color: "#c4a96e" }}><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5"><rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M2 7l8 5 8-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold" style={{ color: _GOLD }}>Application Inbox</p>
@@ -453,7 +453,7 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                 className="text-xs px-2.5 py-1 rounded-lg border transition-all hover:opacity-70 flex items-center gap-1"
                 style={{ borderColor: "rgba(162,137,89,0.28)", color: _GOLD, background: "rgba(162,137,89,0.1)" }}
               >
-                ✏️ Compose
+                <span className="flex items-center gap-1"><svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M13.586 3.586a2 2 0 112.828 2.828L8 14.828 4 16l1.172-4L13.586 3.586z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>Compose</span>
               </button>
               {tab === "inbox" && (
                 <button
@@ -488,7 +488,9 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                     borderBottom: tab === t ? `2px solid ${_GOLD}` : "2px solid transparent",
                     background: tab === t ? "rgba(162,137,89,0.04)" : "transparent",
                   }}>
-                  {t === "inbox" ? "📥 Inbox" : "📤 Sent"}
+                  {t === "inbox"
+                    ? <span className="flex items-center gap-1.5 justify-center"><svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M10 3v10m0 0l-3.5-3.5M10 13l3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><rect x="2" y="14" width="16" height="4" rx="1" stroke="currentColor" strokeWidth="1.3"/></svg>Inbox</span>
+                    : <span className="flex items-center gap-1.5 justify-center"><svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M10 13V3m0 0l-3.5 3.5M10 3l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 15v1a1 1 0 001 1h12a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>Sent</span>}
                 </button>
               ))}
             </div>
@@ -597,14 +599,14 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
                 <div className="px-5 py-8 text-center" style={{ color: "rgba(232,218,180,0.75)" }}>
                   <p className="text-sm">No sent emails yet</p>
                   <button onClick={handleCompose} className="mt-3 text-xs px-3 py-1.5 rounded-lg border" style={{ borderColor: "rgba(162,137,89,0.25)", color: _GOLD }}>
-                    ✏️ Compose your first email
+                    <span className="flex items-center gap-1"><svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M13.586 3.586a2 2 0 112.828 2.828L8 14.828 4 16l1.172-4L13.586 3.586z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>Compose</span> your first email
                   </button>
                 </div>
               )}
               {!outboxLoading && outbox.map(item => (
                 <div key={item.id} className="px-5 py-3.5 border-b" style={{ borderColor: "rgba(162,137,89,0.08)" }}>
                   <div className="flex items-start gap-3">
-                    <span className="mt-1 text-sm">📤</span>
+                    <span className="mt-0.5 shrink-0" style={{ color: "rgba(162,137,89,0.5)" }}><svg viewBox="0 0 20 20" fill="none" className="w-4 h-4"><path d="M10 13V3m0 0l-3.5 3.5M10 3l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 15v1a1 1 0 001 1h12a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline justify-between gap-2">
                         <p className="text-sm truncate font-medium" style={{ color: "rgba(232,218,180,0.92)" }}>To: {item.toAddress}</p>
@@ -1092,10 +1094,7 @@ export default function Portal() {
                 </div>
                 {submission.adminNotes && submission.status !== "docs_requested" && (
                   <div className="mt-5 pt-4 border-t flex gap-3" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm"
-                      style={{ background: "rgba(162,137,89,0.1)", border: "1px solid rgba(162,137,89,0.2)" }}>
-                      💬
-                    </div>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.1)", border: "1px solid rgba(162,137,89,0.2)", color: "#c4a96e" }}><svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v9a1 1 0 01-1 1H7l-4 3V4z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg></div>
                     <div>
                       <p className="text-xs font-semibold mb-1" style={{ color: GOLD }}>{t("portal.consultant")}</p>
                       <p className="text-sm leading-relaxed" style={{ color: "rgba(232,218,180,0.90)" }}>{submission.adminNotes}</p>
@@ -1108,7 +1107,7 @@ export default function Portal() {
             {/* Additional Docs compact alert */}
             {submission.additionalDocsRequested && (
               <div className="mb-5 rounded-2xl border px-4 py-3.5 flex items-center gap-3" style={{ background: "rgba(251,146,60,0.06)", borderColor: "rgba(251,146,60,0.3)" }}>
-                <span className="text-xl shrink-0">📎</span>
+                <span className="shrink-0" style={{ color: "#fb923c" }}><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 shrink-0"><path d="M15.5 8L9 14.5a4 4 0 01-5.657-5.657L10 2.186a2.5 2.5 0 013.536 3.535L7 12.364a1 1 0 01-1.414-1.414L11.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold" style={{ color: "#fb923c" }}>{t("s.additionalDocs")}</p>
                   {submission.additionalDocsRequestNote && (
@@ -1126,7 +1125,7 @@ export default function Portal() {
             {/* ── UNDER REVIEW ── */}
             {submission.status === "pending" && (
               <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.12)" }}>
-                <div className="text-5xl mb-4">⏳</div>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(196,169,110,0.12)", border: "1px solid rgba(196,169,110,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M10 8H38M10 40H38M14 8c0 8 10 10 10 16S14 32 14 40M34 8c0 8-10 10-10 16s10 8 10 16" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>{t("s.underReview")}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(232,218,180,0.88)" }}>{t("s.underReviewSub")}</p>
               </div>
@@ -1135,7 +1134,7 @@ export default function Portal() {
             {/* ── APPROVED ── */}
             {submission.status === "approved" && (
               <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="text-5xl mb-4">🎉</div>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(240,210,140,0.12)", border: "1px solid rgba(196,169,110,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 4l3 9h9l-7.5 5.5 3 9L24 22l-7.5 5.5 3-9L12 13h9L24 4z" stroke="#f0d28c" strokeWidth="2" strokeLinejoin="round"/><path d="M8 36l2-6M40 36l-2-6M14 42l4-4M34 42l-4-4" stroke="#c4a96e" strokeWidth="2" strokeLinecap="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-3" style={{ color: "#4ade80" }}>{t("s.approvedTitle")}</h3>
                 <p className="text-base leading-relaxed mb-2" style={{ color: "rgba(74,222,128,0.75)" }}>{t("s.approvedSub")}</p>
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(74,222,128,0.55)" }}>{t("s.approvedNote")}</p>
@@ -1160,7 +1159,7 @@ export default function Portal() {
             {/* ── ACKNOWLEDGED ── */}
             {submission.status === "acknowledged" && !showTimeline && (
               <div className="mt-6 rounded-2xl p-8 text-center border" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="text-5xl mb-4">✅</div>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#4ade80" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.payReceived")}</h3>
                 <p className="text-sm mb-6" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.payReceivedSub")}</p>
                 <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border mb-6" style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)" }}>
@@ -1179,7 +1178,7 @@ export default function Portal() {
             {/* ── INTERVIEW ARRANGED ── */}
             {submission.status === "interview_arranged" && (
               <div className="mt-6 rounded-2xl p-8 border" style={{ background: "rgba(167,139,250,0.04)", borderColor: "rgba(167,139,250,0.2)" }}>
-                <div className="text-5xl mb-4 text-center">🎥</div>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><rect x="2" y="11" width="30" height="26" rx="4" stroke="#a78bfa" strokeWidth="2.5"/><path d="M32 19l12-6v22l-12-6" stroke="#a78bfa" strokeWidth="2.5" strokeLinejoin="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#a78bfa" }}>{t("s.mockScheduled")}</h3>
                 <p className="text-sm text-center mb-6" style={{ color: "rgba(167,139,250,0.65)" }}>{t("s.mockScheduledSub")}</p>
                 <div className="rounded-2xl border p-5 mb-6" style={{ background: "rgba(167,139,250,0.06)", borderColor: "rgba(167,139,250,0.2)" }}>
@@ -1200,7 +1199,7 @@ export default function Portal() {
                   <a href={submission.interviewZoomLink} target="_blank" rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-base font-semibold transition-all hover:opacity-90"
                     style={{ background: "#a78bfa", color: "#0f2d18" }}>
-                    🎥 {t("s.joinZoom")}
+                    <svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 shrink-0"><rect x="1" y="5" width="12" height="10" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M13 8l5-2v8l-5-2" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg> {t("s.joinZoom")}
                   </a>
                 )}
               </div>
@@ -1209,7 +1208,7 @@ export default function Portal() {
             {/* ── INTERVIEW COMPLETED ── */}
             {submission.status === "interview_completed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="text-5xl mb-4">🎓</div>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#4ade80" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.mockCompleted")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.mockCompletedSub")}</p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>{t("s.awaitingNext")}</p>
@@ -1225,7 +1224,7 @@ export default function Portal() {
             {/* ── 2ND PAYMENT CONFIRMED ── */}
             {submission.status === "second_payment_confirmed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="text-5xl mb-4">✅</div>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#4ade80" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#4ade80" }}>{t("s.pay2Confirmed")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.pay2ConfirmedSub")}</p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>{t("s.awaitingUniInterview")}</p>
@@ -1238,10 +1237,12 @@ export default function Portal() {
               const isTeams = submission.uniInterviewPlatform === "teams";
               const platformLabel = isTeams ? "Microsoft Teams" : "Zoom";
               const platformColor = isTeams ? "#6264a7" : "#2d8cff";
-              const platformEmoji = isTeams ? "💼" : "🎥";
+              const platformIcon = isTeams
+                ? <svg viewBox="0 0 48 48" fill="none" className="w-8 h-8"><rect x="6" y="12" width="24" height="24" rx="4" stroke="#6264a7" strokeWidth="2.5"/><rect x="22" y="18" width="14" height="12" rx="3" stroke="#6264a7" strokeWidth="2.5"/><path d="M22 20l8-4v16l-8-4" stroke="#6264a7" strokeWidth="2" strokeLinejoin="round"/></svg>
+                : <svg viewBox="0 0 48 48" fill="none" className="w-8 h-8"><rect x="2" y="11" width="30" height="26" rx="4" stroke="#38bdf8" strokeWidth="2.5"/><path d="M32 19l12-6v22l-12-6" stroke="#38bdf8" strokeWidth="2.5" strokeLinejoin="round"/></svg>;
               return (
                 <div className="mt-6 rounded-2xl p-8 border" style={{ background: "rgba(56,189,248,0.04)", borderColor: "rgba(56,189,248,0.2)" }}>
-                  <div className="text-5xl mb-4 text-center">{platformEmoji}</div>
+                  <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: isTeams ? "rgba(98,100,167,0.12)" : "rgba(56,189,248,0.12)", border: `1px solid ${isTeams ? "rgba(98,100,167,0.3)" : "rgba(56,189,248,0.3)"}` }}>{platformIcon}</div></div>
                   <h3 className="text-xl font-bold mb-2 text-center" style={{ color: "#38bdf8" }}>{t("s.uniScheduled")}</h3>
                   <p className="text-sm text-center mb-6" style={{ color: "rgba(56,189,248,0.65)" }}>{t("s.uniScheduledSub")}</p>
                   <div className="rounded-2xl border p-5 mb-6" style={{ background: "rgba(56,189,248,0.06)", borderColor: "rgba(56,189,248,0.2)" }}>
@@ -1279,7 +1280,7 @@ export default function Portal() {
             {/* ── UNIVERSITY INTERVIEW COMPLETED ── */}
             {submission.status === "university_interview_completed" && (
               <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
-                <div className="text-5xl mb-4">🎓</div>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#4ade80" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>{t("s.uniInterviewCompleted")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>{t("s.uniInterviewCompletedSub")}</p>
                 <div className="mt-5 px-6 py-5 rounded-2xl border" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
@@ -1299,7 +1300,7 @@ export default function Portal() {
             {submission.status === "final_payment_received" && (
               <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(96,165,250,0.2)" }}>
                 <div className="px-6 py-5 flex items-center gap-3 border-b" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
-                  <span className="text-xl">⏳</span>
+                  <div className="flex items-center justify-center "><div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(196,169,110,0.12)", border: "1px solid rgba(196,169,110,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5"><path d="M10 8H38M10 40H38M14 8c0 8 10 10 10 16S14 32 14 40M34 8c0 8-10 10-10 16s10 8 10 16" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
                   <div>
                     <h3 className="text-base font-semibold" style={{ color: "#60a5fa" }}>{t("s.confirmingPayment")}</h3>
                     <p className="text-xs mt-0.5" style={{ color: "rgba(96,165,250,0.55)" }}>{t("s.confirmingPaymentSub")}</p>
@@ -1321,7 +1322,7 @@ export default function Portal() {
                 <div className="mt-6 space-y-4">
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(74,222,128,0.25)" }}>
                     <div className="px-6 py-5 border-b text-center" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
-                      <div className="text-5xl mb-3">🎉</div>
+                      <div className="flex items-center justify-center mb-3"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(240,210,140,0.12)", border: "1px solid rgba(196,169,110,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 4l3 9h9l-7.5 5.5 3 9L24 22l-7.5 5.5 3-9L12 13h9L24 4z" stroke="#f0d28c" strokeWidth="2" strokeLinejoin="round"/><path d="M8 36l2-6M40 36l-2-6M14 42l4-4M34 42l-4-4" stroke="#c4a96e" strokeWidth="2" strokeLinecap="round"/></svg></div></div>
                       <h3 className="text-xl font-bold mb-1" style={{ color: "#4ade80" }}>{t("s.congratulations")}</h3>
                       <p className="text-sm" style={{ color: "rgba(74,222,128,0.6)" }}>{t("s.congratulationsSub")}</p>
                     </div>
@@ -1331,12 +1332,12 @@ export default function Portal() {
                           <button onClick={() => handleOfferLetterView(submission.id, offerDoc.id)}
                             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                             style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)", color: "#4ade80" }}>
-                            <span>👁</span> {t("s.viewLetter")}
+                            <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z" stroke="currentColor" strokeWidth="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg> {t("s.viewLetter")}
                           </button>
                           <button onClick={() => handleOfferLetterDownload(submission.id, offerDoc.id, offerDoc.fileName)}
                             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                             style={{ background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.35)", color: "#4ade80" }}>
-                            <span>📄</span> {t("s.downloadLetter")}
+                            <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M10 3v10m0 0l-3.5-3.5M10 13l3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 15v1a1 1 0 001 1h12a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> {t("s.downloadLetter")}
                           </button>
                         </div>
                       ) : (
@@ -1367,7 +1368,7 @@ export default function Portal() {
                           <p className="text-sm font-bold" style={{ color: "#4ade80" }}>🇭🇰 {t("portal.immigRef")}</p>
                           <p className="text-xs mt-0.5" style={{ color: "rgba(74,222,128,0.5)" }}>{t("portal.immigRefSub")}</p>
                         </div>
-                        <span className="text-2xl">✅</span>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.35)" }}><svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5"><path d="M2 7l3.5 3.5 6.5-7" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                       </div>
                       <div className="px-5 py-5">
                         <p className="font-mono text-3xl font-bold tracking-widest" style={{ color: "#4ade80", letterSpacing: "0.12em" }}>{submission.immigrationRefNumber}</p>
@@ -1386,7 +1387,7 @@ export default function Portal() {
             {/* ── REJECTED ── */}
             {submission.status === "rejected" && (
               <div className="rounded-2xl p-8 border text-center" style={{ background: "rgba(248,113,113,0.04)", borderColor: "rgba(248,113,113,0.2)" }}>
-                <div className="text-5xl mb-4">❌</div>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#f87171" strokeWidth="2.5"/><path d="M16 16l16 16M32 16L16 32" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#f87171" }}>{statusLabel("rejected")}</h3>
                 {submission.adminNotes && (
                   <p className="text-sm leading-relaxed mt-2" style={{ color: "rgba(248,113,113,0.65)" }}>{submission.adminNotes}</p>
@@ -1627,7 +1628,7 @@ export default function Portal() {
             {submission.additionalDocsRequested && (
               <div className="mb-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.25)" }}>
                 <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(251,146,60,0.18)" }}>
-                  <span className="text-xl">📎</span>
+                  <span style={{ color: "#fb923c" }}><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 shrink-0"><path d="M15.5 8L9 14.5a4 4 0 01-5.657-5.657L10 2.186a2.5 2.5 0 013.536 3.535L7 12.364a1 1 0 01-1.414-1.414L11.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></span>
                   <div>
                     <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>{t("s.additionalDocs")}</h3>
                     <p className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.55)" }}>{t("s.additionalDocsSub")}</p>
@@ -1668,29 +1669,32 @@ export default function Portal() {
               </div>
               <div className="px-6 py-5">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {[
-                    { type: "passport_photo",        label: "Passport Photo",        icon: "🖼️" },
-                    { type: "passport_doc",          label: "Passport / Travel Doc",  icon: "📘" },
-                    { type: "birth_certificate",     label: "Birth Cert / ID",        icon: "📋" },
-                    { type: "cv",                    label: "CV",                     icon: "📄" },
-                    { type: "edu_results",           label: "Completion Cert.",       icon: "📄" },
-                    { type: "edu_transcript",        label: "Edu. Transcript",        icon: "📄" },
-                    { type: "higher_edu_results",    label: "Higher Edu. Cert.",      icon: "📄" },
-                    { type: "higher_edu_transcript", label: "Higher Edu. Transcript", icon: "📄" },
-                  ].map(({ type, label, icon }) => {
-                    const doc = submission.documents.find(d => d.documentType === type);
-                    return (
-                      <div key={type} className="rounded-xl p-3 text-center border text-xs" style={{
-                        background: doc ? "rgba(162,137,89,0.08)" : "rgba(162,137,89,0.03)",
-                        borderColor: doc ? "rgba(162,137,89,0.22)" : "rgba(162,137,89,0.07)",
-                        color: doc ? GOLD : "rgba(162,137,89,0.3)",
-                      }}>
-                        <div className="text-lg mb-1">{doc ? icon : "—"}</div>
-                        <div className="font-medium leading-tight">{label}</div>
-                        {doc && <div className="mt-1 opacity-50 truncate">{doc.fileName.slice(0, 12)}…</div>}
-                      </div>
-                    );
-                  })}
+                  {(() => {
+                    const DOC_TYPES = [
+                      { type: "passport_photo",        label: "Passport Photo",        svg: <><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 mx-auto"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" strokeWidth="1.4"/><circle cx="7" cy="8" r="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M2 13l4-4 3 3 3-2.5 5 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg></> },
+                      { type: "passport_doc",          label: "Passport / Travel Doc",  svg: <><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 mx-auto"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M3 6h14" stroke="currentColor" strokeWidth="1.2"/><circle cx="10" cy="11" r="2" stroke="currentColor" strokeWidth="1.2"/><path d="M7 16c0-1.66 1.34-3 3-3s3 1.34 3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg></> },
+                      { type: "birth_certificate",     label: "Birth Cert / ID",        svg: <><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 mx-auto"><rect x="5" y="3" width="12" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.4"/><path d="M8 3V2a1 1 0 011-1h2a1 1 0 011 1v1" stroke="currentColor" strokeWidth="1.4"/><path d="M8 10h5M8 13h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg></> },
+                      { type: "cv",                    label: "CV",                     svg: <><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 mx-auto"><path d="M5 3h7l4 4v10a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4"/><path d="M12 3v4h4M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></> },
+                      { type: "edu_results",           label: "Completion Cert.",       svg: <><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 mx-auto"><path d="M5 3h7l4 4v10a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4"/><path d="M12 3v4h4M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></> },
+                      { type: "edu_transcript",        label: "Edu. Transcript",        svg: <><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 mx-auto"><path d="M5 3h7l4 4v10a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4"/><path d="M12 3v4h4M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></> },
+                      { type: "higher_edu_results",    label: "Higher Edu. Cert.",      svg: <><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 mx-auto"><path d="M5 3h7l4 4v10a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4"/><path d="M12 3v4h4M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></> },
+                      { type: "higher_edu_transcript", label: "Higher Edu. Transcript", svg: <><svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 mx-auto"><path d="M5 3h7l4 4v10a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4"/><path d="M12 3v4h4M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg></> },
+                    ];
+                    return DOC_TYPES.map(({ type, label, svg }) => {
+                      const doc = submission.documents.find(d => d.documentType === type);
+                      return (
+                        <div key={type} className="rounded-xl p-3 text-center border text-xs" style={{
+                          background: doc ? "rgba(162,137,89,0.08)" : "rgba(162,137,89,0.03)",
+                          borderColor: doc ? "rgba(162,137,89,0.22)" : "rgba(162,137,89,0.07)",
+                          color: doc ? GOLD : "rgba(162,137,89,0.18)",
+                        }}>
+                          <div className="mb-1.5">{doc ? svg : <svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 mx-auto opacity-30"><rect x="5" y="3" width="10" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.4"/></svg>}</div>
+                          <div className="font-medium leading-tight">{label}</div>
+                          {doc && <div className="mt-1 opacity-50 truncate">{doc.fileName.slice(0, 12)}…</div>}
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             </div>
@@ -1702,19 +1706,19 @@ export default function Portal() {
               return (
                 <div className="mb-4 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(74,222,128,0.2)" }}>
                   <div className="px-5 py-3.5 border-b flex items-center gap-2" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
-                    <span>📄</span>
+                    <span style={{ color: "#4ade80" }}><svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M5 3h7l4 4v10a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5"/><path d="M12 3v4h4M7 10h6M7 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></span>
                     <h3 className="text-sm font-semibold" style={{ color: "#4ade80" }}>Offer Letter</h3>
                   </div>
                   <div className="px-5 py-4 flex gap-3">
                     <button onClick={() => handleOfferLetterView(submission.id, offerDoc.id)}
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90"
                       style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)", color: "#4ade80" }}>
-                      👁 {t("s.viewLetter")}
+                      <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z" stroke="currentColor" strokeWidth="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg> {t("s.viewLetter")}
                     </button>
                     <button onClick={() => handleOfferLetterDownload(submission.id, offerDoc.id, offerDoc.fileName)}
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90"
                       style={{ background: "rgba(74,222,128,0.1)", borderColor: "rgba(74,222,128,0.35)", color: "#4ade80" }}>
-                      📥 {t("s.downloadLetter")}
+                      <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M10 3v10m0 0l-3.5-3.5M10 13l3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M3 15v1a1 1 0 001 1h12a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> {t("s.downloadLetter")}
                     </button>
                   </div>
                 </div>
@@ -1750,7 +1754,7 @@ export default function Portal() {
                     <button onClick={() => handleOfferLetterView(submission.id, eVisaDoc.id)}
                       className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                       style={{ background: "rgba(52,211,153,0.06)", borderColor: "rgba(52,211,153,0.22)", color: "#34d399" }}>
-                      <span>👁</span> {t("s.eVisaView")}
+                      <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4 shrink-0"><path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z" stroke="currentColor" strokeWidth="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg> {t("s.eVisaView")}
                     </button>
                     <button onClick={() => handleOfferLetterDownload(submission.id, eVisaDoc.id, eVisaDoc.fileName)}
                       className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
@@ -1845,7 +1849,7 @@ export default function Portal() {
                             <a key={i} href={`${getApiBase()}/api/storage/objects/${att.fileUrl}`} target="_blank" rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium hover:opacity-80 transition-opacity"
                               style={{ borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa", background: "rgba(96,165,250,0.05)" }}>
-                              📎 {att.fileName}
+                              <svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 shrink-0"><path d="M15.5 8L9 14.5a4 4 0 01-5.657-5.657L10 2.186a2.5 2.5 0 013.536 3.535L7 12.364a1 1 0 01-1.414-1.414L11.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> {att.fileName}
                             </a>
                           ))}
                         </div>
@@ -1861,7 +1865,7 @@ export default function Portal() {
                     {replyAttachments.map((att, i) => (
                       <div key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs"
                         style={{ borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa", background: "rgba(96,165,250,0.05)" }}>
-                        📎 {att.fileName}
+                        <svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 shrink-0"><path d="M15.5 8L9 14.5a4 4 0 01-5.657-5.657L10 2.186a2.5 2.5 0 013.536 3.535L7 12.364a1 1 0 01-1.414-1.414L11.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> {att.fileName}
                         <button onClick={() => setReplyAttachments(a => a.filter((_, j) => j !== i))}
                           className="ml-1 hover:opacity-70" style={{ color: "#f87171" }}>✕</button>
                       </div>

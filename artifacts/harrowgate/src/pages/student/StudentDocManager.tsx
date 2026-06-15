@@ -102,7 +102,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
       {/* Instruction banner */}
       <div className="rounded-2xl p-5 border" style={{ background: "rgba(251,146,60,0.05)", borderColor: "rgba(251,146,60,0.22)" }}>
         <div className="flex items-start gap-3">
-          <span className="text-2xl">📎</span>
+          <span style={{ color: "#fb923c" }}><svg viewBox="0 0 20 20" fill="none" className="w-6 h-6"><path d="M15.5 8L9 14.5a4 4 0 01-5.657-5.657L10 2.186a2.5 2.5 0 013.536 3.535L7 12.364a1 1 0 01-1.414-1.414L11.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></span>
           <div>
             <p className="text-sm font-semibold mb-1" style={{ color: "#fb923c" }}>Additional Documents Required</p>
             <p className="text-sm" style={{ color: "rgba(251,146,60,0.7)" }}>
@@ -204,7 +204,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
                       <iframe src={viewUrl(doc)} className="w-full" style={{ height: 360, border: "none" }} title={doc.fileName} />
                     ) : (
                       <div className="flex flex-col items-center justify-center py-8 gap-3">
-                        <span className="text-4xl">📎</span>
+                        <span style={{ color: "rgba(162,137,89,0.5)" }}><svg viewBox="0 0 20 20" fill="none" className="w-10 h-10"><path d="M15.5 8L9 14.5a4 4 0 01-5.657-5.657L10 2.186a2.5 2.5 0 013.536 3.535L7 12.364a1 1 0 01-1.414-1.414L11.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></span>
                         <p className="text-sm" style={{ color: "rgba(232,218,180,0.85)" }}>Preview not available</p>
                         <a href={viewUrl(doc)} target="_blank" rel="noopener noreferrer"
                           className="text-xs px-4 py-2 rounded-full border" style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>
