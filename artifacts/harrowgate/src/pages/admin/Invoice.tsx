@@ -149,10 +149,11 @@ function SendStatus({ status, onClear }: { status: "idle" | "sending" | "sent" |
 /* ═══════════════════════════════════════════════════
    INVOICE PREVIEW
 ═══════════════════════════════════════════════════ */
-function InvoicePreview({ invoiceNo, date, clientName, clientAddress, degreeLabel, items, schedule, remarks, highlightedPayment }: {
+function InvoicePreview({ invoiceNo, date, clientName, clientAddress, degreeLabel, items, schedule, remarks, highlightedPayment, phone, contactEmail }: {
   invoiceNo: string; date: string; clientName: string; clientAddress: string;
   degreeLabel: string; items: LineItem[]; schedule: PayScheduleRow[]; remarks: string[];
   highlightedPayment?: 1 | 2 | 3 | null;
+  phone: string; contactEmail: string;
 }) {
   const total = items.reduce((s, i) => s + i.amount * i.qty, 0);
   return (
@@ -169,8 +170,8 @@ function InvoicePreview({ invoiceNo, date, clientName, clientAddress, degreeLabe
         </div>
         <div style={{ textAlign: "right", fontSize: "9.5pt", color: "#333", lineHeight: 1.9 }}>
           <p style={{ margin: 0, fontWeight: 700 }}>HARROWGATE Consultancy</p>
-          <p style={{ margin: 0 }}>P: +852 6159 0422</p>
-          <p style={{ margin: 0 }}>harrowgateconsultancy@gmail.com</p>
+          <p style={{ margin: 0 }}>P: {phone}</p>
+          <p style={{ margin: 0 }}>{contactEmail}</p>
         </div>
       </div>
 
@@ -354,6 +355,8 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
   const [schedule, setSchedule] = useState<PayScheduleRow[]>(() => makeScheduleFromPricing(DEFAULT_PRICING, "masters"));
   const [remarks, setRemarks] = useState<string[]>([...DEFAULT_REMARKS]);
   const [highlightedPayment, setHighlightedPayment] = useState<1 | 2 | 3 | null>(null);
+  const [phone, setPhone] = useState("+852 6159 0422");
+  const [contactEmail, setContactEmail] = useState("harrowgateconsultancy@gmail.com");
   const [sendStatus, setSendStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   const today = fmtDate(new Date());
@@ -389,7 +392,7 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
     try {
       const res = await adminFetch(`${getApiBase()}/api/admin/invoice/send-invoice`, {
         method: "POST",
-        body: JSON.stringify({ studentEmail: selected.email, studentName: selected.name, invoiceNo, date: today, degreeType: degreeLabel, items, schedule, remarks: remarks.filter(r => r.trim()), total, highlightedPayment }),
+        body: JSON.stringify({ studentEmail: selected.email, studentName: selected.name, invoiceNo, date: today, degreeType: degreeLabel, items, schedule, remarks: remarks.filter(r => r.trim()), total, highlightedPayment, phone, contactEmail }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -405,6 +408,8 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
     setSchedule(makeScheduleFromPricing(DEFAULT_PRICING, "masters"));
     setRemarks([...DEFAULT_REMARKS]);
     setHighlightedPayment(null);
+    setPhone("+852 6159 0422");
+    setContactEmail("harrowgateconsultancy@gmail.com");
     setSendStatus("idle");
   }
 
@@ -412,7 +417,7 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
     <div className="grid grid-cols-1 xl:grid-cols-[440px_1fr] gap-6">
       {/* Hidden print target */}
       <div id="invoice-print-root" style={{ display: "none" }}>
-        <InvoicePreview invoiceNo={invoiceNo} date={today} clientName={selected?.name ?? ""} clientAddress={clientAddress} degreeLabel={degreeLabel} items={items} schedule={schedule} remarks={remarks.filter(r => r.trim())} highlightedPayment={highlightedPayment} />
+        <InvoicePreview invoiceNo={invoiceNo} date={today} clientName={selected?.name ?? ""} clientAddress={clientAddress} degreeLabel={degreeLabel} items={items} schedule={schedule} remarks={remarks.filter(r => r.trim())} highlightedPayment={highlightedPayment} phone={phone} contactEmail={contactEmail} />
       </div>
       <style>{`@media print { body > * { display: none !important; } #invoice-print-root { display: block !important; } #invoice-print-root * { display: revert !important; } }`}</style>
 
@@ -450,6 +455,19 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
                 className="flex-1 px-2 py-1 border border-border rounded bg-background text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
             </div>
           )}
+          <div className="mt-3 pt-3 border-t border-border space-y-1.5">
+            <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide mb-1">Company contact on invoice</p>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-muted-foreground shrink-0 w-12">Phone:</label>
+              <input value={phone} onChange={e => setPhone(e.target.value)}
+                className="flex-1 px-2 py-1 border border-border rounded bg-background text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-muted-foreground shrink-0 w-12">Email:</label>
+              <input value={contactEmail} onChange={e => setContactEmail(e.target.value)}
+                className="flex-1 px-2 py-1 border border-border rounded bg-background text-foreground text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
+            </div>
+          </div>
         </div>
 
         {/* 2. Degree */}
@@ -591,7 +609,7 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
           <p className="text-xs text-muted-foreground">{selected ? `${invoiceNo} · ${selected.name}` : "Select a client"}</p>
         </div>
         <div className="border border-border rounded-xl overflow-hidden shadow-sm bg-white" style={{ minHeight: 600 }}>
-          <InvoicePreview invoiceNo={invoiceNo} date={today} clientName={selected?.name ?? ""} clientAddress={clientAddress} degreeLabel={degreeLabel} items={items} schedule={schedule} remarks={remarks.filter(r => r.trim())} highlightedPayment={highlightedPayment} />
+          <InvoicePreview invoiceNo={invoiceNo} date={today} clientName={selected?.name ?? ""} clientAddress={clientAddress} degreeLabel={degreeLabel} items={items} schedule={schedule} remarks={remarks.filter(r => r.trim())} highlightedPayment={highlightedPayment} phone={phone} contactEmail={contactEmail} />
         </div>
       </div>
     </div>
