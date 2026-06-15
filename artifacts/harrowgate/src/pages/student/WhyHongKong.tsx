@@ -12,91 +12,6 @@ const GOLD_DIM    = "rgba(162,137,89,0.7)";
 const CREAM_DIM   = "rgba(212,197,162,0.75)";
 
 /* ─────────────────────────────────────────────
-   Data
-───────────────────────────────────────────── */
-
-const ADVANTAGES = [
-  {
-    emoji: "🏛️",
-    title: "World-Class Universities",
-    body: "Home to HKU, CUHK, HKUST, PolyU, and CityU — all ranked in the global top 100. Four universities sit in the QS Asia Top 10, rivalling the best in the UK and US.",
-    tag: "Rankings",
-  },
-  {
-    emoji: "🗣️",
-    title: "English Medium + Trilingual Edge",
-    body: "All top universities teach entirely in English. Living in Hong Kong lets you simultaneously acquire Cantonese and Mandarin — skills that open doors across Asia's largest economies.",
-    tag: "Language",
-  },
-  {
-    emoji: "🌏",
-    title: "Gateway to Asia & Global Networks",
-    body: "Hong Kong is Asia's financial and logistics hub. Students gain access to networks spanning China, Southeast Asia, and global markets — a strategic position no Western campus can match.",
-    tag: "Strategy",
-  },
-  {
-    emoji: "💰",
-    title: "Generous Scholarships & Affordable Tuition",
-    body: "Annual tuition at Hong Kong universities averages HKD 140,000–180,000 — significantly less than equivalent programmes in the US, UK, or Australia. Government and university scholarships are widely available.",
-    tag: "Finances",
-  },
-  {
-    emoji: "💼",
-    title: "Internship & Career Ecosystem",
-    body: "Global MNCs — HSBC, Goldman Sachs, Google, Alibaba, and hundreds more — actively recruit from Hong Kong campuses. The city's internship culture is among the most active in Asia.",
-    tag: "Careers",
-  },
-  {
-    emoji: "🛡️",
-    title: "One of the World's Safest Cities",
-    body: "Hong Kong consistently ranks as one of the safest metropolises on earth, with ultra-low crime rates, world-class healthcare, and infrastructure that makes daily life seamless.",
-    tag: "Safety",
-  },
-  {
-    emoji: "🌐",
-    title: "Cultural Diversity & Global Community",
-    body: "Over 100 nationalities call Hong Kong home. From Diwali to Dragon Boat, the city celebrates global culture year-round — students never feel far from home.",
-    tag: "Culture",
-  },
-  {
-    emoji: "🔬",
-    title: "Research & Innovation Funding",
-    body: "Hong Kong's InnoHK clusters and government-backed R&D grants fuel cutting-edge research in AI, biotech, and fintech. Students gain access to state-of-the-art labs and industry partnerships.",
-    tag: "Research",
-  },
-  {
-    emoji: "🏠",
-    title: "Pathway to Permanent Residency",
-    body: "Study years count toward Hong Kong's 7-year continuous residency rule. After 7 years (including your degree programme), you become eligible to apply for permanent residency — a globally respected status.",
-    tag: "PR Pathway",
-    highlight: true,
-  },
-  {
-    emoji: "👨‍👩‍👧",
-    title: "Bring Your Family as Dependants",
-    body: "Student visa holders can sponsor their spouse and children to accompany them to Hong Kong. Your family stays together — no separation for the duration of your studies.",
-    tag: "Family",
-    highlight: true,
-  },
-  {
-    emoji: "⏰",
-    title: "Work While You Study",
-    body: "International students are permitted to work part-time both on-campus and off-campus during term time, and full-time during holidays. Internship opportunities are counted within your study schedule.",
-    tag: "Work Rights",
-    highlight: true,
-  },
-];
-
-const QUICK_STATS = [
-  { value: "4",    label: "QS Asia Top 10 Universities" },
-  { value: "100+", label: "Nationalities on Campus" },
-  { value: "7yr",  label: "Pathway to Permanent Residency" },
-  { value: "98%",  label: "Graduate Employment Rate" },
-  { value: "24h",  label: "Expert Advisor Response Time" },
-  { value: "HKD 3K", label: "To Start Your Application" },
-];
-
-/* ─────────────────────────────────────────────
    Sub-components
 ───────────────────────────────────────────── */
 
@@ -158,7 +73,15 @@ function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void
   );
 }
 
-function AdvantageCard({ a, idx }: { a: typeof ADVANTAGES[0]; idx: number }) {
+type Advantage = {
+  emoji: string;
+  title: string;
+  body: string;
+  tag: string;
+  highlight?: boolean;
+};
+
+function AdvantageCard({ a, idx }: { a: Advantage; idx: number }) {
   const [hov, setHov] = useState(false);
   return (
     <div
@@ -184,7 +107,6 @@ function AdvantageCard({ a, idx }: { a: typeof ADVANTAGES[0]; idx: number }) {
         position: "relative",
         overflow: "hidden",
       }}>
-      {/* Subtle glow top-right for highlight cards */}
       {a.highlight && (
         <div style={{
           position: "absolute", top: 0, right: 0, width: "120px", height: "120px",
@@ -194,7 +116,6 @@ function AdvantageCard({ a, idx }: { a: typeof ADVANTAGES[0]; idx: number }) {
       )}
 
       <div className="flex items-start gap-4">
-        {/* Emoji icon */}
         <div style={{
           width: 52, height: 52, borderRadius: "0.875rem", flexShrink: 0,
           background: hov
@@ -210,7 +131,6 @@ function AdvantageCard({ a, idx }: { a: typeof ADVANTAGES[0]; idx: number }) {
         </div>
 
         <div className="flex-1 min-w-0">
-          {/* Tag */}
           <span style={{
             display: "inline-block", fontSize: "0.65rem", fontWeight: 700,
             letterSpacing: "0.14em", textTransform: "uppercase",
@@ -269,13 +189,36 @@ function StatChip({ value, label }: { value: string; label: string }) {
 ───────────────────────────────────────────── */
 
 export default function WhyHongKong() {
-  const { lang, setLang } = useLang();
+  const { lang, setLang, t } = useLang();
   const [menuOpen, setMenuOpen] = useState(false);
 
   usePageSEO({
     title: "Why Study in Hong Kong? | HARROWGATE Consultancy",
     description: "Discover why thousands of international students choose Hong Kong — world-class universities, English medium teaching, PR pathway, work rights, and a gateway to Asia.",
   });
+
+  const ADVANTAGES: Advantage[] = [
+    { emoji: "🏛️", tag: t("whyhk.a1.tag"), title: t("whyhk.a1.title"), body: t("whyhk.a1.body") },
+    { emoji: "🗣️", tag: t("whyhk.a2.tag"), title: t("whyhk.a2.title"), body: t("whyhk.a2.body") },
+    { emoji: "🌏", tag: t("whyhk.a3.tag"), title: t("whyhk.a3.title"), body: t("whyhk.a3.body") },
+    { emoji: "💰", tag: t("whyhk.a4.tag"), title: t("whyhk.a4.title"), body: t("whyhk.a4.body") },
+    { emoji: "💼", tag: t("whyhk.a5.tag"), title: t("whyhk.a5.title"), body: t("whyhk.a5.body") },
+    { emoji: "🛡️", tag: t("whyhk.a6.tag"), title: t("whyhk.a6.title"), body: t("whyhk.a6.body") },
+    { emoji: "🌐", tag: t("whyhk.a7.tag"), title: t("whyhk.a7.title"), body: t("whyhk.a7.body") },
+    { emoji: "🔬", tag: t("whyhk.a8.tag"), title: t("whyhk.a8.title"), body: t("whyhk.a8.body") },
+    { emoji: "🏠", tag: t("whyhk.a9.tag"),  title: t("whyhk.a9.title"),  body: t("whyhk.a9.body"),  highlight: true },
+    { emoji: "👨‍👩‍👧", tag: t("whyhk.a10.tag"), title: t("whyhk.a10.title"), body: t("whyhk.a10.body"), highlight: true },
+    { emoji: "⏰", tag: t("whyhk.a11.tag"), title: t("whyhk.a11.title"), body: t("whyhk.a11.body"), highlight: true },
+  ];
+
+  const QUICK_STATS = [
+    { value: "4",      label: t("whyhk.stat1") },
+    { value: "100+",   label: t("whyhk.stat2") },
+    { value: "7yr",    label: t("whyhk.stat3") },
+    { value: "98%",    label: t("whyhk.stat4") },
+    { value: "24h",    label: t("whyhk.stat5") },
+    { value: "HKD 3K", label: t("whyhk.stat6") },
+  ];
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: "'Inter', sans-serif", color: "#e5d9c8" }}>
@@ -316,19 +259,19 @@ export default function WhyHongKong() {
             <LangPicker lang={lang} setLang={setLang} />
             <Link href="/packages" className="text-sm font-medium px-4 py-2 rounded-full border"
               style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>
-              Packages
+              {t("nav.packages")}
             </Link>
             <Link href="/agent-signup" className="text-sm font-medium px-4 py-2 rounded-full border"
               style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>
-              Our Agents
+              {t("nav.agents")}
             </Link>
             <Link href="/sign-in" className="text-sm font-semibold px-4 py-2 rounded-full border"
               style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.04)" }}>
-              Sign In
+              {t("nav.signIn")}
             </Link>
             <Link href="/sign-up" className="shimmer-btn text-sm font-bold px-5 py-2.5 rounded-full"
               style={{ color: BG }}>
-              Get Started
+              {t("nav.getStarted")}
             </Link>
           </div>
 
@@ -355,22 +298,22 @@ export default function WhyHongKong() {
             <Link href="/packages" onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
               style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
-              📋 Packages
+              📋 {t("nav.packages")}
             </Link>
             <Link href="/agent-signup" onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
               style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
-              🤝 Our Agents
+              🤝 {t("nav.agents")}
             </Link>
             <Link href="/sign-in" onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
               style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
-              🔑 Sign In
+              🔑 {t("nav.signIn")}
             </Link>
             <Link href="/sign-up" onClick={() => setMenuOpen(false)}
               className="shimmer-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold"
               style={{ color: BG }}>
-              Get Started →
+              {t("nav.getStarted")} →
             </Link>
           </div>
         </div>
@@ -378,26 +321,23 @@ export default function WhyHongKong() {
 
       {/* ── Hero ── */}
       <section style={{ position: "relative", overflow: "hidden", padding: "5rem 1.5rem 4rem" }}>
-        {/* Background glow */}
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
           <div style={{ position: "absolute", top: "-20%", left: "50%", transform: "translateX(-50%)", width: "900px", height: "600px", background: "radial-gradient(ellipse, rgba(162,137,89,0.09) 0%, transparent 70%)" }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, rgba(162,137,89,0.3) 30%, rgba(162,137,89,0.3) 70%, transparent)` }} />
         </div>
 
         <div className="max-w-4xl mx-auto text-center" style={{ position: "relative", zIndex: 1 }}>
-          {/* Back link */}
           <Link href="/" className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase mb-8"
             style={{ color: GOLD_DIM, letterSpacing: "0.2em" }}
             onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
-            ← Back to Home
+            {t("whyhk.back")}
           </Link>
 
-          {/* Badge */}
           <div className="fade-up inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border mb-8"
             style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.25)", animationDelay: "0ms" }}>
             <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ background: "#4ade80" }} />
             <span className="text-sm font-semibold tracking-[0.2em] uppercase" style={{ color: GOLD_DIM }}>
-              Hong Kong Education
+              {t("whyhk.badge")}
             </span>
           </div>
 
@@ -408,7 +348,7 @@ export default function WhyHongKong() {
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             animationDelay: "80ms",
           }}>
-            Why Study in<br />Hong Kong?
+            {t("whyhk.h1")}<br />{t("whyhk.h2")}
           </h1>
 
           <p className="fade-up" style={{
@@ -416,17 +356,17 @@ export default function WhyHongKong() {
             color: CREAM_DIM, maxWidth: "640px", margin: "0 auto 2.5rem",
             animationDelay: "160ms",
           }}>
-            Eleven compelling reasons why thousands of international students choose Hong Kong — and why it could be the best decision of your life.
+            {t("whyhk.sub")}
           </p>
 
           <div className="fade-up flex flex-wrap justify-center gap-3" style={{ animationDelay: "240ms" }}>
             <Link href="/sign-up" className="shimmer-btn px-8 py-4 rounded-full text-sm font-bold"
               style={{ color: BG, boxShadow: "0 6px 28px rgba(162,137,89,0.4)" }}>
-              Start Your Application →
+              {t("whyhk.cta1")}
             </Link>
             <Link href="/packages" className="px-8 py-4 rounded-full text-sm font-semibold border"
               style={{ borderColor: "rgba(162,137,89,0.3)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
-              View Packages
+              {t("whyhk.cta2")}
             </Link>
           </div>
         </div>
@@ -436,7 +376,7 @@ export default function WhyHongKong() {
       <section style={{ background: "rgba(0,0,0,0.2)", padding: "3rem 1.5rem", borderTop: `1px solid ${GOLD_FAINT}`, borderBottom: `1px solid ${GOLD_FAINT}` }}>
         <div className="max-w-5xl mx-auto">
           <p style={{ textAlign: "center", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: "1.75rem" }}>
-            Hong Kong at a Glance
+            {t("whyhk.glance")}
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {QUICK_STATS.map(s => <StatChip key={s.value} value={s.value} label={s.label} />)}
@@ -449,27 +389,25 @@ export default function WhyHongKong() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <p style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: "0.75rem" }}>
-              11 Reasons
+              {t("whyhk.reasons")}
             </p>
             <h2 style={{
               fontSize: "clamp(1.6rem, 4vw, 2.6rem)", fontWeight: 800, color: GOLD,
               letterSpacing: "-0.01em", marginBottom: "0.75rem",
             }}>
-              Everything you need to succeed
+              {t("whyhk.section.h2")}
             </h2>
             <p style={{ color: CREAM_DIM, maxWidth: "520px", margin: "0 auto", lineHeight: 1.65, fontSize: "0.95rem" }}>
-              From academic excellence to life-changing residency rights — Hong Kong delivers on every level.
+              {t("whyhk.section.sub")}
             </p>
           </div>
 
-          {/* Cards grid — first 8 standard, last 3 highlighted */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             {ADVANTAGES.slice(0, 8).map((a, i) => (
-              <AdvantageCard key={a.title} a={a} idx={i} />
+              <AdvantageCard key={i} a={a} idx={i} />
             ))}
           </div>
 
-          {/* Highlighted trio — PR, Family, Work */}
           <div style={{
             borderRadius: "1.5rem", padding: "1.5px",
             background: "linear-gradient(135deg, rgba(240,210,140,0.5) 0%, rgba(162,137,89,0.2) 50%, rgba(240,210,140,0.5) 100%)",
@@ -483,15 +421,15 @@ export default function WhyHongKong() {
                   background: "rgba(240,210,140,0.12)", border: "1px solid rgba(240,210,140,0.3)",
                   borderRadius: "99px", padding: "3px 14px",
                 }}>
-                  ✦ Exclusive Advantages
+                  {t("whyhk.exclusive")}
                 </span>
                 <p style={{ color: CREAM_DIM, fontSize: "0.8rem", marginTop: "0.5rem" }}>
-                  Benefits most students don't know about
+                  {t("whyhk.exclusive.sub")}
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {ADVANTAGES.slice(8).map((a, i) => (
-                  <AdvantageCard key={a.title} a={a} idx={i + 8} />
+                  <AdvantageCard key={i + 8} a={a} idx={i + 8} />
                 ))}
               </div>
             </div>
@@ -506,7 +444,7 @@ export default function WhyHongKong() {
       }}>
         <div className="max-w-2xl mx-auto text-center">
           <p style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: "1rem" }}>
-            Ready to Begin?
+            {t("whyhk.cta.label")}
           </p>
           <h2 style={{
             fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 800,
@@ -514,25 +452,24 @@ export default function WhyHongKong() {
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             letterSpacing: "-0.01em", marginBottom: "1rem",
           }}>
-            Your Hong Kong journey starts with HKD&nbsp;3,000
+            {t("whyhk.cta.h2")}
           </h2>
           <p style={{ color: CREAM_DIM, lineHeight: 1.7, marginBottom: "2.5rem", fontSize: "1rem" }}>
-            One payment. One dedicated expert. Full guidance from application to arrival — and beyond.
+            {t("whyhk.cta.sub")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/sign-up" className="shimmer-btn px-10 py-4 rounded-full text-base font-bold"
               style={{ color: BG, boxShadow: "0 8px 32px rgba(162,137,89,0.45)" }}>
-              Start Your Application →
+              {t("whyhk.cta1")}
             </Link>
             <Link href="/packages" className="px-10 py-4 rounded-full text-base font-semibold border"
               style={{ borderColor: "rgba(162,137,89,0.35)", color: GOLD, background: "rgba(162,137,89,0.07)" }}>
-              View Packages
+              {t("whyhk.cta2")}
             </Link>
           </div>
 
-          {/* Trust line */}
           <p style={{ marginTop: "2rem", fontSize: "0.8rem", color: "rgba(162,137,89,0.45)" }}>
-            500+ students placed · 98% university acceptance rate · Expert advisor assigned within 24h
+            {t("whyhk.trust")}
           </p>
         </div>
       </section>
