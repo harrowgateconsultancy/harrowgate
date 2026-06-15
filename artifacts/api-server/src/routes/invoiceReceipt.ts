@@ -5,9 +5,9 @@ const router = Router();
 
 router.post("/admin/invoice/send-invoice", async (req, res) => {
   try {
-    const { studentEmail, studentName, invoiceNo, date, degreeType, items, schedule, remarks, total, highlightedPayment, phone, contactEmail } = req.body;
+    const { studentEmail, studentName, invoiceNo, date, degreeType, items, schedule, remarks, total, highlightedPayment, phone, contactEmail, pdfBase64 } = req.body;
     if (!studentEmail) { res.status(400).json({ error: "No student email provided." }); return; }
-    await sendInvoiceToStudentEmail({ studentEmail, studentName, invoiceNo, date, degreeType, items, schedule, remarks, total, highlightedPayment, phone, contactEmail });
+    await sendInvoiceToStudentEmail({ studentEmail, studentName, invoiceNo, date, degreeType, items, schedule, remarks, total, highlightedPayment, phone, contactEmail, pdfBase64 });
     res.json({ ok: true });
   } catch (err: any) {
     console.error("[invoice/send-invoice] Email error:", err?.message ?? err);

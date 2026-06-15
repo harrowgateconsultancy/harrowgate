@@ -765,6 +765,7 @@ export async function sendInvoiceToStudentEmail(opts: {
   highlightedPayment?: number | null;
   phone?: string;
   contactEmail?: string;
+  pdfBase64?: string | null;
 }) {
   const transport = createTransport();
   if (!transport) throw new Error("Email credentials not configured (GMAIL_USER / GMAIL_APP_PASSWORD missing).");
@@ -789,10 +790,43 @@ export async function sendInvoiceToStudentEmail(opts: {
   }).join("");
   const remarkRows = opts.remarks.map((r, i) => `<p style="margin:4px 0;font-size:11px;line-height:1.6;color:#333"><strong>${i+1})</strong> ${r}</p>`).join("");
 
+  const plainText = [
+    `Dear ${opts.studentName},`,
+    ``,
+    `Please find your invoice ${opts.invoiceNo} attached.`,
+    ``,
+    `Invoice No: ${opts.invoiceNo}`,
+    `Date: ${opts.date}`,
+    `Degree: ${opts.degreeType}`,
+    ``,
+    `Items:`,
+    ...opts.items.map(it => `  ${it.no}. ${it.description} — HKD$ ${it.amount.toLocaleString("en-HK")}`),
+    ``,
+    `Total: HKD$ ${opts.total.toLocaleString("en-HK")}`,
+    ``,
+    `Payment Schedule:`,
+    ...opts.schedule.map(r => `  ${r.no}. ${r.label} — HKD$ ${r.amount.toLocaleString("en-HK")}`),
+    ``,
+    `Remarks:`,
+    ...opts.remarks.map((r, i) => `  ${i + 1}) ${r}`),
+    ``,
+    `Best regards,`,
+    `HARROWGATE Consultancy`,
+    `P: ${opts.phone ?? "+852 6159 0422"}`,
+    opts.contactEmail ?? "harrowgateconsultancy@gmail.com",
+  ].join("\n");
+
   await transport.sendMail({
     from: `"HARROWGATE Consultancy" <${process.env.GMAIL_USER}>`,
+    replyTo: `"HARROWGATE Consultancy" <${process.env.GMAIL_USER}>`,
     to: opts.studentEmail,
-    subject: `Invoice ${opts.invoiceNo} — HARROWGATE Consultancy`,
+    subject: `Invoice ${opts.invoiceNo} from HARROWGATE Consultancy`,
+    text: plainText,
+    attachments: opts.pdfBase64 ? [{
+      filename: `${opts.invoiceNo}.pdf`,
+      content: Buffer.from(opts.pdfBase64, "base64"),
+      contentType: "application/pdf",
+    }] : [],
     html: `
       <div style="font-family:Arial,sans-serif;max-width:680px;margin:0 auto;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden">
         <div style="background:#0b2213;padding:20px 32px;display:flex;justify-content:space-between;align-items:center">

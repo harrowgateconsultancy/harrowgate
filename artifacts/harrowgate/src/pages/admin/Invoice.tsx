@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Search, Printer, RotateCcw, Send, CheckCircle, AlertCircle, Plus, Trash2, Receipt, FileText } from "lucide-react";
 import { useListClients } from "@workspace/api-client-react";
 import { usePricing, DEFAULT_PRICING, type PricingConfig } from "../../hooks/usePricing";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 /* ─── constants ─── */
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -386,13 +388,47 @@ function InvoiceTab({ clients, isLoading }: { clients: ClientRow[]; isLoading: b
   function addRemark() { setRemarks(prev => [...prev, ""]); }
   function removeRemark(idx: number) { setRemarks(prev => prev.filter((_, i) => i !== idx)); }
 
+  async function generatePdfBase64(): Promise<string | null> {
+    try {
+      const printRoot = document.getElementById("invoice-print-root") as HTMLDivElement | null;
+      if (!printRoot) return null;
+      const prevStyle = printRoot.style.cssText;
+      printRoot.style.cssText = "position:fixed;left:0;top:0;width:210mm;z-index:9999;visibility:visible;background:white;";
+      await new Promise(r => setTimeout(r, 120));
+      const el = printRoot.querySelector("#invoice-printable") as HTMLElement | null;
+      if (!el) { printRoot.style.cssText = prevStyle; return null; }
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: "#ffffff", logging: false });
+      printRoot.style.cssText = prevStyle;
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const W = pdf.internal.pageSize.getWidth();
+      const H = pdf.internal.pageSize.getHeight();
+      const fullImgH = (canvas.height / canvas.width) * W;
+      const imgData = canvas.toDataURL("image/jpeg", 0.92);
+      if (fullImgH <= H) {
+        pdf.addImage(imgData, "JPEG", 0, 0, W, fullImgH);
+      } else {
+        let yOffset = 0;
+        while (yOffset < fullImgH) {
+          pdf.addImage(imgData, "JPEG", 0, -yOffset, W, fullImgH);
+          yOffset += H;
+          if (yOffset < fullImgH) pdf.addPage();
+        }
+      }
+      return pdf.output("datauristring").split(",")[1];
+    } catch (e) {
+      console.warn("[pdf] generation failed:", e);
+      return null;
+    }
+  }
+
   async function handleSend() {
     if (!selected?.email) { alert("This client has no email address."); return; }
     setSendStatus("sending");
     try {
+      const pdfBase64 = await generatePdfBase64();
       const res = await adminFetch(`${getApiBase()}/api/admin/invoice/send-invoice`, {
         method: "POST",
-        body: JSON.stringify({ studentEmail: selected.email, studentName: selected.name, invoiceNo, date: today, degreeType: degreeLabel, items, schedule, remarks: remarks.filter(r => r.trim()), total, highlightedPayment, phone, contactEmail }),
+        body: JSON.stringify({ studentEmail: selected.email, studentName: selected.name, invoiceNo, date: today, degreeType: degreeLabel, items, schedule, remarks: remarks.filter(r => r.trim()), total, highlightedPayment, phone, contactEmail, pdfBase64 }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
