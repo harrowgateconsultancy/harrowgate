@@ -93,17 +93,17 @@ const statusMap: Record<string, { color: string; bg: string }> = {
   approved:                      { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   docs_requested:                { color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
   payment_pending:               { color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
-  payment_received:              { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
+  payment_received:              { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   acknowledged:                  { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
-  interview_arranged:            { color: "#f0d28c",   bg: "rgba(167,139,250,0.12)" },
+  interview_arranged:            { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   interview_completed:           { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   second_payment_pending:        { color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
-  second_payment_received:       { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
+  second_payment_received:       { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   second_payment_confirmed:      { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   university_interview_arranged: { color: "#f0d28c",   bg: "rgba(56,189,248,0.12)" },
   university_interview_completed:{ color: "#f0d28c",   bg: "rgba(162,137,89,0.15)" },
   offer_letter_pending:          { color: "#fb923c",   bg: "rgba(251,146,60,0.12)"  },
-  final_payment_received:        { color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
+  final_payment_received:        { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)"  },
   final_payment_confirmed:       { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)"  },
   visa_issued:                   { color: "#f0d28c",   bg: "rgba(162,137,89,0.15)"  },
   rejected:                      { color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
@@ -1298,16 +1298,16 @@ export default function Portal() {
 
             {/* ── FINAL PAYMENT RECEIVED ── */}
             {submission.status === "final_payment_received" && (
-              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(96,165,250,0.2)" }}>
-                <div className="px-6 py-5 flex items-center gap-3 border-b" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
+              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.2)" }}>
+                <div className="px-6 py-5 flex items-center gap-3 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
                   <div className="flex items-center justify-center "><div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(196,169,110,0.12)", border: "1px solid rgba(196,169,110,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5"><path d="M10 8H38M10 40H38M14 8c0 8 10 10 10 16S14 32 14 40M34 8c0 8-10 10-10 16s10 8 10 16" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
                   <div>
-                    <h3 className="text-base font-semibold" style={{ color: "#60a5fa" }}>{t("s.confirmingPayment")}</h3>
-                    <p className="text-xs mt-0.5" style={{ color: "rgba(96,165,250,0.55)" }}>{t("s.confirmingPaymentSub")}</p>
+                    <h3 className="text-base font-semibold" style={{ color: "#f0d28c" }}>{t("s.confirmingPayment")}</h3>
+                    <p className="text-xs mt-0.5" style={{ color: "rgba(240,210,140,0.65)" }}>{t("s.confirmingPaymentSub")}</p>
                   </div>
                 </div>
                 <div className="px-6 py-5">
-                  <div className="rounded-xl px-4 py-3 border text-sm" style={{ background: "rgba(96,165,250,0.04)", borderColor: "rgba(96,165,250,0.14)", color: "rgba(96,165,250,0.65)", lineHeight: 1.6 }}>
+                  <div className="rounded-xl px-4 py-3 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: "rgba(240,210,140,0.7)", lineHeight: 1.6 }}>
                     {t("s.confirmingPaymentNote")}
                   </div>
                 </div>
@@ -1781,22 +1781,22 @@ export default function Portal() {
             )}
 
             {/* Portal Messages */}
-            <div className="mt-4 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(96,165,250,0.15)" }}>
-              <div className="px-5 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(96,165,250,0.1)" }}>
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(96,165,250,0.12)", color: "#60a5fa" }}>
+            <div className="mt-4 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.2)", borderColor: "rgba(162,137,89,0.2)" }}>
+              <div className="px-5 py-4 border-b flex items-center gap-3" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.12)", color: "#c4a96e" }}>
                   <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                     <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
                     <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <span className="text-sm font-semibold" style={{ color: "#60a5fa" }}>{t("portal.messages")}</span>
+                  <span className="text-sm font-semibold" style={{ color: "#c4a96e" }}>{t("portal.messages")}</span>
                   {unreadMsgs > 0 ? (
-                    <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "rgba(96,165,250,0.18)", color: "#60a5fa" }}>
+                    <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "rgba(162,137,89,0.12)", color: "#f0d28c" }}>
                       {unreadMsgs} {t("portal.new")}
                     </span>
                   ) : (
-                    <span className="ml-2 text-xs" style={{ color: "rgba(96,165,250,0.35)" }}>
+                    <span className="ml-2 text-xs" style={{ color: "rgba(240,210,140,0.35)" }}>
                       {messages.length > 0 ? `${messages.length} message${messages.length !== 1 ? "s" : ""}` : t("portal.noMessages")}
                     </span>
                   )}
@@ -1806,40 +1806,40 @@ export default function Portal() {
               <div className="px-4 py-4 space-y-3 max-h-[480px] overflow-y-auto">
                 {messages.length === 0 && (
                   <div className="text-center py-10">
-                    <div className="w-10 h-10 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ background: "rgba(96,165,250,0.08)" }}>
-                      <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" style={{ color: "rgba(96,165,250,0.3)" }}>
+                    <div className="w-10 h-10 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ background: "rgba(162,137,89,0.06)" }}>
+                      <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" style={{ color: "rgba(240,210,140,0.35)" }}>
                         <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
                       </svg>
                     </div>
-                    <p className="text-sm" style={{ color: "rgba(96,165,250,0.35)" }}>{t("portal.noMessages")}</p>
-                    <p className="text-xs mt-1" style={{ color: "rgba(96,165,250,0.25)" }}>{t("portal.noMessagesSub")}</p>
+                    <p className="text-sm" style={{ color: "rgba(240,210,140,0.35)" }}>{t("portal.noMessages")}</p>
+                    <p className="text-xs mt-1" style={{ color: "rgba(240,210,140,0.25)" }}>{t("portal.noMessagesSub")}</p>
                   </div>
                 )}
                 {messages.map(msg => (
                   <div key={msg.id} className={`flex gap-2.5 ${msg.fromAdmin ? "" : "flex-row-reverse"}`}>
                     <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold mt-0.5"
                       style={{
-                        background: msg.fromAdmin ? "rgba(96,165,250,0.15)" : "rgba(162,137,89,0.15)",
-                        color: msg.fromAdmin ? "#60a5fa" : "#4ade80",
+                        background: msg.fromAdmin ? "rgba(162,137,89,0.15)" : "rgba(162,137,89,0.15)",
+                        color: msg.fromAdmin ? "#c4a96e" : "#f0d28c",
                       }}>
                       {msg.fromAdmin ? "H" : (submission.name[0] || "Y")}
                     </div>
                     <div className={`max-w-[78%] rounded-2xl px-4 py-3 ${msg.fromAdmin ? "rounded-tl-sm" : "rounded-tr-sm"}`}
                       style={{
-                        background: msg.fromAdmin ? "rgba(96,165,250,0.08)" : "rgba(74,222,128,0.08)",
-                        border: `1px solid ${msg.fromAdmin ? "rgba(96,165,250,0.15)" : "rgba(162,137,89,0.15)"}`,
+                        background: msg.fromAdmin ? "rgba(162,137,89,0.06)" : "rgba(162,137,89,0.09)",
+                        border: `1px solid ${msg.fromAdmin ? "rgba(162,137,89,0.2)" : "rgba(162,137,89,0.25)"}`,
                       }}>
                       <div className="flex items-center justify-between gap-3 mb-1.5">
-                        <span className="text-xs font-semibold" style={{ color: msg.fromAdmin ? "#60a5fa" : "#4ade80" }}>
+                        <span className="text-xs font-semibold" style={{ color: msg.fromAdmin ? "#c4a96e" : "#f0d28c" }}>
                           {msg.fromAdmin ? "HARROWGATE" : t("s.you")}
                           {msg.fromAdmin && msg.subject && <span className="ml-1 opacity-60"> · {msg.subject}</span>}
                         </span>
-                        <span className="text-xs shrink-0" style={{ color: msg.fromAdmin ? "rgba(96,165,250,0.3)" : "rgba(74,222,128,0.3)" }}>
+                        <span className="text-xs shrink-0" style={{ color: "rgba(240,210,140,0.35)" }}>
                           {new Date(msg.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} {new Date(msg.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                         </span>
                       </div>
                       {msg.body && (
-                        <p className="text-sm leading-relaxed" style={{ color: msg.fromAdmin ? "rgba(96,165,250,0.85)" : "rgba(74,222,128,0.85)", whiteSpace: "pre-wrap" }}>
+                        <p className="text-sm leading-relaxed" style={{ color: "rgba(240,210,140,0.85)", whiteSpace: "pre-wrap" }}>
                           {msg.body}
                         </p>
                       )}
@@ -1848,7 +1848,7 @@ export default function Portal() {
                           {msg.attachments.map((att: any, i: number) => (
                             <a key={i} href={`${getApiBase()}/api/storage/objects/${att.fileUrl}`} target="_blank" rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium hover:opacity-80 transition-opacity"
-                              style={{ borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa", background: "rgba(96,165,250,0.05)" }}>
+                              style={{ borderColor: "rgba(162,137,89,0.2)", color: "#c4a96e", background: "rgba(162,137,89,0.06)" }}>
                               <svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 shrink-0"><path d="M15.5 8L9 14.5a4 4 0 01-5.657-5.657L10 2.186a2.5 2.5 0 013.536 3.535L7 12.364a1 1 0 01-1.414-1.414L11.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> {att.fileName}
                             </a>
                           ))}
@@ -1859,12 +1859,12 @@ export default function Portal() {
                 ))}
               </div>
 
-              <div className="px-4 pb-4 border-t pt-3 space-y-2.5" style={{ borderColor: "rgba(96,165,250,0.1)" }}>
+              <div className="px-4 pb-4 border-t pt-3 space-y-2.5" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
                 {replyAttachments.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {replyAttachments.map((att, i) => (
                       <div key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs"
-                        style={{ borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa", background: "rgba(96,165,250,0.05)" }}>
+                        style={{ borderColor: "rgba(162,137,89,0.2)", color: "#c4a96e", background: "rgba(162,137,89,0.06)" }}>
                         <svg viewBox="0 0 20 20" fill="none" className="w-5 h-5 shrink-0"><path d="M15.5 8L9 14.5a4 4 0 01-5.657-5.657L10 2.186a2.5 2.5 0 013.536 3.535L7 12.364a1 1 0 01-1.414-1.414L11.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> {att.fileName}
                         <button onClick={() => setReplyAttachments(a => a.filter((_, j) => j !== i))}
                           className="ml-1 hover:opacity-70" style={{ color: "#f87171" }}>✕</button>
@@ -1879,7 +1879,7 @@ export default function Portal() {
                     onChange={e => setReplyBody(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSendReply(); }}
                     className="flex-1 rounded-xl px-3 py-2.5 text-sm outline-none border resize-none"
-                    style={{ background: "rgba(96,165,250,0.04)", borderColor: "rgba(96,165,250,0.15)", color: "#60a5fa", minHeight: 60 }} />
+                    style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: "#f0d28c", minHeight: 60 }} />
                   <div className="flex flex-col gap-1.5 shrink-0">
                     <DropZone
                       onFile={handleReplyAttachment}
@@ -1887,21 +1887,21 @@ export default function Portal() {
                       compact
                       label="Attach"
                       accept="image/*,.pdf,.doc,.docx"
-                      accentColor="#60a5fa"
-                      accentBg="rgba(96,165,250,0.05)"
-                      accentBorder="rgba(96,165,250,0.15)"
+                      accentColor="#c4a96e"
+                      accentBg="rgba(162,137,89,0.06)"
+                      accentBorder="rgba(162,137,89,0.2)"
                     />
                     <button onClick={handleSendReply} disabled={sendingReply || (!replyBody.trim() && replyAttachments.length === 0)}
                       className="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:opacity-90 disabled:opacity-40"
-                      style={{ background: "#60a5fa", color: "#255F38" }}
+                      style={{ background: "#c4a96e", color: "#0b2213" }}
                       title={t("portal.ctrlEnter")}>
                       {sendingReply
-                        ? <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#255F38", borderTopColor: "transparent" }} />
+                        ? <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#0b2213", borderTopColor: "transparent" }} />
                         : <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>}
                     </button>
                   </div>
                 </div>
-                <p className="text-xs" style={{ color: "rgba(96,165,250,0.25)" }}>{t("portal.ctrlEnter")}</p>
+                <p className="text-xs" style={{ color: "rgba(240,210,140,0.25)" }}>{t("portal.ctrlEnter")}</p>
               </div>
             </div>
 
