@@ -918,66 +918,72 @@ export default function Submissions() {
       </div>
 
       {!isDetailPage && (<>
-        <div className="mb-6 sm:mb-8">
-          <div className="mb-4">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: "#f0d28c" }}>Student Submissions</h1>
-            <p className="text-sm" style={{ color: "rgba(162,137,89,0.75)" }}>{submissions.length} total · {pendingCount} requiring action</p>
-          </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-            {pendingCount > 0 && (
-              <div className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold" style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M9 2L4 9h5l-2 5 7-7H9l2-5z" strokeLinejoin="round"/></svg>
-                {pendingCount} need{pendingCount !== 1 ? "" : "s"} your attention
-              </div>
-            )}
-            {!soundEnabled ? (
-              <button onClick={() => { unlockAudio(); setSoundEnabled(true); localStorage.setItem("admin_sound_enabled", "true"); }}
-                className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
-                style={{ borderColor: C.borderMed, color: C.textSec, background: C.muted }}>
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M8 14a1 1 0 002 0H6a1 1 0 002 0z"/><path d="M8 2a5 5 0 00-5 5v3l-1 1h12l-1-1V7a5 5 0 00-5-5z"/></svg>
-                Enable Sound Alerts
+        {/* ── PAGE HEADER ── */}
+        <div className="mb-7">
+          <div className="flex items-start justify-between gap-4 mb-4 flex-wrap">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight mb-0.5" style={{ color: "#f0d28c", letterSpacing: "-0.01em" }}>Student Submissions</h1>
+              <p className="text-xs" style={{ color: "rgba(162,137,89,0.55)" }}>
+                {submissions.length} total
+                {pendingCount > 0 && <> · <span style={{ color: "#fb923c" }}>{pendingCount} need attention</span></>}
+              </p>
+            </div>
+            {/* Unified action bar */}
+            <div className="flex items-center overflow-x-auto rounded-full border shrink-0" style={{ borderColor: C.border, background: C.card, scrollbarWidth: "none" }}>
+              {/* Sound */}
+              {!soundEnabled ? (
+                <button onClick={() => { unlockAudio(); setSoundEnabled(true); localStorage.setItem("admin_sound_enabled", "true"); }}
+                  className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium transition-colors hover:opacity-80 border-r shrink-0"
+                  style={{ color: "rgba(162,137,89,0.50)", borderColor: C.border }}>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5"><path d="M8 14a1 1 0 002 0H6a1 1 0 002 0z"/><path d="M8 2a5 5 0 00-5 5v3l-1 1h12l-1-1V7a5 5 0 00-5-5z"/></svg>
+                  Alerts
+                </button>
+              ) : (
+                <span className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium border-r shrink-0" style={{ color: "#f0d28c", borderColor: C.border }}>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5"><path d="M8 14a1 1 0 002 0H6a1 1 0 002 0z"/><path d="M8 2a5 5 0 00-5 5v3l-1 1h12l-1-1V7a5 5 0 00-5-5z"/></svg>
+                  Alerts On
+                </span>
+              )}
+              {/* Courses */}
+              <button onClick={() => setShowCourses(true)}
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium transition-colors hover:opacity-80 border-r shrink-0"
+                style={{ color: "#c4a96e", borderColor: C.border }}>
+                <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 4h12M2 8h12M2 12h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                Courses
               </button>
-            ) : (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-                style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}>
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M8 14a1 1 0 002 0H6a1 1 0 002 0z"/><path d="M8 2a5 5 0 00-5 5v3l-1 1h12l-1-1V7a5 5 0 00-5-5z"/></svg>
-                Sound alerts on
-              </div>
-            )}
-            <button onClick={() => setShowCourses(true)}
-              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
-              style={{ borderColor: C.borderMed, color: GOLD, background: C.muted }}>
-              <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 4h12M2 8h12M2 12h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              Courses
-            </button>
-            <button onClick={() => setShowPricing(v => !v)}
-              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
-              style={{ borderColor: showPricing ? C.textFaint : C.borderMed, color: GOLD, background: showPricing ? C.muted : C.subtle }}>
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6h2a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3H9" strokeLinecap="round"/></svg>
-              Pricing
-            </button>
-            <button onClick={() => setShowTrash(v => !v)}
-              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
-              style={{ borderColor: showTrash ? "rgba(248,113,113,0.35)" : C.borderMed, color: showTrash ? "#f87171" : C.textMuted, background: showTrash ? "rgba(248,113,113,0.08)" : C.subtle }}>
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M3 5h10M6 5V3h4v2M13 5l-1 8H4L3 5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              Trash
-            </button>
-            <button onClick={() => { localStorage.removeItem("admin_token"); window.location.href = "/admin/login"; }}
-              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80"
-              style={{ borderColor: C.borderMed, color: C.textMid, background: C.muted }}>
-              <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              Sign Out
-            </button>
-            <button onClick={handleMegaSync} disabled={megaSyncing || !megaSyncTarget}
-              title={!megaSyncTarget ? "Select a student first" : `Sync ${megaSyncTarget.name} to UGreen server`}
-              className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ borderColor: C.borderMed, color: megaSyncResult?.startsWith("✓") ? "#f0d28c" : GOLD, background: C.muted }}>
-              {megaSyncing
-                ? <><span className="w-3 h-3 rounded-full border animate-spin shrink-0" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Syncing…</>
-                : megaSyncResult
-                  ? megaSyncResult
-                  : <><svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 8c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> Sync to UGreen{megaSyncTarget ? ` — ${megaSyncTarget.name.split(" ")[0]}` : ""}</>}
-            </button>
+              {/* Pricing */}
+              <button onClick={() => setShowPricing(v => !v)}
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium transition-colors hover:opacity-80 border-r shrink-0"
+                style={{ color: showPricing ? "#f0d28c" : "#c4a96e", background: showPricing ? "rgba(162,137,89,0.10)" : "transparent", borderColor: C.border }}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6h2a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3H9" strokeLinecap="round"/></svg>
+                Pricing
+              </button>
+              {/* Trash */}
+              <button onClick={() => setShowTrash(v => !v)}
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium transition-colors hover:opacity-80 border-r shrink-0"
+                style={{ color: showTrash ? "#f87171" : "rgba(162,137,89,0.50)", background: showTrash ? "rgba(248,113,113,0.06)" : "transparent", borderColor: C.border }}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M3 5h10M6 5V3h4v2M13 5l-1 8H4L3 5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Trash
+              </button>
+              {/* UGreen Sync */}
+              <button onClick={handleMegaSync} disabled={megaSyncing || !megaSyncTarget}
+                title={!megaSyncTarget ? "Select a student first" : `Sync ${megaSyncTarget.name} to UGreen`}
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium transition-colors hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed border-r shrink-0"
+                style={{ color: megaSyncResult?.startsWith("✓") ? "#f0d28c" : "#c4a96e", borderColor: C.border }}>
+                {megaSyncing
+                  ? <><span className="w-3 h-3 rounded-full border animate-spin shrink-0" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} />Syncing</>
+                  : megaSyncResult
+                    ? megaSyncResult
+                    : <><svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 8c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>UGreen{megaSyncTarget ? ` · ${megaSyncTarget.name.split(" ")[0]}` : ""}</>}
+              </button>
+              {/* Sign Out */}
+              <button onClick={() => { localStorage.removeItem("admin_token"); window.location.href = "/admin/login"; }}
+                className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium transition-colors hover:opacity-80 shrink-0"
+                style={{ color: "rgba(162,137,89,0.45)" }}>
+                <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1147,15 +1153,20 @@ export default function Submissions() {
         {/* ── NORMAL LIST (hidden when trash is open) ── */}
         {!showTrash && (<>
 
-        <div className="flex gap-2 mb-5 sm:mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          {filterKeys.map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              className="px-4 py-1.5 rounded-full text-xs font-semibold border transition-all shrink-0"
-              style={filter === f ? { background: GOLD, color: "#0b2213", borderColor: GOLD } : { background: "transparent", color: "#c4a96e", borderColor: C.borderMed }}>
-              {f === "all" ? "All" : (statusConfig[f]?.label || f)}
-              {f !== "all" && <span className="ml-1.5 opacity-50">{submissions.filter(s => s.status === f).length}</span>}
-            </button>
-          ))}
+        <div className="flex mb-5 sm:mb-6 overflow-x-auto border-b" style={{ borderColor: C.border, scrollbarWidth: "none" }}>
+          {filterKeys.map(f => {
+            const count = f !== "all" ? submissions.filter(s => s.status === f).length : submissions.length;
+            const active = filter === f;
+            return (
+              <button key={f} onClick={() => setFilter(f)}
+                className="relative px-4 py-2.5 text-xs font-medium transition-all shrink-0 whitespace-nowrap"
+                style={{ color: active ? "#f0d28c" : "rgba(162,137,89,0.45)" }}>
+                {f === "all" ? "All" : (statusConfig[f]?.label || f)}
+                <span className="ml-1.5" style={{ color: active ? "rgba(240,210,140,0.45)" : "rgba(162,137,89,0.25)" }}>{count}</span>
+                {active && <span className="absolute bottom-0 left-3 right-3 h-px rounded-full" style={{ background: "#c4a96e" }} />}
+              </button>
+            );
+          })}
         </div>
 
         {/* Select All + Actions bar */}
