@@ -2461,11 +2461,11 @@ export default function Submissions() {
                 {detailTab === "messages" && (<div className="space-y-6">
                 {/* Send Message to Student */}
                 {selected.status !== "rejected" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#255F38", borderColor: "rgba(31,125,83,0.45)" }}>
-                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ background: "rgba(31,125,83,0.12)", borderColor: "rgba(31,125,83,0.25)" }}>
-                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c8aa7c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Message Student</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: C.border }}>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: GOLD }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Message Student</p>
                       {messageSent === selected.id && !messageForm && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(31,125,83,0.22)", color: "#1F7D53" }}>✓ Sent</span>
+                        <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Sent</span>
                       )}
                     </div>
                     <div className="px-4 py-4 space-y-3">
@@ -2475,29 +2475,29 @@ export default function Submissions() {
                           {adminMessages.map(msg => (
                             <div key={msg.id} className={`rounded-xl px-3 py-2.5 border text-xs ${msg.fromAdmin ? "ml-4" : "mr-4"}`}
                               style={{
-                                background: msg.fromAdmin ? "rgba(31,125,83,0.14)" : "rgba(31,125,83,0.06)",
-                                borderColor: msg.fromAdmin ? "rgba(31,125,83,0.40)" : "rgba(31,125,83,0.22)",
+                                background: msg.fromAdmin ? "rgba(162,137,89,0.07)" : C.muted,
+                                borderColor: msg.fromAdmin ? "rgba(162,137,89,0.22)" : C.borderFaint,
                               }}>
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-semibold" style={{ color: msg.fromAdmin ? "#c8aa7c" : "#1F7D53" }}>
+                                <span className="font-semibold" style={{ color: msg.fromAdmin ? "#c4a96e" : C.textSec }}>
                                   {msg.fromAdmin ? "You (Admin)" : selected.name}
                                 </span>
                                 {!msg.isRead && !msg.fromAdmin && (
-                                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: "#1F7D53", color: "#255F38" }}>NEW</span>
+                                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: "rgba(162,137,89,0.18)", color: "#f0d28c" }}>NEW</span>
                                 )}
-                                <span className="ml-auto" style={{ color: "rgba(31,125,83,0.55)" }}>
+                                <span className="ml-auto" style={{ color: C.textFaint }}>
                                   {new Date(msg.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} {new Date(msg.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                                 </span>
                               </div>
-                              {msg.subject && !msg.fromAdmin && <p className="font-medium mb-1" style={{ color: "#b09a6e", opacity: 0.8 }}>{msg.subject}</p>}
-                              {msg.body && <p className="leading-relaxed" style={{ color: msg.fromAdmin ? "#c8aa7c" : "#1F7D53", whiteSpace: "pre-wrap" }}>{msg.body}</p>}
+                              {msg.subject && !msg.fromAdmin && <p className="font-medium mb-1" style={{ color: C.textDark }}>{msg.subject}</p>}
+                              {msg.body && <p className="leading-relaxed" style={{ color: msg.fromAdmin ? "#c4a96e" : C.textMid, whiteSpace: "pre-wrap" }}>{msg.body}</p>}
                               {msg.attachments?.length > 0 && (
                                 <div className="mt-1.5 flex flex-wrap gap-1">
                                   {msg.attachments.map((att: any, i: number) => (
                                     <a key={i} href={`${getApiBase()}/api/storage/objects/${att.fileUrl}`} target="_blank" rel="noopener noreferrer"
                                       className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-medium hover:opacity-80 transition-opacity"
-                                      style={{ borderColor: "rgba(31,125,83,0.35)", color: "#c8aa7c", background: "rgba(31,125,83,0.10)" }}>
-                                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3 shrink-0 inline-block mr-0.5"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>{att.fileName}
+                                      style={{ borderColor: C.borderMed, color: GOLD, background: C.muted }}>
+                                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3 shrink-0"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>{att.fileName}
                                     </a>
                                   ))}
                                 </div>
@@ -2509,7 +2509,7 @@ export default function Submissions() {
                       {!messageForm ? (
                         <button onClick={() => setMessageForm({ subject: "Message from HARROWGATE", body: "", attachments: [] })}
                           className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
-                          style={{ background: "rgba(31,125,83,0.10)", borderColor: "rgba(31,125,83,0.40)", color: "#c8aa7c" }}>
+                          style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e" }}>
                           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg>Compose New Message
                         </button>
                       ) : (
@@ -2518,18 +2518,18 @@ export default function Submissions() {
                             value={messageForm.subject}
                             onChange={e => setMessageForm(f => f ? { ...f, subject: e.target.value } : f)}
                             className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
-                            style={{ background: "rgba(31,125,83,0.07)", borderColor: "rgba(31,125,83,0.35)", color: "#c8aa7c" }} />
+                            style={{ background: C.muted, borderColor: C.borderMed, color: "#c4a96e" }} />
                           <textarea rows={4} placeholder="Type your message to the student…"
                             value={messageForm.body}
                             onChange={e => setMessageForm(f => f ? { ...f, body: e.target.value } : f)}
                             className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
-                            style={{ background: "rgba(31,125,83,0.07)", borderColor: "rgba(31,125,83,0.35)", color: "#c8aa7c" }} />
+                            style={{ background: C.muted, borderColor: C.borderMed, color: "#c4a96e" }} />
                           {messageForm.attachments.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {messageForm.attachments.map((att, i) => (
                                 <div key={i} className="flex items-center gap-1 px-2 py-1 rounded-lg border text-xs"
-                                  style={{ borderColor: "rgba(31,125,83,0.25)", color: "#1F7D53", background: "rgba(31,125,83,0.07)" }}>
-                                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3 shrink-0 inline-block mr-0.5"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>{att.fileName}
+                                  style={{ borderColor: C.borderMed, color: GOLD, background: C.muted }}>
+                                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3 shrink-0"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>{att.fileName}
                                   <button onClick={() => setMessageForm(f => f ? { ...f, attachments: f.attachments.filter((_, j) => j !== i) } : f)}
                                     className="ml-1 hover:opacity-70" style={{ color: "#f87171" }}>✕</button>
                                 </div>
@@ -2544,7 +2544,7 @@ export default function Submissions() {
                             </button>
                             <button onClick={() => { msgAttachmentRef.current?.click(); }} disabled={uploadingMsgAttachment}
                               className="px-3 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70 disabled:opacity-40"
-                              style={{ borderColor: "rgba(162,137,89,0.18)", color: "#c4a96e" }}>
+                              style={{ borderColor: C.borderMed, color: GOLD, background: C.muted }}>
                               {uploadingMsgAttachment ? "…" : <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M11 5.5a3 3 0 014.2 4.2L7 18A4.5 4.5 0 01.4 11.6L11 1" strokeLinecap="round"/></svg>}
                             </button>
                             <button onClick={() => setMessageForm(null)}
