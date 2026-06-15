@@ -249,21 +249,22 @@ function AdvantageCard({ a, idx }: { a: Advantage; idx: number }) {
   );
 }
 
-function StatChip({ value, label }: { value: string; label: string }) {
+function StatChip({ value, label, href }: { value: string; label: string; href?: string }) {
   const [hov, setHov] = useState(false);
-  return (
-    <div
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        textAlign: "center", padding: "1.5rem 1rem",
-        background: hov ? "rgba(162,137,89,0.12)" : "rgba(162,137,89,0.05)",
-        border: `1px solid ${hov ? "rgba(196,169,110,0.5)" : "rgba(162,137,89,0.18)"}`,
-        borderRadius: "1rem",
-        boxShadow: hov ? "0 8px 28px rgba(162,137,89,0.18)" : "none",
-        transform: hov ? "scale(1.05)" : "scale(1)",
-        transition: "all 0.25s ease",
-      }}>
+  const chipStyle = {
+    textAlign: "center" as const, padding: "1.5rem 1rem",
+    background: hov ? "rgba(162,137,89,0.12)" : "rgba(162,137,89,0.05)",
+    border: `1px solid ${hov ? "rgba(196,169,110,0.5)" : "rgba(162,137,89,0.18)"}`,
+    borderRadius: "1rem",
+    boxShadow: hov ? "0 8px 28px rgba(162,137,89,0.18)" : "none",
+    transform: hov ? "scale(1.05)" : "scale(1)",
+    transition: "all 0.25s ease",
+    cursor: href ? "pointer" : "default",
+    textDecoration: "none",
+    display: "block",
+  };
+  const inner = (
+    <>
       <p style={{
         fontSize: "1.9rem", fontWeight: 900, letterSpacing: "-0.02em",
         background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 100%)`,
@@ -271,6 +272,15 @@ function StatChip({ value, label }: { value: string; label: string }) {
         marginBottom: "0.3rem",
       }}>{value}</p>
       <p style={{ fontSize: "0.72rem", fontWeight: 600, color: CREAM_DIM, lineHeight: 1.4 }}>{label}</p>
+    </>
+  );
+  return href ? (
+    <Link href={href} style={chipStyle} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
+      {inner}
+    </Link>
+  ) : (
+    <div style={chipStyle} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
+      {inner}
     </div>
   );
 }
@@ -303,12 +313,12 @@ export default function WhyHongKong() {
   ];
 
   const QUICK_STATS = [
-    { value: "4",      label: t("whyhk.stat1") },
-    { value: "100+",   label: t("whyhk.stat2") },
-    { value: "7yr",    label: t("whyhk.stat3") },
-    { value: "98%",    label: t("whyhk.stat4") },
-    { value: "24h",    label: t("whyhk.stat5") },
-    { value: "HKD 3K", label: t("whyhk.stat6") },
+    { value: "4",          label: t("whyhk.stat1"), href: undefined },
+    { value: "100+",       label: t("whyhk.stat2"), href: undefined },
+    { value: "7yr",        label: t("whyhk.stat3"), href: undefined },
+    { value: "98%",        label: t("whyhk.stat4"), href: undefined },
+    { value: "24h",        label: t("whyhk.stat5"), href: undefined },
+    { value: "HKD 3,000",  label: t("whyhk.stat6"), href: "/sign-in" },
   ];
 
   return (
@@ -438,13 +448,14 @@ export default function WhyHongKong() {
           </div>
 
           <h1 className="fade-up" style={{
-            fontSize: "clamp(2.4rem, 6vw, 4.5rem)", fontWeight: 900,
-            letterSpacing: "-0.02em", lineHeight: 1.08, marginBottom: "1.5rem",
+            fontSize: "clamp(2.4rem, 5vw, 5.5rem)", fontWeight: 900,
+            letterSpacing: "-0.03em", lineHeight: 1.0, marginBottom: "1.5rem",
+            whiteSpace: "nowrap",
             background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 50%, rgba(162,137,89,0.6) 100%)`,
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             animationDelay: "80ms",
           }}>
-            {t("whyhk.h1")}<br />{t("whyhk.h2")}
+            {t("whyhk.h1")} {t("whyhk.h2")}
           </h1>
 
           <p className="fade-up" style={{
@@ -475,7 +486,7 @@ export default function WhyHongKong() {
             {t("whyhk.glance")}
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {QUICK_STATS.map(s => <StatChip key={s.value} value={s.value} label={s.label} />)}
+            {QUICK_STATS.map(s => <StatChip key={s.value} value={s.value} label={s.label} href={s.href} />)}
           </div>
         </div>
       </section>
