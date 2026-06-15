@@ -449,8 +449,7 @@ export default function WhyHongKong() {
 
           <h1 className="fade-up" style={{
             fontSize: "clamp(2.4rem, 5vw, 5.5rem)", fontWeight: 900,
-            letterSpacing: "-0.03em", lineHeight: 1.0, marginBottom: "1.5rem",
-            whiteSpace: "nowrap",
+            letterSpacing: "-0.03em", lineHeight: 1.05, marginBottom: "1.5rem",
             background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 50%, rgba(162,137,89,0.6) 100%)`,
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             animationDelay: "80ms",
