@@ -996,16 +996,19 @@ export default function Portal() {
               const isActive = activeTab === tab.id;
               return (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className="relative flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold tracking-wide transition-all"
+                  className="relative flex items-center justify-center gap-2 px-6 py-3 font-bold tracking-wide transition-all group"
+                  onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "#f0d28c"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(196,169,110,0.08)"; } }}
+                  onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "rgba(232,218,180,0.55)"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; } }}
                   style={{
-                    color: isActive ? "#f0d28c" : "rgba(232,218,180,0.55)",
-                    borderBottom: `2px solid ${isActive ? "#c4a96e" : "transparent"}`,
+                    color: isActive ? "#ffffff" : "rgba(232,218,180,0.55)",
+                    borderBottom: `2px solid ${isActive ? "#f0d28c" : "transparent"}`,
                     background: isActive
-                      ? "linear-gradient(180deg, rgba(196,169,110,0.10) 0%, rgba(196,169,110,0.04) 100%)"
+                      ? "linear-gradient(180deg, rgba(240,210,140,0.18) 0%, rgba(196,169,110,0.06) 100%)"
                       : "transparent",
                     letterSpacing: "0.06em",
                     textTransform: "uppercase",
                     fontSize: "0.72rem",
+                    textShadow: isActive ? "0 0 20px rgba(240,210,140,0.6)" : "none",
                   }}>
                   {tab.label}
                   {tab.badge != null && tab.badge > 0 && (
