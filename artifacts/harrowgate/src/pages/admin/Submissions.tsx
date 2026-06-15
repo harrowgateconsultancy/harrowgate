@@ -929,7 +929,7 @@ export default function Submissions() {
               </p>
             </div>
             {/* Unified action bar — flat tab style matching student portal */}
-            <div className="flex items-center overflow-x-auto border-b shrink-0" style={{ borderColor: C.borderFaint, scrollbarWidth: "none" }}>
+            <div className="tab-nav flex items-center overflow-x-auto border-b shrink-0" style={{ borderColor: C.borderFaint, scrollbarWidth: "none" }}>
               {/* Sound */}
               {!soundEnabled ? (
                 <button onClick={() => { unlockAudio(); setSoundEnabled(true); localStorage.setItem("admin_sound_enabled", "true"); }}

@@ -210,6 +210,10 @@
   border-radius: 9999px !important;
   transition: opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, border-color 0.2s ease !important;
 }
+/* Flat tab-style buttons — no pill shape */
+.admin-submissions .tab-nav button {
+  border-radius: 0 !important;
+}
 .admin-submissions button:hover:not(:disabled) {
   opacity: 0.85;
 }

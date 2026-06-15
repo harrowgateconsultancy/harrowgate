@@ -5,6 +5,9 @@ export type AdminColors = {
   n01: string; n02: string; n04: string; n06: string; n08: string; n10: string;
   n15: string; n20: string; n25: string; n30: string; n35: string; n40: string;
   n45: string; n50: string; n60: string; n75: string;
+  border: string; borderFaint: string; borderMed: string;
+  muted: string; subtle: string;
+  textDark: string; textSec: string; textMid: string; textMuted: string; textFaint: string;
 };
 
 // Dark = Forest Green (matches student portal)
@@ -29,6 +32,16 @@ const DARK_C: AdminColors = {
   n50: "rgba(196,169,110,0.72)",
   n60: "rgba(240,210,140,0.82)",
   n75: "rgba(240,210,140,0.92)",
+  border:      "rgba(162,137,89,0.20)",
+  borderFaint: "rgba(162,137,89,0.12)",
+  borderMed:   "rgba(162,137,89,0.28)",
+  muted:       "rgba(162,137,89,0.07)",
+  subtle:      "rgba(162,137,89,0.04)",
+  textDark:    "#f0d28c",
+  textSec:     "rgba(240,210,140,0.85)",
+  textMid:     "rgba(240,210,140,0.65)",
+  textMuted:   "rgba(162,137,89,0.65)",
+  textFaint:   "rgba(162,137,89,0.40)",
 };
 
 // Light = White / Clean
@@ -53,6 +66,16 @@ const LIGHT_C: AdminColors = {
   n50: "rgba(13,26,58,0.68)",
   n60: "rgba(13,26,58,0.78)",
   n75: "rgba(13,26,58,0.88)",
+  border:      "rgba(0,0,0,0.12)",
+  borderFaint: "rgba(0,0,0,0.07)",
+  borderMed:   "rgba(0,0,0,0.18)",
+  muted:       "rgba(0,0,0,0.04)",
+  subtle:      "rgba(0,0,0,0.02)",
+  textDark:    "#0d2210",
+  textSec:     "rgba(13,34,16,0.80)",
+  textMid:     "rgba(13,34,16,0.65)",
+  textMuted:   "rgba(13,34,16,0.50)",
+  textFaint:   "rgba(13,34,16,0.35)",
 };
 
 interface AdminThemeContextType {
