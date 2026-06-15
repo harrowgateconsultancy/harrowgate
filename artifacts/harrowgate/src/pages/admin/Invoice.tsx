@@ -65,13 +65,13 @@ function makeScheduleFromPricing(p: PricingConfig, degreeId: string): PaySchedul
 }
 
 const DEFAULT_REMARKS = [
-  "From the first deposit, HKD 10,000 shall be refundable only in the event that Harrowgate Consultancy fails to secure an offer.",
+  "The Deposit HKD$ 3,000 is Non-refundable.",
   "(2nd Payment) — Upon successfully securing an offer.",
   "(3rd Payment) — Upon approval of student's visa.",
   "This fee includes career guidance/counselling for students.",
   "Air fare & any travel expenses are NOT included.",
   "Refunds are subject to the University/College's official refund policy.",
-  "Only the first semester fee is included; subsequent semester fees shall be paid directly by students to the institution.",
+  "Once the payment is made, please send back the receipt.",
 ];
 
 const PAYMENT_METHODS = ["Bank Transfer", "FPS", "Cash", "Cheque", "WeChat Pay", "Alipay", "Other"];
