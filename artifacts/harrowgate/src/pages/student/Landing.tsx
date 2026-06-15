@@ -670,11 +670,6 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Bottom: full-width stats */}
-          <div className="hero-item-7 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 w-full pb-3" style={{ position: "relative", zIndex: 1 }}>
-            {STATS_VALUES.map((val, i) => <StatCard key={val} val={val} label={statsLabels[i]} />)}
-          </div>
-
           {/* Scroll indicator — pinned to very bottom */}
           <div className="flex flex-col items-center pb-3 pt-1 gap-1" style={{ position: "relative", zIndex: 1 }}>
             <p className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: "rgba(162,137,89,0.4)" }}>Scroll</p>
