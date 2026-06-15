@@ -1336,12 +1336,14 @@ export default function Portal() {
                           <button onClick={() => handleOfferLetterView(submission.id, eVisaDoc.id)}
                             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                             style={{ background: "rgba(52,211,153,0.06)", borderColor: "rgba(52,211,153,0.22)", color: "#34d399" }}>
-                            <span>🛂</span> {t("s.eVisaView")}
+                            <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" strokeWidth="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.3"/></svg>
+                            {t("s.eVisaView")}
                           </button>
                           <button onClick={() => handleOfferLetterDownload(submission.id, eVisaDoc.id, eVisaDoc.fileName)}
                             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                             style={{ background: "rgba(52,211,153,0.1)", borderColor: "rgba(52,211,153,0.35)", color: "#34d399" }}>
-                            <span>📥</span> {t("s.eVisaDownload")}
+                            <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                            {t("s.eVisaDownload")}
                           </button>
                         </div>
                       )}
@@ -1715,7 +1717,21 @@ export default function Portal() {
               return (
                 <div className="mb-4 rounded-2xl border overflow-hidden" style={{ background: "rgba(52,211,153,0.04)", borderColor: "rgba(52,211,153,0.3)" }}>
                   <div className="px-6 py-5 border-b text-center" style={{ borderColor: "rgba(52,211,153,0.12)" }}>
-                    <div className="text-5xl mb-3">🛂</div>
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(196,169,110,0.18) 0%, rgba(162,137,89,0.08) 100%)", border: "1px solid rgba(196,169,110,0.35)" }}>
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-9 h-9">
+                          <rect x="4" y="8" width="40" height="32" rx="4" stroke="#c4a96e" strokeWidth="2" fill="none"/>
+                          <rect x="4" y="8" width="40" height="10" rx="4" fill="rgba(196,169,110,0.18)" stroke="#c4a96e" strokeWidth="2"/>
+                          <circle cx="14" cy="28" r="5" stroke="#f0d28c" strokeWidth="1.5" fill="none"/>
+                          <path d="M9 35c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="#f0d28c" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                          <line x1="24" y1="25" x2="38" y2="25" stroke="#c4a96e" strokeWidth="1.5" strokeLinecap="round"/>
+                          <line x1="24" y1="29" x2="36" y2="29" stroke="rgba(196,169,110,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
+                          <line x1="24" y1="33" x2="34" y2="33" stroke="rgba(196,169,110,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
+                          <circle cx="38" cy="38" r="8" fill="#0b2213" stroke="#c4a96e" strokeWidth="1.5"/>
+                          <path d="M35 38l2 2 4-4" stroke="#f0d28c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                    </div>
                     <h3 className="text-xl font-bold mb-1" style={{ color: "#34d399" }}>{t("s.eVisaTitle")}</h3>
                     <p className="text-sm" style={{ color: "rgba(52,211,153,0.6)" }}>{t("s.eVisaSub")}</p>
                   </div>
@@ -1728,7 +1744,8 @@ export default function Portal() {
                     <button onClick={() => handleOfferLetterDownload(submission.id, eVisaDoc.id, eVisaDoc.fileName)}
                       className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90"
                       style={{ background: "rgba(52,211,153,0.1)", borderColor: "rgba(52,211,153,0.35)", color: "#34d399" }}>
-                      <span>🛂</span> {t("s.eVisaDownload")}
+                      <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4"><path d="M8 1v9m0 0l-3-3m3 3l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      {t("s.eVisaDownload")}
                     </button>
                   </div>
                 </div>
