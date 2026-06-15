@@ -10,6 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "@/pages/student/Landing";
 import Portal from "@/pages/student/Portal";
 import Packages from "@/pages/student/Packages";
+import WhyHongKong from "@/pages/student/WhyHongKong";
 import Submissions from "@/pages/admin/Submissions";
 import AdminLogin from "@/pages/admin/AdminLogin";
 
@@ -385,6 +386,7 @@ function ClerkProviderWithRoutes() {
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/portal" component={PortalPage} />
             <Route path="/packages" component={Packages} />
+            <Route path="/why-hong-kong" component={WhyHongKong} />
 
             {/* Staff portal (public login, protected dashboard) */}
             <Route path="/staff/login" component={StaffLogin} />

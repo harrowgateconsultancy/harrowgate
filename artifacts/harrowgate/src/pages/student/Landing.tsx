@@ -506,6 +506,8 @@ export default function Landing() {
               <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
               <Link href="/packages" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border inline-flex items-center gap-1.5"
                 style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>Packages</Link>
+              <Link href="/why-hong-kong" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border inline-flex items-center gap-1.5"
+                style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>Why HK?</Link>
               <Link href="/agent-signup" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border inline-flex items-center gap-1.5"
                 style={{ borderColor: "rgba(162,137,89,0.35)", color: GOLD, background: "rgba(162,137,89,0.08)" }}>Our Agents</Link>
               <Link
@@ -555,6 +557,11 @@ export default function Landing() {
                 className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
                 style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
                 <span style={{ fontSize: "1rem" }}>📋</span> Packages
+              </Link>
+              <Link href="/why-hong-kong" onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
+                style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
+                <span style={{ fontSize: "1rem" }}>🏙️</span> Why Hong Kong?
               </Link>
               <Link href="/agent-signup" onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
