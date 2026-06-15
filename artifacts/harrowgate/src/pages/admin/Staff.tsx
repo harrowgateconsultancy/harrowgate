@@ -13,7 +13,7 @@ const NAVY = "#0d1a3a";
 const GOLD = "#1F7D53";
 
 const PRIORITIES = [
-  { value: "low",    label: "Low",    color: "#4ade80", bg: "rgba(74,222,128,0.1)" },
+  { value: "low",    label: "Low",    color: "#f0d28c", bg: "rgba(162,137,89,0.10)" },
   { value: "medium", label: "Medium", color: GOLD,      bg: "rgba(31,125,83,0.1)" },
   { value: "high",   label: "High",   color: "#fb923c", bg: "rgba(251,146,60,0.1)" },
   { value: "urgent", label: "Urgent", color: "#f87171", bg: "rgba(248,113,113,0.1)" },
@@ -21,7 +21,7 @@ const PRIORITIES = [
 const STATUSES = [
   { value: "pending",     label: "To Do",       color: "rgba(13,26,58,0.4)" },
   { value: "in_progress", label: "In Progress", color: "#fb923c" },
-  { value: "done",        label: "Done",        color: "#4ade80" },
+  { value: "done",        label: "Done",        color: "#f0d28c" },
 ];
 
 interface StaffMember { id: number; name: string; username: string; email?: string | null; role: string; createdAt: string; }
@@ -559,8 +559,8 @@ function TaskCard({ task, onEdit, onDelete }: { task: Task; onEdit: (t: Task) =>
           {task.checklist.slice(0, 3).map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className="w-3.5 h-3.5 rounded border shrink-0 flex items-center justify-center"
-                style={{ borderColor: item.completed ? "#4ade80" : C.n20, background: item.completed ? "rgba(74,222,128,0.15)" : "transparent" }}>
-                {item.completed && <svg viewBox="0 0 10 8" className="w-2 h-2" fill="none"><path d="M1 4l3 3 5-6" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                style={{ borderColor: item.completed ? "#f0d28c" : C.n20, background: item.completed ? "rgba(162,137,89,0.15)" : "transparent" }}>
+                {item.completed && <svg viewBox="0 0 10 8" className="w-2 h-2" fill="none"><path d="M1 4l3 3 5-6" stroke="#c4a96e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
               </div>
               <span className="text-xs line-clamp-1" style={{ color: item.completed ? C.n35 : C.n60, textDecoration: item.completed ? "line-through" : "none" }}>{item.text}</span>
             </div>
@@ -570,7 +570,7 @@ function TaskCard({ task, onEdit, onDelete }: { task: Task; onEdit: (t: Task) =>
           )}
           {total > 0 && (
             <div className="mt-1 h-1 rounded-full overflow-hidden" style={{ background: C.n08 }}>
-              <div className="h-full rounded-full transition-all" style={{ width: `${(done / total) * 100}%`, background: "#4ade80" }} />
+              <div className="h-full rounded-full transition-all" style={{ width: `${(done / total) * 100}%`, background: "#f0d28c" }} />
             </div>
           )}
         </div>
@@ -580,8 +580,8 @@ function TaskCard({ task, onEdit, onDelete }: { task: Task; onEdit: (t: Task) =>
         <div className="space-y-1">
           {task.attachments.filter(a => a.uploadedBy === "staff").length > 0 && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(74,222,128,0.12)", color: "#4ade80" }}>Staff</span>
-              <span className="text-[11px]" style={{ color: "#4ade80" }}>
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(162,137,89,0.12)", color: "#f0d28c" }}>Staff</span>
+              <span className="text-[11px]" style={{ color: "#f0d28c" }}>
                 {task.attachments.filter(a => a.uploadedBy === "staff").length} file{task.attachments.filter(a => a.uploadedBy === "staff").length !== 1 ? "s" : ""} sent back
               </span>
             </div>

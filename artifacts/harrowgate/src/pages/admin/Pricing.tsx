@@ -42,8 +42,8 @@ const TIERS = [
   {
     id: "associate",
     label: "Associate Degree",
-    color: "#4ade80",
-    accentBg: "rgba(74,222,128,0.12)",
+    color: "#f0d28c",
+    accentBg: "rgba(162,137,89,0.12)",
     badge: false,
     totalKey: "associateTotal" as keyof PricingConfig,
     stage2Key: "associateStage2" as keyof PricingConfig,
@@ -66,8 +66,8 @@ const TIERS = [
   {
     id: "master",
     label: "Master's Degree",
-    color: "#60a5fa",
-    accentBg: "rgba(96,165,250,0.12)",
+    color: "#c4a96e",
+    accentBg: "rgba(162,137,89,0.12)",
     badge: false,
     totalKey: "mastersTotal" as keyof PricingConfig,
     stage2Key: "mastersStage2" as keyof PricingConfig,
@@ -78,7 +78,7 @@ const TIERS = [
   {
     id: "diploma",
     label: "Diploma Courses",
-    color: "#c084fc",
+    color: "#c4a96e",
     accentBg: "rgba(192,132,252,0.12)",
     badge: false,
     totalKey: "diplomaTotal" as keyof PricingConfig,
@@ -381,7 +381,7 @@ export default function Pricing() {
 
                   {/* Balance indicator */}
                   <div className={`mt-3 pt-3 border-t border-border flex items-center justify-between gap-2 text-[11px] font-semibold`}
-                    style={{ color: ok ? "#4ade80" : "#f87171" }}>
+                    style={{ color: ok ? "#f0d28c" : "#f87171" }}>
                     <span>{ok ? "✓ Amounts balance" : "⚠ Don't balance"}</span>
                     <span className="font-mono">
                       3k + {fmtNum(stage2Num)} + {fmtNum(stage3Num)} = {fmtNum(computedSum)}
@@ -410,9 +410,9 @@ export default function Pricing() {
                   disabled={isSaving || !ok}
                   className="mt-auto w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 border"
                   style={{
-                    background: isSaved ? "rgba(74,222,128,0.15)" : tier.accentBg,
-                    color: isSaved ? "#4ade80" : tier.color,
-                    borderColor: isSaved ? "rgba(74,222,128,0.4)" : tier.color + "50",
+                    background: isSaved ? "rgba(162,137,89,0.15)" : tier.accentBg,
+                    color: isSaved ? "#f0d28c" : tier.color,
+                    borderColor: isSaved ? "rgba(162,137,89,0.40)" : tier.color + "50",
                   }}
                 >
                   {isSaving ? (
@@ -456,7 +456,7 @@ export default function Pricing() {
         </div>
 
         <div className="rounded-2xl bg-card border border-border overflow-hidden">
-          <div className="h-1 w-full" style={{ background: "linear-gradient(to right, #1F7D53, #60a5fa)" }} />
+          <div className="h-1 w-full" style={{ background: "linear-gradient(to right, #1F7D53, #c4a96e)" }} />
           <div className="p-6 grid md:grid-cols-2 gap-5">
             {(
               [
@@ -506,9 +506,9 @@ export default function Pricing() {
               disabled={bankSaving}
               className="ml-auto flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 border"
               style={{
-                background: bankSaved ? "rgba(74,222,128,0.15)" : "rgba(31,125,83,0.12)",
-                color: bankSaved ? "#4ade80" : "#1F7D53",
-                borderColor: bankSaved ? "rgba(74,222,128,0.4)" : "rgba(31,125,83,0.4)",
+                background: bankSaved ? "rgba(162,137,89,0.15)" : "rgba(31,125,83,0.12)",
+                color: bankSaved ? "#f0d28c" : "#1F7D53",
+                borderColor: bankSaved ? "rgba(162,137,89,0.40)" : "rgba(31,125,83,0.4)",
               }}
             >
               {bankSaving ? (

@@ -326,14 +326,14 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
           {/* Import result */}
           {importResult && (
             <div className="rounded-xl border px-5 py-4 flex items-center gap-3"
-              style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.25)" }}>
-              <CheckCircle size={18} style={{ color: "#16a34a" }} />
+              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)" }}>
+              <CheckCircle size={18} style={{ color: "#c4a96e" }} />
               <div>
-                <p className="text-sm font-semibold" style={{ color: "#16a34a" }}>
+                <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>
                   {importResult.ok} transaction{importResult.ok !== 1 ? "s" : ""} imported successfully
                   {importResult.fail > 0 ? ` · ${importResult.fail} failed` : ""}
                 </p>
-                <button onClick={onClose} className="mt-2 text-xs font-semibold" style={{ color: "#16a34a" }}>Close and view ledger →</button>
+                <button onClick={onClose} className="mt-2 text-xs font-semibold" style={{ color: "#c4a96e" }}>Close and view ledger →</button>
               </div>
             </div>
           )}
@@ -355,9 +355,9 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
               </div>
 
               <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-xl border px-4 py-3 text-center" style={{ borderColor: "rgba(74,222,128,0.2)", background: "rgba(74,222,128,0.05)" }}>
+                <div className="rounded-xl border px-4 py-3 text-center" style={{ borderColor: "rgba(162,137,89,0.20)", background: "rgba(162,137,89,0.05)" }}>
                   <p className="text-xs font-semibold" style={{ color: C.n40 }}>Income</p>
-                  <p className="text-base font-bold mt-1" style={{ color: "#16a34a" }}>+{fmt(incomeTotal)}</p>
+                  <p className="text-base font-bold mt-1" style={{ color: "#c4a96e" }}>+{fmt(incomeTotal)}</p>
                 </div>
                 <div className="rounded-xl border px-4 py-3 text-center" style={{ borderColor: "rgba(248,113,113,0.2)", background: "rgba(248,113,113,0.05)" }}>
                   <p className="text-xs font-semibold" style={{ color: C.n40 }}>Expenses</p>
@@ -393,8 +393,8 @@ function DBSImportModal({ onClose, onImported }: { onClose: () => void; onImport
                         <button onClick={() => updateType(i, row.type === "income" ? "expense" : "income")}
                           className="px-2 py-0.5 rounded-full font-semibold transition-all text-[11px]"
                           style={{
-                            background: row.type === "income" ? "rgba(74,222,128,0.12)" : "rgba(248,113,113,0.12)",
-                            color: row.type === "income" ? "#16a34a" : "#dc2626",
+                            background: row.type === "income" ? "rgba(162,137,89,0.12)" : "rgba(248,113,113,0.12)",
+                            color: row.type === "income" ? "#c4a96e" : "#dc2626",
                           }}>
                           {row.type === "income" ? "+" : "−"}{fmt(row.amount).replace("HKD$ ", "")}
                         </button>
@@ -506,10 +506,10 @@ export default function Finance() {
   const filtered = transactions.filter(t => tab === "all" || t.type === tab);
 
   const statCards = [
-    { label: "Total Income", value: summary.income, icon: TrendingUp, color: "#4ade80", bg: "rgba(74,222,128,0.08)", border: "rgba(74,222,128,0.2)" },
+    { label: "Total Income", value: summary.income, icon: TrendingUp, color: "#f0d28c", bg: "rgba(162,137,89,0.08)", border: "rgba(162,137,89,0.20)" },
     { label: "Total Expenses", value: summary.expenses, icon: TrendingDown, color: "#f87171", bg: "rgba(248,113,113,0.08)", border: "rgba(248,113,113,0.2)" },
     { label: "Net Profit", value: summary.profit, icon: DollarSign, color: GOLD, bg: "rgba(31,125,83,0.08)", border: "rgba(31,125,83,0.2)" },
-    { label: "Zakat Due (2.5%)", value: summary.zakat, icon: Moon, color: "#c084fc", bg: "rgba(192,132,252,0.08)", border: "rgba(192,132,252,0.2)" },
+    { label: "Zakat Due (2.5%)", value: summary.zakat, icon: Moon, color: "#c4a96e", bg: "rgba(192,132,252,0.08)", border: "rgba(192,132,252,0.2)" },
   ];
 
   return (
@@ -550,10 +550,10 @@ export default function Finance() {
       {summary.profit > 0 && (
         <div className="mb-6 rounded-xl border px-5 py-4 flex items-center gap-3"
           style={{ background: "rgba(192,132,252,0.05)", borderColor: "rgba(192,132,252,0.2)" }}>
-          <Moon size={18} style={{ color: "#c084fc" }} />
+          <Moon size={18} style={{ color: "#c4a96e" }} />
           <p className="text-sm" style={{ color: C.n60 }}>
             Zakat is calculated at <strong>2.5%</strong> of net profit ({fmt(summary.profit)}).
-            Amount due: <strong style={{ color: "#c084fc" }}>{fmt(summary.zakat)}</strong>
+            Amount due: <strong style={{ color: "#c4a96e" }}>{fmt(summary.zakat)}</strong>
           </p>
         </div>
       )}
@@ -605,7 +605,7 @@ export default function Finance() {
                   </td>
                   <td className="px-5 py-3.5 hidden sm:table-cell">
                     <span className="text-xs px-2 py-0.5 rounded-full font-medium"
-                      style={{ background: tx.type === "income" ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)", color: tx.type === "income" ? "#16a34a" : "#dc2626" }}>
+                      style={{ background: tx.type === "income" ? "rgba(162,137,89,0.10)" : "rgba(248,113,113,0.1)", color: tx.type === "income" ? "#c4a96e" : "#dc2626" }}>
                       {tx.category}
                     </span>
                   </td>
@@ -614,7 +614,7 @@ export default function Finance() {
                     {tx.notes && <p className="text-xs mt-0.5" style={{ color: C.n40 }}>{tx.notes}</p>}
                   </td>
                   <td className="px-5 py-3.5 text-right">
-                    <span className="font-bold text-sm" style={{ color: tx.type === "income" ? "#16a34a" : "#dc2626" }}>
+                    <span className="font-bold text-sm" style={{ color: tx.type === "income" ? "#c4a96e" : "#dc2626" }}>
                       {tx.type === "income" ? "+" : "−"}{fmt(tx.amount)}
                     </span>
                   </td>
@@ -646,9 +646,9 @@ export default function Finance() {
                   <button key={t} type="button" onClick={() => setForm(f => ({ ...f, type: t, category: t === "income" ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0] }))}
                     className="flex-1 py-2 rounded-lg text-sm font-semibold border transition-all"
                     style={{
-                      background: form.type === t ? (t === "income" ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)") : "transparent",
-                      borderColor: form.type === t ? (t === "income" ? "rgba(74,222,128,0.4)" : "rgba(248,113,113,0.4)") : C.n15,
-                      color: form.type === t ? (t === "income" ? "#16a34a" : "#dc2626") : C.n50,
+                      background: form.type === t ? (t === "income" ? "rgba(162,137,89,0.10)" : "rgba(248,113,113,0.1)") : "transparent",
+                      borderColor: form.type === t ? (t === "income" ? "rgba(162,137,89,0.40)" : "rgba(248,113,113,0.4)") : C.n15,
+                      color: form.type === t ? (t === "income" ? "#c4a96e" : "#dc2626") : C.n50,
                     }}>
                     {t === "income" ? "Income" : "Expense"}
                   </button>

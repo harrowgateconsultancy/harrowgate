@@ -122,7 +122,7 @@ function EmailModal({ agent, onClose }: { agent: Agent; onClose: () => void }) {
         {sent ? (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
             <p style={{ fontSize: 32, margin: "0 0 12px" }}>✅</p>
-            <p style={{ color: "#4caf7d", fontWeight: 600, margin: "0 0 4px" }}>Email sent successfully!</p>
+            <p style={{ color: "#c4a96e", fontWeight: 600, margin: "0 0 4px" }}>Email sent successfully!</p>
             <p style={{ color: "#9a8a6a", fontSize: 13, margin: "0 0 20px" }}>Your message has been delivered to {agent.email}.</p>
             <button onClick={onClose} style={{ background: "rgba(162,137,89,0.12)", border: `1px solid ${BORDER}`, color: GOLD, borderRadius: 8, padding: "8px 24px", cursor: "pointer", fontSize: 13 }}>
               Close
@@ -167,7 +167,7 @@ function EmailModal({ agent, onClose }: { agent: Agent; onClose: () => void }) {
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { bg: string; color: string; label: string }> = {
     pending: { bg: "rgba(162,137,89,0.15)", color: GOLD, label: "Pending" },
-    approved: { bg: "rgba(34,160,80,0.15)", color: "#4caf7d", label: "Approved" },
+    approved: { bg: "rgba(34,160,80,0.15)", color: "#c4a96e", label: "Approved" },
     rejected: { bg: "rgba(220,50,50,0.15)", color: "#e07070", label: "Rejected" },
   };
   const s = map[status] ?? map.pending;
@@ -318,7 +318,7 @@ function AgentCard({
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             {agent.status !== "approved" && (
               <button onClick={() => updateStatus("approved")} disabled={updating}
-                style={{ background: "rgba(34,160,80,0.15)", border: "1px solid rgba(34,160,80,0.4)", color: "#4caf7d", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                style={{ background: "rgba(34,160,80,0.15)", border: "1px solid rgba(34,160,80,0.4)", color: "#c4a96e", borderRadius: 8, padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                 ✓ Approve
               </button>
             )}

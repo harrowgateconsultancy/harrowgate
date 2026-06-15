@@ -29,7 +29,7 @@ interface StaffMember {
 
 const ROLE_CONFIG = {
   manager: { label: "Manager", color: "#1F7D53", bg: "rgba(31,125,83,0.12)", desc: "All pages except Finance & Pricing" },
-  staff:   { label: "Staff",   color: "#60a5fa", bg: "rgba(96,165,250,0.12)",  desc: "All pages except Finance & Pricing" },
+  staff:   { label: "Staff",   color: "#c4a96e", bg: "rgba(162,137,89,0.12)",  desc: "All pages except Finance & Pricing" },
 };
 
 export default function Settings() {

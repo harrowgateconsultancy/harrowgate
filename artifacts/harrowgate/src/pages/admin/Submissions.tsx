@@ -36,28 +36,28 @@ type Submission = {
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   pending:              { label: "Pending",              color: "#d97706",   bg: "rgba(217,119,6,0.1)" },
-  approved:             { label: "Approved",             color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  approved:             { label: "Approved",             color: "#f0d28c",   bg: "rgba(162,137,89,0.12)" },
   docs_requested:       { label: "Docs Requested",       color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
   payment_pending:      { label: "Payment Pending",      color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
-  payment_received:     { label: "Receipt Received",     color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
-  acknowledged:         { label: "Acknowledged",         color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  interview_arranged:              { label: "Interview Arranged",    color: "#a78bfa",   bg: "rgba(167,139,250,0.12)" },
-  interview_completed:             { label: "Mock Interview Done",    color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
+  payment_received:     { label: "Receipt Received",     color: "#c4a96e",   bg: "rgba(162,137,89,0.12)" },
+  acknowledged:         { label: "Acknowledged",         color: "#f0d28c",   bg: "rgba(162,137,89,0.12)" },
+  interview_arranged:              { label: "Interview Arranged",    color: "#c4a96e",   bg: "rgba(162,137,89,0.12)" },
+  interview_completed:             { label: "Mock Interview Done",    color: "#f0d28c",   bg: "rgba(162,137,89,0.12)" },
   second_payment_pending:          { label: "2nd Payment Pending",   color: "#fb923c",   bg: "rgba(251,146,60,0.12)" },
-  second_payment_received:         { label: "2nd Receipt Received",  color: "#60a5fa",   bg: "rgba(96,165,250,0.12)" },
-  second_payment_confirmed:        { label: "2nd Payment Confirmed", color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  university_interview_arranged:   { label: "Uni Interview Arranged", color: "#38bdf8",  bg: "rgba(56,189,248,0.12)" },
-  university_interview_completed:  { label: "Uni Interview Done",    color: "#4ade80",   bg: "rgba(74,222,128,0.12)" },
-  offer_letter_pending:            { label: "Offer Letter Sent",      color: "#9333ea",   bg: "rgba(147,51,234,0.1)" },
-  final_payment_received:          { label: "Final Receipt Received", color: "#60a5fa",   bg: "rgba(96,165,250,0.12)"  },
-  final_payment_confirmed:         { label: "Final Payment Done",     color: "#4ade80",   bg: "rgba(74,222,128,0.12)"  },
-  visa_issued:                     { label: "e-Visa Issued 🎉",       color: "#34d399",   bg: "rgba(52,211,153,0.12)"  },
+  second_payment_received:         { label: "2nd Receipt Received",  color: "#c4a96e",   bg: "rgba(162,137,89,0.12)" },
+  second_payment_confirmed:        { label: "2nd Payment Confirmed", color: "#f0d28c",   bg: "rgba(162,137,89,0.12)" },
+  university_interview_arranged:   { label: "Uni Interview Arranged", color: "#c4a96e",  bg: "rgba(162,137,89,0.12)" },
+  university_interview_completed:  { label: "Uni Interview Done",    color: "#f0d28c",   bg: "rgba(162,137,89,0.12)" },
+  offer_letter_pending:            { label: "Offer Letter Sent",      color: "#c4a96e",   bg: "rgba(162,137,89,0.10)" },
+  final_payment_received:          { label: "Final Receipt Received", color: "#c4a96e",   bg: "rgba(162,137,89,0.12)"  },
+  final_payment_confirmed:         { label: "Final Payment Done",     color: "#f0d28c",   bg: "rgba(162,137,89,0.12)"  },
+  visa_issued:                     { label: "e-Visa Issued 🎉",       color: "#f0d28c",   bg: "rgba(162,137,89,0.12)"  },
   rejected:                        { label: "Rejected",              color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
 
 const nextActions: Record<string, { label: string; nextStatus: string; color: string; icon: string }[]> = {
   pending: [
-    { label: "Approve",                   nextStatus: "approved",        color: "#4ade80", icon: "✅" },
+    { label: "Approve",                   nextStatus: "approved",        color: "#f0d28c", icon: "✅" },
     { label: "Request Additional Docs",   nextStatus: "docs_requested",  color: "#fb923c", icon: "📎" },
     { label: "Reject",                    nextStatus: "rejected",        color: "#f87171", icon: "✕" },
   ],
@@ -65,14 +65,14 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
     { label: "Request Payment",           nextStatus: "payment_pending", color: "#fb923c", icon: "💳" },
   ],
   docs_requested: [
-    { label: "Approve",                   nextStatus: "approved",        color: "#4ade80", icon: "✅" },
+    { label: "Approve",                   nextStatus: "approved",        color: "#f0d28c", icon: "✅" },
     { label: "Reject",                    nextStatus: "rejected",        color: "#f87171", icon: "✕" },
   ],
   rejected: [
     { label: "Unreject — Move to Pending", nextStatus: "pending",        color: "#d97706", icon: "↩" },
   ],
   payment_received: [
-    { label: "Confirm Payment & Acknowledge", nextStatus: "acknowledged", color: "#16a34a", icon: "✅" },
+    { label: "Confirm Payment & Acknowledge", nextStatus: "acknowledged", color: "#c4a96e", icon: "✅" },
   ],
   interview_arranged: [],
   interview_completed: [
@@ -80,14 +80,14 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
   ],
   second_payment_pending: [],
   second_payment_received: [
-    { label: "Confirm 2nd Payment", nextStatus: "second_payment_confirmed", color: "#4ade80", icon: "✅" },
+    { label: "Confirm 2nd Payment", nextStatus: "second_payment_confirmed", color: "#f0d28c", icon: "✅" },
   ],
   second_payment_confirmed: [],
   university_interview_arranged: [],
   university_interview_completed: [],
   offer_letter_pending: [],
   final_payment_received: [
-    { label: "Confirm Final Payment", nextStatus: "final_payment_confirmed", color: "#4ade80", icon: "✅" },
+    { label: "Confirm Final Payment", nextStatus: "final_payment_confirmed", color: "#f0d28c", icon: "✅" },
   ],
   final_payment_confirmed: [],
   visa_issued: [],
@@ -110,11 +110,11 @@ function calcAge(dob: string): number | null {
 }
 
 function getDocMeta(dt: string, C: Record<string, string>, GOLD: string): { label: string; tagColor: string; tagText: string; tag: string } {
-  if (dt === "payment_receipt")        return { label: "Payment Receipt",            tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Receipt"       };
-  if (dt === "second_payment_receipt") return { label: "2nd Payment Receipt",        tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "2nd Receipt"   };
+  if (dt === "payment_receipt")        return { label: "Payment Receipt",            tagColor: "rgba(162,137,89,0.18)",  tagText: "#c4a96e", tag: "Receipt"       };
+  if (dt === "second_payment_receipt") return { label: "2nd Payment Receipt",        tagColor: "rgba(162,137,89,0.18)",  tagText: "#c4a96e", tag: "2nd Receipt"   };
   if (dt === "additional_doc")         return { label: "Additional Document",        tagColor: "rgba(251,146,60,0.18)",  tagText: "#fb923c", tag: "Additional"    };
-  if (dt === "offer_letter")           return { label: "Offer Letter",               tagColor: "rgba(147,51,234,0.1)", tagText: "#9333ea", tag: "Offer Letter"  };
-  if (dt === "final_payment_receipt")  return { label: "Final Payment Receipt",      tagColor: "rgba(96,165,250,0.18)",  tagText: "#60a5fa", tag: "Final Receipt" };
+  if (dt === "offer_letter")           return { label: "Offer Letter",               tagColor: "rgba(162,137,89,0.10)", tagText: "#c4a96e", tag: "Offer Letter"  };
+  if (dt === "final_payment_receipt")  return { label: "Final Payment Receipt",      tagColor: "rgba(162,137,89,0.18)",  tagText: "#c4a96e", tag: "Final Receipt" };
   if (dt === "passport_photo")         return { label: "Passport Size Photo",        tagColor: C.muted,  tagText: GOLD,      tag: "Student"       };
   if (dt === "passport_doc")           return { label: "Passport / Travel Document", tagColor: C.muted,  tagText: GOLD,      tag: "Student"       };
   if (dt === "birth_certificate")      return { label: "Birth Certificate / Nat. ID",tagColor: C.muted, tagText: GOLD,      tag: "Student"       };
@@ -124,9 +124,9 @@ function getDocMeta(dt: string, C: Record<string, string>, GOLD: string): { labe
   if (dt === "higher_edu_results")     return { label: "Higher Education Certificate",  tagColor: C.muted,  tagText: GOLD,      tag: "Student"       };
   if (dt === "higher_edu_transcript")  return { label: "Higher Education Transcript",tagColor: C.muted, tagText: GOLD,      tag: "Student"       };
   if (dt.startsWith("edu_"))           return { label: `Education Document ${dt.replace("edu_", "")}`, tagColor: C.muted, tagText: GOLD, tag: "Student" };
-  if (dt === "evisa")                  return { label: "e-Visa (HK Immigration)", tagColor: "rgba(52,211,153,0.18)", tagText: "#34d399", tag: "e-Visa" };
+  if (dt === "evisa")                  return { label: "e-Visa (HK Immigration)", tagColor: "rgba(162,137,89,0.18)", tagText: "#f0d28c", tag: "e-Visa" };
   if (dt === "signed_terms")           return { label: "Signed Terms & Conditions", tagColor: C.muted, tagText: GOLD, tag: "Signed T&C" };
-  if (dt.startsWith("admin_"))         return { label: dt === "admin_doc" ? "Admin Document" : dt.replace("admin_", "").replace(/_/g, " "), tagColor: "rgba(74,222,128,0.15)", tagText: "#4ade80", tag: "Admin" };
+  if (dt.startsWith("admin_"))         return { label: dt === "admin_doc" ? "Admin Document" : dt.replace("admin_", "").replace(/_/g, " "), tagColor: "rgba(162,137,89,0.15)", tagText: "#f0d28c", tag: "Admin" };
   return { label: dt.replace(/_/g, " ").toUpperCase(), tagColor: C.muted, tagText: GOLD, tag: "Student" };
 }
 
@@ -200,8 +200,8 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs font-mono truncate" style={{ color: C.textSec }}>To: {item.toAddress}</span>
                   <span className="text-xs px-1.5 py-0.5 rounded-full" style={{
-                    background: item.status === "pending" ? "rgba(251,146,60,0.12)" : item.status === "sent" ? "rgba(74,222,128,0.1)" : "rgba(248,113,113,0.1)",
-                    color: item.status === "pending" ? "#fb923c" : item.status === "sent" ? "#4ade80" : "#f87171",
+                    background: item.status === "pending" ? "rgba(251,146,60,0.12)" : item.status === "sent" ? "rgba(162,137,89,0.10)" : "rgba(248,113,113,0.1)",
+                    color: item.status === "pending" ? "#fb923c" : item.status === "sent" ? "#f0d28c" : "#f87171",
                   }}>
                     {item.status === "pending" ? "Pending" : item.status === "sent" ? "✓ Sent" : "Rejected"}
                   </span>
@@ -223,7 +223,7 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
                     onClick={() => { if (!approveMutation.isPending) approveMutation.mutate(item.id); }}
                     disabled={approveMutation.isPending || rejectMutation.isPending}
                     className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all hover:opacity-80 disabled:opacity-40"
-                    style={{ background: "rgba(74,222,128,0.15)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.25)" }}>
+                    style={{ background: "rgba(162,137,89,0.15)", color: "#f0d28c", border: "1px solid rgba(162,137,89,0.25)" }}>
                     {approveMutation.isPending ? "Sending…" : "✓ Approve & Send"}
                   </button>
                   <button
@@ -925,7 +925,7 @@ export default function Submissions() {
               </button>
             ) : (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-                style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>
+                style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}>
                 🔔 Sound alerts on
               </div>
             )}
@@ -954,7 +954,7 @@ export default function Submissions() {
             <button onClick={handleMegaSync} disabled={megaSyncing || !megaSyncTarget}
               title={!megaSyncTarget ? "Select a student first" : `Sync ${megaSyncTarget.name} to UGreen server`}
               className="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ borderColor: C.borderMed, color: megaSyncResult?.startsWith("✓") ? "#4ade80" : GOLD, background: C.muted }}>
+              style={{ borderColor: C.borderMed, color: megaSyncResult?.startsWith("✓") ? "#f0d28c" : GOLD, background: C.muted }}>
               {megaSyncing
                 ? <><span className="w-3 h-3 rounded-full border animate-spin shrink-0" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Syncing…</>
                 : megaSyncResult
@@ -1055,7 +1055,7 @@ export default function Submissions() {
               </p>
               <button onClick={savePricing} disabled={pricingSaving}
                 className="flex items-center gap-2 text-xs font-bold px-5 py-2.5 rounded-xl border transition-all hover:opacity-80 disabled:opacity-40"
-                style={{ borderColor: pricingSaved ? "rgba(74,222,128,0.4)" : C.borderMed, color: pricingSaved ? "#4ade80" : GOLD, background: pricingSaved ? "rgba(74,222,128,0.08)" : C.muted }}>
+                style={{ borderColor: pricingSaved ? "rgba(162,137,89,0.40)" : C.borderMed, color: pricingSaved ? "#f0d28c" : GOLD, background: pricingSaved ? "rgba(162,137,89,0.08)" : C.muted }}>
                 {pricingSaving ? "Saving…" : pricingSaved ? "✓ Saved" : "💾 Save Pricing"}
               </button>
             </div>
@@ -1112,7 +1112,7 @@ export default function Submissions() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button onClick={() => restoreFromTrash(item.id)}
                       className="text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all hover:opacity-80"
-                      style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.25)", color: "#4ade80" }}>
+                      style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#f0d28c" }}>
                       ↩ Restore
                     </button>
                     <button onClick={() => setPermDeleteConfirmId(item.id)}
@@ -1252,7 +1252,7 @@ export default function Submissions() {
                       target="_blank" rel="noopener noreferrer"
                       onClick={e => e.stopPropagation()}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shrink-0 transition-all hover:opacity-80"
-                      style={{ borderColor: "rgba(96,165,250,0.25)", color: "#60a5fa", background: "rgba(96,165,250,0.05)" }}>
+                      style={{ borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e", background: "rgba(162,137,89,0.06)" }}>
                       💳 Receipt ↗
                     </a>
                   )}
@@ -1260,7 +1260,7 @@ export default function Submissions() {
                     const state = addedToClients[s.id];
                     if (state === "added") return (
                       <span className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 border"
-                        style={{ borderColor: "rgba(74,222,128,0.25)", color: "#4ade80", background: "rgba(74,222,128,0.07)" }}>
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: "#f0d28c", background: "rgba(162,137,89,0.08)" }}>
                         ✓ Added
                       </span>
                     );
@@ -1338,7 +1338,7 @@ export default function Submissions() {
                     )}
                     {["payment_received", "acknowledged"].includes(selected.status) && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold font-mono"
-                        style={{ background: "rgba(74,222,128,0.08)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.2)" }}>
+                        style={{ background: "rgba(162,137,89,0.08)", color: "#f0d28c", border: "1px solid rgba(162,137,89,0.20)" }}>
                         STU{selected.passportNumber.slice(-4).toUpperCase()}
                       </span>
                     )}
@@ -1550,17 +1550,17 @@ export default function Submissions() {
                       {/* Mock Interview */}
                       {(selected.interviewZoomLink || selected.interviewDateTime) && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#3b82f6" }}>🎥 Mock Interview</p>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#c4a96e" }}>🎥 Mock Interview</p>
                           <div className="space-y-1.5">
                             {selected.interviewDateTime && (
-                              <div className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.15)", color: "#60a5fa" }}>
+                              <div className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                                 <span>📅</span><span>{selected.interviewDateTime}</span>
                               </div>
                             )}
                             {selected.interviewZoomLink && (
                               <a href={selected.interviewZoomLink} target="_blank" rel="noopener noreferrer"
                                 className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm hover:opacity-80 transition-opacity truncate"
-                                style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.15)", color: "#60a5fa" }}>
+                                style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                                 <span>🔗</span><span className="truncate">{selected.interviewZoomLink}</span>
                               </a>
                             )}
@@ -1571,19 +1571,19 @@ export default function Submissions() {
                       {/* University Interview */}
                       {(selected.uniInterviewLink || selected.uniInterviewDateTime) && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#0ea5e9" }}>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "#c4a96e" }}>
                             🏫 University Interview{selected.uniInterviewPlatform ? ` · ${selected.uniInterviewPlatform === "zoom" ? "Zoom" : "Teams"}` : ""}
                           </p>
                           <div className="space-y-1.5">
                             {selected.uniInterviewDateTime && (
-                              <div className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                              <div className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                                 <span>📅</span><span>{selected.uniInterviewDateTime}</span>
                               </div>
                             )}
                             {selected.uniInterviewLink && (
                               <a href={selected.uniInterviewLink} target="_blank" rel="noopener noreferrer"
                                 className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm hover:opacity-80 transition-opacity truncate"
-                                style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                                style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                                 <span>🔗</span><span className="truncate">{selected.uniInterviewLink}</span>
                               </a>
                             )}
@@ -1732,8 +1732,8 @@ export default function Submissions() {
                     </div>
                     <div className="px-4 py-4 space-y-3">
                       {selected.programmeType && (
-                        <div className="rounded-xl px-4 py-2 border" style={{ background: C.muted, borderColor: "rgba(74,222,128,0.2)" }}>
-                          <p className="text-xs font-semibold" style={{ color: "#4ade80" }}>
+                        <div className="rounded-xl px-4 py-2 border" style={{ background: C.muted, borderColor: "rgba(162,137,89,0.20)" }}>
+                          <p className="text-xs font-semibold" style={{ color: "#f0d28c" }}>
                             ✓ Currently assigned: {
                               selected.programmeType === "masters" ? "Master's Degree"
                               : selected.programmeType === "bachelor" ? "Bachelor's Degree"
@@ -1773,7 +1773,7 @@ export default function Submissions() {
                           </button>
                         )}
                       </div>
-                      {programmeSaved && <p className="text-xs" style={{ color: "#4ade80" }}>✓ Saved</p>}
+                      {programmeSaved && <p className="text-xs" style={{ color: "#f0d28c" }}>✓ Saved</p>}
                       {savingProgramme && <p className="text-xs" style={{ color: C.textFaint }}>Saving…</p>}
                     </div>
                   </div>
@@ -1791,8 +1791,8 @@ export default function Submissions() {
                     </div>
                     <div className="px-4 py-4 space-y-3">
                       {selected.customBankDetails && (selected.customBankDetails.bankName || selected.customBankDetails.accountNumber) && (
-                        <div className="rounded-xl px-4 py-3 border space-y-1.5" style={{ background: C.muted, borderColor: "rgba(74,222,128,0.2)" }}>
-                          <p className="text-xs font-semibold mb-2" style={{ color: "#4ade80" }}>✓ Custom account active</p>
+                        <div className="rounded-xl px-4 py-3 border space-y-1.5" style={{ background: C.muted, borderColor: "rgba(162,137,89,0.20)" }}>
+                          <p className="text-xs font-semibold mb-2" style={{ color: "#f0d28c" }}>✓ Custom account active</p>
                           {selected.customBankDetails.bankName && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Bank</span><span className="font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.bankName}</span></div>}
                           {selected.customBankDetails.accountName && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Account Name</span><span className="font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.accountName}</span></div>}
                           {selected.customBankDetails.accountNumber && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Account No.</span><span className="font-mono font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.accountNumber}</span></div>}
@@ -1857,11 +1857,11 @@ export default function Submissions() {
                 )}
                 {/* Mock Interview — Schedule (acknowledged only) */}
                 {selected.status === "acknowledged" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(96,165,250,0.18)" }}>
-                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#60a5fa" }}>🎥 Mock Interview</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.18)" }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>🎥 Mock Interview</p>
                       {inviteSent === selected.id && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>✓ Invite sent</span>
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}>✓ Invite sent</span>
                       )}
                     </div>
                     <div className="px-4 py-4">
@@ -1869,7 +1869,7 @@ export default function Submissions() {
                         <div className="space-y-2">
                           <button onClick={() => setInterviewForm({ zoomLink: "", dateTime: "", notes: "" })}
                             className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
-                            style={{ background: "rgba(96,165,250,0.06)", borderColor: "rgba(96,165,250,0.22)", color: "#60a5fa" }}>
+                            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e" }}>
                             🎥 Schedule Mock Interview
                           </button>
                           <button onClick={() => { if (confirm("Skip the mock interview and proceed directly to 2nd payment?")) updateStatus.mutate({ id: selected.id, status: "interview_completed", adminNotes: notes }); }}
@@ -1882,34 +1882,34 @@ export default function Submissions() {
                       ) : (
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(96,165,250,0.6)" }}>Zoom Meeting Link *</label>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.60)" }}>Zoom Meeting Link *</label>
                             <input type="url" placeholder="https://zoom.us/j/..."
                               value={interviewForm.zoomLink}
                               onChange={e => setInterviewForm(f => f ? { ...f, zoomLink: e.target.value } : f)}
                               className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
-                              style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa" }} />
+                              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#c4a96e" }} />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(96,165,250,0.6)" }}>Date &amp; Time *</label>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.60)" }}>Date &amp; Time *</label>
                             <input type="text" placeholder="e.g. Thursday, 29 May 2026 at 2:00 PM HKT"
                               value={interviewForm.dateTime}
                               onChange={e => setInterviewForm(f => f ? { ...f, dateTime: e.target.value } : f)}
                               className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
-                              style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa" }} />
+                              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#c4a96e" }} />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(96,165,250,0.6)" }}>Additional Notes (optional)</label>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.60)" }}>Additional Notes (optional)</label>
                             <textarea rows={2} placeholder="Any instructions for the student…"
                               value={interviewForm.notes}
                               onChange={e => setInterviewForm(f => f ? { ...f, notes: e.target.value } : f)}
                               className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
-                              style={{ background: "rgba(96,165,250,0.05)", borderColor: "rgba(96,165,250,0.2)", color: "#60a5fa" }} />
+                              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#c4a96e" }} />
                           </div>
                           <div className="flex gap-2">
                             <button onClick={handleSendInvite} disabled={sendingInvite || !interviewForm.zoomLink || !interviewForm.dateTime}
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
-                              style={{ background: "rgba(96,165,250,0.1)", borderColor: "rgba(96,165,250,0.3)", color: "#60a5fa" }}>
-                              {sendingInvite ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin" style={{ borderColor: "#60a5fa", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Zoom Invite"}
+                              style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(162,137,89,0.30)", color: "#c4a96e" }}>
+                              {sendingInvite ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Zoom Invite"}
                             </button>
                             <button onClick={() => setInterviewForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
@@ -1925,26 +1925,26 @@ export default function Submissions() {
 
                 {/* Mock Interview — Confirm Completed (interview_arranged only) */}
                 {selected.status === "interview_arranged" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(167,139,250,0.2)" }}>
-                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(167,139,250,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#a78bfa" }}>🎥 Mock Interview — Arranged</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>🎥 Mock Interview — Arranged</p>
                     </div>
                     <div className="px-4 py-4 space-y-3">
                       {selected.interviewDateTime && (
-                        <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(167,139,250,0.05)", borderColor: "rgba(167,139,250,0.15)", color: "#a78bfa" }}>
+                        <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                           📅 {selected.interviewDateTime}
                         </div>
                       )}
                       {selected.interviewZoomLink && (
                         <a href={selected.interviewZoomLink} target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm truncate hover:opacity-80 transition-opacity"
-                          style={{ background: "rgba(167,139,250,0.05)", borderColor: "rgba(167,139,250,0.15)", color: "#a78bfa" }}>
+                          style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                           🔗 {selected.interviewZoomLink}
                         </a>
                       )}
                       <button onClick={handleCompleteInterview}
                         className="w-full py-3 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 flex items-center justify-center gap-2"
-                        style={{ background: "rgba(74,222,128,0.08)", borderColor: "rgba(74,222,128,0.28)", color: "#4ade80" }}>
+                        style={{ background: "rgba(162,137,89,0.08)", borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c" }}>
                         ✅ Confirm Interview Completed
                       </button>
                       <button onClick={() => { if (confirm("Skip the mock interview and proceed to 2nd payment stage?")) updateStatus.mutate({ id: selected.id, status: "interview_completed", adminNotes: notes }); }}
@@ -1959,13 +1959,13 @@ export default function Submissions() {
 
                 {/* 2nd Payment — Receipt received info (second_payment_received) */}
                 {selected.status === "second_payment_received" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(96,165,250,0.2)" }}>
-                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#60a5fa" }}>💳 2nd Payment Receipt Received</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>💳 2nd Payment Receipt Received</p>
                     </div>
                     <div className="px-4 py-3">
-                      <p className="text-xs" style={{ color: "rgba(96,165,250,0.6)" }}>
-                        The student has uploaded their 2nd payment receipt. Review it in the documents section above, then click <strong style={{ color: "#4ade80" }}>Confirm 2nd Payment</strong> below.
+                      <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>
+                        The student has uploaded their 2nd payment receipt. Review it in the documents section above, then click <strong style={{ color: "#f0d28c" }}>Confirm 2nd Payment</strong> below.
                       </p>
                     </div>
                   </div>
@@ -1973,11 +1973,11 @@ export default function Submissions() {
 
                 {/* University Interview — Schedule (second_payment_confirmed only) */}
                 {selected.status === "second_payment_confirmed" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(56,189,248,0.2)" }}>
-                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(56,189,248,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>🏫 University Interview</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
+                    <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>🏫 University Interview</p>
                       {uniInviteSent === selected.id && (
-                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}>✓ Invite sent</span>
+                        <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}>✓ Invite sent</span>
                       )}
                     </div>
                     <div className="px-4 py-4">
@@ -1985,7 +1985,7 @@ export default function Submissions() {
                         <div className="space-y-2">
                           <button onClick={() => setUniInterviewForm({ platform: "zoom", link: "", dateTime: "", notes: "" })}
                             className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
-                            style={{ background: "rgba(56,189,248,0.06)", borderColor: "rgba(56,189,248,0.22)", color: "#38bdf8" }}>
+                            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e" }}>
                             🏫 Schedule University Interview
                           </button>
                           <button onClick={() => { if (confirm("Skip the university interview and proceed directly to offer letter stage?")) updateStatus.mutate({ id: selected.id, status: "university_interview_completed", adminNotes: notes }); }}
@@ -1998,15 +1998,15 @@ export default function Submissions() {
                       ) : (
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.6)" }}>Platform *</label>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.60)" }}>Platform *</label>
                             <div className="flex gap-2">
                               {(["zoom", "teams"] as const).map(p => (
                                 <button key={p} onClick={() => setUniInterviewForm(f => f ? { ...f, platform: p } : f)}
                                   className="flex-1 py-2 rounded-xl text-sm font-semibold border transition-all"
                                   style={{
-                                    background: uniInterviewForm.platform === p ? "rgba(56,189,248,0.12)" : "rgba(56,189,248,0.03)",
-                                    borderColor: uniInterviewForm.platform === p ? "rgba(56,189,248,0.4)" : "rgba(56,189,248,0.12)",
-                                    color: "#38bdf8",
+                                    background: uniInterviewForm.platform === p ? "rgba(162,137,89,0.12)" : "rgba(162,137,89,0.03)",
+                                    borderColor: uniInterviewForm.platform === p ? "rgba(162,137,89,0.40)" : "rgba(162,137,89,0.12)",
+                                    color: "#c4a96e",
                                   }}>
                                   {p === "zoom" ? "🎥 Zoom" : "💼 Teams"}
                                 </button>
@@ -2014,34 +2014,34 @@ export default function Submissions() {
                             </div>
                           </div>
                           <div>
-                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.6)" }}>Meeting Link *</label>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.60)" }}>Meeting Link *</label>
                             <input type="url" placeholder={uniInterviewForm.platform === "teams" ? "https://teams.microsoft.com/l/meetup-join/..." : "https://zoom.us/j/..."}
                               value={uniInterviewForm.link}
                               onChange={e => setUniInterviewForm(f => f ? { ...f, link: e.target.value } : f)}
                               className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
-                              style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.2)", color: "#38bdf8" }} />
+                              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#c4a96e" }} />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.6)" }}>Date & Time *</label>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.60)" }}>Date & Time *</label>
                             <input type="text" placeholder="e.g. Monday, 2 June 2026 at 10:00 AM HKT"
                               value={uniInterviewForm.dateTime}
                               onChange={e => setUniInterviewForm(f => f ? { ...f, dateTime: e.target.value } : f)}
                               className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
-                              style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.2)", color: "#38bdf8" }} />
+                              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#c4a96e" }} />
                           </div>
                           <div>
-                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(56,189,248,0.6)" }}>Additional Notes (optional)</label>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.60)" }}>Additional Notes (optional)</label>
                             <textarea rows={2} placeholder="Any instructions for the student…"
                               value={uniInterviewForm.notes}
                               onChange={e => setUniInterviewForm(f => f ? { ...f, notes: e.target.value } : f)}
                               className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
-                              style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.2)", color: "#38bdf8" }} />
+                              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#c4a96e" }} />
                           </div>
                           <div className="flex gap-2">
                             <button onClick={handleSendUniInvite} disabled={sendingUniInvite || !uniInterviewForm.link || !uniInterviewForm.dateTime}
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
-                              style={{ background: "rgba(56,189,248,0.1)", borderColor: "rgba(56,189,248,0.3)", color: "#38bdf8" }}>
-                              {sendingUniInvite ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#38bdf8", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Interview Invite"}
+                              style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(162,137,89,0.30)", color: "#c4a96e" }}>
+                              {sendingUniInvite ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Interview Invite"}
                             </button>
                             <button onClick={() => setUniInterviewForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
@@ -2097,13 +2097,13 @@ export default function Submissions() {
 
                 {/* Final Payment — Receipt info (final_payment_received) */}
                 {selected.status === "final_payment_received" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(96,165,250,0.2)" }}>
-                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(96,165,250,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#60a5fa" }}>💳 Final Payment Receipt Received</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>💳 Final Payment Receipt Received</p>
                     </div>
                     <div className="px-4 py-3">
-                      <p className="text-xs" style={{ color: "rgba(96,165,250,0.6)" }}>
-                        The student has uploaded their final payment receipt. Review it in the documents section above, then click <strong style={{ color: "#4ade80" }}>Confirm Final Payment</strong> below.
+                      <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>
+                        The student has uploaded their final payment receipt. Review it in the documents section above, then click <strong style={{ color: "#f0d28c" }}>Confirm Final Payment</strong> below.
                       </p>
                     </div>
                   </div>
@@ -2112,27 +2112,27 @@ export default function Submissions() {
                 {/* Final Payment Confirmed + ID995A + e-Visa */}
                 {["final_payment_confirmed","visa_issued"].includes(selected.status) && (
                   <>
-                    <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(74,222,128,0.2)" }}>
-                      <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(74,222,128,0.12)" }}>
-                        <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>✅ Final Payment Confirmed</p>
+                    <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
+                      <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                        <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>✅ Final Payment Confirmed</p>
                       </div>
                       <div className="px-4 py-3">
-                        <p className="text-xs" style={{ color: "rgba(74,222,128,0.5)" }}>
+                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.50)" }}>
                           The student's final payment has been confirmed. They can now download the offer letter from their portal.
                         </p>
                       </div>
                     </div>
                     {/* Immigration Reference Number */}
-                    <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(74,222,128,0.2)" }}>
-                      <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(74,222,128,0.1)" }}>
-                        <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>🇭🇰 Immigration Reference Number</p>
-                        <p className="text-xs mt-0.5" style={{ color: "rgba(74,222,128,0.45)" }}>Assign the official EOEN-XXXXXXX-XX reference number visible to the student</p>
+                    <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
+                      <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
+                        <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>🇭🇰 Immigration Reference Number</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>Assign the official EOEN-XXXXXXX-XX reference number visible to the student</p>
                       </div>
                       <div className="px-4 py-4 space-y-3">
                         {selected.immigrationRefNumber && (
-                          <div className="rounded-xl px-3 py-2.5 border" style={{ background: "rgba(74,222,128,0.05)", borderColor: "rgba(74,222,128,0.15)" }}>
-                            <p className="text-xs font-medium mb-0.5" style={{ color: "rgba(74,222,128,0.5)" }}>Current reference:</p>
-                            <p className="font-mono text-sm font-bold" style={{ color: "#4ade80" }}>{selected.immigrationRefNumber}</p>
+                          <div className="rounded-xl px-3 py-2.5 border" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
+                            <p className="text-xs font-medium mb-0.5" style={{ color: "rgba(162,137,89,0.50)" }}>Current reference:</p>
+                            <p className="font-mono text-sm font-bold" style={{ color: "#f0d28c" }}>{selected.immigrationRefNumber}</p>
                           </div>
                         )}
                         <div className="flex gap-2">
@@ -2148,7 +2148,7 @@ export default function Submissions() {
                             onClick={handleSetImmigrationRef}
                             disabled={settingRef || !refNumInput.trim()}
                             className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
-                            style={{ borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
+                            style={{ borderColor: "rgba(162,137,89,0.30)", color: "#f0d28c", background: "rgba(162,137,89,0.06)" }}>
                             {settingRef ? "Saving…" : refSetSuccess ? "✓ Saved" : "Save"}
                           </button>
                         </div>
@@ -2178,22 +2178,22 @@ export default function Submissions() {
 
                     {/* e-Visa Upload — final_payment_confirmed only */}
                     {selected.status === "final_payment_confirmed" && (
-                      <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(52,211,153,0.25)" }}>
-                        <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(52,211,153,0.12)" }}>
-                          <p className="text-sm font-semibold" style={{ color: "#34d399" }}>🛂 Upload e-Visa (HK Immigration)</p>
+                      <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.25)" }}>
+                        <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                          <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>🛂 Upload e-Visa (HK Immigration)</p>
                           {eVisaSent === selected.id && (
-                            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(52,211,153,0.1)", color: "#34d399" }}>✓ Sent to student</span>
+                            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.10)", color: "#f0d28c" }}>✓ Sent to student</span>
                           )}
                         </div>
                         <div className="px-4 py-4 space-y-3">
-                          <p className="text-xs" style={{ color: "rgba(52,211,153,0.6)" }}>
+                          <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>
                             Once the Hong Kong Immigration Department issues the official e-Visa, upload it here. The student will be notified by email and can download it from their portal.
                           </p>
                           <button onClick={() => eVisaFileRef.current?.click()} disabled={eVisaUploading}
                             className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-50 flex items-center justify-center gap-2"
-                            style={{ background: "rgba(52,211,153,0.06)", borderColor: "rgba(52,211,153,0.25)", color: "#34d399", borderStyle: "dashed" }}>
+                            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#f0d28c", borderStyle: "dashed" }}>
                             {eVisaUploading
-                              ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#34d399", borderTopColor: "transparent" }} /> Uploading…</>
+                              ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#f0d28c", borderTopColor: "transparent" }} /> Uploading…</>
                               : <>🛂 Choose e-Visa File…</>}
                           </button>
                           <input ref={eVisaFileRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png"
@@ -2204,12 +2204,12 @@ export default function Submissions() {
 
                     {/* e-Visa Issued info — visa_issued only */}
                     {selected.status === "visa_issued" && (
-                      <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(52,211,153,0.3)" }}>
-                        <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(52,211,153,0.12)" }}>
-                          <p className="text-sm font-semibold" style={{ color: "#34d399" }}>🎉 e-Visa Issued to Student</p>
+                      <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.30)" }}>
+                        <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                          <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>🎉 e-Visa Issued to Student</p>
                         </div>
                         <div className="px-4 py-3">
-                          <p className="text-xs" style={{ color: "rgba(52,211,153,0.6)" }}>
+                          <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>
                             The official Hong Kong Immigration e-Visa has been uploaded and the student has been notified by email. They can now download it from their portal.
                           </p>
                         </div>
@@ -2226,7 +2226,7 @@ export default function Submissions() {
                         <span className="text-base">✉️</span>
                         <span className="text-sm font-semibold" style={{ color: GOLD }}>Immigration Letters</span>
                         {lettersData?.generatedAt && (
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium ml-1" style={{ background: "rgba(74,222,128,0.12)", color: "#4ade80" }}>Generated</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium ml-1" style={{ background: "rgba(162,137,89,0.12)", color: "#f0d28c" }}>Generated</span>
                         )}
                       </div>
                       <span style={{ color: C.textFaint }}>{lettersOpen ? "▲" : "▼"}</span>
@@ -2334,29 +2334,29 @@ export default function Submissions() {
 
                 {/* University Interview — Arranged (awaiting student) */}
                 {selected.status === "university_interview_arranged" && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(56,189,248,0.2)" }}>
-                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(56,189,248,0.12)" }}>
-                      <p className="text-sm font-semibold" style={{ color: "#38bdf8" }}>🏫 University Interview — Arranged</p>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: "rgba(162,137,89,0.20)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#c4a96e" }}>🏫 University Interview — Arranged</p>
                     </div>
                     <div className="px-4 py-4 space-y-3">
                       {selected.uniInterviewPlatform && (
-                        <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                        <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                           {selected.uniInterviewPlatform === "teams" ? "💼 Microsoft Teams" : "🎥 Zoom"}
                         </div>
                       )}
                       {selected.uniInterviewDateTime && (
-                        <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                        <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                           📅 {selected.uniInterviewDateTime}
                         </div>
                       )}
                       {selected.uniInterviewLink && (
                         <a href={selected.uniInterviewLink} target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-2 rounded-xl px-3 py-2 border text-sm truncate hover:opacity-80 transition-opacity"
-                          style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.15)", color: "#38bdf8" }}>
+                          style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                           🔗 {selected.uniInterviewLink}
                         </a>
                       )}
-                      <p className="text-xs text-center py-1" style={{ color: "rgba(56,189,248,0.45)" }}>
+                      <p className="text-xs text-center py-1" style={{ color: "rgba(240,210,140,0.45)" }}>
                         Awaiting student to confirm completion
                       </p>
                     </div>
@@ -2498,12 +2498,12 @@ export default function Submissions() {
                           <div className="flex gap-2">
                             <button onClick={handleSendMessage} disabled={sendingMessage || !messageForm.body.trim()}
                               className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
-                              style={{ background: "rgba(96,165,250,0.1)", borderColor: "rgba(96,165,250,0.3)", color: "#60a5fa" }}>
-                              {sendingMessage ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#60a5fa", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Message"}
+                              style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(162,137,89,0.30)", color: "#c4a96e" }}>
+                              {sendingMessage ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} /> Sending…</> : "📧 Send Message"}
                             </button>
                             <button onClick={() => { msgAttachmentRef.current?.click(); }} disabled={uploadingMsgAttachment}
                               className="px-3 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70 disabled:opacity-40"
-                              style={{ borderColor: "rgba(96,165,250,0.18)", color: "#60a5fa" }}>
+                              style={{ borderColor: "rgba(162,137,89,0.18)", color: "#c4a96e" }}>
                               {uploadingMsgAttachment ? "…" : "📎"}
                             </button>
                             <button onClick={() => setMessageForm(null)}
@@ -2672,7 +2672,7 @@ export default function Submissions() {
             <div className="flex items-center justify-between px-5 py-3 border-b shrink-0" style={{ borderColor: C.border }}>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5">
-                  <span className="inline-block w-2 h-2 rounded-full" style={{ background: liveViewStatus === "streaming" ? "#4ade80" : liveViewStatus === "waiting" ? GOLD : "#f87171", boxShadow: liveViewStatus === "streaming" ? "0 0 6px #4ade80" : "none" }} />
+                  <span className="inline-block w-2 h-2 rounded-full" style={{ background: liveViewStatus === "streaming" ? "#f0d28c" : liveViewStatus === "waiting" ? GOLD : "#f87171", boxShadow: liveViewStatus === "streaming" ? "0 0 6px #f0d28c" : "none" }} />
                   <span className="text-sm font-semibold" style={{ color: GOLD }}>Live View</span>
                 </div>
                 <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: C.muted, color: C.textSec }}>
@@ -2846,7 +2846,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
             <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: C.subtle, color: GOLD }}>✨ AI pre-filled</span>
           )}
           {Object.values(formData).some(v => v) && !aiGenerated && (
-            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(74,222,128,0.08)", color: "#4ade80" }}>Manually edited</span>
+            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.08)", color: "#f0d28c" }}>Manually edited</span>
           )}
         </div>
         <div className="flex gap-2">
@@ -2859,7 +2859,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
           </button>
           <button onClick={handleSave} disabled={saving}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border font-medium transition-all hover:opacity-80 disabled:opacity-40"
-            style={{ borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
+            style={{ borderColor: "rgba(162,137,89,0.30)", color: "#f0d28c", background: "rgba(162,137,89,0.06)" }}>
             {saving ? "Saving…" : saved ? "✓ Saved" : "💾 Save"}
           </button>
         </div>
@@ -2901,7 +2901,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
       <div className="flex justify-end pt-2">
         <button onClick={handleSave} disabled={saving}
           className="text-xs px-4 py-2 rounded-lg border font-semibold transition-all hover:opacity-80 disabled:opacity-40"
-          style={{ borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
+          style={{ borderColor: "rgba(162,137,89,0.30)", color: "#f0d28c", background: "rgba(162,137,89,0.06)" }}>
           {saving ? "Saving…" : saved ? "✓ Saved" : "💾 Save All Changes"}
         </button>
       </div>
