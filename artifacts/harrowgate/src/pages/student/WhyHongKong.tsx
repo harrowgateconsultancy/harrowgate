@@ -12,6 +12,94 @@ const GOLD_DIM    = "rgba(162,137,89,0.7)";
 const CREAM_DIM   = "rgba(212,197,162,0.75)";
 
 /* ─────────────────────────────────────────────
+   Themed SVG Icons
+───────────────────────────────────────────── */
+const S = { strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+
+const Icons: Record<string, (c: string) => JSX.Element> = {
+  rankings: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <path d="M3 21h18M6 21V10M10 21V4M14 21V10M18 21V7" />
+      <path d="M10 4l2-2 2 2" />
+    </svg>
+  ),
+  language: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <path d="M5 8h14M5 12h9M12 3a9 9 0 1 0 0 18A9 9 0 0 0 12 3z" />
+      <path d="M12 3c-2.5 2.5-3.5 5.5-3.5 9s1 6.5 3.5 9" />
+      <path d="M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9" />
+    </svg>
+  ),
+  strategy: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3.6 9h16.8M3.6 15h16.8" />
+      <path d="M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9" />
+      <path d="M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" />
+    </svg>
+  ),
+  finances: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v1.5M12 15.5V17" />
+      <path d="M9.5 10a2.5 2 0 0 1 5 0c0 1.5-1 2-2.5 2.5S9.5 14 9.5 15.5a2.5 2 0 0 0 5 0" />
+    </svg>
+  ),
+  careers: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <rect x="2" y="8" width="20" height="12" rx="2" />
+      <path d="M8 8V6a4 4 0 0 1 8 0v2" />
+      <path d="M12 13v2M2 13h20" />
+    </svg>
+  ),
+  safety: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <path d="M12 2l8 3.5v6C20 17 16.5 21 12 22 7.5 21 4 17 4 11.5v-6L12 2z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  ),
+  culture: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 9c2 1 4 1.5 9 1.5S19 10 21 9" />
+      <path d="M3 15c2-1 4-1.5 9-1.5S19 14 21 15" />
+      <path d="M12 3v18" />
+    </svg>
+  ),
+  research: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <path d="M9 3h6M12 3v5" />
+      <path d="M8 8h8l2 9H6L8 8z" />
+      <path d="M7 17l-2 4h14l-2-4" />
+      <path d="M10 12h4M11 15h2" />
+    </svg>
+  ),
+  pr: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <path d="M3 21V9l9-6 9 6v12H3z" />
+      <path d="M9 21V12h6v9" />
+      <path d="M12 6v1" />
+    </svg>
+  ),
+  family: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <circle cx="9" cy="6" r="2" />
+      <circle cx="15" cy="6" r="2" />
+      <circle cx="19" cy="8" r="1.5" />
+      <path d="M5 21v-4a4 4 0 0 1 8 0v4" />
+      <path d="M15 13a3 3 0 0 1 6 0v8h-6" />
+      <path d="M9 11v10" />
+    </svg>
+  ),
+  work: c => (
+    <svg viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.6" width="26" height="26" {...S}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 3" />
+    </svg>
+  ),
+};
+
+/* ─────────────────────────────────────────────
    Sub-components
 ───────────────────────────────────────────── */
 
@@ -74,7 +162,7 @@ function LangPicker({ lang, setLang }: { lang: string; setLang: (l: any) => void
 }
 
 type Advantage = {
-  emoji: string;
+  icon: string;
   title: string;
   body: string;
   tag: string;
@@ -123,11 +211,14 @@ function AdvantageCard({ a, idx }: { a: Advantage; idx: number }) {
             : a.highlight ? "rgba(240,210,140,0.14)" : "rgba(162,137,89,0.1)",
           border: `1px solid ${a.highlight ? "rgba(240,210,140,0.4)" : "rgba(162,137,89,0.2)"}`,
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "1.5rem",
           transition: "background 0.25s, transform 0.25s",
           transform: hov ? "scale(1.1) rotate(-2deg)" : "scale(1) rotate(0deg)",
         }}>
-          {a.emoji}
+          {(Icons[a.icon] ?? Icons.rankings)(
+            hov
+              ? a.highlight ? GOLD_LIGHT : GOLD_BRIGHT
+              : a.highlight ? GOLD_LIGHT : GOLD
+          )}
         </div>
 
         <div className="flex-1 min-w-0">
@@ -198,17 +289,17 @@ export default function WhyHongKong() {
   });
 
   const ADVANTAGES: Advantage[] = [
-    { emoji: "🏛️", tag: t("whyhk.a1.tag"), title: t("whyhk.a1.title"), body: t("whyhk.a1.body") },
-    { emoji: "🗣️", tag: t("whyhk.a2.tag"), title: t("whyhk.a2.title"), body: t("whyhk.a2.body") },
-    { emoji: "🌏", tag: t("whyhk.a3.tag"), title: t("whyhk.a3.title"), body: t("whyhk.a3.body") },
-    { emoji: "💰", tag: t("whyhk.a4.tag"), title: t("whyhk.a4.title"), body: t("whyhk.a4.body") },
-    { emoji: "💼", tag: t("whyhk.a5.tag"), title: t("whyhk.a5.title"), body: t("whyhk.a5.body") },
-    { emoji: "🛡️", tag: t("whyhk.a6.tag"), title: t("whyhk.a6.title"), body: t("whyhk.a6.body") },
-    { emoji: "🌐", tag: t("whyhk.a7.tag"), title: t("whyhk.a7.title"), body: t("whyhk.a7.body") },
-    { emoji: "🔬", tag: t("whyhk.a8.tag"), title: t("whyhk.a8.title"), body: t("whyhk.a8.body") },
-    { emoji: "🏠", tag: t("whyhk.a9.tag"),  title: t("whyhk.a9.title"),  body: t("whyhk.a9.body"),  highlight: true },
-    { emoji: "👨‍👩‍👧", tag: t("whyhk.a10.tag"), title: t("whyhk.a10.title"), body: t("whyhk.a10.body"), highlight: true },
-    { emoji: "⏰", tag: t("whyhk.a11.tag"), title: t("whyhk.a11.title"), body: t("whyhk.a11.body"), highlight: true },
+    { icon: "rankings", tag: t("whyhk.a1.tag"), title: t("whyhk.a1.title"), body: t("whyhk.a1.body") },
+    { icon: "language", tag: t("whyhk.a2.tag"), title: t("whyhk.a2.title"), body: t("whyhk.a2.body") },
+    { icon: "strategy", tag: t("whyhk.a3.tag"), title: t("whyhk.a3.title"), body: t("whyhk.a3.body") },
+    { icon: "finances", tag: t("whyhk.a4.tag"), title: t("whyhk.a4.title"), body: t("whyhk.a4.body") },
+    { icon: "careers",  tag: t("whyhk.a5.tag"), title: t("whyhk.a5.title"), body: t("whyhk.a5.body") },
+    { icon: "safety",   tag: t("whyhk.a6.tag"), title: t("whyhk.a6.title"), body: t("whyhk.a6.body") },
+    { icon: "culture",  tag: t("whyhk.a7.tag"), title: t("whyhk.a7.title"), body: t("whyhk.a7.body") },
+    { icon: "research", tag: t("whyhk.a8.tag"), title: t("whyhk.a8.title"), body: t("whyhk.a8.body") },
+    { icon: "pr",       tag: t("whyhk.a9.tag"),  title: t("whyhk.a9.title"),  body: t("whyhk.a9.body"),  highlight: true },
+    { icon: "family",   tag: t("whyhk.a10.tag"), title: t("whyhk.a10.title"), body: t("whyhk.a10.body"), highlight: true },
+    { icon: "work",     tag: t("whyhk.a11.tag"), title: t("whyhk.a11.title"), body: t("whyhk.a11.body"), highlight: true },
   ];
 
   const QUICK_STATS = [
