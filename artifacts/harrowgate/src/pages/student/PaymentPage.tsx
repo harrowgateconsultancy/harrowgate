@@ -200,12 +200,15 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                       <span className="text-sm" style={{ color: "rgba(162,137,89,0.70)" }}>
                         {progType ? "Amount Due" : "Amount Due (by degree)"}
                       </span>
-                      <div className="flex flex-wrap gap-2 mt-1">
+                      <div className="flex flex-wrap gap-3 mt-1">
                         {tiers.map(({ label, amount }) => (
-                          <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
-                            style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.20)" }}>
-                            <span className="font-extrabold text-sm" style={{ color: GOLD_L }}>{amount}</span>
-                            <span className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.55)" }}>{label}</span>
+                          <div key={label} className="flex flex-col items-center px-5 py-3 rounded-xl border text-center"
+                            style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(196,169,110,0.35)" }}>
+                            <span className="font-extrabold text-2xl tracking-tight"
+                              style={{ color: "#f0d28c", textShadow: "0 0 22px rgba(240,210,140,0.55), 0 0 8px rgba(240,210,140,0.30)" }}>
+                              {amount}
+                            </span>
+                            <span className="text-xs mt-1 font-semibold tracking-wide" style={{ color: "rgba(162,137,89,0.70)" }}>{label}</span>
                           </div>
                         ))}
                       </div>
