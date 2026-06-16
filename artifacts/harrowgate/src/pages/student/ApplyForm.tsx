@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { useSession } from "@clerk/react";
 import { COURSES, LEVEL_LABELS, getCoursesByLevel, type DegreeLevel } from "../../data/courses";
@@ -45,6 +45,123 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
   const { uploadURL, objectPath } = await res.json();
   await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
   return { url: objectPath };
+}
+
+// ── Custom styled agent dropdown ──────────────────────────────────────────────
+function AgentDropdown({
+  value, onChange, agents,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  agents: { agentCode: string; companyName: string }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) close();
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open, close]);
+
+  const selected = agents.find(a => a.agentCode === value);
+  const label = selected ? `${selected.agentCode} · ${selected.companyName}` : "— Not referred by an agent —";
+
+  return (
+    <div ref={ref} className="relative w-full select-none">
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm transition-all"
+        style={{
+          background: open ? "rgba(162,137,89,0.10)" : "rgba(162,137,89,0.05)",
+          borderColor: open ? "rgba(162,137,89,0.45)" : "rgba(162,137,89,0.2)",
+          color: value ? "#a28959" : "rgba(162,137,89,0.45)",
+          outline: "none",
+        }}
+      >
+        <span className="truncate">{label}</span>
+        <svg
+          viewBox="0 0 20 20" fill="currentColor"
+          className="w-4 h-4 shrink-0 transition-transform duration-200"
+          style={{ color: "rgba(162,137,89,0.5)", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+        >
+          <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+        </svg>
+      </button>
+
+      {/* Dropdown panel */}
+      {open && (
+        <div
+          className="absolute z-50 w-full mt-1.5 rounded-xl border overflow-hidden"
+          style={{
+            background: "#071a0d",
+            borderColor: "rgba(162,137,89,0.25)",
+            boxShadow: "0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(162,137,89,0.08)",
+          }}
+        >
+          {/* None option */}
+          <button
+            type="button"
+            onClick={() => { onChange(""); setOpen(false); }}
+            className="w-full flex items-center px-4 py-3 text-sm text-left transition-colors"
+            style={{
+              background: !value ? "rgba(162,137,89,0.10)" : "transparent",
+              color: !value ? "#a28959" : "rgba(162,137,89,0.40)",
+              borderBottom: "1px solid rgba(162,137,89,0.08)",
+            }}
+            onMouseEnter={e => { if (value) (e.currentTarget as HTMLElement).style.background = "rgba(162,137,89,0.06)"; }}
+            onMouseLeave={e => { if (value) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+          >
+            <span className="italic">— Not referred by an agent —</span>
+            {!value && (
+              <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 ml-auto shrink-0" style={{ color: "#a28959" }}>
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15 3.293 9.879a1 1 0 011.414-1.414L8.414 12.172l6.879-6.879a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            )}
+          </button>
+
+          {/* Agent options */}
+          <div className="max-h-52 overflow-y-auto" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(162,137,89,0.2) transparent" }}>
+            {agents.map(a => {
+              const isSelected = a.agentCode === value;
+              return (
+                <button
+                  key={a.agentCode}
+                  type="button"
+                  onClick={() => { onChange(a.agentCode); setOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors"
+                  style={{
+                    background: isSelected ? "rgba(162,137,89,0.12)" : "transparent",
+                    color: isSelected ? "#c4a96e" : "rgba(162,137,89,0.75)",
+                    borderBottom: "1px solid rgba(162,137,89,0.05)",
+                  }}
+                  onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "rgba(162,137,89,0.07)"; }}
+                  onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                >
+                  <span className="font-semibold shrink-0" style={{ color: isSelected ? "#f0d28c" : "#a28959", minWidth: "4rem" }}>
+                    {a.agentCode}
+                  </span>
+                  <span className="truncate">{a.companyName}</span>
+                  {isSelected && (
+                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 ml-auto shrink-0" style={{ color: "#f0d28c" }}>
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15 3.293 9.879a1 1 0 011.414-1.414L8.414 12.172l6.879-6.879a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ApplyForm({ user, onSubmitted }: Props) {
@@ -554,19 +671,11 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
             </div>
             <div className="px-6 py-5">
               <label className="block text-xs font-semibold mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>Select Agent Code</label>
-              <select
+              <AgentDropdown
                 value={agentCode}
-                onChange={e => setAgentCode(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition-all"
-                style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: agentCode ? GOLD : "rgba(162,137,89,0.45)" }}
-              >
-                <option value="">— Not referred by an agent —</option>
-                {approvedAgents.map(a => (
-                  <option key={a.agentCode} value={a.agentCode}>
-                    {a.agentCode} · {a.companyName}
-                  </option>
-                ))}
-              </select>
+                onChange={setAgentCode}
+                agents={approvedAgents}
+              />
               {agentCode && (
                 <p className="text-xs mt-2" style={{ color: "rgba(232,218,180,0.87)" }}>
                   ✓ Agent code <strong style={{ color: GOLD }}>{agentCode}</strong> will be linked to your application.
