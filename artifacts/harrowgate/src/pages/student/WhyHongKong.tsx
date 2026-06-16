@@ -463,7 +463,8 @@ export default function WhyHongKong() {
             color: CREAM_DIM, maxWidth: "640px", margin: "0 auto 2.5rem",
             animationDelay: "160ms",
           }}>
-            {t("whyhk.sub")}
+            Eleven compelling reasons why thousands of international students choose Hong Kong — and why it could be the best decision of{" "}
+            <span style={{ whiteSpace: "nowrap" }}>your life.</span>
           </p>
 
           <div className="fade-up flex flex-wrap justify-center gap-3" style={{ animationDelay: "240ms" }}>
