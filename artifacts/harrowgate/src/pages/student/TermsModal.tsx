@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState } from "react";
 
 const BG = "#0b2213";
 const GOLD = "#a28959";
@@ -139,23 +139,16 @@ type Props = {
 };
 
 export default function TermsModal({ submissionId, studentName, authHeaders, onAccepted }: Props) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [scrolledToBottom, setScrolledToBottom] = useState(false);
+  const fullTextRef = useRef<HTMLDivElement>(null);
+
+  const [expanded, setExpanded] = useState(false);
   const [checked, setChecked] = useState(false);
   const [hasSigned, setHasSigned] = useState(false);
   const [drawing, setDrawing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
-
-  const handleScroll = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 30) {
-      setScrolledToBottom(true);
-    }
-  };
 
   const getPos = (e: React.MouseEvent | React.TouchEvent, canvas: HTMLCanvasElement) => {
     const rect = canvas.getBoundingClientRect();
@@ -236,7 +229,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
     }
   };
 
-  const canConfirm = scrolledToBottom && checked && hasSigned && !submitting;
+  const canConfirm = checked && hasSigned && !submitting;
 
   return (
     <div style={{
@@ -247,7 +240,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
     }}>
       <div style={{
         background: "#0d1f12",
-        border: `1px solid rgba(162,137,89,0.3)`,
+        border: "1px solid rgba(162,137,89,0.3)",
         borderRadius: 20,
         width: "100%", maxWidth: 680,
         maxHeight: "calc(100vh - 32px)",
@@ -273,154 +266,169 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
           </div>
         </div>
 
-        {/* Scrollable T&C text */}
-        <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          style={{
-            flex: "1 1 auto",
-            overflowY: "auto",
-            padding: "20px 24px",
-            minHeight: 0,
-          }}
-        >
-          {!scrolledToBottom && (
+        {/* Scrollable content */}
+        <div style={{ flex: "1 1 auto", overflowY: "auto", minHeight: 0 }}>
+          <div style={{ padding: "20px 24px 0" }}>
+            {/* T&C heading */}
             <div style={{
-              position: "sticky", top: 0, zIndex: 10,
-              background: "linear-gradient(to bottom, #0d1f12 60%, transparent)",
-              paddingBottom: 8, marginBottom: -8,
-            }}>
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                background: "rgba(162,137,89,0.1)", border: "1px solid rgba(162,137,89,0.2)",
-                borderRadius: 20, padding: "4px 12px", fontSize: 11,
-                color: "rgba(232,218,180,0.91)",
-              }}>
-                <svg viewBox="0 0 16 16" fill="currentColor" width={10} height={10}>
-                  <path fillRule="evenodd" d="M8 1a.75.75 0 01.75.75v6.19l1.72-1.72a.75.75 0 111.06 1.06l-3 3a.75.75 0 01-1.06 0l-3-3a.75.75 0 111.06-1.06l1.72 1.72V1.75A.75.75 0 018 1zM1.5 11.75a.75.75 0 011.5 0v1.5a.25.25 0 00.25.25h9.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 0112.75 15h-9.5A1.75 1.75 0 011.5 13.25v-1.5z" clipRule="evenodd" />
-                </svg>
-                Scroll down to read all terms
-              </div>
-            </div>
-          )}
-
-          <div style={{ whiteSpace: "pre-wrap", fontSize: 12.5, lineHeight: 1.75, color: "rgba(232,218,180,0.91)" }}>
-            <div style={{
-              fontWeight: 700, fontSize: 15, color: GOLD,
-              textAlign: "center", marginBottom: 20,
-              letterSpacing: "0.08em",
+              fontWeight: 700, fontSize: 14, color: GOLD,
+              textAlign: "center", marginBottom: 16, letterSpacing: "0.07em",
             }}>
               HARROWGATE CONSULTANCY LIMITED<br />
               <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(232,218,180,0.88)" }}>
                 Terms and Conditions of Service
               </span>
             </div>
-            {TERMS_TEXT}
-          </div>
-        </div>
 
-        {/* Checkbox + Signature section */}
-        <div style={{ padding: "16px 24px 20px", borderTop: "1px solid rgba(162,137,89,0.15)", flexShrink: 0 }}>
-          {/* Checkbox */}
-          <label style={{
-            display: "flex", alignItems: "flex-start", gap: 10,
-            cursor: scrolledToBottom ? "pointer" : "not-allowed",
-            opacity: scrolledToBottom ? 1 : 0.4,
-            marginBottom: 16,
-          }}>
-            <div
-              onClick={() => scrolledToBottom && setChecked(v => !v)}
-              style={{
-                width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 1,
-                border: `2px solid ${checked ? GOLD : "rgba(162,137,89,0.35)"}`,
-                background: checked ? GOLD : "transparent",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "all 0.15s", cursor: scrolledToBottom ? "pointer" : "not-allowed",
-              }}
-            >
-              {checked && (
-                <svg viewBox="0 0 12 10" fill="none" width={10} height={10}>
-                  <path d="M1 5l3.5 3.5L11 1" stroke="#255F38" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+            {/* Preview / full text */}
+            <div style={{ position: "relative" }}>
+              <div
+                ref={fullTextRef}
+                style={{
+                  whiteSpace: "pre-wrap",
+                  fontSize: 12.5,
+                  lineHeight: 1.75,
+                  color: "rgba(232,218,180,0.91)",
+                  maxHeight: expanded ? "none" : 180,
+                  overflow: "hidden",
+                  transition: "max-height 0.3s ease",
+                }}
+              >
+                {TERMS_TEXT}
+              </div>
+
+              {/* Fade + expand button — only when collapsed */}
+              {!expanded && (
+                <div style={{
+                  position: "absolute", bottom: 0, left: 0, right: 0,
+                  height: 80,
+                  background: "linear-gradient(to bottom, transparent, #0d1f12 85%)",
+                  display: "flex", alignItems: "flex-end", paddingBottom: 4,
+                }}>
+                  <button
+                    onClick={() => setExpanded(true)}
+                    style={{
+                      background: "none", border: "none", padding: 0,
+                      fontSize: 11, color: "rgba(162,137,89,0.65)",
+                      cursor: "pointer", textDecoration: "underline",
+                      textUnderlineOffset: 2,
+                      letterSpacing: "0.02em",
+                    }}
+                  >
+                    Read full terms ↓
+                  </button>
+                </div>
               )}
             </div>
-            <span style={{ fontSize: 13, color: "rgba(232,218,180,0.93)", lineHeight: 1.5 }}>
-              I, <strong style={{ color: GOLD }}>{studentName}</strong>, have read and fully understood the above Terms and Conditions and agree to be bound by them.
-            </span>
-          </label>
 
-          {/* Signature pad */}
-          {checked && (
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                <p style={{ fontSize: 12, color: "rgba(232,218,180,0.88)", margin: 0 }}>
-                  Sign below to confirm:
-                </p>
+            {/* Collapse button — only when expanded */}
+            {expanded && (
+              <div style={{ marginTop: 8 }}>
                 <button
-                  onClick={clearSignature}
+                  onClick={() => setExpanded(false)}
                   style={{
-                    fontSize: 11, color: "rgba(232,218,180,0.85)", background: "transparent",
-                    border: "1px solid rgba(162,137,89,0.2)", borderRadius: 6,
-                    padding: "2px 10px", cursor: "pointer",
+                    background: "none", border: "none", padding: 0,
+                    fontSize: 11, color: "rgba(162,137,89,0.50)",
+                    cursor: "pointer", textDecoration: "underline",
+                    textUnderlineOffset: 2,
                   }}
                 >
-                  Clear
+                  Collapse ↑
                 </button>
               </div>
-              <canvas
-                ref={canvasRef}
-                width={600}
-                height={120}
-                onMouseDown={startDraw}
-                onMouseMove={draw}
-                onMouseUp={stopDraw}
-                onMouseLeave={stopDraw}
-                onTouchStart={startDraw}
-                onTouchMove={draw}
-                onTouchEnd={stopDraw}
+            )}
+          </div>
+
+          {/* Checkbox + Signature */}
+          <div style={{ padding: "16px 24px 20px" }}>
+            {/* Checkbox */}
+            <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", marginBottom: 16 }}>
+              <div
+                onClick={() => setChecked(v => !v)}
                 style={{
-                  width: "100%", height: 120,
-                  border: `1.5px dashed ${hasSigned ? "rgba(162,137,89,0.5)" : "rgba(162,137,89,0.25)"}`,
-                  borderRadius: 10,
-                  background: "rgba(162,137,89,0.04)",
-                  cursor: "crosshair",
-                  touchAction: "none",
-                  display: "block",
+                  width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 1,
+                  border: `2px solid ${checked ? GOLD : "rgba(162,137,89,0.35)"}`,
+                  background: checked ? GOLD : "transparent",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all 0.15s", cursor: "pointer",
                 }}
-              />
-              {!hasSigned && (
-                <p style={{ fontSize: 11, color: "rgba(232,218,180,0.75)", marginTop: 6, textAlign: "center" }}>
-                  Draw your signature above using your mouse or finger
-                </p>
-              )}
-            </div>
-          )}
+              >
+                {checked && (
+                  <svg viewBox="0 0 12 10" fill="none" width={10} height={10}>
+                    <path d="M1 5l3.5 3.5L11 1" stroke="#255F38" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+              <span style={{ fontSize: 13, color: "rgba(232,218,180,0.93)", lineHeight: 1.5 }}>
+                I, <strong style={{ color: GOLD }}>{studentName}</strong>, have read and fully understood the above Terms and Conditions and agree to be bound by them.
+              </span>
+            </label>
 
-          {error && (
-            <p style={{ fontSize: 12, color: "#f87171", marginBottom: 10 }}>{error}</p>
-          )}
+            {/* Signature pad */}
+            {checked && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <p style={{ fontSize: 12, color: "rgba(232,218,180,0.88)", margin: 0 }}>Sign below to confirm:</p>
+                  <button
+                    onClick={clearSignature}
+                    style={{
+                      fontSize: 11, color: "rgba(232,218,180,0.85)", background: "transparent",
+                      border: "1px solid rgba(162,137,89,0.2)", borderRadius: 6,
+                      padding: "2px 10px", cursor: "pointer",
+                    }}
+                  >
+                    Clear
+                  </button>
+                </div>
+                <canvas
+                  ref={canvasRef}
+                  width={600}
+                  height={120}
+                  onMouseDown={startDraw}
+                  onMouseMove={draw}
+                  onMouseUp={stopDraw}
+                  onMouseLeave={stopDraw}
+                  onTouchStart={startDraw}
+                  onTouchMove={draw}
+                  onTouchEnd={stopDraw}
+                  style={{
+                    width: "100%", height: 120,
+                    border: `1.5px dashed ${hasSigned ? "rgba(162,137,89,0.5)" : "rgba(162,137,89,0.25)"}`,
+                    borderRadius: 10,
+                    background: "rgba(162,137,89,0.04)",
+                    cursor: "crosshair",
+                    touchAction: "none",
+                    display: "block",
+                  }}
+                />
+                {!hasSigned && (
+                  <p style={{ fontSize: 11, color: "rgba(232,218,180,0.75)", marginTop: 6, textAlign: "center" }}>
+                    Draw your signature above using your mouse or finger
+                  </p>
+                )}
+              </div>
+            )}
 
-          <button
-            onClick={handleSubmit}
-            disabled={!canConfirm}
-            style={{
-              width: "100%", padding: "13px 0",
-              borderRadius: 12, border: "none",
-              background: canConfirm ? GOLD : "rgba(162,137,89,0.15)",
-              color: canConfirm ? BG : "rgba(162,137,89,0.3)",
-              fontSize: 14, fontWeight: 700,
-              cursor: canConfirm ? "pointer" : "not-allowed",
-              transition: "all 0.2s",
-            }}
-          >
-            {submitting ? "Saving…" : "Confirm & Proceed to Payment"}
-          </button>
+            {error && (
+              <p style={{ fontSize: 12, color: "#f87171", marginBottom: 10 }}>{error}</p>
+            )}
 
-          {!scrolledToBottom && (
-            <p style={{ fontSize: 11, color: "rgba(232,218,180,0.75)", textAlign: "center", marginTop: 8 }}>
-              Please scroll through all the terms above to continue
-            </p>
-          )}
+            <button
+              onClick={handleSubmit}
+              disabled={!canConfirm}
+              style={{
+                width: "100%", padding: "13px 0",
+                borderRadius: 12, border: "none",
+                background: canConfirm ? GOLD : "rgba(162,137,89,0.15)",
+                color: canConfirm ? BG : "rgba(162,137,89,0.3)",
+                fontSize: 14, fontWeight: 700,
+                cursor: canConfirm ? "pointer" : "not-allowed",
+                transition: "all 0.2s",
+              }}
+            >
+              {submitting ? "Saving…" : "Confirm & Proceed to Payment"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
