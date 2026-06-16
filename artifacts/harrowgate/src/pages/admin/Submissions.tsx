@@ -933,7 +933,27 @@ export default function Submissions() {
   const viewUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/view?token=${encodeURIComponent(adminToken)}`;
   const downloadUrl = (doc: Document) => `${getApiBase()}/api/admin/student-submissions/${selected?.id}/documents/${doc.id}/download?token=${encodeURIComponent(adminToken)}`;
 
-  const filterKeys = ["all", "pending", "approved", "docs_requested", "payment_pending", "payment_received", "acknowledged", "rejected"];
+  const filterKeys = [
+    "all",
+    "pending",
+    "approved",
+    "docs_requested",
+    "payment_pending",
+    "payment_received",
+    "acknowledged",
+    "interview_arranged",
+    "interview_completed",
+    "second_payment_pending",
+    "second_payment_received",
+    "second_payment_confirmed",
+    "university_interview_arranged",
+    "university_interview_completed",
+    "offer_letter_pending",
+    "final_payment_received",
+    "final_payment_confirmed",
+    "visa_issued",
+    "rejected",
+  ];
 
   return (
     <div className="p-6 lg:p-8 admin-submissions">
