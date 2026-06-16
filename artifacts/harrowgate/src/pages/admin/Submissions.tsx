@@ -1200,17 +1200,21 @@ export default function Submissions() {
         {/* ── NORMAL LIST (hidden when trash is open) ── */}
         {!showTrash && (<>
 
-        <div className="flex mb-5 sm:mb-6 overflow-x-auto border-b" style={{ borderColor: "rgba(162,137,89,0.18)", scrollbarWidth: "none" }}>
+        <div className="flex mb-5 sm:mb-6 overflow-x-auto gap-1 px-1 py-1.5" style={{ scrollbarWidth: "none" }}>
           {filterKeys.map(f => {
             const count = f !== "all" ? submissions.filter(s => s.status === f).length : submissions.length;
             const active = filter === f;
             return (
               <button key={f} onClick={() => setFilter(f)}
-                className="relative px-4 py-2.5 text-xs font-medium transition-all shrink-0 whitespace-nowrap"
-                style={{ color: active ? "#f0d28c" : "rgba(162,137,89,0.45)" }}>
+                className="relative px-3.5 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap rounded-full"
+                style={{
+                  color: active ? "#0b2213" : "rgba(162,137,89,0.55)",
+                  background: active ? "linear-gradient(135deg, #c4a96e 0%, #a28959 100%)" : "rgba(162,137,89,0.06)",
+                  border: active ? "1.5px solid #1f7d53" : "1.5px solid rgba(162,137,89,0.12)",
+                  boxShadow: active ? "0 0 0 1px rgba(31,125,83,0.35), 0 2px 8px rgba(162,137,89,0.20)" : "none",
+                }}>
                 {f === "all" ? "All" : (statusConfig[f]?.label || f)}
-                <span className="ml-1.5" style={{ color: active ? "rgba(240,210,140,0.45)" : "rgba(162,137,89,0.25)" }}>{count}</span>
-                {active && <span className="absolute bottom-0 left-3 right-3 h-px rounded-full" style={{ background: "#c4a96e" }} />}
+                <span className="ml-1" style={{ color: active ? "rgba(11,34,19,0.55)" : "rgba(162,137,89,0.30)", fontWeight: 400 }}>{count}</span>
               </button>
             );
           })}
