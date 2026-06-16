@@ -1172,20 +1172,25 @@ export default function Portal() {
 
             {/* ── ACKNOWLEDGED ── */}
             {submission.status === "acknowledged" && !showTimeline && (
-              <div className="mt-6 rounded-2xl p-8 text-center border" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.22)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(162,137,89,0.35)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#c4a96e" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: "#f0d28c" }}>{t("s.payReceived")}</h3>
-                <p className="text-sm mb-6" style={{ color: "rgba(162,137,89,0.65)" }}>{t("s.payReceivedSub")}</p>
-                <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border mb-6" style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.25)" }}>
-                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(162,137,89,0.55)" }}>{t("s.ackCodeLabel")}</p>
-                  <p className="text-3xl font-bold tracking-widest font-mono" style={{ color: "#f0d28c" }}>STU{submission.passportNumber.slice(-4).toUpperCase()}</p>
-                  <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.45)" }}>{t("s.ackCodeNote")}</p>
+              <div className="mt-6 rounded-2xl border" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.22)" }}>
+                <div className="p-8 text-center">
+                  <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(162,137,89,0.35)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#c4a96e" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
+                  <h3 className="text-xl font-bold mb-2" style={{ color: "#f0d28c" }}>{t("s.payReceived")}</h3>
+                  <p className="text-sm mb-6" style={{ color: "rgba(162,137,89,0.65)" }}>{t("s.payReceivedSub")}</p>
+                  <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border" style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.25)" }}>
+                    <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(162,137,89,0.55)" }}>{t("s.ackCodeLabel")}</p>
+                    <p className="text-3xl font-bold tracking-widest font-mono" style={{ color: "#f0d28c" }}>STU{submission.passportNumber.slice(-4).toUpperCase()}</p>
+                    <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.45)" }}>{t("s.ackCodeNote")}</p>
+                  </div>
                 </div>
-                <button onClick={() => { if (hasFirstPayment(submission.status)) { setShowTimeline(true); setActiveTab("progress"); } }}
-                  className="px-8 py-3 rounded-full text-sm font-semibold border transition-all hover:opacity-80"
-                  style={{ borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c", background: "rgba(162,137,89,0.08)" }}>
-                  View Progress →
-                </button>
+                <div className="flex justify-end px-6 py-4 border-t" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                  <button onClick={() => { if (hasFirstPayment(submission.status)) { setShowTimeline(true); setActiveTab("progress"); } }}
+                    className="px-6 py-2.5 rounded-full text-sm font-semibold border transition-all hover:opacity-80 flex items-center gap-2"
+                    style={{ borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c", background: "rgba(162,137,89,0.08)" }}>
+                    View Progress
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3.5 h-3.5"><path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </button>
+                </div>
               </div>
             )}
 
