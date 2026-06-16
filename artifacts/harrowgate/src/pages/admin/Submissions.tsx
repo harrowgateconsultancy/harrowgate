@@ -127,19 +127,19 @@ function getDocMeta(dt: string, C: Record<string, string>, GOLD: string): { labe
   if (dt === "additional_doc")         return { label: "Additional Document",        tagColor: "rgba(251,146,60,0.18)",  tagText: "#fb923c", tag: "Additional"    };
   if (dt === "offer_letter")           return { label: "Offer Letter",               tagColor: "rgba(162,137,89,0.10)", tagText: "#c4a96e", tag: "Offer Letter"  };
   if (dt === "final_payment_receipt")  return { label: "Final Payment Receipt",      tagColor: "rgba(162,137,89,0.18)",  tagText: "#c4a96e", tag: "Final Receipt" };
-  if (dt === "passport_photo")         return { label: "Passport Size Photo",        tagColor: C.muted,  tagText: GOLD,      tag: "Student"       };
-  if (dt === "passport_doc")           return { label: "Passport / Travel Document", tagColor: C.muted,  tagText: GOLD,      tag: "Student"       };
-  if (dt === "birth_certificate")      return { label: "Birth Certificate / Nat. ID",tagColor: C.muted, tagText: GOLD,      tag: "Student"       };
-  if (dt === "cv")                     return { label: "CV",                         tagColor: C.muted,  tagText: GOLD,      tag: "Student"       };
-  if (dt === "edu_results")            return { label: "Completion Certificate",        tagColor: C.muted,  tagText: GOLD,      tag: "Student"       };
-  if (dt === "edu_transcript")         return { label: "Educational Transcript",        tagColor: C.muted,  tagText: GOLD,      tag: "Student"       };
-  if (dt === "higher_edu_results")     return { label: "Higher Education Certificate",  tagColor: C.muted,  tagText: GOLD,      tag: "Student"       };
-  if (dt === "higher_edu_transcript")  return { label: "Higher Education Transcript",tagColor: C.muted, tagText: GOLD,      tag: "Student"       };
-  if (dt.startsWith("edu_"))           return { label: `Education Document ${dt.replace("edu_", "")}`, tagColor: C.muted, tagText: GOLD, tag: "Student" };
+  if (dt === "passport_photo")         return { label: "Passport Size Photo",        tagColor: "rgba(162,137,89,0.10)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "passport_doc")           return { label: "Passport / Travel Document", tagColor: "rgba(162,137,89,0.10)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "birth_certificate")      return { label: "Birth Certificate / Nat. ID",tagColor: "rgba(162,137,89,0.10)", tagText: GOLD,      tag: "Student"       };
+  if (dt === "cv")                     return { label: "CV",                         tagColor: "rgba(162,137,89,0.10)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "edu_results")            return { label: "Completion Certificate",        tagColor: "rgba(162,137,89,0.10)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "edu_transcript")         return { label: "Educational Transcript",        tagColor: "rgba(162,137,89,0.10)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "higher_edu_results")     return { label: "Higher Education Certificate",  tagColor: "rgba(162,137,89,0.10)",  tagText: GOLD,      tag: "Student"       };
+  if (dt === "higher_edu_transcript")  return { label: "Higher Education Transcript",tagColor: "rgba(162,137,89,0.10)", tagText: GOLD,      tag: "Student"       };
+  if (dt.startsWith("edu_"))           return { label: `Education Document ${dt.replace("edu_", "")}`, tagColor: "rgba(162,137,89,0.10)", tagText: GOLD, tag: "Student" };
   if (dt === "evisa")                  return { label: "e-Visa (HK Immigration)", tagColor: "rgba(162,137,89,0.18)", tagText: "#f0d28c", tag: "e-Visa" };
-  if (dt === "signed_terms")           return { label: "Signed Terms & Conditions", tagColor: C.muted, tagText: GOLD, tag: "Signed T&C" };
+  if (dt === "signed_terms")           return { label: "Signed Terms & Conditions", tagColor: "rgba(162,137,89,0.10)", tagText: GOLD, tag: "Signed T&C" };
   if (dt.startsWith("admin_"))         return { label: dt === "admin_doc" ? "Admin Document" : dt.replace("admin_", "").replace(/_/g, " "), tagColor: "rgba(162,137,89,0.15)", tagText: "#f0d28c", tag: "Admin" };
-  return { label: dt.replace(/_/g, " ").toUpperCase(), tagColor: C.muted, tagText: GOLD, tag: "Student" };
+  return { label: dt.replace(/_/g, " ").toUpperCase(), tagColor: "rgba(162,137,89,0.10)", tagText: GOLD, tag: "Student" };
 }
 
 async function uploadToStorage(file: File): Promise<{ url: string }> {
@@ -202,30 +202,30 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
             </span>
           )}
         </div>
-        {isLoading && <span className="text-xs" style={{ color: C.textFaint }}>Loading…</span>}
+        {isLoading && <span className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>Loading…</span>}
       </div>
-      <div className="divide-y" style={{ borderColor: C.borderFaint }}>
+      <div className="divide-y" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
         {items.map(item => (
-          <div key={item.id} className="px-4 py-3" style={{ borderBottom: `1px solid ${C.borderFaint}` }}>
+          <div key={item.id} className="px-4 py-3" style={{ borderBottom: "1px solid rgba(162,137,89,0.10)" }}>
             <div className="flex items-start gap-2">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-mono truncate" style={{ color: C.textSec }}>To: {item.toAddress}</span>
+                  <span className="text-xs font-mono truncate" style={{ color: "rgba(162,137,89,0.60)" }}>To: {item.toAddress}</span>
                   <span className="text-xs px-1.5 py-0.5 rounded-full" style={{
                     background: item.status === "pending" ? "rgba(251,146,60,0.12)" : item.status === "sent" ? "rgba(162,137,89,0.10)" : "rgba(248,113,113,0.1)",
                     color: item.status === "pending" ? "#fb923c" : item.status === "sent" ? "#f0d28c" : "#f87171",
                   }}>
                     {item.status === "pending" ? "Pending" : item.status === "sent" ? "✓ Sent" : "Rejected"}
                   </span>
-                  <span className="text-xs" style={{ color: C.borderMed }}>{new Date(item.createdAt).toLocaleString()}</span>
+                  <span className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>{new Date(item.createdAt).toLocaleString()}</span>
                 </div>
                 <p className="text-sm font-medium mt-0.5 truncate" style={{ color: GOLD }}>{item.subject}</p>
                 {expanded === item.id ? (
-                  <p className="text-xs mt-1 whitespace-pre-wrap leading-relaxed" style={{ color: C.textDark }}>{item.body}</p>
+                  <p className="text-xs mt-1 whitespace-pre-wrap leading-relaxed" style={{ color: "#e8d5b0" }}>{item.body}</p>
                 ) : (
-                  <p className="text-xs mt-0.5 truncate" style={{ color: C.textMuted }}>{item.body}</p>
+                  <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(162,137,89,0.55)" }}>{item.body}</p>
                 )}
-                <button onClick={() => setExpanded(expanded === item.id ? null : item.id)} className="text-xs mt-1" style={{ color: C.textFaint }}>
+                <button onClick={() => setExpanded(expanded === item.id ? null : item.id)} className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.45)" }}>
                   {expanded === item.id ? "Show less" : "Read more"}
                 </button>
               </div>
@@ -960,7 +960,7 @@ export default function Submissions() {
               </p>
             </div>
             {/* Unified action bar — flat tab style matching student portal */}
-            <div className="tab-nav flex items-center overflow-x-auto border-b shrink-0" style={{ borderColor: C.borderFaint, scrollbarWidth: "none" }}>
+            <div className="tab-nav flex items-center overflow-x-auto border-b shrink-0" style={{ borderColor: "rgba(162,137,89,0.10)", scrollbarWidth: "none" }}>
               {/* Sound */}
               {!soundEnabled ? (
                 <button onClick={() => { unlockAudio(); setSoundEnabled(true); localStorage.setItem("admin_sound_enabled", "true"); }}
@@ -1036,30 +1036,30 @@ export default function Submissions() {
 
         {/* ── PRICING PANEL ── */}
         {showPricing && (
-          <div className="mb-8 rounded-2xl border overflow-hidden" style={{ background: C.subtle, borderColor: C.border }}>
-            <div className="px-6 py-4 border-b flex items-center justify-between gap-3" style={{ borderColor: C.border }}>
+          <div className="mb-8 rounded-2xl border overflow-hidden" style={{ background: "#163320", borderColor: "rgba(162,137,89,0.18)" }}>
+            <div className="px-6 py-4 border-b flex items-center justify-between gap-3" style={{ borderColor: "rgba(162,137,89,0.18)" }}>
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
-                  style={{ background: C.subtle, color: GOLD }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6h2a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3H9" strokeLinecap="round"/></svg></div>
+                  style={{ background: "#163320", color: GOLD }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6h2a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3H9" strokeLinecap="round"/></svg></div>
                 <div>
                   <p className="text-sm font-bold" style={{ color: GOLD }}>Package Pricing</p>
-                  <p className="text-xs" style={{ color: C.textMuted }}>
+                  <p className="text-xs" style={{ color: "rgba(162,137,89,0.55)" }}>
                     Changes apply instantly to the landing page, packages page, and student portal
                   </p>
                 </div>
               </div>
               {pricingLoading && (
-                <span className="text-xs" style={{ color: C.textFaint }}>Loading…</span>
+                <span className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>Loading…</span>
               )}
             </div>
 
             <div className="px-6 py-5 grid sm:grid-cols-2 gap-6">
               {/* Total Package Costs */}
               <div>
-                <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: C.textFaint }}>
+                <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "rgba(162,137,89,0.45)" }}>
                   Total Package Costs
                 </p>
-                <p className="text-xs mb-4" style={{ color: C.textFaint }}>
+                <p className="text-xs mb-4" style={{ color: "rgba(162,137,89,0.45)" }}>
                   Shown on the Packages page and landing page pricing section.
                 </p>
                 {([
@@ -1068,10 +1068,10 @@ export default function Submissions() {
                   { label: "Associate Degree", field: "associateTotal" as const },
                 ] as const).map(({ label, field }) => (
                   <div key={field} className="flex items-center gap-3 mb-3">
-                    <label className="text-xs w-36 shrink-0 text-right" style={{ color: C.textMid }}>{label}</label>
+                    <label className="text-xs w-36 shrink-0 text-right" style={{ color: "#c4a96e" }}>{label}</label>
                     <div className="flex items-center rounded-xl border overflow-hidden flex-1"
-                      style={{ borderColor: C.borderMed, background: C.muted }}>
-                      <span className="px-3 text-xs font-semibold border-r" style={{ color: C.textMuted, borderColor: C.border, whiteSpace: "nowrap" }}>HKD$</span>
+                      style={{ borderColor: "rgba(162,137,89,0.25)", background: "rgba(162,137,89,0.06)" }}>
+                      <span className="px-3 text-xs font-semibold border-r" style={{ color: "rgba(162,137,89,0.55)", borderColor: "rgba(162,137,89,0.18)", whiteSpace: "nowrap" }}>HKD$</span>
                       <input
                         type="number"
                         value={pricingForm[field]}
@@ -1088,10 +1088,10 @@ export default function Submissions() {
 
               {/* Final Payment (Step 6) */}
               <div>
-                <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: C.textFaint }}>
+                <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "rgba(162,137,89,0.45)" }}>
                   Final Payment — Step 6
                 </p>
-                <p className="text-xs mb-4" style={{ color: C.textFaint }}>
+                <p className="text-xs mb-4" style={{ color: "rgba(162,137,89,0.45)" }}>
                   The last instalment shown in the journey timeline (includes tuition fees).
                 </p>
                 {([
@@ -1100,10 +1100,10 @@ export default function Submissions() {
                   { label: "Associate Degree", field: "associateLastPayment" as const },
                 ] as const).map(({ label, field }) => (
                   <div key={field} className="flex items-center gap-3 mb-3">
-                    <label className="text-xs w-36 shrink-0 text-right" style={{ color: C.textMid }}>{label}</label>
+                    <label className="text-xs w-36 shrink-0 text-right" style={{ color: "#c4a96e" }}>{label}</label>
                     <div className="flex items-center rounded-xl border overflow-hidden flex-1"
-                      style={{ borderColor: C.borderMed, background: C.muted }}>
-                      <span className="px-3 text-xs font-semibold border-r" style={{ color: C.textMuted, borderColor: C.border, whiteSpace: "nowrap" }}>HKD$</span>
+                      style={{ borderColor: "rgba(162,137,89,0.25)", background: "rgba(162,137,89,0.06)" }}>
+                      <span className="px-3 text-xs font-semibold border-r" style={{ color: "rgba(162,137,89,0.55)", borderColor: "rgba(162,137,89,0.18)", whiteSpace: "nowrap" }}>HKD$</span>
                       <input
                         type="number"
                         value={pricingForm[field]}
@@ -1120,12 +1120,12 @@ export default function Submissions() {
             </div>
 
             <div className="px-6 pb-5 flex items-center justify-between gap-4">
-              <p className="text-xs" style={{ color: C.textFaint }}>
+              <p className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>
                 Enter values as plain numbers (e.g. 140000 for HKD$ 140,000)
               </p>
               <button onClick={savePricing} disabled={pricingSaving}
                 className="flex items-center gap-2 text-xs font-bold px-5 py-2.5 rounded-xl border transition-all hover:opacity-80 disabled:opacity-40"
-                style={{ borderColor: pricingSaved ? "rgba(162,137,89,0.40)" : C.borderMed, color: pricingSaved ? "#f0d28c" : GOLD, background: pricingSaved ? "rgba(162,137,89,0.08)" : C.muted }}>
+                style={{ borderColor: pricingSaved ? "rgba(162,137,89,0.40)" : "rgba(162,137,89,0.25)", color: pricingSaved ? "#f0d28c" : GOLD, background: pricingSaved ? "rgba(162,137,89,0.08)" : "rgba(162,137,89,0.06)" }}>
                 {pricingSaving ? "Saving…" : pricingSaved ? <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5 inline-block mr-1"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Saved</> : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1"><path d="M2 11V13h11V11M8 1v8M5 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round"/></svg>Save Pricing</>}
               </button>
             </div>
@@ -1172,8 +1172,8 @@ export default function Submissions() {
                       {item.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: C.textDark }}>{item.name}</p>
-                      <p className="text-xs" style={{ color: C.textFaint }}>
+                      <p className="text-sm font-semibold truncate" style={{ color: "#e8d5b0" }}>{item.name}</p>
+                      <p className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>
                         {item.email || "No email"} · {item.documents.length} doc{item.documents.length !== 1 ? "s" : ""}
                         {item.deletedAt && <span className="ml-2">· Deleted {new Date(item.deletedAt).toLocaleDateString()}</span>}
                       </p>
@@ -1200,7 +1200,7 @@ export default function Submissions() {
         {/* ── NORMAL LIST (hidden when trash is open) ── */}
         {!showTrash && (<>
 
-        <div className="flex mb-5 sm:mb-6 overflow-x-auto border-b" style={{ borderColor: C.border, scrollbarWidth: "none" }}>
+        <div className="flex mb-5 sm:mb-6 overflow-x-auto border-b" style={{ borderColor: "rgba(162,137,89,0.18)", scrollbarWidth: "none" }}>
           {filterKeys.map(f => {
             const count = f !== "all" ? submissions.filter(s => s.status === f).length : submissions.length;
             const active = filter === f;
@@ -1224,7 +1224,7 @@ export default function Submissions() {
               style={{ color: "#c4a96e" }}>
               <div className="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
                 style={{
-                  borderColor: selectedIds.size === filtered.length && filtered.length > 0 ? GOLD : C.borderMed,
+                  borderColor: selectedIds.size === filtered.length && filtered.length > 0 ? GOLD : "rgba(162,137,89,0.25)",
                   background: selectedIds.size === filtered.length && filtered.length > 0 ? GOLD : "transparent",
                 }}>
                 {selectedIds.size === filtered.length && filtered.length > 0 && (
@@ -1235,12 +1235,12 @@ export default function Submissions() {
             </button>
             {selectedIds.size > 0 && (
               <div className="flex items-center gap-2">
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: C.muted, color: C.textSec }}>
+                <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.06)", color: "rgba(162,137,89,0.60)" }}>
                   {selectedIds.size} selected
                 </span>
                 <button onClick={handleBulkExport}
                   className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all hover:opacity-80"
-                  style={{ background: C.muted, borderColor: C.borderMed, color: GOLD }}>
+                  style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>
                   <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 10V13h11V10" strokeLinecap="round"/><path d="M8 1v8M5 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round"/></svg>Export
                 </button>
                 <button onClick={() => setDeleteConfirmOpen(true)}
@@ -1255,9 +1255,9 @@ export default function Submissions() {
 
         {isLoading && <div className="text-center py-20"><div className="w-8 h-8 rounded-full border-2 animate-spin mx-auto mb-3" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /></div>}
         {!isLoading && filtered.length === 0 && (
-          <div className="text-center py-20 rounded-2xl border" style={{ borderColor: C.borderFaint }}>
+          <div className="text-center py-20 rounded-2xl border" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
             <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-12 h-12 mx-auto mb-3" style={{ color: "#a28959", opacity: 0.3 }}><rect x="4" y="8" width="40" height="32" rx="3"/><path d="M4 18l20 12 20-12"/><path d="M4 30h8M36 30h8" strokeLinecap="round"/></svg>
-            <p className="text-sm" style={{ color: C.textFaint }}>No submissions</p>
+            <p className="text-sm" style={{ color: "rgba(162,137,89,0.45)" }}>No submissions</p>
           </div>
         )}
 
@@ -1284,7 +1284,7 @@ export default function Submissions() {
                   <button onClick={e => toggleSelect(s.id, e)}
                     className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all hover:scale-110"
                     style={{
-                      borderColor: selectedIds.has(s.id) ? GOLD : C.borderMed,
+                      borderColor: selectedIds.has(s.id) ? GOLD : "rgba(162,137,89,0.25)",
                       background: selectedIds.has(s.id) ? GOLD : "transparent",
                     }}>
                     {selectedIds.has(s.id) && (
@@ -1388,17 +1388,17 @@ export default function Submissions() {
         >
           <div
             className={isDetailPage ? "w-full rounded-2xl border flex flex-col" : "w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl border flex flex-col"}
-            style={isDetailPage ? { background: C.card, borderColor: C.border, minHeight: "calc(100dvh - 130px)" } : { background: C.card, borderColor: C.border, maxHeight: "94dvh" }}
+            style={isDetailPage ? { background: C.card, borderColor: "rgba(162,137,89,0.18)", minHeight: "calc(100dvh - 130px)" } : { background: C.card, borderColor: "rgba(162,137,89,0.18)", maxHeight: "94dvh" }}
           >
 
             {/* Modal top accent */}
             <div className="h-0.5 rounded-t-3xl" style={{ background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
 
-            <div className="px-4 sm:px-6 py-4 border-b flex items-start justify-between gap-4 shrink-0" style={{ borderColor: C.borderFaint }}>
+            <div className="px-4 sm:px-6 py-4 border-b flex items-start justify-between gap-4 shrink-0" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
               <div className="flex items-start gap-3 min-w-0">
                 {/* Avatar */}
                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-base font-bold mt-0.5"
-                  style={{ background: C.muted, color: GOLD }}>
+                  style={{ background: "rgba(162,137,89,0.06)", color: GOLD }}>
                   {(selected.name[0] || "?").toUpperCase()}
                 </div>
                 <div className="min-w-0">
@@ -1418,7 +1418,7 @@ export default function Submissions() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs mt-0.5" style={{ color: C.textFaint }}>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>
                     {selected.email}
                     {selected.email && " · "}
                     <span className="font-mono">{selected.passportNumber}</span>
@@ -1432,13 +1432,13 @@ export default function Submissions() {
                   </p>
                   {(selected.preferredCourse || selected.preferredLevel) && (
                     <div className="mt-2 flex items-start gap-2">
-                      <span className="text-xs px-2 py-0.5 rounded-full font-semibold shrink-0" style={{ background: C.muted, color: GOLD }}>
+                      <span className="text-xs px-2 py-0.5 rounded-full font-semibold shrink-0" style={{ background: "rgba(162,137,89,0.06)", color: GOLD }}>
                         {selected.preferredLevel === "masters" ? "Master's" : selected.preferredLevel === "bachelors" ? "Bachelor's" : selected.preferredLevel === "associate" ? "Associate" : selected.preferredLevel}
                       </span>
                       {selected.preferredCourse && (
-                        <p className="text-xs" style={{ color: C.textSec }}>
+                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>
                           {selected.preferredCourse}
-                          {selected.preferredInstitution && <span style={{ color: C.textFaint }}> · {selected.preferredInstitution}</span>}
+                          {selected.preferredInstitution && <span style={{ color: "rgba(162,137,89,0.45)" }}> · {selected.preferredInstitution}</span>}
                         </p>
                       )}
                     </div>
@@ -1451,7 +1451,7 @@ export default function Submissions() {
                   target="_blank" rel="noopener noreferrer"
                   title="Print student profile"
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all hover:opacity-80"
-                  style={{ borderColor: C.borderMed, color: C.textMid, background: C.muted }}
+                  style={{ borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e", background: "rgba(162,137,89,0.06)" }}
                 >
                   <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h8a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a1 1 0 00-1-1H6a1 1 0 00-1 1zm2-1h2v3H7V3zm-1 9H5V9h1v3zm2 0H8V9h1v3zm2 0h-1V9h1v3z" clipRule="evenodd" /></svg>
                   Print
@@ -1461,7 +1461,7 @@ export default function Submissions() {
                   download
                   title="Download all documents as ZIP"
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all hover:opacity-80"
-                  style={{ borderColor: C.borderMed, color: C.textMid, background: C.muted }}
+                  style={{ borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e", background: "rgba(162,137,89,0.06)" }}
                 >
                   <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M8 1a.75.75 0 01.75.75v7.69l2.72-2.72a.75.75 0 011.06 1.06l-4 4a.75.75 0 01-1.06 0l-4-4a.75.75 0 111.06-1.06L7.25 9.44V1.75A.75.75 0 018 1zM1.75 14a.75.75 0 000 1.5h12.5a.75.75 0 000-1.5H1.75z" clipRule="evenodd" /></svg>
                   ZIP
@@ -1479,14 +1479,14 @@ export default function Submissions() {
                   <button
                     onClick={() => setLocation("/admin/submissions")}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all hover:opacity-80"
-                    style={{ background: C.muted, borderColor: C.borderMed, color: C.textMid }}>
+                    style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: "#c4a96e" }}>
                     ← Back
                   </button>
                 ) : (
                   <button
                     onClick={() => { setSelected(null); setPreviewDoc(null); }}
                     className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80"
-                    style={{ background: C.muted, color: C.textMuted }}>
+                    style={{ background: "rgba(162,137,89,0.06)", color: "rgba(162,137,89,0.55)" }}>
                     <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z" /></svg>
                   </button>
                 )}
@@ -1494,7 +1494,7 @@ export default function Submissions() {
             </div>
 
             {/* ── Tab navigation ── */}
-            <div className="flex items-center gap-1 shrink-0 px-2 py-1.5" style={{ background: C.subtle, borderBottom: `1px solid ${C.borderFaint}` }}>
+            <div className="flex items-center gap-1 shrink-0 px-2 py-1.5" style={{ background: "#163320", borderBottom: "1px solid rgba(162,137,89,0.10)" }}>
               {([
                 { id: "overview",  label: "Overview",  svg: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg> },
                 { id: "documents", label: "Docs",      svg: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3M5 7h6M5 10h6M5 13h3"/></svg> },
@@ -1513,15 +1513,15 @@ export default function Submissions() {
                     onClick={() => setDetailTab(tab.id as typeof detailTab)}
                     className="relative flex-1 flex flex-col items-center py-2 gap-0.5 text-xs font-medium transition-all rounded-xl"
                     style={{
-                      color: isActive ? (isDark ? "#f0d28c" : "#0d2b17") : C.textFaint,
-                      background: isActive ? (isDark ? "rgba(15,45,24,0.95)" : "rgba(255,255,255,0.85)") : "transparent",
-                      boxShadow: isActive ? (isDark ? "0 1px 6px rgba(0,0,0,0.35), inset 0 1px 0 rgba(162,137,89,0.10)" : "0 1px 4px rgba(0,0,0,0.10)") : "none",
-                      border: isActive ? `1px solid ${isDark ? "rgba(162,137,89,0.18)" : "rgba(10,40,20,0.10)"}` : "1px solid transparent",
+                      color: isActive ? "#f0d28c" : "rgba(162,137,89,0.45)",
+                      background: isActive ? "rgba(15,45,24,0.95)" : "transparent",
+                      boxShadow: isActive ? "0 1px 6px rgba(0,0,0,0.35), inset 0 1px 0 rgba(162,137,89,0.10)" : "none",
+                      border: isActive ? "1px solid rgba(162,137,89,0.18)" : "1px solid transparent",
                     }}>
                     <span className="leading-none">{tab.svg}</span>
                     <span className="leading-none">{tab.label}</span>
                     {(badge && badge > 0) ? (
-                      <span className="absolute top-1 right-2 text-[9px] font-bold px-1 rounded-full leading-4" style={{ background: isDark ? "#f0d28c" : "#a28959", color: isDark ? C.card : "#fff" }}>{badge}</span>
+                      <span className="absolute top-1 right-2 text-[9px] font-bold px-1 rounded-full leading-4" style={{ background: "#f0d28c", color: "#0b2213" }}>{badge}</span>
                     ) : dot ? (
                       <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full" style={{ background: "#fb923c" }} />
                     ) : null}
@@ -1534,16 +1534,16 @@ export default function Submissions() {
               {/* Inline preview */}
               {previewDoc && (
                 <div className="mx-3 sm:mx-6 mt-4 sm:mt-5 rounded-2xl border overflow-hidden" style={{ borderColor: "rgba(162,137,89,0.18)", background: "#0b2213" }}>
-                  <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: C.borderFaint }}>
+                  <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
                     <span className="text-sm font-medium truncate max-w-xs" style={{ color: GOLD }}>{previewDoc.fileName}</span>
                     <div className="flex items-center gap-2 shrink-0 ml-3">
                       <a href={viewUrl(previewDoc)} target="_blank" rel="noopener noreferrer"
                         className="text-xs px-3 py-1.5 rounded-full border hover:opacity-80"
-                        style={{ borderColor: C.borderMed, color: GOLD }}>Open full ↗</a>
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>Open full ↗</a>
                       <a href={downloadUrl(previewDoc)} download={previewDoc.fileName}
                         className="text-xs px-3 py-1.5 rounded-full border hover:opacity-80"
-                        style={{ borderColor: C.borderMed, color: GOLD }}>↓ Download</a>
-                      <button onClick={() => setPreviewDoc(null)} className="text-lg leading-none ml-1" style={{ color: C.textFaint }}>×</button>
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>↓ Download</a>
+                      <button onClick={() => setPreviewDoc(null)} className="text-lg leading-none ml-1" style={{ color: "rgba(162,137,89,0.45)" }}>×</button>
                     </div>
                   </div>
                   <div className="p-2" style={{ minHeight: 260 }}>
@@ -1571,8 +1571,8 @@ export default function Submissions() {
                 <div>
                   <p className="text-sm font-semibold mb-3" style={{ color: GOLD }}>Documents ({selected.documents.length})</p>
                   {selected.documents.length === 0 && (
-                    <div className="rounded-xl py-6 text-center border" style={{ borderColor: C.borderFaint }}>
-                      <p className="text-sm" style={{ color: C.textFaint }}>No documents uploaded yet</p>
+                    <div className="rounded-xl py-6 text-center border" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
+                      <p className="text-sm" style={{ color: "rgba(162,137,89,0.45)" }}>No documents uploaded yet</p>
                     </div>
                   )}
                   <div className="space-y-2">
@@ -1598,7 +1598,7 @@ export default function Submissions() {
                   <div className="px-4 py-4 flex items-center gap-3 flex-wrap">
                     <select value={uploadDocType} onChange={e => setUploadDocType(e.target.value)}
                       className="rounded-xl px-3 py-2 text-xs border outline-none"
-                      style={{ background: C.muted, borderColor: C.border, color: GOLD }}>
+                      style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }}>
                       <option value="admin_doc">Admin Document</option>
                       <option value="admin_form">Application Form</option>
                       <option value="admin_approval">Approval Letter</option>
@@ -1606,7 +1606,7 @@ export default function Submissions() {
                     </select>
                     <button onClick={() => adminFileRef.current?.click()} disabled={uploadingDoc}
                       className="flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-semibold transition-all hover:opacity-80 disabled:opacity-50"
-                      style={{ background: C.muted, borderColor: C.borderMed, color: GOLD }}>
+                      style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>
                       {uploadingDoc
                         ? <><span className="w-3 h-3 rounded-full border border-t-transparent animate-spin inline-block" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Uploading…</>
                         : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M10.5 2.5a2.5 2.5 0 013.54 3.54L5.5 14.55a3.5 3.5 0 01-4.95-4.95L9 1.1" strokeLinecap="round"/></svg>Choose file…</>}
@@ -1698,11 +1698,11 @@ export default function Submissions() {
                       {/* Admin notes read-only preview */}
                       {selected.adminNotes && (
                         <div>
-                          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: C.textSec }}>
+                          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(162,137,89,0.60)" }}>
                             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><rect x="2" y="1" width="12" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h3"/></svg>
                             Last Note to Student
                           </p>
-                          <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: C.muted, borderColor: C.border, color: C.textDark }}>
+                          <div className="rounded-xl px-3 py-2 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: "#e8d5b0" }}>
                             {selected.adminNotes}
                           </div>
                         </div>
@@ -1718,7 +1718,7 @@ export default function Submissions() {
                   <textarea value={notes} onChange={e => setNotes(e.target.value)}
                     placeholder="Optional note visible to the student on their portal…" rows={3}
                     className="w-full rounded-xl px-4 py-3 text-sm outline-none border resize-none"
-                    style={{ background: C.muted, borderColor: C.border, color: GOLD }} />
+                    style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }} />
                 </div>
 
                 {/* Status action buttons */}
@@ -1947,10 +1947,10 @@ export default function Submissions() {
                 {detailTab === "workflow" && (<div className="space-y-6">
                 {/* Empty state when no workflow panels apply */}
                 {!["acknowledged","interview_arranged","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
-                  <div className="rounded-2xl border px-5 py-10 text-center" style={{ background: "rgba(31,125,83,0.03)", borderColor: C.borderFaint }}>
+                  <div className="rounded-2xl border px-5 py-10 text-center" style={{ background: "rgba(31,125,83,0.03)", borderColor: "rgba(162,137,89,0.10)" }}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-8 h-8 mx-auto mb-2" style={{ color: "#a28959", opacity: 0.35 }}><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    <p className="text-sm font-medium" style={{ color: C.textMuted }}>No workflow actions yet</p>
-                    <p className="text-xs mt-1.5" style={{ color: C.textFaint }}>Actions will appear here as the application progresses past the payment stage.</p>
+                    <p className="text-sm font-medium" style={{ color: "rgba(162,137,89,0.55)" }}>No workflow actions yet</p>
+                    <p className="text-xs mt-1.5" style={{ color: "rgba(162,137,89,0.45)" }}>Actions will appear here as the application progresses past the payment stage.</p>
                   </div>
                 )}
                 {/* Mock Interview — Schedule (acknowledged only) */}
@@ -1973,7 +1973,7 @@ export default function Submissions() {
                           <button onClick={() => { if (confirm("Skip the mock interview and proceed directly to 2nd payment?")) updateStatus.mutate({ id: selected.id, status: "interview_completed", adminNotes: notes }); }}
                             disabled={updateStatus.isPending}
                             className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
-                            style={{ background: C.muted, borderColor: C.border, color: C.textSec }}>
+                            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.60)" }}>
                             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip Mock Interview
                           </button>
                         </div>
@@ -2011,7 +2011,7 @@ export default function Submissions() {
                             </button>
                             <button onClick={() => setInterviewForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
-                              style={{ borderColor: C.border, color: C.textFaint }}>
+                              style={{ borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.45)" }}>
                               Cancel
                             </button>
                           </div>
@@ -2048,7 +2048,7 @@ export default function Submissions() {
                       <button onClick={() => { if (confirm("Skip the mock interview and proceed to 2nd payment stage?")) updateStatus.mutate({ id: selected.id, status: "interview_completed", adminNotes: notes }); }}
                         disabled={updateStatus.isPending}
                         className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
-                        style={{ background: C.muted, borderColor: C.border, color: C.textSec }}>
+                        style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.60)" }}>
                         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip Mock Interview
                       </button>
                     </div>
@@ -2089,7 +2089,7 @@ export default function Submissions() {
                           <button onClick={() => { if (confirm("Skip the university interview and proceed directly to offer letter stage?")) updateStatus.mutate({ id: selected.id, status: "university_interview_completed", adminNotes: notes }); }}
                             disabled={updateStatus.isPending}
                             className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
-                            style={{ background: C.muted, borderColor: C.border, color: C.textSec }}>
+                            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.60)" }}>
                             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip University Interview
                           </button>
                         </div>
@@ -2143,7 +2143,7 @@ export default function Submissions() {
                             </button>
                             <button onClick={() => setUniInterviewForm(null)}
                               className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
-                              style={{ borderColor: C.border, color: C.textFaint }}>
+                              style={{ borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.45)" }}>
                               Cancel
                             </button>
                           </div>
@@ -2240,7 +2240,7 @@ export default function Submissions() {
                             value={refNumInput}
                             onChange={e => setRefNumInput(e.target.value)}
                             className="flex-1 rounded-xl px-3 py-2 text-sm border outline-none font-mono"
-                            style={{ background: C.muted, borderColor: C.borderMed, color: GOLD }}
+                            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.25)", color: GOLD }}
                           />
                           <button
                             onClick={handleSetImmigrationRef}
@@ -2261,14 +2261,14 @@ export default function Submissions() {
                         <div className="flex items-center gap-2">
                           <button onClick={e => { e.stopPropagation(); handleId995aDownload(); }}
                             className="text-xs px-3 py-1 rounded-lg border font-medium transition-all hover:opacity-80"
-                            style={{ borderColor: C.borderMed, color: GOLD, background: C.muted }}>
+                            style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
                             ⬇ Download PDF
                           </button>
-                          <span style={{ color: C.textFaint }}>{id995aOpen ? "▲" : "▼"}</span>
+                          <span style={{ color: "rgba(162,137,89,0.45)" }}>{id995aOpen ? "▲" : "▼"}</span>
                         </div>
                       </button>
                       {id995aOpen && (
-                        <div className="border-t" style={{ borderColor: C.border }}>
+                        <div className="border-t" style={{ borderColor: "rgba(162,137,89,0.18)" }}>
                           <Id995aPanel submissionId={selected.id} apiBase={getApiBase()} C={C} GOLD={GOLD} />
                         </div>
                       )}
@@ -2327,19 +2327,19 @@ export default function Submissions() {
                           <span className="text-xs px-2 py-0.5 rounded-full font-medium ml-1" style={{ background: "rgba(162,137,89,0.12)", color: "#f0d28c" }}>Generated</span>
                         )}
                       </div>
-                      <span style={{ color: C.textFaint }}>{lettersOpen ? "▲" : "▼"}</span>
+                      <span style={{ color: "rgba(162,137,89,0.45)" }}>{lettersOpen ? "▲" : "▼"}</span>
                     </button>
 
                     {lettersOpen && (
-                      <div className="border-t px-4 py-4 space-y-4" style={{ borderColor: C.border }}>
-                        <p className="text-xs" style={{ color: C.textMid }}>
+                      <div className="border-t px-4 py-4 space-y-4" style={{ borderColor: "rgba(162,137,89,0.18)" }}>
+                        <p className="text-xs" style={{ color: "#c4a96e" }}>
                           Enter course details to generate 4 formal immigration letters. Letters are written in first person using the student's ID995A data.
                         </p>
 
                         {/* Course info inputs */}
                         <div className="space-y-2">
                           <div>
-                            <label className="text-xs font-medium mb-1 block" style={{ color: C.textDark }}>Course Name *</label>
+                            <label className="text-xs font-medium mb-1 block" style={{ color: "#e8d5b0" }}>Course Name *</label>
                             <input
                               className="w-full rounded-xl px-3 py-2 text-sm border outline-none"
                               style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#e8d5b0" }}
@@ -2349,7 +2349,7 @@ export default function Submissions() {
                             />
                           </div>
                           <div>
-                            <label className="text-xs font-medium mb-1 block" style={{ color: C.textDark }}>University / Institution *</label>
+                            <label className="text-xs font-medium mb-1 block" style={{ color: "#e8d5b0" }}>University / Institution *</label>
                             <input
                               className="w-full rounded-xl px-3 py-2 text-sm border outline-none"
                               style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#e8d5b0" }}
@@ -2359,7 +2359,7 @@ export default function Submissions() {
                             />
                           </div>
                           <div>
-                            <label className="text-xs font-medium mb-1 block" style={{ color: C.textDark }}>Course Website (optional)</label>
+                            <label className="text-xs font-medium mb-1 block" style={{ color: "#e8d5b0" }}>Course Website (optional)</label>
                             <input
                               className="w-full rounded-xl px-3 py-2 text-sm border outline-none"
                               style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#e8d5b0" }}
@@ -2380,7 +2380,7 @@ export default function Submissions() {
                           onClick={handleGenerateLetters}
                           disabled={generatingLetters}
                           className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-50"
-                          style={{ background: "#e2e8f0", borderColor: C.borderMed, color: GOLD }}
+                          style={{ background: "#e2e8f0", borderColor: "rgba(162,137,89,0.25)", color: GOLD }}
                         >
                           {generatingLetters
                             ? <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 inline-block mr-1.5 animate-spin"><circle cx="8" cy="8" r="6" strokeOpacity="0.25"/><path d="M8 2a6 6 0 016 6" strokeLinecap="round"/></svg>Generating letters via AI…</>
@@ -2403,14 +2403,14 @@ export default function Submissions() {
                               <div className="px-3 py-2.5 flex items-center justify-between border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
                                 <div>
                                   <span className="text-xs font-bold mr-1.5" style={{ color: GOLD }}>Letter {num}</span>
-                                  <span className="text-xs" style={{ color: C.textSec }}>{title}</span>
+                                  <span className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>{title}</span>
                                 </div>
                                 <a
                                   href={`${getApiBase()}/api/admin/student-submissions/${selected.id}/immigration-letters/${num}/view`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-xs px-3 py-1 rounded-lg border font-medium transition-all hover:opacity-80"
-                                  style={{ borderColor: C.borderMed, color: GOLD, background: C.muted }}
+                                  style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.06)" }}
                                 >
                                   ↗ View &amp; Print
                                 </a>
@@ -2425,7 +2425,7 @@ export default function Submissions() {
                         })}
 
                         {lettersData?.generatedAt && (
-                          <p className="text-xs text-center" style={{ color: C.textFaint }}>
+                          <p className="text-xs text-center" style={{ color: "rgba(162,137,89,0.45)" }}>
                             Last generated: {new Date(lettersData.generatedAt).toLocaleString("en-GB")}
                           </p>
                         )}
@@ -2522,16 +2522,16 @@ export default function Submissions() {
 
                 {/* ── MESSAGES TAB ── */}
                 {detailTab === "messages" && (
-                <div className="flex flex-col rounded-2xl border overflow-hidden" style={{ background: "#0a1e10", borderColor: C.borderMed, minHeight: 420 }}>
+                <div className="flex flex-col rounded-2xl border overflow-hidden" style={{ background: "#0a1e10", borderColor: "rgba(162,137,89,0.25)", minHeight: 420 }}>
                   {/* Header */}
-                  <div className="flex items-center justify-between px-5 py-3.5 border-b shrink-0" style={{ borderColor: C.border }}>
+                  <div className="flex items-center justify-between px-5 py-3.5 border-b shrink-0" style={{ borderColor: "rgba(162,137,89,0.18)" }}>
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: "rgba(162,137,89,0.15)", color: "#c4a96e" }}>
                         {selected.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <p className="text-sm font-semibold leading-tight" style={{ color: "#c4a96e" }}>{selected.name}</p>
-                        <p className="text-[11px] leading-tight" style={{ color: C.textFaint }}>Student</p>
+                        <p className="text-[11px] leading-tight" style={{ color: "rgba(162,137,89,0.45)" }}>Student</p>
                       </div>
                     </div>
                     {messageSent === selected.id && !messageForm && (
@@ -2546,7 +2546,7 @@ export default function Submissions() {
                     {adminMessages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full py-10 gap-2">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-10 h-10" style={{ color: "rgba(162,137,89,0.20)" }}><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                        <p className="text-xs" style={{ color: C.textFaint }}>No messages yet</p>
+                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>No messages yet</p>
                       </div>
                     ) : (
                       adminMessages.map(msg => (
@@ -2567,11 +2567,11 @@ export default function Submissions() {
                               style={{
                                 background: msg.fromAdmin ? "rgba(162,137,89,0.14)" : "rgba(255,255,255,0.04)",
                                 border: `1px solid ${msg.fromAdmin ? "rgba(162,137,89,0.25)" : "rgba(162,137,89,0.10)"}`,
-                                color: msg.fromAdmin ? "#c4a96e" : C.textMid,
+                                color: msg.fromAdmin ? "#c4a96e" : "#c4a96e",
                                 borderRadius: msg.fromAdmin ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
                               }}>
                               {msg.subject && !msg.fromAdmin && (
-                                <p className="font-semibold mb-1 text-[11px]" style={{ color: C.textDark }}>{msg.subject}</p>
+                                <p className="font-semibold mb-1 text-[11px]" style={{ color: "#e8d5b0" }}>{msg.subject}</p>
                               )}
                               <p style={{ whiteSpace: "pre-wrap" }}>{msg.body}</p>
                               {msg.attachments?.length > 0 && (
@@ -2594,7 +2594,7 @@ export default function Submissions() {
 
                   {/* Compose */}
                   {selected.status !== "rejected" && (
-                    <div className="shrink-0 border-t px-4 py-3" style={{ borderColor: C.border, background: "#0b1f11" }}>
+                    <div className="shrink-0 border-t px-4 py-3" style={{ borderColor: "rgba(162,137,89,0.18)", background: "#0b1f11" }}>
                       {!messageForm ? (
                         <button onClick={() => setMessageForm({ subject: "Message from HARROWGATE", body: "", attachments: [] })}
                           className="w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all hover:opacity-80"
@@ -2645,7 +2645,7 @@ export default function Submissions() {
                           <div className="flex justify-end">
                             <button onClick={() => setMessageForm(null)}
                               className="text-xs px-3 py-1 rounded-lg transition-all hover:opacity-70"
-                              style={{ color: C.textFaint }}>
+                              style={{ color: "rgba(162,137,89,0.45)" }}>
                               Cancel
                             </button>
                           </div>
@@ -2670,13 +2670,13 @@ export default function Submissions() {
               <p className="text-base font-bold flex items-center gap-2" style={{ color: "#f87171" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9" strokeLinecap="round" strokeLinejoin="round"/></svg>Move {selectedIds.size} Profile{selectedIds.size !== 1 ? "s" : ""} to Trash?</p>
             </div>
             <div className="px-6 py-5">
-              <p className="text-sm mb-6 leading-relaxed" style={{ color: C.textSec }}>
+              <p className="text-sm mb-6 leading-relaxed" style={{ color: "rgba(162,137,89,0.60)" }}>
                 {selectedIds.size === 1 ? "This profile" : `These ${selectedIds.size} profiles`} will be moved to the Trash folder. You can restore or permanently delete them from there.
               </p>
               <div className="flex gap-3">
                 <button onClick={() => setDeleteConfirmOpen(false)} disabled={deletingSelected}
                   className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
-                  style={{ borderColor: C.border, color: C.textMid }}>
+                  style={{ borderColor: "rgba(162,137,89,0.18)", color: "#c4a96e" }}>
                   Cancel
                 </button>
                 <button onClick={handleBulkDelete} disabled={deletingSelected}
@@ -2700,13 +2700,13 @@ export default function Submissions() {
               <p className="text-base font-bold flex items-center gap-2" style={{ color: "#f87171" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M8 3v5M8 10v2" strokeLinecap="round"/><path d="M1.5 13L8 2l6.5 11H1.5z" strokeLinejoin="round"/></svg>Permanently Delete?</p>
             </div>
             <div className="px-6 py-5">
-              <p className="text-sm mb-6 leading-relaxed" style={{ color: C.textSec }}>
+              <p className="text-sm mb-6 leading-relaxed" style={{ color: "rgba(162,137,89,0.60)" }}>
                 This will <strong style={{ color: "#f87171" }}>permanently remove</strong> this student profile, all uploaded documents and messages. <strong style={{ color: "#f87171" }}>This cannot be undone.</strong>
               </p>
               <div className="flex gap-3">
                 <button onClick={() => setPermDeleteConfirmId(null)} disabled={permDeleting}
                   className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
-                  style={{ borderColor: C.border, color: C.textMid }}>
+                  style={{ borderColor: "rgba(162,137,89,0.18)", color: "#c4a96e" }}>
                   Cancel
                 </button>
                 <button onClick={() => permanentDelete(permDeleteConfirmId)} disabled={permDeleting}
@@ -2726,31 +2726,31 @@ export default function Submissions() {
       {showCourses && (
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
           onClick={e => { if (e.target === e.currentTarget) setShowCourses(false); }}>
-          <div className="rounded-2xl border overflow-hidden w-full max-w-3xl mx-4 flex flex-col" style={{ background: C.card, borderColor: C.borderMed, maxHeight: "88vh" }}>
-            <div className="px-6 py-4 border-b flex items-center justify-between gap-3 flex-wrap shrink-0" style={{ borderColor: C.border }}>
+          <div className="rounded-2xl border overflow-hidden w-full max-w-3xl mx-4 flex flex-col" style={{ background: C.card, borderColor: "rgba(162,137,89,0.25)", maxHeight: "88vh" }}>
+            <div className="px-6 py-4 border-b flex items-center justify-between gap-3 flex-wrap shrink-0" style={{ borderColor: "rgba(162,137,89,0.18)" }}>
               <div>
                 <p className="text-base font-bold" style={{ color: GOLD }}>Course Catalogue</p>
-                <p className="text-xs mt-0.5" style={{ color: C.textFaint }}>{COURSES.length} programmes · institution & fees visible to admin only</p>
+                <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.45)" }}>{COURSES.length} programmes · institution & fees visible to admin only</p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: C.muted, border: "1px solid #e5e7eb" }}>
+                <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "rgba(162,137,89,0.06)", border: "1px solid #e5e7eb" }}>
                   {(["masters","bachelors","associate"] as DegreeLevel[]).map(l => (
                     <button key={l} onClick={() => { setCoursesLevel(l); setCoursesSearch(""); }}
                       className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
-                      style={{ background: coursesLevel === l ? C.muted : "transparent", color: coursesLevel === l ? GOLD : C.textFaint }}>
+                      style={{ background: coursesLevel === l ? "rgba(162,137,89,0.12)" : "transparent", color: coursesLevel === l ? GOLD : "rgba(162,137,89,0.45)" }}>
                       {l === "masters" ? "Master's" : l === "bachelors" ? "Bachelor's" : "Associate"}
                     </button>
                   ))}
                 </div>
                 <button onClick={() => setShowCourses(false)} className="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:opacity-70"
-                  style={{ background: C.muted, color: C.textMuted, border: "1px solid #e5e7eb" }}>✕</button>
+                  style={{ background: "rgba(162,137,89,0.06)", color: "rgba(162,137,89,0.55)", border: "1px solid #e5e7eb" }}>✕</button>
               </div>
             </div>
             <div className="px-5 pt-4 pb-2 shrink-0">
               <input value={coursesSearch} onChange={e => setCoursesSearch(e.target.value)}
                 placeholder="Search by programme or institution…"
                 className="w-full text-sm px-4 py-2.5 rounded-xl border bg-transparent outline-none"
-                style={{ borderColor: C.border, color: GOLD, background: C.subtle }}
+                style={{ borderColor: "rgba(162,137,89,0.18)", color: GOLD, background: "#163320" }}
               />
             </div>
             <div className="overflow-y-auto flex-1 px-5 py-3">
@@ -2761,7 +2761,7 @@ export default function Submissions() {
                   c.institution.toLowerCase().includes(coursesSearch.toLowerCase())
                 ));
                 if (filtered.length === 0) return (
-                  <p className="text-sm text-center py-8" style={{ color: C.textFaint }}>No results for "{coursesSearch}"</p>
+                  <p className="text-sm text-center py-8" style={{ color: "rgba(162,137,89,0.45)" }}>No results for "{coursesSearch}"</p>
                 );
                 let lastInst = "";
                 return filtered.map(c => {
@@ -2770,18 +2770,18 @@ export default function Submissions() {
                   return (
                     <div key={c.id}>
                       {showInst && (
-                        <p className="text-xs font-bold tracking-wider uppercase mt-4 mb-1.5 first:mt-0" style={{ color: C.textMuted }}>
+                        <p className="text-xs font-bold tracking-wider uppercase mt-4 mb-1.5 first:mt-0" style={{ color: "rgba(162,137,89,0.55)" }}>
                           {c.institution}
                         </p>
                       )}
                       <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 mb-1.5 border"
-                        style={{ background: C.subtle, borderColor: C.borderFaint }}>
+                        style={{ background: "#163320", borderColor: "rgba(162,137,89,0.10)" }}>
                         <div className="flex items-center gap-2.5 min-w-0">
                           <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: GOLD }} />
-                          <span className="text-sm leading-snug truncate" style={{ color: C.textDark }}>{c.programme}</span>
+                          <span className="text-sm leading-snug truncate" style={{ color: "#e8d5b0" }}>{c.programme}</span>
                         </div>
                         <span className="text-xs font-semibold shrink-0 px-2.5 py-1 rounded-full"
-                          style={{ background: C.muted, color: GOLD }}>
+                          style={{ background: "rgba(162,137,89,0.06)", color: GOLD }}>
                           {typeof c.annualFeeHKD === "number" ? `HKD ${c.annualFeeHKD.toLocaleString()}` : `HKD ${c.annualFeeHKD}`}
                         </span>
                       </div>
@@ -2790,8 +2790,8 @@ export default function Submissions() {
                 });
               })()}
             </div>
-            <div className="px-5 py-3 border-t shrink-0" style={{ borderColor: C.borderFaint }}>
-              <p className="text-xs" style={{ color: C.borderMed }}>
+            <div className="px-5 py-3 border-t shrink-0" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
+              <p className="text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>
                 {LEVEL_LABELS[coursesLevel]} · Annual fees shown · Institution names & fees are hidden from students
               </p>
             </div>
@@ -2802,29 +2802,29 @@ export default function Submissions() {
       {/* ── Live View Modal ─────────────────────────────────────────── */}
       {liveViewOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.85)" }}>
-          <div className="rounded-2xl border flex flex-col overflow-hidden" style={{ width: "min(90vw, 1100px)", maxHeight: "90vh", background: C.card, borderColor: C.borderMed }}>
+          <div className="rounded-2xl border flex flex-col overflow-hidden" style={{ width: "min(90vw, 1100px)", maxHeight: "90vh", background: C.card, borderColor: "rgba(162,137,89,0.25)" }}>
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b shrink-0" style={{ borderColor: C.border }}>
+            <div className="flex items-center justify-between px-5 py-3 border-b shrink-0" style={{ borderColor: "rgba(162,137,89,0.18)" }}>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5">
                   <span className="inline-block w-2 h-2 rounded-full" style={{ background: liveViewStatus === "streaming" ? "#f0d28c" : liveViewStatus === "waiting" ? GOLD : "#f87171", boxShadow: liveViewStatus === "streaming" ? "0 0 6px #f0d28c" : "none" }} />
                   <span className="text-sm font-semibold" style={{ color: GOLD }}>Live View</span>
                 </div>
-                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: C.muted, color: C.textSec }}>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(162,137,89,0.06)", color: "rgba(162,137,89,0.60)" }}>
                   {liveViewStatus === "connecting" && "Connecting…"}
                   {liveViewStatus === "waiting" && "Waiting for student…"}
                   {liveViewStatus === "streaming" && "Streaming"}
                   {liveViewStatus === "offline" && "Student offline"}
                 </span>
               </div>
-              <button onClick={closeLiveView} className="w-7 h-7 rounded-lg flex items-center justify-center text-lg leading-none hover:opacity-70" style={{ background: C.muted, color: C.textMuted }}>×</button>
+              <button onClick={closeLiveView} className="w-7 h-7 rounded-lg flex items-center justify-center text-lg leading-none hover:opacity-70" style={{ background: "rgba(162,137,89,0.06)", color: "rgba(162,137,89,0.55)" }}>×</button>
             </div>
             {/* Canvas area */}
             <div className="flex-1 overflow-auto flex items-center justify-center p-4" style={{ minHeight: 300 }}>
               {liveViewStatus === "streaming" ? (
                 <canvas ref={liveViewCanvasRef} className="rounded-xl w-full" style={{ maxWidth: "100%", border: "1px solid #e5e7eb" }} />
               ) : (
-                <div className="flex flex-col items-center gap-4" style={{ color: C.textFaint }}>
+                <div className="flex flex-col items-center gap-4" style={{ color: "rgba(162,137,89,0.45)" }}>
                   <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-16 h-16 opacity-40">
                     <ellipse cx="24" cy="24" rx="20" ry="14" />
                     <circle cx="24" cy="24" r="5" />
@@ -2839,7 +2839,7 @@ export default function Submissions() {
               )}
             </div>
             {/* Footer note */}
-            <div className="px-5 py-2.5 border-t shrink-0 text-xs" style={{ borderColor: C.borderFaint, color: C.borderMed }}>
+            <div className="px-5 py-2.5 border-t shrink-0 text-xs" style={{ borderColor: "rgba(162,137,89,0.10)", color: "rgba(162,137,89,0.45)" }}>
               The student sees a "Being watched" banner and can stop sharing at any time. Frames are not recorded.
             </div>
           </div>
@@ -2978,7 +2978,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           {aiGenerated && (
-            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: C.subtle, color: GOLD }}>✨ AI pre-filled</span>
+            <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#163320", color: GOLD }}>✨ AI pre-filled</span>
           )}
           {Object.values(formData).some(v => v) && !aiGenerated && (
             <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "rgba(162,137,89,0.08)", color: "#f0d28c" }}>Manually edited</span>
@@ -2987,7 +2987,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
         <div className="flex gap-2">
           <button onClick={handleGenerate} disabled={generating}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border font-medium transition-all hover:opacity-80 disabled:opacity-40"
-            style={{ borderColor: C.borderMed, color: GOLD, background: C.muted }}>
+            style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>
             {generating
               ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: GOLD, borderTopColor: "transparent" }} /> Generating…</>
               : "✨ AI Auto-fill"}
@@ -3000,24 +3000,24 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
         </div>
       </div>
 
-      <p className="text-xs" style={{ color: C.textMuted }}>
+      <p className="text-xs" style={{ color: "rgba(162,137,89,0.55)" }}>
         Click <strong style={{ color: GOLD }}>✨ AI Auto-fill</strong> to extract details from the student's documents automatically, then review and edit any fields before downloading the PDF.
       </p>
 
       {sections.map(section => (
         <div key={section} className="space-y-2">
-          <div className="px-3 py-1.5 rounded-lg" style={{ background: C.muted }}>
+          <div className="px-3 py-1.5 rounded-lg" style={{ background: "rgba(162,137,89,0.06)" }}>
             <p className="text-xs font-semibold tracking-wide uppercase" style={{ color: GOLD }}>Part A — {section}</p>
           </div>
           {FORM_FIELDS.filter(f => f.section === section).map(field => (
             <div key={field.key} className="grid grid-cols-[180px_1fr] gap-2 items-center">
-              <label className="text-xs text-right pr-2" style={{ color: C.textMid }}>{field.label}</label>
+              <label className="text-xs text-right pr-2" style={{ color: "#c4a96e" }}>{field.label}</label>
               {field.type === "select" ? (
                 <select
                   value={formData[field.key] || ""}
                   onChange={e => setFormData(d => ({ ...d, [field.key]: e.target.value }))}
                   className="rounded-lg px-2.5 py-1.5 text-xs border outline-none"
-                  style={{ background: C.muted, borderColor: C.border, color: GOLD }}>
+                  style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }}>
                   <option value="">— select —</option>
                   {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
@@ -3026,7 +3026,7 @@ function Id995aPanel({ submissionId, apiBase, C, GOLD }: { submissionId: number;
                   value={formData[field.key] || ""}
                   onChange={e => setFormData(d => ({ ...d, [field.key]: e.target.value }))}
                   className="rounded-lg px-2.5 py-1.5 text-xs border outline-none"
-                  style={{ background: C.muted, borderColor: C.border, color: GOLD }} />
+                  style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: GOLD }} />
               )}
             </div>
           ))}
@@ -3050,21 +3050,21 @@ function DocRow({ doc, label, onPreview, onDownload, onDelete, isActive, tagColo
   C: Record<string, string>; GOLD: string;
 }) {
   return (
-    <div className="rounded-xl border transition-all" style={{ background: isActive ? C.muted : C.subtle, borderColor: isActive ? C.borderMed : C.border }}>
+    <div className="rounded-xl border transition-all" style={{ background: isActive ? "rgba(162,137,89,0.08)" : "#163320", borderColor: isActive ? "rgba(162,137,89,0.25)" : "rgba(162,137,89,0.18)" }}>
       <div className="px-4 py-3 flex items-center gap-3">
         <span className="text-xl shrink-0">{fileIcon(doc.fileName, doc.mimeType)}</span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate" style={{ color: GOLD }}>{doc.fileName}</p>
-          <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>{label}</p>
+          <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.55)" }}>{label}</p>
         </div>
         <span className="text-xs px-2 py-0.5 rounded-full shrink-0 font-medium" style={{ background: tagColor, color: tagTextColor }}>{tag}</span>
         <div className="flex items-center gap-1 shrink-0">
           <button onClick={onPreview} className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-all hover:opacity-80"
-            style={{ background: isActive ? C.muted : "transparent", borderColor: C.borderMed, color: GOLD }}>
+            style={{ background: isActive ? "rgba(162,137,89,0.08)" : "transparent", borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>
             {isActive ? "Hide" : "View"}
           </button>
           <button onClick={onDownload} className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-all hover:opacity-80"
-            style={{ borderColor: C.borderMed, color: GOLD }}>↓</button>
+            style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD }}>↓</button>
           <button onClick={onDelete} className="px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all hover:opacity-80"
             style={{ borderColor: "rgba(248,113,113,0.2)", color: "#f87171" }}>✕</button>
         </div>
