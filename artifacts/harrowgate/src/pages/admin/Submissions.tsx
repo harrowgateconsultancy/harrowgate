@@ -32,6 +32,8 @@ type Submission = {
   sharedEmailPassword?: string | null;
   customBankDetails?: { bankName: string; accountName: string; accountNumber: string; fps: string; additionalInfo: string } | null;
   programmeType?: string | null;
+  termsAcceptedAt?: string | null;
+  termsSignatureUrl?: string | null;
 };
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -1703,6 +1705,52 @@ export default function Submissions() {
                     </div>
                   </div>
                 )}
+
+                {/* ── Terms & Conditions Card ── */}
+                <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: selected.termsAcceptedAt ? "rgba(162,137,89,0.25)" : "rgba(162,137,89,0.12)" }}>
+                  <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: selected.termsAcceptedAt ? "rgba(162,137,89,0.15)" : "rgba(162,137,89,0.06)", color: selected.termsAcceptedAt ? "#f0d28c" : "rgba(162,137,89,0.40)" }}>
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
+                        <rect x="2" y="1" width="12" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h3"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold" style={{ color: selected.termsAcceptedAt ? "#f0d28c" : "rgba(162,137,89,0.45)" }}>Terms &amp; Conditions</p>
+                      {selected.termsAcceptedAt ? (
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.60)" }}>
+                          Signed on {new Date(selected.termsAcceptedAt).toLocaleString("en-HK", { dateStyle: "medium", timeStyle: "short" })}
+                        </p>
+                      ) : (
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.38)" }}>Not yet signed</p>
+                      )}
+                    </div>
+                    {selected.termsAcceptedAt && (
+                      <div className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: "rgba(34,197,94,0.10)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.20)" }}>
+                        <svg viewBox="0 0 12 10" fill="none" className="w-3 h-3">
+                          <path d="M1 5l3.5 3.5L11 1" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Signed
+                      </div>
+                    )}
+                  </div>
+                  {selected.termsAcceptedAt && selected.termsSignatureUrl && (
+                    <div className="px-4 py-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "rgba(162,137,89,0.55)" }}>Student Signature</p>
+                      <div className="rounded-xl border overflow-hidden flex items-center justify-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.18)", padding: "12px 16px" }}>
+                        <img
+                          src={selected.termsSignatureUrl}
+                          alt="Student signature"
+                          style={{ maxWidth: "100%", maxHeight: 100, objectFit: "contain", filter: "sepia(1) saturate(3) hue-rotate(5deg) brightness(0.9)" }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {!selected.termsAcceptedAt && (
+                    <div className="px-4 py-4">
+                      <p className="text-xs" style={{ color: "rgba(162,137,89,0.38)" }}>The student has not yet signed the Terms &amp; Conditions. This step is required before their first payment is processed.</p>
+                    </div>
+                  )}
+                </div>
 
                 {/* Notes */}
                 <div>
