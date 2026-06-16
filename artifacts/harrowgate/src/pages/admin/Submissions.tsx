@@ -191,8 +191,8 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
   if (!isLoading && items.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: pending.length > 0 ? "rgba(251,146,60,0.35)" : C.border }}>
-      <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: pending.length > 0 ? "rgba(251,146,60,0.2)" : C.borderFaint }}>
+    <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: pending.length > 0 ? "rgba(251,146,60,0.35)" : "rgba(162,137,89,0.18)" }}>
+      <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: pending.length > 0 ? "rgba(251,146,60,0.2)" : "rgba(162,137,89,0.10)" }}>
         <div className="flex items-center gap-2">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0" style={{ color: pending.length > 0 ? "#fb923c" : "#a28959" }}><path d="M2 10V13h11V10" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 9V1M5 4l3-3 3 3" strokeLinecap="round" strokeLinejoin="round"/></svg>
           <p className="text-sm font-semibold" style={{ color: pending.length > 0 ? "#fb923c" : GOLD }}>Student Outbox</p>
@@ -1750,33 +1750,33 @@ export default function Submissions() {
                 {detailTab === "settings" && (<div className="space-y-6">
                 {/* Shared Application Email — visible for acknowledged and beyond */}
                 {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
-                    <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: C.border }}>
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.08)", color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg></div>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.18)" }}>
+                    <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.10)", color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 6l7 4 7-4" strokeLinecap="round"/></svg></div>
                       <div>
-                        <p className="text-sm font-semibold" style={{ color: GOLD }}>Shared Application Email</p>
-                        <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>Gmail account shared between you and the student for HK university applications</p>
+                        <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>Shared Application Email</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.60)" }}>Gmail account shared between you and the student for HK university applications</p>
                       </div>
                     </div>
                     <div className="px-4 py-4 space-y-3">
                       {selected.sharedEmail && (
-                        <div className="rounded-xl px-4 py-3 border space-y-2" style={{ background: C.muted, borderColor: C.borderMed }}>
+                        <div className="rounded-xl px-4 py-3 border space-y-2" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)" }}>
                           <div className="flex items-center justify-between gap-3">
                             <div className="min-w-0">
-                              <p className="text-xs font-medium mb-0.5" style={{ color: C.textMuted }}>Email address</p>
-                              <p className="text-sm font-mono font-semibold truncate" style={{ color: GOLD }}>{selected.sharedEmail}</p>
+                              <p className="text-xs font-medium mb-0.5" style={{ color: "rgba(162,137,89,0.60)" }}>Email address</p>
+                              <p className="text-sm font-mono font-semibold truncate" style={{ color: "#f0d28c" }}>{selected.sharedEmail}</p>
                             </div>
                             <a href={`https://mail.google.com/mail/u/0/?authuser=${selected.sharedEmail}`} target="_blank" rel="noopener noreferrer"
                               className="shrink-0 text-xs px-3 py-1.5 rounded-lg border font-medium transition-all hover:opacity-80 flex items-center gap-1"
-                              style={{ borderColor: C.borderMed, color: GOLD, background: C.muted }}>
+                              style={{ borderColor: "rgba(162,137,89,0.22)", color: "#c4a96e", background: "rgba(162,137,89,0.06)" }}>
                               Open Gmail ↗
                             </a>
                           </div>
                           {selected.sharedEmailPassword && (
                             <div className="flex items-center gap-3">
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium mb-0.5" style={{ color: C.textMuted }}>App Password</p>
-                                <p className="text-sm font-mono" style={{ color: GOLD }}>{selected.sharedEmailPassword}</p>
+                                <p className="text-xs font-medium mb-0.5" style={{ color: "rgba(162,137,89,0.60)" }}>App Password</p>
+                                <p className="text-sm font-mono" style={{ color: "#c4a96e" }}>{selected.sharedEmailPassword}</p>
                               </div>
                             </div>
                           )}
@@ -1789,7 +1789,7 @@ export default function Submissions() {
                           value={sharedEmailForm.email}
                           onChange={e => setSharedEmailForm(f => ({ ...f, email: e.target.value }))}
                           className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none font-mono"
-                          style={{ background: C.muted, borderColor: C.border, color: GOLD }}
+                          style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.14)", color: "#c4a96e" }}
                         />
                         <div className="relative">
                           <input
@@ -1798,11 +1798,11 @@ export default function Submissions() {
                             value={sharedEmailForm.password}
                             onChange={e => setSharedEmailForm(f => ({ ...f, password: e.target.value }))}
                             className="w-full rounded-xl px-3 py-2.5 pr-10 text-sm border outline-none font-mono"
-                            style={{ background: C.muted, borderColor: C.border, color: GOLD }}
+                            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.14)", color: "#c4a96e" }}
                           />
                           <button type="button" onClick={() => setSharedEmailShowPw(v => !v)}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
-                            style={{ color: C.textMuted }}>
+                            style={{ color: "rgba(162,137,89,0.55)" }}>
                             {sharedEmailShowPw ? "Hide" : "Show"}
                           </button>
                         </div>
@@ -1810,7 +1810,7 @@ export default function Submissions() {
                           onClick={handleSaveSharedEmail}
                           disabled={savingSharedEmail || (!sharedEmailForm.email && !sharedEmailForm.password)}
                           className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
-                          style={{ background: C.subtle, borderColor: C.borderMed, color: GOLD }}>
+                          style={{ background: "#163320", borderColor: "rgba(162,137,89,0.22)", color: "#c4a96e" }}>
                           {savingSharedEmail ? "Saving…" : sharedEmailSaved ? "✓ Saved" : selected.sharedEmail ? "Update Credentials" : "Set Credentials"}
                         </button>
                       </div>
@@ -1820,17 +1820,17 @@ export default function Submissions() {
 
                 {/* Programme Type Selector */}
                 {!["pending","rejected"].includes(selected.status) && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
-                    <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: C.border }}>
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.08)", color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M8 2L1 6l7 4 7-4-7-4z" strokeLinejoin="round"/><path d="M3 8v4c0 1.1 2.24 2 5 2s5-.9 5-2V8" strokeLinecap="round"/></svg></div>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.18)" }}>
+                    <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.10)", color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M8 2L1 6l7 4 7-4-7-4z" strokeLinejoin="round"/><path d="M3 8v4c0 1.1 2.24 2 5 2s5-.9 5-2V8" strokeLinecap="round"/></svg></div>
                       <div>
-                        <p className="text-sm font-semibold" style={{ color: GOLD }}>Programme Type</p>
-                        <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>Assign a programme level — filters the payment amounts shown to this student.</p>
+                        <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>Programme Type</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.60)" }}>Assign a programme level — filters the payment amounts shown to this student.</p>
                       </div>
                     </div>
                     <div className="px-4 py-4 space-y-3">
                       {selected.programmeType && (
-                        <div className="rounded-xl px-4 py-2 border" style={{ background: C.muted, borderColor: "rgba(162,137,89,0.20)" }}>
+                        <div className="rounded-xl px-4 py-2 border" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)" }}>
                           <p className="text-xs font-semibold flex items-center gap-1" style={{ color: "#f0d28c" }}>
                             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Currently assigned: {
                               selected.programmeType === "masters" ? "Master's Degree"
@@ -1854,9 +1854,9 @@ export default function Submissions() {
                             disabled={savingProgramme}
                             className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all hover:opacity-85 disabled:opacity-40"
                             style={{
-                              background: selected.programmeType === value ? "rgba(31,125,83,0.18)" : C.muted,
-                              borderColor: selected.programmeType === value ? GOLD : C.border,
-                              color: selected.programmeType === value ? GOLD : C.textMuted,
+                              background: selected.programmeType === value ? "rgba(162,137,89,0.18)" : "rgba(162,137,89,0.06)",
+                              borderColor: selected.programmeType === value ? "#c4a96e" : "rgba(162,137,89,0.16)",
+                              color: selected.programmeType === value ? "#f0d28c" : "rgba(162,137,89,0.60)",
                             }}>
                             {label}
                           </button>
@@ -1872,30 +1872,30 @@ export default function Submissions() {
                         )}
                       </div>
                       {programmeSaved && <p className="text-xs" style={{ color: "#f0d28c" }}>✓ Saved</p>}
-                      {savingProgramme && <p className="text-xs" style={{ color: C.textFaint }}>Saving…</p>}
+                      {savingProgramme && <p className="text-xs" style={{ color: "rgba(162,137,89,0.40)" }}>Saving…</p>}
                     </div>
                   </div>
                 )}
 
                 {/* Per-Student Dedicated Bank Account */}
                 {["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
-                  <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
-                    <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: C.border }}>
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.08)", color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M2 14h12M3 14V8M6 14V8M10 14V8M13 14V8M8 2l6 4H2l6-4z" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.18)" }}>
+                    <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.10)", color: "#c4a96e" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M2 14h12M3 14V8M6 14V8M10 14V8M13 14V8M8 2l6 4H2l6-4z" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
                       <div>
-                        <p className="text-sm font-semibold" style={{ color: GOLD }}>Dedicated Bank Account</p>
-                        <p className="text-xs mt-0.5" style={{ color: C.textMuted }}>Override the global bank details for this student. Shown on their payment page immediately.</p>
+                        <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>Dedicated Bank Account</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.60)" }}>Override the global bank details for this student. Shown on their payment page immediately.</p>
                       </div>
                     </div>
                     <div className="px-4 py-4 space-y-3">
                       {selected.customBankDetails && (selected.customBankDetails.bankName || selected.customBankDetails.accountNumber) && (
-                        <div className="rounded-xl px-4 py-3 border space-y-1.5" style={{ background: C.muted, borderColor: "rgba(162,137,89,0.20)" }}>
+                        <div className="rounded-xl px-4 py-3 border space-y-1.5" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)" }}>
                           <p className="text-xs font-semibold mb-2 flex items-center gap-1" style={{ color: "#f0d28c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3 h-3 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Custom account active</p>
-                          {selected.customBankDetails.bankName && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Bank</span><span className="font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.bankName}</span></div>}
-                          {selected.customBankDetails.accountName && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Account Name</span><span className="font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.accountName}</span></div>}
-                          {selected.customBankDetails.accountNumber && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>Account No.</span><span className="font-mono font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.accountNumber}</span></div>}
-                          {selected.customBankDetails.fps && <div className="flex justify-between text-xs"><span style={{ color: C.textMuted }}>FPS</span><span className="font-mono font-semibold" style={{ color: GOLD }}>{selected.customBankDetails.fps}</span></div>}
-                          {selected.customBankDetails.additionalInfo && <div className="flex justify-between text-xs gap-4"><span style={{ color: C.textMuted }}>Note</span><span className="text-right" style={{ color: GOLD }}>{selected.customBankDetails.additionalInfo}</span></div>}
+                          {selected.customBankDetails.bankName && <div className="flex justify-between text-xs"><span style={{ color: "rgba(162,137,89,0.60)" }}>Bank</span><span className="font-semibold" style={{ color: "#c4a96e" }}>{selected.customBankDetails.bankName}</span></div>}
+                          {selected.customBankDetails.accountName && <div className="flex justify-between text-xs"><span style={{ color: "rgba(162,137,89,0.60)" }}>Account Name</span><span className="font-semibold" style={{ color: "#c4a96e" }}>{selected.customBankDetails.accountName}</span></div>}
+                          {selected.customBankDetails.accountNumber && <div className="flex justify-between text-xs"><span style={{ color: "rgba(162,137,89,0.60)" }}>Account No.</span><span className="font-mono font-semibold" style={{ color: "#c4a96e" }}>{selected.customBankDetails.accountNumber}</span></div>}
+                          {selected.customBankDetails.fps && <div className="flex justify-between text-xs"><span style={{ color: "rgba(162,137,89,0.60)" }}>FPS</span><span className="font-mono font-semibold" style={{ color: "#c4a96e" }}>{selected.customBankDetails.fps}</span></div>}
+                          {selected.customBankDetails.additionalInfo && <div className="flex justify-between text-xs gap-4"><span style={{ color: "rgba(162,137,89,0.60)" }}>Note</span><span className="text-right" style={{ color: "#c4a96e" }}>{selected.customBankDetails.additionalInfo}</span></div>}
                         </div>
                       )}
                       <div className="space-y-2">
@@ -1913,14 +1913,14 @@ export default function Submissions() {
                             value={customBankForm[field]}
                             onChange={e => setCustomBankForm(f => ({ ...f, [field]: e.target.value }))}
                             className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none"
-                            style={{ background: C.muted, borderColor: C.border, color: GOLD }}
+                            style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.14)", color: "#c4a96e" }}
                           />
                         ))}
                         <button
                           onClick={() => handleSaveCustomBank()}
                           disabled={savingCustomBank || (!customBankForm.bankName && !customBankForm.accountNumber)}
                           className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
-                          style={{ background: C.subtle, borderColor: C.borderMed, color: GOLD }}>
+                          style={{ background: "#163320", borderColor: "rgba(162,137,89,0.22)", color: "#c4a96e" }}>
                           {savingCustomBank ? "Saving…" : customBankSaved ? "✓ Saved" : selected.customBankDetails ? "Update Bank Details" : "Set Bank Details"}
                         </button>
                         {selected.customBankDetails && (
