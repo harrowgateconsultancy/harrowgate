@@ -668,6 +668,9 @@ export default function Portal() {
   const [showLangPicker, setShowLangPicker] = useState(false);
   const langPickerRef = useRef<HTMLDivElement | null>(null);
   const [activeTab, setActiveTab] = useState<"home" | "progress" | "documents" | "messages">("home");
+
+  const hasFirstPayment = (s: string) =>
+    !["pending", "approved", "docs_requested", "payment_pending"].includes(s);
   const [emailUnreadCount, setEmailUnreadCount] = useState(0);
 
   // Screen share state
@@ -1007,13 +1010,17 @@ export default function Portal() {
               { id: "messages",  label: "Messages",  badge: totalUnread },
             ] as { id: "home"|"progress"|"documents"|"messages"; label: string; badge?: number }[]).map(tab => {
               const isActive = activeTab === tab.id;
+              const isLocked = tab.id === "progress" && !hasFirstPayment(submission.status);
               return (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                <button key={tab.id}
+                  onClick={() => { if (!isLocked) setActiveTab(tab.id); }}
+                  disabled={isLocked}
+                  title={isLocked ? "Available after your first payment is confirmed" : undefined}
                   className="relative flex items-center justify-center gap-2 px-6 py-3 font-bold tracking-wide transition-all group"
-                  onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "#f0d28c"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(196,169,110,0.08)"; (e.currentTarget as HTMLButtonElement).style.textShadow = "0 0 18px rgba(240,210,140,0.55)"; } }}
-                  onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLButtonElement).style.color = "rgba(232,218,180,0.55)"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; (e.currentTarget as HTMLButtonElement).style.textShadow = "none"; } }}
+                  onMouseEnter={e => { if (!isActive && !isLocked) { (e.currentTarget as HTMLButtonElement).style.color = "#f0d28c"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(196,169,110,0.08)"; (e.currentTarget as HTMLButtonElement).style.textShadow = "0 0 18px rgba(240,210,140,0.55)"; } }}
+                  onMouseLeave={e => { if (!isActive && !isLocked) { (e.currentTarget as HTMLButtonElement).style.color = "rgba(232,218,180,0.55)"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; (e.currentTarget as HTMLButtonElement).style.textShadow = "none"; } }}
                   style={{
-                    color: isActive ? "#ffffff" : "rgba(232,218,180,0.55)",
+                    color: isLocked ? "rgba(232,218,180,0.22)" : isActive ? "#ffffff" : "rgba(232,218,180,0.55)",
                     borderBottom: `2px solid ${isActive ? "#f0d28c" : "transparent"}`,
                     background: isActive
                       ? "linear-gradient(180deg, rgba(240,210,140,0.18) 0%, rgba(196,169,110,0.06) 100%)"
@@ -1022,8 +1029,15 @@ export default function Portal() {
                     textTransform: "uppercase",
                     fontSize: "0.72rem",
                     textShadow: isActive ? "0 0 20px rgba(240,210,140,0.6)" : "none",
+                    cursor: isLocked ? "not-allowed" : "pointer",
                   }}>
                   {tab.label}
+                  {isLocked && (
+                    <svg viewBox="0 0 12 14" fill="none" style={{ width: 10, height: 10, opacity: 0.35 }}>
+                      <rect x="1" y="6" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.4"/>
+                      <path d="M3.5 6V4a2.5 2.5 0 015 0v2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                    </svg>
+                  )}
                   {tab.badge != null && tab.badge > 0 && (
                     <span className="min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-black flex items-center justify-center"
                       style={{ background: "#c4a96e", color: "#0b2213" }}>
@@ -1167,7 +1181,7 @@ export default function Portal() {
                   <p className="text-3xl font-bold tracking-widest font-mono" style={{ color: "#f0d28c" }}>STU{submission.passportNumber.slice(-4).toUpperCase()}</p>
                   <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.45)" }}>{t("s.ackCodeNote")}</p>
                 </div>
-                <button onClick={() => { setShowTimeline(true); setActiveTab("progress"); }}
+                <button onClick={() => { if (hasFirstPayment(submission.status)) { setShowTimeline(true); setActiveTab("progress"); } }}
                   className="px-8 py-3 rounded-full text-sm font-semibold border transition-all hover:opacity-80"
                   style={{ borderColor: "rgba(162,137,89,0.35)", color: "#f0d28c", background: "rgba(162,137,89,0.08)" }}>
                   View Progress →
