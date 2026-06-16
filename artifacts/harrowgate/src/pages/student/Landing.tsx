@@ -803,8 +803,9 @@ export default function Landing() {
             <Reveal idx={40} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase mb-6" style={{ color: LABEL_COLOR }}>{t("cta.label")}</p></Reveal>
             <Reveal idx={41} visible={visible} setRef={setRef} delay={80}>
               <h2 className="text-4xl md:text-5xl font-bold mb-5"
-                style={{ background: `linear-gradient(135deg, #c4a96e 0%, ${GOLD} 50%, rgba(162,137,89,0.6) 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                {t("cta.heading")}
+                style={{ background: `linear-gradient(135deg, #c4a96e 0%, ${GOLD} 50%, rgba(162,137,89,0.6) 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", paddingBottom: "0.2em", lineHeight: 1.2 }}>
+                Ready to begin your journey to{" "}
+                <span style={{ whiteSpace: "nowrap" }}>Hong Kong?</span>
               </h2>
             </Reveal>
             <Reveal idx={42} visible={visible} setRef={setRef} delay={140}><p className="mb-10 text-base leading-relaxed" style={{ color: GOLD_DIM }}>{t("cta.sub")}</p></Reveal>
