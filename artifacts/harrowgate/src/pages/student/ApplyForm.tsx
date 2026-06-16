@@ -664,7 +664,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
 
         {/* Agent Code (optional) */}
         {approvedAgents.length > 0 && (
-          <div className="rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
+          <div className="rounded-2xl border" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.15)" }}>
             <div className="px-6 py-4 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
               <h2 className="text-base font-semibold" style={{ color: GOLD }}>Agent Referral <span className="font-normal text-xs ml-1" style={{ color: "rgba(232,218,180,0.82)" }}>(optional)</span></h2>
               <p className="text-xs mt-0.5" style={{ color: "rgba(232,218,180,0.82)" }}>Were you referred by a HARROWGATE partner agent?</p>
