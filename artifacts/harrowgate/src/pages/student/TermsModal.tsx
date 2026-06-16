@@ -383,7 +383,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
                 <canvas
                   ref={canvasRef}
                   width={600}
-                  height={120}
+                  height={200}
                   onMouseDown={startDraw}
                   onMouseMove={draw}
                   onMouseUp={stopDraw}
@@ -392,7 +392,7 @@ export default function TermsModal({ submissionId, studentName, authHeaders, onA
                   onTouchMove={draw}
                   onTouchEnd={stopDraw}
                   style={{
-                    width: "100%", height: 120,
+                    width: "100%", height: 200,
                     border: `1.5px dashed ${hasSigned ? "rgba(162,137,89,0.5)" : "rgba(162,137,89,0.25)"}`,
                     borderRadius: 10,
                     background: "rgba(162,137,89,0.04)",
