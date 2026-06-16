@@ -4,9 +4,11 @@ import type { Submission } from "./Portal";
 import TermsModal from "./TermsModal";
 import { usePricing } from "../../hooks/usePricing";
 
-const BG = "#0b2213";
-const GOLD = "#a28959";
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BG   = "#0b2213";
+const GOLD  = "#a28959";
+const GOLD_B = "#c4a96e";
+const GOLD_L = "#f0d28c";
+const BASE  = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
 
 interface BankDetails {
@@ -58,26 +60,24 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
   };
 
   const isSecond = paymentType === "second";
-  const isFinal = paymentType === "final";
+  const isFinal  = paymentType === "final";
 
-  const docType = isFinal ? "final_payment_receipt" : isSecond ? "second_payment_receipt" : "payment_receipt";
-  const endpoint = isFinal ? "receipt3" : isSecond ? "receipt2" : "receipt";
-
+  const docType       = isFinal ? "final_payment_receipt" : isSecond ? "second_payment_receipt" : "payment_receipt";
+  const endpoint      = isFinal ? "receipt3" : isSecond ? "receipt2" : "receipt";
   const existingReceipt = submission.documents.find(d => d.documentType === docType);
   const alreadySubmitted = isFinal
-    ? (submission.status === "final_payment_received" || submission.status === "final_payment_confirmed")
+    ? (submission.status === "final_payment_received"  || submission.status === "final_payment_confirmed")
     : isSecond
     ? (submission.status === "second_payment_received" || submission.status === "second_payment_confirmed")
-    : (submission.status === "payment_received" || submission.status === "acknowledged");
+    : (submission.status === "payment_received"        || submission.status === "acknowledged");
 
-  const title = isFinal ? "Final Payment Required" : isSecond ? "2nd Service Payment" : "Service Payment";
+  const title    = isFinal ? "Final Payment Required" : isSecond ? "2nd Service Payment" : "Service Payment";
   const subtitle = isFinal
     ? "A final payment is required to collect your official university offer letter."
     : isSecond
     ? "A second payment is required before proceeding to your university interview."
     : "Your application has been approved — please complete payment to proceed.";
-
-  const stepNum = isFinal ? "3rd" : isSecond ? "2nd" : "1st";
+  const stepNum  = isFinal ? "3rd" : isSecond ? "2nd" : "1st";
 
   const handleReceiptUpload = async (file: File) => {
     setUploading(true); setError(null);
@@ -110,12 +110,12 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
 
   return (
     <div className="space-y-4">
-      {/* Header card */}
-      <div className="rounded-2xl overflow-hidden border" style={{ background: "rgba(0,0,0,0.3)", borderColor: "rgba(251,146,60,0.18)" }}>
-        <div className="h-0.5" style={{ background: "linear-gradient(to right, transparent, rgba(251,146,60,0.6), transparent)" }} />
+      {/* ── Header card ── */}
+      <div className="rounded-2xl overflow-hidden border" style={{ background: "rgba(0,0,0,0.35)", borderColor: "rgba(162,137,89,0.30)" }}>
+        <div className="h-0.5" style={{ background: `linear-gradient(to right, transparent, ${GOLD_B}, transparent)` }} />
         <div className="px-6 py-5 flex items-start gap-4">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
+            style={{ background: "rgba(162,137,89,0.14)", color: GOLD_L }}>
             <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
               <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
               <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
@@ -123,116 +123,129 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>{title}</h3>
+              <h3 className="text-base font-semibold" style={{ color: GOLD_L }}>{title}</h3>
               <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                style={{ background: "rgba(251,146,60,0.1)", color: "#fb923c" }}>
+                style={{ background: "rgba(162,137,89,0.12)", color: GOLD_B }}>
                 {stepNum} payment
               </span>
             </div>
-            <p className="text-sm mt-1 leading-relaxed" style={{ color: "rgba(251,146,60,0.55)" }}>{subtitle}</p>
+            <p className="text-sm mt-1 leading-relaxed" style={{ color: "rgba(162,137,89,0.65)" }}>{subtitle}</p>
           </div>
         </div>
       </div>
 
       {!alreadySubmitted ? (
         <>
-          {/* Steps */}
+          {/* ── Steps ── */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { n: "1", title: "Review Bank Details", body: "Bank details are shown below. Use Bank Transfer or FPS to make the payment." },
-              { n: "2", title: "Make the Transfer", body: "Pay via Bank Transfer or FPS. Reference your full name on the transfer." },
-              { n: "3", title: "Upload Your Receipt", body: "Take a screenshot of your payment confirmation and upload it below." },
+              { n: "2", title: "Make the Transfer",   body: "Pay via Bank Transfer or FPS. Reference your full name on the transfer."  },
+              { n: "3", title: "Upload Your Receipt", body: "Take a screenshot of your payment confirmation and upload it below."      },
             ].map(step => (
               <div key={step.n} className="rounded-2xl p-4 border"
-                style={{ background: "rgba(251,146,60,0.04)", borderColor: "rgba(251,146,60,0.12)" }}>
+                style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold mb-3"
-                  style={{ background: "rgba(251,146,60,0.12)", color: "#fb923c" }}>
+                  style={{ background: "rgba(162,137,89,0.14)", color: GOLD_B }}>
                   {step.n}
                 </div>
-                <p className="text-sm font-semibold mb-1" style={{ color: "#fb923c" }}>{step.title}</p>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(251,146,60,0.5)" }}>{step.body}</p>
+                <p className="text-sm font-semibold mb-1" style={{ color: GOLD_L }}>{step.title}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(162,137,89,0.55)" }}>{step.body}</p>
               </div>
             ))}
           </div>
 
-          {/* Payment info */}
-          <div className="rounded-2xl border px-5 py-4"
-            style={{ background: "rgba(251,146,60,0.04)", borderColor: "rgba(251,146,60,0.12)" }}>
-            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "rgba(251,146,60,0.4)" }}>Payment Info</p>
-            <div className="space-y-2 text-sm" style={{ color: "rgba(251,146,60,0.7)" }}>
-              {paymentType === "first" && (
-                <div className="flex justify-between items-center">
-                  <span>Amount Due</span>
-                  <div className="text-right">
-                    <span className="font-bold text-base" style={{ color: "#fb923c" }}>HKD 3,000</span>
-                    <span className="block text-xs" style={{ color: "rgba(251,146,60,0.5)" }}>non-refundable consultancy fee</span>
-                  </div>
-                </div>
-              )}
-              {(paymentType === "second" || paymentType === "final") && (() => {
-                const progType = (submission as any).programmeType as string | null | undefined;
-                const allSecond = [
-                  { key: "masters",   label: "Master's Degree",   amount: pricing.mastersStage2 },
-                  { key: "bachelor",  label: "Bachelor's Degree",  amount: pricing.bachelorStage2 },
-                  { key: "associate", label: "Associate Degree",   amount: pricing.associateStage2 },
-                  { key: "diploma",   label: "Diploma",            amount: pricing.diplomaStage2 },
-                ];
-                const allFinal = [
-                  { key: "masters",   label: "Master's Degree",   amount: pricing.mastersLastPayment },
-                  { key: "bachelor",  label: "Bachelor's Degree",  amount: pricing.bachelorLastPayment },
-                  { key: "associate", label: "Associate Degree",   amount: pricing.associateLastPayment },
-                  { key: "diploma",   label: "Diploma",            amount: pricing.diplomaLastPayment },
-                ];
-                const allTiers = paymentType === "second" ? allSecond : allFinal;
-                const tiers = progType ? allTiers.filter(t => t.key === progType) : allTiers;
-                return (
-                  <div className="space-y-2">
-                    <span style={{ color: "rgba(251,146,60,0.6)" }}>
-                      {progType ? "Amount Due" : "Amount Due (by degree)"}
-                    </span>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {tiers.map(({ label, amount }) => (
-                        <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
-                          style={{ background: "rgba(251,146,60,0.06)", borderColor: "rgba(251,146,60,0.18)" }}>
-                          <span className="font-bold text-sm" style={{ color: "#fb923c" }}>{amount}</span>
-                          <span className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.5)" }}>{label}</span>
-                        </div>
-                      ))}
+          {/* ── Payment info card — bank-statement style ── */}
+          <div className="rounded-2xl border overflow-hidden"
+            style={{ background: "linear-gradient(160deg, #0d1f12 0%, #0a1a0e 100%)", borderColor: "rgba(162,137,89,0.28)" }}>
+
+            {/* Section: Payment Info */}
+            <div className="px-5 pt-5 pb-4 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "rgba(162,137,89,0.45)" }}>
+                Payment Info
+              </p>
+              <div className="space-y-3">
+                {paymentType === "first" && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm" style={{ color: "rgba(162,137,89,0.70)" }}>Amount Due</span>
+                    <div className="text-right">
+                      <span className="text-xl font-extrabold tracking-tight"
+                        style={{ color: GOLD_L, textShadow: `0 0 18px rgba(240,210,140,0.25)` }}>
+                        HKD 3,000
+                      </span>
+                      <span className="block text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.50)" }}>
+                        non-refundable consultancy fee
+                      </span>
                     </div>
                   </div>
-                );
-              })()}
-              <div className="flex justify-between items-center">
-                <span>Accepted Methods</span>
-                <span className="font-semibold" style={{ color: "#fb923c" }}>Bank Transfer / FPS</span>
+                )}
+                {(paymentType === "second" || paymentType === "final") && (() => {
+                  const progType = (submission as any).programmeType as string | null | undefined;
+                  const allSecond = [
+                    { key: "masters",   label: "Master's Degree",   amount: pricing.mastersStage2 },
+                    { key: "bachelor",  label: "Bachelor's Degree",  amount: pricing.bachelorStage2 },
+                    { key: "associate", label: "Associate Degree",   amount: pricing.associateStage2 },
+                    { key: "diploma",   label: "Diploma",            amount: pricing.diplomaStage2 },
+                  ];
+                  const allFinal = [
+                    { key: "masters",   label: "Master's Degree",   amount: pricing.mastersLastPayment },
+                    { key: "bachelor",  label: "Bachelor's Degree",  amount: pricing.bachelorLastPayment },
+                    { key: "associate", label: "Associate Degree",   amount: pricing.associateLastPayment },
+                    { key: "diploma",   label: "Diploma",            amount: pricing.diplomaLastPayment },
+                  ];
+                  const allTiers = paymentType === "second" ? allSecond : allFinal;
+                  const tiers    = progType ? allTiers.filter(t => t.key === progType) : allTiers;
+                  return (
+                    <div className="space-y-2">
+                      <span className="text-sm" style={{ color: "rgba(162,137,89,0.70)" }}>
+                        {progType ? "Amount Due" : "Amount Due (by degree)"}
+                      </span>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {tiers.map(({ label, amount }) => (
+                          <div key={label} className="flex flex-col items-center px-3 py-2 rounded-xl border text-center"
+                            style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.20)" }}>
+                            <span className="font-extrabold text-sm" style={{ color: GOLD_L }}>{amount}</span>
+                            <span className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.55)" }}>{label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+                <div className="flex justify-between items-center">
+                  <span className="text-sm" style={{ color: "rgba(162,137,89,0.70)" }}>Accepted Methods</span>
+                  <span className="text-sm font-semibold" style={{ color: GOLD_B }}>Bank Transfer / FPS</span>
+                </div>
               </div>
             </div>
 
-            {/* Bank details */}
+            {/* Section: Bank Details */}
             {bankDetails && (bankDetails.bankName || bankDetails.accountName || bankDetails.accountNumber || bankDetails.fps) && (
-              <div className="mt-4 pt-4 border-t space-y-2.5" style={{ borderColor: "rgba(251,146,60,0.1)" }}>
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(251,146,60,0.4)" }}>Bank Details</p>
+              <div className="px-5 pt-4 pb-5 space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(162,137,89,0.45)" }}>
+                  Bank Details
+                </p>
                 {bankDetails.bankName && (
                   <div className="flex justify-between text-sm">
-                    <span style={{ color: "rgba(251,146,60,0.55)" }}>Bank</span>
-                    <span className="font-semibold" style={{ color: "#fb923c" }}>{bankDetails.bankName}</span>
+                    <span style={{ color: "rgba(162,137,89,0.60)" }}>Bank</span>
+                    <span className="font-bold" style={{ color: GOLD_L }}>{bankDetails.bankName}</span>
                   </div>
                 )}
                 {bankDetails.accountName && (
                   <div className="flex justify-between text-sm">
-                    <span style={{ color: "rgba(251,146,60,0.55)" }}>Account Name</span>
-                    <span className="font-semibold" style={{ color: "#fb923c" }}>{bankDetails.accountName}</span>
+                    <span style={{ color: "rgba(162,137,89,0.60)" }}>Account Name</span>
+                    <span className="font-bold" style={{ color: GOLD_L }}>{bankDetails.accountName}</span>
                   </div>
                 )}
                 {bankDetails.accountNumber && (
                   <div className="flex justify-between items-center text-sm">
-                    <span style={{ color: "rgba(251,146,60,0.55)" }}>Account No.</span>
+                    <span style={{ color: "rgba(162,137,89,0.60)" }}>Account No.</span>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold" style={{ color: "#fb923c" }}>{bankDetails.accountNumber}</span>
+                      <span className="font-mono font-bold" style={{ color: GOLD_L }}>{bankDetails.accountNumber}</span>
                       <button
                         onClick={() => navigator.clipboard.writeText(bankDetails.accountNumber)}
                         className="text-xs px-2 py-0.5 rounded border transition-opacity hover:opacity-70"
-                        style={{ borderColor: "rgba(251,146,60,0.2)", color: "rgba(251,146,60,0.5)", background: "rgba(251,146,60,0.05)" }}
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}
                         title="Copy"
                       >Copy</button>
                     </div>
@@ -240,27 +253,26 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                 )}
                 {bankDetails.fps && (
                   <div className="flex justify-between items-center text-sm">
-                    <span style={{ color: "rgba(251,146,60,0.55)" }}>FPS</span>
+                    <span style={{ color: "rgba(162,137,89,0.60)" }}>FPS</span>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold" style={{ color: "#fb923c" }}>{bankDetails.fps}</span>
+                      <span className="font-mono font-bold" style={{ color: GOLD_L }}>{bankDetails.fps}</span>
                       <button
                         onClick={() => navigator.clipboard.writeText(bankDetails.fps)}
                         className="text-xs px-2 py-0.5 rounded border transition-opacity hover:opacity-70"
-                        style={{ borderColor: "rgba(251,146,60,0.2)", color: "rgba(251,146,60,0.5)", background: "rgba(251,146,60,0.05)" }}
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}
                         title="Copy"
                       >Copy</button>
                     </div>
                   </div>
                 )}
+                <p className="text-xs pt-3 border-t" style={{ borderColor: "rgba(162,137,89,0.10)", color: "rgba(162,137,89,0.45)" }}>
+                  {bankDetails?.additionalInfo || "Please include your full name in the payment reference."}
+                </p>
               </div>
             )}
-
-            <p className="text-xs mt-3 pt-3 border-t" style={{ borderColor: "rgba(251,146,60,0.1)", color: "rgba(251,146,60,0.4)" }}>
-              {bankDetails?.additionalInfo || "Please include your full name in the payment reference."}
-            </p>
           </div>
 
-          {/* Upload — drag & drop zone */}
+          {/* ── Upload zone ── */}
           <div>
             <div
               onClick={() => !uploading && inputRef.current?.click()}
@@ -268,8 +280,7 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
               onDragEnter={e => { e.preventDefault(); if (!uploading) setDragOver(true); }}
               onDragLeave={e => { e.preventDefault(); setDragOver(false); }}
               onDrop={e => {
-                e.preventDefault();
-                setDragOver(false);
+                e.preventDefault(); setDragOver(false);
                 if (uploading) return;
                 const file = e.dataTransfer.files?.[0];
                 if (file) handleReceiptUpload(file);
@@ -277,19 +288,20 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
               className="w-full rounded-2xl border-2 text-sm font-semibold transition-all flex flex-col items-center justify-center gap-2 select-none"
               style={{
                 padding: dragOver ? "28px 20px" : "20px",
-                background: dragOver ? "rgba(251,146,60,0.1)" : "rgba(251,146,60,0.04)",
-                borderColor: dragOver ? "#fb923c" : "rgba(251,146,60,0.22)",
+                background: dragOver ? "rgba(162,137,89,0.10)" : "rgba(162,137,89,0.04)",
+                borderColor: dragOver ? GOLD_B : "rgba(162,137,89,0.25)",
                 borderStyle: "dashed",
-                color: "#fb923c",
+                color: GOLD_B,
                 cursor: uploading ? "not-allowed" : "pointer",
                 opacity: uploading ? 0.5 : 1,
                 transform: dragOver ? "scale(1.01)" : "scale(1)",
-                boxShadow: dragOver ? "0 0 20px rgba(251,146,60,0.12)" : "none",
+                boxShadow: dragOver ? "0 0 20px rgba(162,137,89,0.12)" : "none",
               }}
             >
               {uploading ? (
                 <>
-                  <span className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#fb923c", borderTopColor: "transparent" }} />
+                  <span className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin"
+                    style={{ borderColor: GOLD_B, borderTopColor: "transparent" }} />
                   <span>Uploading receipt…</span>
                 </>
               ) : dragOver ? (
@@ -305,8 +317,8 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                     <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
                   <span>Upload Payment Receipt Screenshot</span>
-                  <span className="text-xs font-normal" style={{ color: "rgba(251,146,60,0.45)" }}>
-                    Drag & drop here, or click to browse · PNG, JPG, PDF
+                  <span className="text-xs font-normal" style={{ color: "rgba(162,137,89,0.50)" }}>
+                    Drag &amp; drop here, or click to browse · PNG, JPG, PDF
                   </span>
                 </>
               )}
@@ -344,7 +356,8 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
             </div>
             <div className="px-5 py-4">
               <div className="flex items-start gap-3">
-                <span className="w-4 h-4 rounded-full border-2 animate-spin shrink-0 mt-0.5" style={{ borderColor: "#60a5fa", borderTopColor: "transparent" }} />
+                <span className="w-4 h-4 rounded-full border-2 animate-spin shrink-0 mt-0.5"
+                  style={{ borderColor: "#60a5fa", borderTopColor: "transparent" }} />
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(96,165,250,0.6)" }}>
                   Your payment receipt has been received. Our consultant will confirm your payment shortly — usually within a few hours during business hours.
                 </p>
@@ -352,12 +365,10 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
             </div>
           </div>
 
-          {/* WhatsApp follow-up (first payment only, after acknowledged) */}
           {!isSecond && !isFinal && submission.status === "acknowledged" && (
             <a
               href="https://wa.me/85260606457?text=Hi%2C%20I%20have%20submitted%20my%20payment%20receipt%20for%20my%20student%20visa%20application."
-              target="_blank"
-              rel="noopener noreferrer"
+              target="_blank" rel="noopener noreferrer"
               className="flex items-center justify-center gap-2.5 w-full rounded-2xl py-3.5 border text-sm font-semibold transition-all hover:opacity-85 hover:scale-[1.01] active:scale-[0.99]"
               style={{ background: "rgba(37,211,102,0.08)", borderColor: "rgba(37,211,102,0.28)", color: "#25d366" }}
             >
