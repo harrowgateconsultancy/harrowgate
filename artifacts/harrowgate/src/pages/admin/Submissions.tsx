@@ -1263,7 +1263,7 @@ export default function Submissions() {
 
         <div className="space-y-3">
           {filtered.map(s => {
-            const sc = statusConfig[s.status] || { label: s.status, color: GOLD, bg: C.muted };
+            const sc = statusConfig[s.status] || { label: s.status, color: GOLD, bg: "rgba(162,137,89,0.10)" };
             const hasAction = (nextActions[s.status]?.length ?? 0) > 0 || !!s.additionalDocsRequested;
             const docCount = s.documents.filter(d => !d.documentType.startsWith("admin_") && d.documentType !== "payment_receipt").length;
             const receiptDoc = s.documents.find(d => d.documentType === "payment_receipt");
@@ -1272,8 +1272,8 @@ export default function Submissions() {
               <div key={s.id}
                 className="rounded-2xl border transition-all cursor-pointer hover:scale-[1.005] hover:shadow-lg group"
                 style={{
-                  background: isDone ? "rgba(31,125,83,0.10)" : C.card,
-                  borderColor: selectedIds.has(s.id) ? GOLD : isDone ? "rgba(31,125,83,0.55)" : hasAction ? "rgba(251,146,60,0.25)" : C.border,
+                  background: isDone ? "#112d1a" : "#0b2213",
+                  borderColor: selectedIds.has(s.id) ? GOLD : isDone ? "rgba(31,125,83,0.55)" : hasAction ? "rgba(251,146,60,0.25)" : "rgba(162,137,89,0.18)",
                   boxShadow: isDone ? "0 0 0 1px rgba(31,125,83,0.12)" : hasAction ? "0 0 0 1px rgba(251,146,60,0.08)" : "none",
                 }}
                 onClick={() => setLocation(`/admin/submissions/${s.id}`)}>
@@ -1295,7 +1295,7 @@ export default function Submissions() {
                   </button>
                   {/* Avatar initial */}
                   <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
-                    style={{ background: isDone ? "rgba(31,125,83,0.22)" : C.muted, color: GOLD }}>
+                    style={{ background: isDone ? "rgba(31,125,83,0.22)" : "rgba(162,137,89,0.12)", color: GOLD }}>
                     {(s.name[0] || "?").toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
