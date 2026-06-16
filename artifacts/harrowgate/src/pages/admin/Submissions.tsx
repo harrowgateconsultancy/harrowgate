@@ -1494,7 +1494,7 @@ export default function Submissions() {
             </div>
 
             {/* ── Tab navigation ── */}
-            <div className="flex border-b shrink-0" style={{ borderColor: C.borderFaint, background: C.subtle }}>
+            <div className="flex items-center gap-1 shrink-0 px-2 py-1.5" style={{ background: C.subtle, borderBottom: `1px solid ${C.borderFaint}` }}>
               {([
                 { id: "overview",  label: "Overview",  svg: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg> },
                 { id: "documents", label: "Docs",      svg: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3M5 7h6M5 10h6M5 13h3"/></svg> },
@@ -1511,12 +1511,17 @@ export default function Submissions() {
                 return (
                   <button key={tab.id}
                     onClick={() => setDetailTab(tab.id as typeof detailTab)}
-                    className="relative flex-1 flex flex-col items-center py-2.5 gap-0.5 text-xs font-medium transition-colors"
-                    style={{ color: isActive ? "#f0d28c" : C.textFaint, borderBottom: `2px solid ${isActive ? "#f0d28c" : "transparent"}` }}>
+                    className="relative flex-1 flex flex-col items-center py-2 gap-0.5 text-xs font-medium transition-all rounded-xl"
+                    style={{
+                      color: isActive ? (isDark ? "#f0d28c" : "#0d2b17") : C.textFaint,
+                      background: isActive ? (isDark ? "rgba(15,45,24,0.95)" : "rgba(255,255,255,0.85)") : "transparent",
+                      boxShadow: isActive ? (isDark ? "0 1px 6px rgba(0,0,0,0.35), inset 0 1px 0 rgba(162,137,89,0.10)" : "0 1px 4px rgba(0,0,0,0.10)") : "none",
+                      border: isActive ? `1px solid ${isDark ? "rgba(162,137,89,0.18)" : "rgba(10,40,20,0.10)"}` : "1px solid transparent",
+                    }}>
                     <span className="leading-none">{tab.svg}</span>
                     <span className="leading-none">{tab.label}</span>
                     {(badge && badge > 0) ? (
-                      <span className="absolute top-1 right-2 text-[9px] font-bold px-1 rounded-full leading-4" style={{ background: "#f0d28c", color: C.card }}>{badge}</span>
+                      <span className="absolute top-1 right-2 text-[9px] font-bold px-1 rounded-full leading-4" style={{ background: isDark ? "#f0d28c" : "#a28959", color: isDark ? C.card : "#fff" }}>{badge}</span>
                     ) : dot ? (
                       <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full" style={{ background: "#fb923c" }} />
                     ) : null}
