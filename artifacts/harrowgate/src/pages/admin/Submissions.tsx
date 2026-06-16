@@ -1474,6 +1474,27 @@ export default function Submissions() {
                       )}
                     </div>
                   )}
+                  {(selected as any).agentCode ? (
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border"
+                        style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.22)", color: "#c4a96e" }}>
+                        <svg viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3 shrink-0">
+                          <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-2.67 0-8 1.34-8 4v1h16v-1c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Agent: {(selected as any).agentCode}
+                      </span>
+                      {(selected as any).agentCompanyName && (
+                        <span className="text-xs" style={{ color: "rgba(162,137,89,0.55)" }}>
+                          {(selected as any).agentCompanyName}
+                          {(selected as any).agentContactName && <span style={{ color: "rgba(162,137,89,0.40)" }}> · {(selected as any).agentContactName}</span>}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="mt-1.5">
+                      <span className="text-xs" style={{ color: "rgba(162,137,89,0.35)" }}>No agent referral</span>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">

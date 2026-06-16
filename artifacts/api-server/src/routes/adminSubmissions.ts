@@ -7,8 +7,9 @@ import {
   studentMessagesTable,
   studentOutboxTable,
   clientsTable,
+  agentsTable,
 } from "@workspace/db/schema";
-import { eq, desc, and, isNull, isNotNull, sql } from "drizzle-orm";
+import { eq, desc, and, isNull, isNotNull, inArray, sql } from "drizzle-orm";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail, sendApprovedOutboxEmail } from "../email";
 import { upsertStudentRow, deleteStudentRow } from "../lib/googleIntegration";
@@ -32,9 +33,18 @@ router.get("/admin/student-submissions", async (_req, res) => {
     const submissions = await db.select().from(studentSubmissionsTable)
       .where(isNull(studentSubmissionsTable.deletedAt))
       .orderBy(desc(studentSubmissionsTable.createdAt));
+
+    const agentCodes = [...new Set(submissions.map(s => s.agentCode).filter(Boolean))] as string[];
+    const agents = agentCodes.length
+      ? await db.select({ agentCode: agentsTable.agentCode, companyName: agentsTable.companyName, contactName: agentsTable.contactName })
+          .from(agentsTable).where(inArray(agentsTable.agentCode, agentCodes))
+      : [];
+    const agentMap = Object.fromEntries(agents.map(a => [a.agentCode, a]));
+
     const withDocs = await Promise.all(submissions.map(async (s) => {
       const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, s.id));
-      return { ...s, documents };
+      const agentInfo = s.agentCode ? agentMap[s.agentCode] : null;
+      return { ...s, documents, agentCompanyName: agentInfo?.companyName ?? null, agentContactName: agentInfo?.contactName ?? null };
     }));
     res.json(withDocs);
   } catch { res.status(500).json({ error: "Failed to fetch submissions" }); }
@@ -46,7 +56,15 @@ router.get("/admin/student-submissions/:id", async (req, res) => {
     const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
     if (!submission) return res.status(404).json({ error: "Not found" });
     const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, id));
-    res.json({ ...submission, documents });
+    let agentCompanyName: string | null = null;
+    let agentContactName: string | null = null;
+    if (submission.agentCode) {
+      const [agent] = await db.select({ companyName: agentsTable.companyName, contactName: agentsTable.contactName })
+        .from(agentsTable).where(eq(agentsTable.agentCode, submission.agentCode)).limit(1);
+      agentCompanyName = agent?.companyName ?? null;
+      agentContactName = agent?.contactName ?? null;
+    }
+    res.json({ ...submission, documents, agentCompanyName, agentContactName });
   } catch { res.status(500).json({ error: "Failed to fetch submission" }); }
 });
 
