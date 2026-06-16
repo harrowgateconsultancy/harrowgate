@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAdminColors } from "../../contexts/AdminThemeContext";
-import { Shield, Users, UserCog, Plus, Trash2, X, Eye, EyeOff, Lock } from "lucide-react";
+import { Shield, Users, UserCog, Plus, Trash2, X, Eye, EyeOff, Lock, KeyRound } from "lucide-react";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
@@ -45,6 +45,43 @@ export default function Settings() {
 
   const [accounts, setAccounts] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // ── Change admin credentials ──
+  const [showCredentials, setShowCredentials] = useState(false);
+  const [credForm, setCredForm] = useState({ currentPassword: "", newUsername: "", newPassword: "", confirmPassword: "" });
+  const [showCredPass, setShowCredPass] = useState({ current: false, newPass: false });
+  const [credSaving, setCredSaving] = useState(false);
+  const [credError, setCredError] = useState<string | null>(null);
+  const [credSuccess, setCredSuccess] = useState(false);
+
+  async function handleChangeCredentials(e: React.FormEvent) {
+    e.preventDefault();
+    setCredError(null);
+    setCredSuccess(false);
+    if (credForm.newPassword !== credForm.confirmPassword) {
+      setCredError("New passwords do not match.");
+      return;
+    }
+    if (credForm.newPassword.length < 6) {
+      setCredError("New password must be at least 6 characters.");
+      return;
+    }
+    setCredSaving(true);
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/credentials`, {
+        method: "PUT",
+        body: JSON.stringify({
+          currentPassword: credForm.currentPassword,
+          newUsername: credForm.newUsername,
+          newPassword: credForm.newPassword,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setCredError(data.error || "Failed to update credentials"); return; }
+      setCredSuccess(true);
+      setCredForm({ currentPassword: "", newUsername: "", newPassword: "", confirmPassword: "" });
+    } finally { setCredSaving(false); }
+  }
 
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ name: "", username: "", password: "", email: "", role: "manager" });
@@ -125,33 +162,147 @@ export default function Settings() {
       ) : (
         <div className="space-y-8">
 
-          {/* Super Admin — locked */}
+          {/* Super Admin — with credential change */}
           <section>
             <h2 className="text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2"
               style={{ color: C.n40 }}>
               <Shield size={12} /> Super Admin
             </h2>
-            <div className="rounded-2xl border p-4 flex items-center justify-between gap-3"
+            <div className="rounded-2xl border overflow-hidden"
               style={{ borderColor: C.borderFaint, background: C.subtle }}>
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center"
-                  style={{ background: C.muted }}>
-                  <Shield size={16} style={{ color: C.n50 }} />
+              {/* Row */}
+              <div className="p-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center"
+                    style={{ background: C.muted }}>
+                    <Shield size={16} style={{ color: C.n50 }} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm" style={{ color: C.navyText }}>Admin</p>
+                    <p className="text-xs mt-0.5" style={{ color: C.n45 }}>
+                      {credSuccess ? "Credentials updated — sign in with new details next time" : "Full access · username & password protected"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-sm" style={{ color: C.navyText }}>Admin</p>
-                  <p className="text-xs mt-0.5" style={{ color: C.n45 }}>Environment credentials</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
+                    style={{ background: C.muted, color: C.n60 }}>
+                    Super Admin
+                  </span>
+                  <button
+                    onClick={() => { setShowCredentials(v => !v); setCredError(null); setCredSuccess(false); }}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-80"
+                    title="Change username or password"
+                    style={{ background: showCredentials ? "rgba(162,137,89,0.15)" : "rgba(162,137,89,0.08)", color: "#a28959", border: "1px solid rgba(162,137,89,0.2)" }}>
+                    <KeyRound size={12} />
+                    {showCredentials ? "Cancel" : "Change"}
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
-                  style={{ background: C.muted, color: C.n60 }}>
-                  Super Admin
-                </span>
-                <div className="p-1.5 rounded-lg opacity-30" title="Cannot be deleted">
-                  <Lock size={13} style={{ color: C.n50 }} />
-                </div>
-              </div>
+
+              {/* Change credentials inline form */}
+              {showCredentials && (
+                <form onSubmit={handleChangeCredentials}
+                  className="px-5 pb-5 pt-1 border-t space-y-3"
+                  style={{ borderColor: C.n10 }}>
+                  <p className="text-xs font-semibold pt-2" style={{ color: C.n45 }}>Change Admin Username &amp; Password</p>
+
+                  {/* Current password */}
+                  <div>
+                    <label className="block text-xs font-medium mb-1" style={{ color: C.n45 }}>Current Password</label>
+                    <div className="relative">
+                      <input
+                        type={showCredPass.current ? "text" : "password"}
+                        placeholder="Your current password"
+                        required
+                        value={credForm.currentPassword}
+                        onChange={e => setCredForm(f => ({ ...f, currentPassword: e.target.value }))}
+                        className="w-full px-3 py-2.5 pr-10 rounded-xl border text-sm outline-none"
+                        style={{ borderColor: C.n20, color: C.navyText, background: C.n02 }} />
+                      <button type="button"
+                        onClick={() => setShowCredPass(v => ({ ...v, current: !v.current }))}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-80 text-xs"
+                        style={{ color: C.n60 }}>
+                        {showCredPass.current ? <EyeOff size={13} /> : <Eye size={13} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* New username */}
+                  <div>
+                    <label className="block text-xs font-medium mb-1" style={{ color: C.n45 }}>New Username</label>
+                    <input
+                      type="text"
+                      placeholder="New username (min. 3 chars)"
+                      required
+                      value={credForm.newUsername}
+                      onChange={e => setCredForm(f => ({ ...f, newUsername: e.target.value }))}
+                      className="w-full px-3 py-2.5 rounded-xl border text-sm outline-none"
+                      style={{ borderColor: C.n20, color: C.navyText, background: C.n02 }} />
+                  </div>
+
+                  {/* New password */}
+                  <div>
+                    <label className="block text-xs font-medium mb-1" style={{ color: C.n45 }}>New Password</label>
+                    <div className="relative">
+                      <input
+                        type={showCredPass.newPass ? "text" : "password"}
+                        placeholder="Min. 6 characters"
+                        required
+                        value={credForm.newPassword}
+                        onChange={e => setCredForm(f => ({ ...f, newPassword: e.target.value }))}
+                        className="w-full px-3 py-2.5 pr-10 rounded-xl border text-sm outline-none"
+                        style={{ borderColor: C.n20, color: C.navyText, background: C.n02 }} />
+                      <button type="button"
+                        onClick={() => setShowCredPass(v => ({ ...v, newPass: !v.newPass }))}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-80"
+                        style={{ color: C.n60 }}>
+                        {showCredPass.newPass ? <EyeOff size={13} /> : <Eye size={13} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm password */}
+                  <div>
+                    <label className="block text-xs font-medium mb-1" style={{ color: C.n45 }}>Confirm New Password</label>
+                    <input
+                      type="password"
+                      placeholder="Repeat new password"
+                      required
+                      value={credForm.confirmPassword}
+                      onChange={e => setCredForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                      className="w-full px-3 py-2.5 rounded-xl border text-sm outline-none"
+                      style={{ borderColor: C.n20, color: C.navyText, background: C.n02 }} />
+                  </div>
+
+                  {credError && (
+                    <p className="text-xs px-3 py-2 rounded-xl"
+                      style={{ background: "rgba(248,113,113,0.08)", color: "#dc2626", border: "1px solid rgba(248,113,113,0.2)" }}>
+                      {credError}
+                    </p>
+                  )}
+                  {credSuccess && (
+                    <p className="text-xs px-3 py-2 rounded-xl"
+                      style={{ background: "rgba(74,222,128,0.07)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.18)" }}>
+                      ✓ Credentials updated. Sign in with your new username and password next time.
+                    </p>
+                  )}
+
+                  <div className="flex gap-2 pt-1">
+                    <button type="button" onClick={() => { setShowCredentials(false); setCredError(null); setCredSuccess(false); }}
+                      className="px-4 py-2.5 rounded-xl text-xs border"
+                      style={{ borderColor: C.n15, color: C.n60 }}>
+                      Cancel
+                    </button>
+                    <button type="submit" disabled={credSaving}
+                      className="flex-1 py-2.5 rounded-xl text-xs font-bold disabled:opacity-50 transition-all hover:opacity-90 flex items-center justify-center gap-1.5"
+                      style={{ background: C.navyBg, color: C.navyText }}>
+                      <KeyRound size={12} />
+                      {credSaving ? "Updating…" : "Update Credentials"}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </section>
 

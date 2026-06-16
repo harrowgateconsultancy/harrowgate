@@ -2,6 +2,7 @@ import { createServer } from "http";
 import app from "./app";
 import { logger } from "./lib/logger";
 import { setupScreenMirror } from "./lib/screenMirror";
+import { initAdminCredentialsTables } from "./routes/adminAuth";
 
 process.on("uncaughtException", (err) => {
   logger.error({ err }, "Uncaught exception — keeping server alive");
@@ -26,6 +27,11 @@ if (Number.isNaN(port) || port <= 0) {
 
 const httpServer = createServer(app);
 setupScreenMirror(httpServer);
+
+// Ensure admin credential override tables exist
+initAdminCredentialsTables().catch(err =>
+  logger.warn({ err }, "Could not init admin credentials tables")
+);
 
 httpServer.listen(port, (err?: Error) => {
   if (err) {

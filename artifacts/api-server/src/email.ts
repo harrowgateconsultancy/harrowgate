@@ -200,6 +200,48 @@ export async function sendDocsRequestedEmail(opts: {
   } catch (err) { console.error("[email] Failed:", err); }
 }
 
+// ── Admin: password reset ──────────────────────────────────────────────────
+export async function sendAdminPasswordResetEmail(resetLink: string) {
+  const transport = createTransport();
+  if (!transport) { console.warn("[email] credentials not set — skipping admin reset email"); return; }
+  try {
+    await transport.sendMail({
+      from: `"HARROWGATE Portal" <${process.env.GMAIL_USER}>`,
+      to: NOTIFY_TO,
+      subject: "Admin Password Reset — HARROWGATE Portal",
+      html: `
+        <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0b2213;border-radius:12px;overflow:hidden;border:1px solid rgba(162,137,89,0.2)">
+          <div style="background:#071a0d;padding:24px 32px;text-align:center;border-bottom:1px solid rgba(162,137,89,0.2)">
+            <h1 style="margin:0;color:#a28959;font-size:20px;letter-spacing:2px">HARROWGATE</h1>
+            <p style="margin:4px 0 0;color:rgba(162,137,89,0.5);font-size:11px;letter-spacing:3px;text-transform:uppercase">Admin Portal</p>
+          </div>
+          <div style="padding:32px">
+            <h2 style="margin:0 0 16px;color:#f0d28c;font-size:20px">🔑 Password Reset Request</h2>
+            <p style="margin:0 0 20px;color:rgba(162,137,89,0.75);font-size:15px;line-height:1.6">
+              A password reset was requested for the HARROWGATE admin portal account. Click the button below to set a new username and password.
+            </p>
+            <p style="margin:0 0 16px;color:rgba(162,137,89,0.55);font-size:13px;line-height:1.6">
+              This link expires in <strong style="color:#f0d28c">1 hour</strong>. If you did not request this, you can safely ignore this email.
+            </p>
+            <div style="margin-top:28px;text-align:center">
+              <a href="${resetLink}" style="display:inline-block;background:linear-gradient(135deg,#c4a96e,#a28959);color:#0b2213;padding:14px 36px;border-radius:999px;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.5px">
+                Reset Password →
+              </a>
+            </div>
+            <p style="margin:24px 0 0;color:rgba(162,137,89,0.35);font-size:11px;text-align:center;word-break:break-all">
+              Or copy this link: ${resetLink}
+            </p>
+          </div>
+          <div style="padding:16px 32px;text-align:center;border-top:1px solid rgba(162,137,89,0.1)">
+            <p style="margin:0;color:rgba(162,137,89,0.3);font-size:11px">HARROWGATE Consultancy · Hong Kong · Admin Portal</p>
+          </div>
+        </div>
+      `,
+    });
+    console.log("[email] Admin password reset email sent to backup account");
+  } catch (err) { console.error("[email] Failed to send admin reset email:", err); }
+}
+
 // ── Notify student: mock interview invite ────────────────────────────────────
 export async function sendInterviewInviteEmail(opts: {
   name: string; studentEmail: string; zoomLink: string;
