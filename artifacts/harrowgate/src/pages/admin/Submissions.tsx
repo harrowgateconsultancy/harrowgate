@@ -258,7 +258,7 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
 export default function Submissions() {
   const { isDark } = useAdminTheme();
 
-  const C = {
+  const C = isDark ? {
     card: "#0f2d18",
     subtle: "#163320",
     muted: "rgba(162,137,89,0.06)",
@@ -273,9 +273,40 @@ export default function Submissions() {
     textFaint: "rgba(162,137,89,0.40)",
     textDark: "#c8aa7c",
     inputBg: "rgba(162,137,89,0.06)",
+    navBtn: "rgba(232,218,180,0.55)",
+    navBtnFaint: "rgba(232,218,180,0.35)",
+    navBtnActive: "#ffffff",
+    navActiveBg: "linear-gradient(180deg, rgba(240,210,140,0.18) 0%, rgba(196,169,110,0.06) 100%)",
+    navActiveShadow: "0 0 20px rgba(240,210,140,0.6)",
+    navActiveBorder: "#f0d28c",
+    heading: "#f0d28c",
+    headingSub: "rgba(162,137,89,0.55)",
+  } : {
+    card: "#ffffff",
+    subtle: "#f4f6f4",
+    muted: "rgba(10,40,20,0.04)",
+    softBlue: "#eef2ee",
+    border: "rgba(10,40,20,0.10)",
+    borderFaint: "rgba(10,40,20,0.07)",
+    borderMed: "rgba(10,40,20,0.18)",
+    text: "#7a6038",
+    textSec: "#6b5530",
+    textMid: "rgba(10,40,20,0.70)",
+    textMuted: "rgba(10,40,20,0.50)",
+    textFaint: "rgba(10,40,20,0.35)",
+    textDark: "#0d2b17",
+    inputBg: "rgba(10,40,20,0.04)",
+    navBtn: "rgba(10,40,20,0.55)",
+    navBtnFaint: "rgba(10,40,20,0.35)",
+    navBtnActive: "#0d2b17",
+    navActiveBg: "linear-gradient(180deg, rgba(162,137,89,0.12) 0%, rgba(162,137,89,0.04) 100%)",
+    navActiveShadow: "none",
+    navActiveBorder: "#a28959",
+    heading: "#0d2b17",
+    headingSub: "rgba(10,40,20,0.45)",
   };
-  const GOLD = "#a28959";
-  const BG = "#111812";
+  const GOLD = isDark ? "#a28959" : "#7a6038";
+  const BG = isDark ? "#111812" : "#f4f6f4";
 
   const qc = useQueryClient();
   const [, setLocation] = useLocation();
@@ -922,8 +953,8 @@ export default function Submissions() {
         <div className="mb-7">
           <div className="flex items-start justify-between gap-4 mb-4 flex-wrap">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight mb-0.5" style={{ color: "#f0d28c", letterSpacing: "-0.01em" }}>Student Submissions</h1>
-              <p className="text-xs" style={{ color: "rgba(162,137,89,0.55)" }}>
+              <h1 className="text-2xl font-bold tracking-tight mb-0.5" style={{ color: C.heading, letterSpacing: "-0.01em" }}>Student Submissions</h1>
+              <p className="text-xs" style={{ color: C.headingSub }}>
                 {submissions.length} total
                 {pendingCount > 0 && <> · <span style={{ color: "#fb923c" }}>{pendingCount} need attention</span></>}
               </p>
@@ -934,24 +965,24 @@ export default function Submissions() {
               {!soundEnabled ? (
                 <button onClick={() => { unlockAudio(); setSoundEnabled(true); localStorage.setItem("admin_sound_enabled", "true"); }}
                   className="relative flex items-center gap-1.5 px-4 py-2.5 font-bold tracking-wide transition-all shrink-0 hover:opacity-80"
-                  style={{ color: "rgba(232,218,180,0.45)", letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem" }}>
+                  style={{ color: C.navBtn, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem" }}>
                   <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5"><path d="M8 14a1 1 0 002 0H6a1 1 0 002 0z"/><path d="M8 2a5 5 0 00-5 5v3l-1 1h12l-1-1V7a5 5 0 00-5-5z"/></svg>
                   Alerts
                 </button>
               ) : (
                 <span className="relative flex items-center gap-1.5 px-4 py-2.5 font-bold tracking-wide shrink-0"
-                  style={{ color: "#ffffff", letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem",
-                    borderBottom: "2px solid #f0d28c", background: "linear-gradient(180deg, rgba(240,210,140,0.18) 0%, rgba(196,169,110,0.06) 100%)",
-                    textShadow: "0 0 20px rgba(240,210,140,0.6)" }}>
+                  style={{ color: C.navBtnActive, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem",
+                    borderBottom: `2px solid ${C.navActiveBorder}`, background: C.navActiveBg,
+                    textShadow: C.navActiveShadow }}>
                   <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5"><path d="M8 14a1 1 0 002 0H6a1 1 0 002 0z"/><path d="M8 2a5 5 0 00-5 5v3l-1 1h12l-1-1V7a5 5 0 00-5-5z"/></svg>
                   Alerts On
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: "linear-gradient(90deg, transparent, #f0d28c, transparent)" }} />
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: `linear-gradient(90deg, transparent, ${C.navActiveBorder}, transparent)` }} />
                 </span>
               )}
               {/* Courses */}
               <button onClick={() => setShowCourses(true)}
                 className="relative flex items-center gap-1.5 px-4 py-2.5 font-bold tracking-wide transition-all shrink-0 hover:opacity-80"
-                style={{ color: "rgba(232,218,180,0.55)", letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem" }}>
+                style={{ color: C.navBtn, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem" }}>
                 <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 4h12M2 8h12M2 12h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                 Courses
               </button>
@@ -959,21 +990,21 @@ export default function Submissions() {
               <button onClick={() => setShowPricing(v => !v)}
                 className="relative flex items-center gap-1.5 px-4 py-2.5 font-bold tracking-wide transition-all shrink-0"
                 style={{
-                  color: showPricing ? "#ffffff" : "rgba(232,218,180,0.55)",
+                  color: showPricing ? C.navBtnActive : C.navBtn,
                   letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem",
-                  borderBottom: showPricing ? "2px solid #f0d28c" : "2px solid transparent",
-                  background: showPricing ? "linear-gradient(180deg, rgba(240,210,140,0.18) 0%, rgba(196,169,110,0.06) 100%)" : "transparent",
-                  textShadow: showPricing ? "0 0 20px rgba(240,210,140,0.6)" : "none",
+                  borderBottom: showPricing ? `2px solid ${C.navActiveBorder}` : "2px solid transparent",
+                  background: showPricing ? C.navActiveBg : "transparent",
+                  textShadow: showPricing ? C.navActiveShadow : "none",
                 }}>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M6.5 6h2a1.5 1.5 0 010 3h-2a1.5 1.5 0 000 3H9" strokeLinecap="round"/></svg>
                 Pricing
-                {showPricing && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: "linear-gradient(90deg, transparent, #f0d28c, transparent)" }} />}
+                {showPricing && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: `linear-gradient(90deg, transparent, ${C.navActiveBorder}, transparent)` }} />}
               </button>
               {/* Trash */}
               <button onClick={() => setShowTrash(v => !v)}
                 className="relative flex items-center gap-1.5 px-4 py-2.5 font-bold tracking-wide transition-all shrink-0"
                 style={{
-                  color: showTrash ? "#f87171" : "rgba(232,218,180,0.45)",
+                  color: showTrash ? "#f87171" : C.navBtn,
                   letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem",
                   borderBottom: showTrash ? "2px solid #f87171" : "2px solid transparent",
                   background: showTrash ? "rgba(248,113,113,0.06)" : "transparent",
@@ -985,9 +1016,9 @@ export default function Submissions() {
               <button onClick={handleMegaSync} disabled={megaSyncing || !megaSyncTarget}
                 title={!megaSyncTarget ? "Select a student first" : `Sync ${megaSyncTarget.name} to UGreen`}
                 className="relative flex items-center gap-1.5 px-4 py-2.5 font-bold tracking-wide transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
-                style={{ color: megaSyncResult?.startsWith("✓") ? "#f0d28c" : "rgba(232,218,180,0.55)", letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem" }}>
+                style={{ color: megaSyncResult?.startsWith("✓") ? C.navActiveBorder : C.navBtn, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem" }}>
                 {megaSyncing
-                  ? <><span className="w-3 h-3 rounded-full border animate-spin shrink-0" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} />Syncing</>
+                  ? <><span className="w-3 h-3 rounded-full border animate-spin shrink-0" style={{ borderColor: GOLD, borderTopColor: "transparent" }} />Syncing</>
                   : megaSyncResult
                     ? megaSyncResult
                     : <><svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M2 8c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>UGreen{megaSyncTarget ? ` · ${megaSyncTarget.name.split(" ")[0]}` : ""}</>}
@@ -995,7 +1026,7 @@ export default function Submissions() {
               {/* Sign Out */}
               <button onClick={() => { localStorage.removeItem("admin_token"); window.location.href = "/admin/login"; }}
                 className="relative flex items-center gap-1.5 px-4 py-2.5 font-bold tracking-wide transition-all shrink-0 hover:opacity-80"
-                style={{ color: "rgba(232,218,180,0.35)", letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem" }}>
+                style={{ color: C.navBtnFaint, letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "0.72rem" }}>
                 <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 Sign Out
               </button>
