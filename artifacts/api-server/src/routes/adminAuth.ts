@@ -4,6 +4,7 @@ import { db, pool } from "@workspace/db";
 import { staffAccountsTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { sendAdminPasswordResetEmail } from "../email";
+import { registerSession, heartbeatSession, removeSession } from "../lib/sessionTracker";
 
 const router = Router();
 
@@ -167,26 +168,35 @@ function verifyPassword(password: string, stored: string): boolean {
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 
+function clientIp(req: any): string {
+  return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
+}
+
 // Combined login: DB override → env-var admin → staff/manager DB
 router.post("/admin/login", async (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) {
     return res.status(400).json({ error: "Username and password required" });
   }
+  const ip = clientIp(req);
 
   // 1. Check DB credential override (admin changed their credentials)
   try {
     const dbCreds = await getAdminCredentials();
     if (dbCreds) {
       if (username === dbCreds.username && verifyHashedPassword(password, dbCreds.passwordHash)) {
-        return res.json({ token: makeAdminToken(), role: "admin", name: "Admin" });
+        const sessionId = randomBytes(16).toString("hex");
+        registerSession(sessionId, "admin", username, ip);
+        return res.json({ token: makeAdminToken(), role: "admin", name: "Admin", sessionId });
       }
     } else {
       // 2. Fall back to env-var credentials
       const expectedUser = process.env.ADMIN_USERNAME;
       const expectedPass = process.env.ADMIN_PASSWORD;
       if (expectedUser && expectedPass && username === expectedUser && password === expectedPass) {
-        return res.json({ token: makeAdminToken(), role: "admin", name: "Admin" });
+        const sessionId = randomBytes(16).toString("hex");
+        registerSession(sessionId, "admin", username, ip);
+        return res.json({ token: makeAdminToken(), role: "admin", name: "Admin", sessionId });
       }
     }
   } catch { /* fall through to staff check */ }
@@ -200,11 +210,27 @@ router.post("/admin/login", async (req, res) => {
       .limit(1);
     if (staff && verifyPassword(password, staff.passwordHash)) {
       const token = makeManagerToken(staff.id, staff.role);
-      return res.json({ token, role: staff.role, name: staff.name });
+      const sessionId = randomBytes(16).toString("hex");
+      registerSession(sessionId, staff.role, staff.name, ip);
+      return res.json({ token, role: staff.role, name: staff.name, sessionId });
     }
   } catch { /* fall through */ }
 
   return res.status(401).json({ error: "Invalid username or password" });
+});
+
+// Heartbeat — keeps session alive
+router.post("/admin/heartbeat", (req: any, res) => {
+  const { sessionId } = req.body || {};
+  if (sessionId) heartbeatSession(sessionId);
+  res.json({ ok: true });
+});
+
+// Remove session on logout
+router.delete("/admin/session", (req: any, res) => {
+  const { sessionId } = req.body || {};
+  if (sessionId) removeSession(sessionId);
+  res.json({ ok: true });
 });
 
 // Returns current authenticated user info

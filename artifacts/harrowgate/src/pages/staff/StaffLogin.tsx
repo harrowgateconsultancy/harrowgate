@@ -24,6 +24,7 @@ export default function StaffLogin() {
       if (!res.ok) { setError(data.error || "Invalid credentials"); return; }
       localStorage.setItem("staff_token", data.token);
       localStorage.setItem("staff_user", JSON.stringify(data.staff));
+      if (data.sessionId) localStorage.setItem("staff_session_id", data.sessionId);
       setLocation("/staff");
     } finally { setLoading(false); }
   }

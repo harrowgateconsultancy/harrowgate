@@ -1,8 +1,11 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, Users, FileText, Menu, X, Bell, TrendingUp, UserCog, Tag, Sun, Moon, Settings, LogOut, Shield, Receipt } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminThemeProvider, useAdminTheme } from "@/contexts/AdminThemeContext";
+
+const BASE_LAYOUT = import.meta.env.BASE_URL.replace(/\/$/, "");
+function getApiBaseLayout() { return `${window.location.origin}${BASE_LAYOUT}`; }
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -36,10 +39,35 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   const navItems = ALL_NAV_ITEMS.filter(item => item.roles.includes(role));
 
+  // Heartbeat — keeps this session alive in the server's session tracker
+  useEffect(() => {
+    const sessionId = localStorage.getItem("admin_session_id");
+    if (!sessionId) return;
+    function beat() {
+      fetch(`${getApiBaseLayout()}/api/admin/heartbeat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      }).catch(() => {});
+    }
+    beat();
+    const ref = setInterval(beat, 30_000);
+    return () => clearInterval(ref);
+  }, []);
+
   function handleLogout() {
+    const sessionId = localStorage.getItem("admin_session_id");
+    if (sessionId) {
+      fetch(`${getApiBaseLayout()}/api/admin/session`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      }).catch(() => {});
+    }
     localStorage.removeItem("admin_token");
     localStorage.removeItem("admin_role");
     localStorage.removeItem("admin_name");
+    localStorage.removeItem("admin_session_id");
     window.location.href = `${BASE}/admin/login`;
   }
 

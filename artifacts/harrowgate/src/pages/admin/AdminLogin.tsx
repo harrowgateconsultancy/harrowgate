@@ -66,6 +66,7 @@ export default function AdminLogin() {
       localStorage.setItem("admin_token", data.token);
       localStorage.setItem("admin_role", data.role ?? "admin");
       localStorage.setItem("admin_name", data.name ?? "Admin");
+      if (data.sessionId) localStorage.setItem("admin_session_id", data.sessionId);
       setLocation("/admin/submissions");
     } catch {
       setLoginError("Could not reach server. Please try again.");

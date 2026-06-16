@@ -3,6 +3,7 @@ import { createHmac, scryptSync, randomBytes, timingSafeEqual } from "crypto";
 import { db } from "@workspace/db";
 import { staffAccountsTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
+import { registerSession, heartbeatSession, removeSession } from "../lib/sessionTracker";
 
 const router = Router();
 
@@ -62,6 +63,10 @@ export function requireStaffAuth(req: any, res: any, next: any) {
   next();
 }
 
+function clientIp(req: any): string {
+  return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
+}
+
 // Staff login
 router.post("/staff/login", async (req, res) => {
   try {
@@ -72,8 +77,24 @@ router.post("/staff/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid username or password" });
     }
     const token = makeStaffToken(staff.id);
-    res.json({ token, staff: { id: staff.id, name: staff.name, username: staff.username, role: staff.role } });
+    const sessionId = randomBytes(16).toString("hex");
+    registerSession(sessionId, staff.role || "staff", staff.name, clientIp(req));
+    res.json({ token, sessionId, staff: { id: staff.id, name: staff.name, username: staff.username, role: staff.role } });
   } catch { res.status(500).json({ error: "Login failed" }); }
+});
+
+// Heartbeat — keeps staff session alive
+router.post("/staff/heartbeat", (req: any, res) => {
+  const { sessionId } = req.body || {};
+  if (sessionId) heartbeatSession(sessionId);
+  res.json({ ok: true });
+});
+
+// Remove session on logout
+router.delete("/staff/session", (req: any, res) => {
+  const { sessionId } = req.body || {};
+  if (sessionId) removeSession(sessionId);
+  res.json({ ok: true });
 });
 
 // Admin: create staff account

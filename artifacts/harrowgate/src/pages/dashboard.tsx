@@ -1,7 +1,7 @@
 import { useGetDashboardStats } from "@workspace/api-client-react";
 import { Link } from "wouter";
-import { Users, FileText, Printer, CheckCircle, Clock, AlertCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Users, FileText, Printer, CheckCircle, Clock, AlertCircle, Shield, UserCog, Briefcase } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 import { useAdminTheme } from "@/contexts/AdminThemeContext";
 
 const STATUS_LABELS: Record<string, { label: string }> = {
@@ -79,6 +79,157 @@ type ActionItem = {
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+type SessionRecord = {
+  id: string;
+  role: string;
+  name: string;
+  ip: string;
+  loginAt: number;
+  lastSeen: number;
+};
+
+function useLiveSessions() {
+  const [sessions, setSessions] = useState<SessionRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const ref = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+    if (!token) { setLoading(false); return; }
+    function fetchSessions() {
+      fetch(`${window.location.origin}${BASE}/api/admin/active-sessions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(r => r.ok ? r.json() : [])
+        .then(d => { setSessions(Array.isArray(d) ? d : []); setLoading(false); })
+        .catch(() => setLoading(false));
+    }
+    fetchSessions();
+    ref.current = setInterval(fetchSessions, 15_000);
+    return () => { if (ref.current) clearInterval(ref.current); };
+  }, []);
+
+  return { sessions, loading };
+}
+
+function timeAgo(ts: number): string {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  return `${Math.floor(s / 3600)}h ago`;
+}
+
+function RoleBadge({ role }: { role: string }) {
+  const cfg =
+    role === "admin"   ? { label: "Admin",   icon: Shield,   color: "#f0d28c", bg: "rgba(240,210,140,0.12)", border: "rgba(240,210,140,0.25)" } :
+    role === "manager" ? { label: "Manager", icon: UserCog,  color: "#c4a96e", bg: "rgba(196,169,110,0.12)", border: "rgba(196,169,110,0.25)" } :
+                         { label: "Staff",   icon: Briefcase,color: "#86a878", bg: "rgba(134,168,120,0.12)", border: "rgba(134,168,120,0.25)" };
+  const Icon = cfg.icon;
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border"
+      style={{ color: cfg.color, background: cfg.bg, borderColor: cfg.border }}>
+      <Icon size={10} />
+      {cfg.label}
+    </span>
+  );
+}
+
+function LiveSessionsPanel({ isDark }: { isDark: boolean }) {
+  const { sessions, loading } = useLiveSessions();
+  const [expanded, setExpanded] = useState(false);
+  const role = localStorage.getItem("admin_role") ?? "";
+  if (role !== "admin") return null;
+
+  const admins   = sessions.filter(s => s.role === "admin").length;
+  const managers = sessions.filter(s => s.role === "manager").length;
+  const staff    = sessions.filter(s => s.role === "staff").length;
+  const total    = sessions.length;
+
+  const CARD_BG = isDark ? "rgba(240,210,140,0.04)" : "rgba(15,45,24,0.04)";
+  const BORDER  = isDark ? "rgba(240,210,140,0.12)" : "rgba(15,45,24,0.10)";
+  const PULSE   = total > 0 ? "#4ade80" : "rgba(162,137,89,0.35)";
+
+  return (
+    <div className="rounded-xl border mb-8" style={{ background: CARD_BG, borderColor: BORDER }}>
+      {/* Header */}
+      <button
+        className="w-full flex items-center justify-between px-5 py-4"
+        onClick={() => setExpanded(v => !v)}
+      >
+        <div className="flex items-center gap-3">
+          <span className="relative flex h-2.5 w-2.5">
+            {total > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: PULSE }} />}
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: PULSE }} />
+          </span>
+          <span className="font-semibold text-sm tracking-wide uppercase"
+            style={{ color: isDark ? "rgba(240,210,140,0.80)" : "#0f2d18" }}>
+            Live Sessions
+          </span>
+          {!loading && (
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+              style={{ background: isDark ? "rgba(74,222,128,0.12)" : "rgba(15,45,24,0.08)", color: isDark ? "#4ade80" : "#0f2d18" }}>
+              {total} online
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-4">
+          {/* Role counters */}
+          {[
+            { label: "Admin", count: admins, icon: Shield, color: "#f0d28c" },
+            { label: "Manager", count: managers, icon: UserCog, color: "#c4a96e" },
+            { label: "Staff", count: staff, icon: Briefcase, color: "#86a878" },
+          ].map(({ label, count, icon: Icon, color }) => (
+            <div key={label} className="hidden sm:flex items-center gap-1.5">
+              <Icon size={13} style={{ color }} />
+              <span className="text-xs font-bold" style={{ color }}>{count}</span>
+              <span className="text-xs" style={{ color: isDark ? "rgba(162,137,89,0.45)" : "rgba(15,45,24,0.45)" }}>{label}</span>
+            </div>
+          ))}
+          <span className="text-xs" style={{ color: isDark ? "rgba(162,137,89,0.40)" : "rgba(15,45,24,0.35)" }}>
+            {expanded ? "▲" : "▼"}
+          </span>
+        </div>
+      </button>
+
+      {/* Expanded list */}
+      {expanded && (
+        <div className="border-t" style={{ borderColor: BORDER }}>
+          {loading ? (
+            <div className="py-8 text-center text-xs" style={{ color: "rgba(162,137,89,0.45)" }}>Loading sessions…</div>
+          ) : sessions.length === 0 ? (
+            <div className="py-8 text-center text-xs" style={{ color: "rgba(162,137,89,0.40)" }}>No active sessions right now.</div>
+          ) : (
+            <div className="divide-y" style={{ borderColor: BORDER }}>
+              {sessions.map(s => (
+                <div key={s.id} className="flex items-center justify-between px-5 py-3 gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+                      style={{ background: isDark ? "rgba(162,137,89,0.10)" : "rgba(15,45,24,0.08)", color: isDark ? "#c4a96e" : "#0f2d18" }}>
+                      {(s.name?.[0] ?? "?").toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate" style={{ color: isDark ? "rgba(240,210,140,0.85)" : "#0f2d18" }}>{s.name}</p>
+                      <p className="text-xs truncate" style={{ color: "rgba(162,137,89,0.50)" }}>
+                        {s.ip !== "unknown" ? s.ip : "—"} · signed in {timeAgo(s.loginAt)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <RoleBadge role={s.role} />
+                    <span className="text-[11px]" style={{ color: "rgba(162,137,89,0.45)" }}>
+                      seen {timeAgo(s.lastSeen)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function useActionNeeded() {
   const [items, setItems] = useState<ActionItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -131,6 +282,9 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground text-sm mt-1">Overview of all client applications and status</p>
       </div>
+
+      {/* Live Sessions — admin only */}
+      <LiveSessionsPanel isDark={isDark} />
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">

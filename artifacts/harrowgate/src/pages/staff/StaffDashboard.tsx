@@ -79,7 +79,23 @@ export default function StaffDashboard() {
     });
     loadTasks();
     pollRef.current = setInterval(() => loadTasks(true), 15_000);
-    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+
+    // Heartbeat to keep session alive
+    const sessionId = localStorage.getItem("staff_session_id");
+    function sendHeartbeat() {
+      if (!sessionId) return;
+      fetch(`${getApiBase()}/api/staff/heartbeat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      }).catch(() => {});
+    }
+    sendHeartbeat();
+    const hbRef = setInterval(sendHeartbeat, 30_000);
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+      clearInterval(hbRef);
+    };
   }, []);
 
   // Re-register poll with updated soundEnabled
@@ -114,8 +130,17 @@ export default function StaffDashboard() {
   }
 
   function handleLogout() {
+    const sessionId = localStorage.getItem("staff_session_id");
+    if (sessionId) {
+      fetch(`${getApiBase()}/api/staff/session`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      }).catch(() => {});
+    }
     localStorage.removeItem("staff_token");
     localStorage.removeItem("staff_user");
+    localStorage.removeItem("staff_session_id");
     setLocation("/staff/login");
   }
 

@@ -10,6 +10,7 @@ import {
   agentsTable,
 } from "@workspace/db/schema";
 import { eq, desc, and, isNull, isNotNull, inArray, sql } from "drizzle-orm";
+import { getActiveSessions } from "../lib/sessionTracker";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { sendApprovalEmail, sendDocsRequestedEmail, sendInterviewInviteEmail, sendUniversityInterviewInviteEmail, sendAdditionalDocsRequestEmail, sendOfferLetterAvailableEmail, sendOfferLetterConfirmedEmail, sendCustomMessageToStudentEmail, sendEVisaReadyEmail, sendApprovedOutboxEmail } from "../email";
 import { upsertStudentRow, deleteStudentRow } from "../lib/googleIntegration";
@@ -27,6 +28,12 @@ const VALID_STATUSES = [
   "offer_letter_pending", "final_payment_received", "final_payment_confirmed",
   "visa_issued",
 ];
+
+router.get("/admin/active-sessions", (_req, res) => {
+  try {
+    res.json(getActiveSessions());
+  } catch { res.status(500).json({ error: "Failed" }); }
+});
 
 router.get("/admin/student-submissions", async (_req, res) => {
   try {
