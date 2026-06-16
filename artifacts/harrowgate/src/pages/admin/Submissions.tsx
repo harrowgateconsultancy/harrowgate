@@ -310,6 +310,7 @@ export default function Submissions() {
   const [uploadDocType, setUploadDocType] = useState("admin_doc");
   const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
   const adminFileRef = useRef<HTMLInputElement | null>(null);
+  const detailCardRef = useRef<HTMLDivElement | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem("admin_sound_enabled") === "true");
   const prevCountRef = useRef<number | null>(null);
   const [interviewForm, setInterviewForm] = useState<{ zoomLink: string; dateTime: string; notes: string } | null>(null);
@@ -878,6 +879,21 @@ export default function Submissions() {
   useEffect(() => { setDetailTab("overview"); }, [selected?.id]);
 
   useEffect(() => {
+    if (!selected) return;
+    const handler = (e: MouseEvent) => {
+      if (detailCardRef.current && !detailCardRef.current.contains(e.target as Node)) {
+        if (isDetailPage) {
+          setLocation("/admin/submissions");
+        }
+        setSelected(null);
+        setPreviewDoc(null);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [selected, isDetailPage]);
+
+  useEffect(() => {
     if (!detailId || !submissions.length) return;
     const sub = submissions.find(s => s.id === detailId);
     if (!sub || selected?.id === detailId) return;
@@ -1381,6 +1397,7 @@ export default function Submissions() {
           onClick={!isDetailPage ? (e => { if (e.target === e.currentTarget) { setSelected(null); setPreviewDoc(null); } }) : undefined}
         >
           <div
+            ref={detailCardRef}
             className={isDetailPage ? "w-full rounded-2xl border flex flex-col" : "w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl border flex flex-col"}
             style={isDetailPage ? { background: C.card, borderColor: "rgba(162,137,89,0.18)", minHeight: "calc(100dvh - 130px)" } : { background: C.card, borderColor: "rgba(162,137,89,0.18)", maxHeight: "94dvh" }}
           >
