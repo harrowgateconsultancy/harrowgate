@@ -79,6 +79,255 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
     : "Your application has been approved — please complete payment to proceed.";
   const stepNum  = isFinal ? "3rd" : isSecond ? "2nd" : "1st";
 
+  const printDemandNote = () => {
+    const logoUrl = `${window.location.origin}${BASE}/harrowgate-logo.png`;
+    const date = new Date().toLocaleDateString("en-HK", { year: "numeric", month: "long", day: "numeric" });
+    const paymentLabel = isFinal ? "Final Payment" : isSecond ? "2nd Service Payment" : "1st Service Payment";
+    const refCode = `HG-${submission.id}-${paymentType.toUpperCase().slice(0,3)}`;
+
+    const progType = (submission as any).programmeType as string | null | undefined;
+    const allSecond = [
+      { key: "masters",   label: "Master's Degree",   amount: pricing.mastersStage2 },
+      { key: "bachelor",  label: "Bachelor's Degree",  amount: pricing.bachelorStage2 },
+      { key: "associate", label: "Associate Degree",   amount: pricing.associateStage2 },
+      { key: "diploma",   label: "Diploma",            amount: pricing.diplomaStage2 },
+    ];
+    const allFinal = [
+      { key: "masters",   label: "Master's Degree",   amount: pricing.mastersLastPayment },
+      { key: "bachelor",  label: "Bachelor's Degree",  amount: pricing.bachelorLastPayment },
+      { key: "associate", label: "Associate Degree",   amount: pricing.associateLastPayment },
+      { key: "diploma",   label: "Diploma",            amount: pricing.diplomaLastPayment },
+    ];
+
+    let amountHtml = "";
+    if (paymentType === "first") {
+      amountHtml = `
+        <div class="info-row">
+          <span class="info-label">Amount Due</span>
+          <span class="amount-value">HKD 3,000</span>
+        </div>
+        <div class="info-row" style="margin-top:2px">
+          <span class="info-label"></span>
+          <span class="info-note">Non-refundable consultancy fee</span>
+        </div>`;
+    } else {
+      const allTiers = paymentType === "second" ? allSecond : allFinal;
+      const tiers = progType ? allTiers.filter(t => t.key === progType) : allTiers;
+      if (tiers.length === 1) {
+        amountHtml = `
+          <div class="info-row">
+            <span class="info-label">Amount Due</span>
+            <span class="amount-value">${tiers[0].amount}</span>
+          </div>
+          <div class="info-row" style="margin-top:2px">
+            <span class="info-label"></span>
+            <span class="info-note">${tiers[0].label}</span>
+          </div>`;
+      } else {
+        amountHtml = `
+          <div class="info-row">
+            <span class="info-label">Amount Due</span>
+            <span></span>
+          </div>
+          <table class="tier-table">
+            <thead><tr><th>Programme</th><th>Amount</th></tr></thead>
+            <tbody>${tiers.map(t => `<tr><td>${t.label}</td><td>${t.amount}</td></tr>`).join("")}</tbody>
+          </table>`;
+      }
+    }
+
+    const bankHtml = bankDetails ? `
+      ${bankDetails.bankName ? `<div class="info-row"><span class="info-label">Bank</span><span class="info-value">${bankDetails.bankName}</span></div>` : ""}
+      ${bankDetails.accountName ? `<div class="info-row"><span class="info-label">Account Name</span><span class="info-value">${bankDetails.accountName}</span></div>` : ""}
+      ${bankDetails.accountNumber ? `<div class="info-row"><span class="info-label">Account No.</span><span class="info-value mono">${bankDetails.accountNumber}</span></div>` : ""}
+      ${bankDetails.fps ? `<div class="info-row"><span class="info-label">FPS</span><span class="info-value mono">${bankDetails.fps}</span></div>` : ""}
+    ` : "";
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Demand Note — ${paymentLabel}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Georgia', serif;
+    background: #fff;
+    color: #1a1a1a;
+    padding: 48px 56px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #a28959;
+  }
+  .logo {
+    height: 64px;
+    object-fit: contain;
+    margin-bottom: 12px;
+  }
+  .company-name {
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #6b4f22;
+  }
+  .doc-title {
+    margin-top: 6px;
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+  }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    font-size: 12px;
+    color: #555;
+  }
+  .to-block {
+    background: #faf7f1;
+    border-left: 3px solid #a28959;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    border-radius: 0 6px 6px 0;
+  }
+  .to-block .to-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 4px; }
+  .to-block .to-name  { font-size: 16px; font-weight: bold; color: #1a1a1a; }
+  .to-block .to-ref   { font-size: 11px; color: #888; margin-top: 2px; }
+  .section-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #a28959;
+    font-weight: bold;
+    margin: 20px 0 10px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e8dfc0;
+  }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0e8d0;
+    font-size: 13px;
+  }
+  .info-label { color: #666; flex-shrink: 0; margin-right: 16px; }
+  .info-value { font-weight: 600; color: #1a1a1a; text-align: right; }
+  .info-note  { font-size: 11px; color: #999; text-align: right; }
+  .amount-value {
+    font-size: 22px;
+    font-weight: bold;
+    color: #6b4f22;
+    letter-spacing: 0.02em;
+  }
+  .mono { font-family: 'Courier New', monospace; }
+  .tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+  .tier-table th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+    padding: 4px 8px;
+    background: #faf7f1;
+  }
+  .tier-table th:last-child, .tier-table td:last-child { text-align: right; }
+  .tier-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f0e8d0;
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+  .footer {
+    margin-top: 36px;
+    padding-top: 16px;
+    border-top: 1px solid #e8dfc0;
+    font-size: 11px;
+    color: #888;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .stamp {
+    display: inline-block;
+    margin-top: 24px;
+    border: 2px solid #a28959;
+    border-radius: 6px;
+    padding: 8px 24px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #a28959;
+  }
+  @media print {
+    body { padding: 32px 40px; }
+    button { display: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <img class="logo" src="${logoUrl}" alt="Harrowgate Consultancy" onerror="this.style.display='none'"/>
+    <div class="company-name">Harrowgate Consultancy</div>
+    <div class="doc-title">Payment Demand Note</div>
+  </div>
+
+  <div class="meta">
+    <span>Date: ${date}</span>
+    <span>Ref: ${refCode}</span>
+  </div>
+
+  <div class="to-block">
+    <div class="to-label">Issued To</div>
+    <div class="to-name">${submission.name}</div>
+    <div class="to-ref">Payment Type: ${paymentLabel}</div>
+  </div>
+
+  <div class="section-title">Payment Information</div>
+  ${amountHtml}
+  <div class="info-row">
+    <span class="info-label">Accepted Methods</span>
+    <span class="info-value">Bank Transfer / FPS</span>
+  </div>
+
+  <div class="section-title">Bank Details</div>
+  ${bankHtml}
+  <p style="font-size:11px;color:#999;margin-top:10px;">${bankDetails?.additionalInfo || "Please include your full name in the payment reference."}</p>
+
+  <div style="text-align:center; margin-top:32px;">
+    <div class="stamp">Pending Payment</div>
+  </div>
+
+  <div class="footer">
+    This demand note is issued by Harrowgate Consultancy for internal reference only.<br/>
+    For queries, please contact your assigned consultant.
+  </div>
+
+  <script>window.onload = function() { window.print(); }<\/script>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank", "width=720,height=960,scrollbars=yes");
+    if (!win) { alert("Please allow pop-ups to print the demand note."); return; }
+    win.document.write(html);
+    win.document.close();
+  };
+
   const handleReceiptUpload = async (file: File) => {
     setUploading(true); setError(null);
     try {
@@ -275,6 +524,18 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
             )}
           </div>
 
+          {/* ── Print Demand Note ── */}
+          <div className="flex justify-end">
+            <button onClick={printDemandNote}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold border transition-all hover:opacity-80"
+              style={{ borderColor: "rgba(162,137,89,0.30)", color: GOLD_B, background: "rgba(162,137,89,0.07)" }}>
+              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                <path fillRule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v4a2 2 0 002 2h1v1a2 2 0 002 2h6a2 2 0 002-2v-1h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0v3H7V4h6zm-7 8v4h6v-4H6zm8-4a1 1 0 110 2 1 1 0 010-2z" clipRule="evenodd"/>
+              </svg>
+              Print Demand Note
+            </button>
+          </div>
+
           {/* ── Upload zone ── */}
           <div>
             <div
@@ -366,6 +627,17 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                 </p>
               </div>
             </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button onClick={printDemandNote}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold border transition-all hover:opacity-80"
+              style={{ borderColor: "rgba(162,137,89,0.30)", color: GOLD_B, background: "rgba(162,137,89,0.07)" }}>
+              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                <path fillRule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v4a2 2 0 002 2h1v1a2 2 0 002 2h6a2 2 0 002-2v-1h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0v3H7V4h6zm-7 8v4h6v-4H6zm8-4a1 1 0 110 2 1 1 0 010-2z" clipRule="evenodd"/>
+              </svg>
+              Print Demand Note
+            </button>
           </div>
 
           {!isSecond && !isFinal && submission.status === "acknowledged" && (
