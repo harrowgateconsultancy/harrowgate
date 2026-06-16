@@ -1158,14 +1158,14 @@ export default function Portal() {
 
             {/* ── ACKNOWLEDGED ── */}
             {submission.status === "acknowledged" && !showTimeline && (
-              <div className="mt-6 rounded-2xl p-8 text-center border" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#4ade80" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
+              <div className="mt-6 rounded-2xl p-8 text-center border" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.22)" }}>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(162,137,89,0.35)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#c4a96e" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#f0d28c" }}>{t("s.payReceived")}</h3>
-                <p className="text-sm mb-6" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.payReceivedSub")}</p>
-                <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border mb-6" style={{ background: "rgba(74,222,128,0.06)", borderColor: "rgba(74,222,128,0.22)" }}>
-                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(74,222,128,0.5)" }}>{t("s.ackCodeLabel")}</p>
+                <p className="text-sm mb-6" style={{ color: "rgba(162,137,89,0.65)" }}>{t("s.payReceivedSub")}</p>
+                <div className="inline-flex flex-col items-center gap-1 px-8 py-4 rounded-2xl border mb-6" style={{ background: "rgba(162,137,89,0.07)", borderColor: "rgba(162,137,89,0.25)" }}>
+                  <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(162,137,89,0.55)" }}>{t("s.ackCodeLabel")}</p>
                   <p className="text-3xl font-bold tracking-widest font-mono" style={{ color: "#f0d28c" }}>STU{submission.passportNumber.slice(-4).toUpperCase()}</p>
-                  <p className="text-xs mt-1" style={{ color: "rgba(74,222,128,0.4)" }}>{t("s.ackCodeNote")}</p>
+                  <p className="text-xs mt-1" style={{ color: "rgba(162,137,89,0.45)" }}>{t("s.ackCodeNote")}</p>
                 </div>
                 <button onClick={() => { setShowTimeline(true); setActiveTab("progress"); }}
                   className="px-8 py-3 rounded-full text-sm font-semibold border transition-all hover:opacity-80"
@@ -1207,10 +1207,10 @@ export default function Portal() {
 
             {/* ── INTERVIEW COMPLETED ── */}
             {submission.status === "interview_completed" && (
-              <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#4ade80" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
+              <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.22)" }}>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(162,137,89,0.35)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#c4a96e" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#f0d28c" }}>{t("s.mockCompleted")}</h3>
-                <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.mockCompletedSub")}</p>
+                <p className="text-sm mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>{t("s.mockCompletedSub")}</p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>{t("s.awaitingNext")}</p>
                 <p className="text-sm mt-2" style={{ color: "rgba(232,218,180,0.87)" }}>{t("s.teamInTouch")}</p>
               </div>
@@ -1223,10 +1223,10 @@ export default function Portal() {
 
             {/* ── 2ND PAYMENT CONFIRMED ── */}
             {submission.status === "second_payment_confirmed" && (
-              <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(74,222,128,0.04)", borderColor: "rgba(74,222,128,0.18)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#4ade80" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
+              <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.22)" }}>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(162,137,89,0.35)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><circle cx="24" cy="24" r="18" stroke="#c4a96e" strokeWidth="2.5"/><path d="M14 24l7 7 13-14" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: "#f0d28c" }}>{t("s.pay2Confirmed")}</h3>
-                <p className="text-sm mb-2" style={{ color: "rgba(74,222,128,0.65)" }}>{t("s.pay2ConfirmedSub")}</p>
+                <p className="text-sm mb-2" style={{ color: "rgba(162,137,89,0.65)" }}>{t("s.pay2ConfirmedSub")}</p>
                 <p className="text-base font-semibold mt-4" style={{ color: GOLD }}>{t("s.awaitingUniInterview")}</p>
                 <p className="text-sm mt-2" style={{ color: "rgba(232,218,180,0.87)" }}>{t("s.uniCoordinating")}</p>
               </div>
@@ -1279,8 +1279,8 @@ export default function Portal() {
 
             {/* ── UNIVERSITY INTERVIEW COMPLETED ── */}
             {submission.status === "university_interview_completed" && (
-              <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.15)" }}>
-                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#4ade80" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
+              <div className="mt-6 rounded-2xl p-8 border text-center" style={{ background: "rgba(162,137,89,0.04)", borderColor: "rgba(162,137,89,0.22)" }}>
+                <div className="flex items-center justify-center mb-4"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(162,137,89,0.15)", border: "1px solid rgba(162,137,89,0.35)" }}><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8"><path d="M24 6L4 18l20 10 20-10L24 6z" stroke="#c4a96e" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 22v9c0 4 6.27 7 14 7s14-3 14-7v-9" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round"/><path d="M40 18v10" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round"/></svg></div></div>
                 <h3 className="text-xl font-bold mb-2" style={{ color: GOLD }}>{t("s.uniInterviewCompleted")}</h3>
                 <p className="text-sm mb-2" style={{ color: "rgba(232,218,180,0.90)" }}>{t("s.uniInterviewCompletedSub")}</p>
                 <div className="mt-5 px-6 py-5 rounded-2xl border" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
