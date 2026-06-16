@@ -256,9 +256,9 @@ function OutboxPanel({ submissionId, C, GOLD }: { submissionId: number; C: Recor
 }
 
 export default function Submissions() {
-  const { isDark } = useAdminTheme();
+  const { isDark: _isDark } = useAdminTheme();
 
-  const C = isDark ? {
+  const C = {
     card: "#0f2d18",
     subtle: "#163320",
     muted: "rgba(162,137,89,0.06)",
@@ -281,32 +281,20 @@ export default function Submissions() {
     navActiveBorder: "#f0d28c",
     heading: "#f0d28c",
     headingSub: "rgba(162,137,89,0.55)",
-  } : {
-    card: "#ffffff",
-    subtle: "#f4f6f4",
-    muted: "rgba(10,40,20,0.04)",
-    softBlue: "#eef2ee",
-    border: "rgba(10,40,20,0.10)",
-    borderFaint: "rgba(10,40,20,0.07)",
-    borderMed: "rgba(10,40,20,0.18)",
-    text: "#7a6038",
-    textSec: "#6b5530",
-    textMid: "rgba(10,40,20,0.70)",
-    textMuted: "rgba(10,40,20,0.50)",
-    textFaint: "rgba(10,40,20,0.35)",
-    textDark: "#0d2b17",
-    inputBg: "rgba(10,40,20,0.04)",
-    navBtn: "rgba(10,40,20,0.55)",
-    navBtnFaint: "rgba(10,40,20,0.35)",
-    navBtnActive: "#0d2b17",
-    navActiveBg: "linear-gradient(180deg, rgba(162,137,89,0.12) 0%, rgba(162,137,89,0.04) 100%)",
-    navActiveShadow: "none",
-    navActiveBorder: "#a28959",
-    heading: "#0d2b17",
-    headingSub: "rgba(10,40,20,0.45)",
+    n02: "rgba(162,137,89,0.04)",
+    n10: "rgba(162,137,89,0.10)",
+    n15: "rgba(162,137,89,0.15)",
+    n20: "rgba(162,137,89,0.20)",
+    n40: "rgba(162,137,89,0.40)",
+    n45: "rgba(162,137,89,0.45)",
+    n50: "rgba(162,137,89,0.50)",
+    n55: "rgba(162,137,89,0.55)",
+    n60: "rgba(162,137,89,0.60)",
+    navyBg: "rgba(15,45,24,0.95)",
+    navyText: "#f0d28c",
   };
-  const GOLD = isDark ? "#a28959" : "#7a6038";
-  const BG = isDark ? "#111812" : "#f4f6f4";
+  const GOLD = "#a28959";
+  const BG = "#111812";
 
   const qc = useQueryClient();
   const [, setLocation] = useLocation();
