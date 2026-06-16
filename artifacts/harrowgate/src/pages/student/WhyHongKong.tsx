@@ -448,10 +448,11 @@ export default function WhyHongKong() {
           </div>
 
           <h1 className="fade-up" style={{
-            fontSize: "clamp(2.4rem, 5vw, 5.5rem)", fontWeight: 900,
-            letterSpacing: "-0.03em", lineHeight: 1.05, marginBottom: "1.5rem",
-            background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 50%, rgba(162,137,89,0.6) 100%)`,
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            fontSize: "clamp(1.6rem, 3.8vw, 3.8rem)", fontWeight: 900,
+            letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: "1.5rem",
+            whiteSpace: "nowrap",
+            color: GOLD_LIGHT,
+            textShadow: `0 0 40px rgba(240,210,140,0.35)`,
             animationDelay: "80ms",
           }}>
             {t("whyhk.h1")} {t("whyhk.h2")}
