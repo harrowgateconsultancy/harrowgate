@@ -1801,6 +1801,22 @@ export default function Submissions() {
                           style={{ maxWidth: "100%", maxHeight: 100, objectFit: "contain", filter: "sepia(1) saturate(3) hue-rotate(5deg) brightness(0.9)" }}
                         />
                       </div>
+                      <div className="flex justify-end mt-3">
+                        <a
+                          href={`${getApiBase()}/api/admin/student-submissions/${selected.id}/terms-pdf?token=${encodeURIComponent(getAdminToken())}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Download signed T&C as PDF"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all hover:opacity-80"
+                          style={{ borderColor: "rgba(162,137,89,0.30)", color: "#c4a96e", background: "rgba(162,137,89,0.07)", textDecoration: "none" }}
+                        >
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+                            <path d="M8 3v7m0 0L5.5 7.5M8 10l2.5-2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M3 13h10" strokeLinecap="round"/>
+                          </svg>
+                          Download T&amp;C PDF
+                        </a>
+                      </div>
                     </div>
                   )}
                   {!selected.termsAcceptedAt && (

@@ -349,4 +349,285 @@ function buildLetterHtml(studentName: string, num: number, title: string, body: 
 </html>`;
 }
 
+// ── GET /api/admin/student-submissions/:id/terms-pdf ─────────────────────────
+const TERMS_TEXT = `IMPORTANT DISCLAIMER
+
+Harrowgate Consultancy is an EDUCATION CONSULTANCY ONLY. We are NOT a licensed immigration service provider under the Immigration Service Providers (Regulation) Ordinance (Cap. 658) of Hong Kong. We do NOT provide immigration advice, immigration services, or act as a representative in any immigration matter. Nothing in these Terms or our services constitutes immigration advice.
+
+────────────────────────────────────────
+
+1. DEFINITIONS
+
+"Harrowgate" / "We" / "Us" means Harrowgate Consultancy Limited, a company incorporated in Hong Kong.
+"Student" / "You" / "User" means the individual engaging our services for overseas education placement.
+"Institution" means any university, college, or educational provider outside Hong Kong.
+"Service Fee" means the consultancy fee payable to Harrowgate as specified in your quotation.
+
+2. SCOPE OF SERVICES
+
+Harrowgate provides education consultancy and administrative support services including, but not limited to:
+• University and course selection guidance
+• Application processing and document preparation assistance
+• Career guidance and counselling for students
+• General information about student administrative requirements (NOT immigration advice)
+• Pre-departure briefing and orientation support
+
+We do NOT provide:
+• Immigration advice of any kind
+• Legal advice
+• Representation before any immigration authority
+
+Exclusions: Our Service Fee does NOT include:
+• Airfare or flight tickets
+• Accommodation costs
+• Living expenses
+• Health insurance premiums
+• Any fees payable directly to the Institution
+
+3. FEE STRUCTURE AND PAYMENT
+
+3.1 Tuition and University Charges
+All tuition and university charges must be paid directly by the student to the institution in accordance with the university's payment schedule.
+
+3.2 Payment to Harrowgate
+The full Service Fee must be remitted to Harrowgate Consultancy via the payment methods specified in your invoice. A valid receipt issued by Harrowgate must be obtained and retained as proof of payment. No application will be processed without receipt verification.
+
+3.3 Currency
+All fees are quoted and payable in Hong Kong Dollars (HKD) unless otherwise stated.
+
+4. REFUND POLICY
+
+4.1 Harrowgate's Role in Payments
+Harrowgate does not collect, hold, or transmit any tuition payments or deposits to any institution on the student's behalf.
+All tuition, deposits, and charges are paid directly by the student to the institution, and all refunds are governed solely by the institution's official refund policy.
+Harrowgate has no authority to override, amend, or influence any institution's refund decisions and accepts no liability for any refund disputes between the student and the institution.
+
+4.2 Consultancy Fee Non-Refundable
+The Service Fee paid to Harrowgate is NON-REFUNDABLE except where:
+• Harrowgate fails to submit the application through demonstrable negligence.
+
+In all circumstances, the first HKD 3,000 of the Service Fee is strictly non-refundable regardless of the reason for cancellation or withdrawal.
+
+4.3 Processing Time
+Refund processing from institutions typically takes 60 to 90 business days from the date of formal withdrawal or rejection. Harrowgate will facilitate but does not guarantee processing timelines.
+
+5. PERSONAL DATA COLLECTION AND PRIVACY
+
+5.1 Data Collection
+By engaging our services, you consent to the collection, processing, and recording of your personal data including:
+• Identity documents (passport, HKID)
+• Academic records and transcripts
+• Contact information and residential address
+• Financial information for payment processing
+• Any other data required by Institutions or immigration authorities
+
+5.2 Purpose of Processing
+Your personal data will be used for:
+• Processing university applications
+• Communicating with Institutions and relevant authorities
+• Internal record-keeping and service improvement
+• Compliance with legal and regulatory obligations
+
+5.3 Data Retention
+Personal data will be retained for SEVEN (7) YEARS from the completion of services or as required by applicable law, whichever is longer.
+
+5.4 Third-Party Disclosure
+We may disclose your personal data to:
+• The Institution(s) to which you apply
+• Government authorities (immigration, education departments)
+• Payment processors and financial institutions
+• Legal and regulatory bodies as required by law
+
+6. LIMITATION OF LIABILITY
+
+6.1 No Liability for Personal Data Incidents
+To the fullest extent permitted by the Personal Data (Privacy) Ordinance (Cap. 486) and other applicable Hong Kong law, Harrowgate Consultancy SHALL NOT BE LIABLE for any damage, loss, or harm suffered by the Student arising from:
+• Unauthorized access to personal data by third parties
+• Data breaches occurring at the Institution or government level
+• Loss of data due to circumstances beyond our reasonable control
+
+6.2 No Guarantee of Admission
+Harrowgate does not guarantee acceptance by any Institution. Admission decisions rest solely with the Institution.
+
+6.3 No Liability for Institutional Actions
+We are not liable for:
+• Changes to Institution courses, fees, or policies
+• Visa refusals by foreign governments
+• Disruption to travel or study caused by geopolitical events, pandemics, or force majeure
+
+6.4 Cap on Liability
+Our total liability under these Terms shall not exceed the Service Fee paid by the Student.
+
+7. STUDENT OBLIGATIONS
+
+You agree to:
+• Provide accurate, complete, and truthful information
+• Submit all required documents within specified deadlines
+• Comply with all applicable laws of Hong Kong and the destination country
+• Notify Harrowgate promptly of any changes to your circumstances
+
+8. GOVERNING LAW AND JURISDICTION
+
+These Terms are governed by the laws of the Hong Kong Special Administrative Region. Any dispute arising from these Terms shall be subject to the exclusive jurisdiction of the courts of Hong Kong.
+
+9. AMENDMENTS
+
+Harrowgate reserves the right to amend these Terms at any time. Material changes will be notified via email or website update. Continued use of our services constitutes acceptance of revised Terms.
+
+10. SEVERABILITY
+
+If any provision of these Terms is held invalid or unenforceable under Hong Kong law, the remaining provisions shall continue in full force.`;
+
+router.get("/admin/student-submissions/:id/terms-pdf", async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(eq(studentSubmissionsTable.id, submissionId)).limit(1);
+    if (!submission) return res.status(404).send("Not found");
+    if (!submission.termsAcceptedAt) return res.status(400).send("Terms have not been signed yet");
+
+    const signedDate = new Date(submission.termsAcceptedAt).toLocaleString("en-HK", {
+      dateStyle: "long", timeStyle: "short", timeZone: "Asia/Hong_Kong",
+    });
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Terms &amp; Conditions — ${esc(submission.name)}</title>
+<style>
+  @page { margin: 22mm 18mm; size: A4; }
+  * { box-sizing: border-box; }
+  body { font-family: Georgia, 'Times New Roman', serif; font-size: 11pt; line-height: 1.65; color: #1a1a1a; margin: 0; padding: 0; }
+  .page { max-width: 720px; margin: 0 auto; padding: 8px 0; }
+
+  /* Header */
+  .header { display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #0f2d18; padding-bottom: 16px; margin-bottom: 24px; }
+  .header-text { flex: 1; }
+  .company { font-size: 15pt; font-weight: bold; color: #0f2d18; letter-spacing: 0.04em; }
+  .subtitle { font-size: 9pt; color: #6b7280; margin-top: 2px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* Document title */
+  .doc-title { text-align: center; margin-bottom: 24px; }
+  .doc-title h1 { font-size: 14pt; color: #0f2d18; font-weight: bold; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .doc-title p { font-size: 10pt; color: #4b5563; margin: 0; }
+
+  /* Student info box */
+  .info-box { border: 1.5px solid #0f2d18; border-radius: 8px; padding: 14px 18px; margin-bottom: 28px; background: #f7faf7; }
+  .info-box h2 { font-size: 10pt; font-weight: bold; color: #0f2d18; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
+  .info-row { display: flex; flex-direction: column; }
+  .info-label { font-size: 8.5pt; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1px; }
+  .info-value { font-size: 10.5pt; font-weight: 600; color: #111827; }
+  .signed-badge { display: inline-flex; align-items: center; gap: 6px; background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; border-radius: 20px; padding: 3px 12px; font-size: 9pt; font-weight: 700; margin-top: 10px; }
+
+  /* T&C body */
+  .tc-section { margin-bottom: 28px; }
+  .tc-section h2 { font-size: 11pt; font-weight: bold; color: #0f2d18; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #d1d5db; padding-bottom: 6px; margin-bottom: 14px; }
+  .tc-body { white-space: pre-wrap; font-size: 10pt; color: #374151; line-height: 1.7; }
+
+  /* Signature */
+  .sig-section { margin-top: 32px; border-top: 1.5px solid #0f2d18; padding-top: 20px; page-break-inside: avoid; }
+  .sig-section h2 { font-size: 11pt; font-weight: bold; color: #0f2d18; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+  .sig-box { border: 1.5px solid #9ca3af; border-radius: 8px; padding: 16px; background: #fafafa; display: inline-block; min-width: 300px; }
+  .sig-img { max-width: 320px; max-height: 110px; object-fit: contain; display: block; }
+  .sig-meta { margin-top: 10px; font-size: 9.5pt; color: #4b5563; }
+  .sig-meta strong { color: #111827; }
+
+  /* Footer */
+  .footer { margin-top: 40px; border-top: 1px solid #d1d5db; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 8.5pt; color: #9ca3af; }
+
+  @media print {
+    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body onload="window.print()">
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-text">
+      <div class="company">HARROWGATE CONSULTANCY LIMITED</div>
+      <div class="subtitle">Education Consultancy · Hong Kong</div>
+    </div>
+    <div style="font-size:9pt;color:#6b7280;text-align:right">
+      Reference No.<br/>
+      <strong style="color:#0f2d18;font-size:10pt">HGT-TC-${String(submissionId).padStart(5,"0")}</strong>
+    </div>
+  </div>
+
+  <!-- Document title -->
+  <div class="doc-title">
+    <h1>Terms &amp; Conditions — Signed Agreement</h1>
+    <p>This document certifies that the student named below has read, understood, and digitally signed the Terms and Conditions of Service.</p>
+  </div>
+
+  <!-- Student info -->
+  <div class="info-box">
+    <h2>Student Information</h2>
+    <div class="info-grid">
+      <div class="info-row">
+        <span class="info-label">Full Name</span>
+        <span class="info-value">${esc(submission.name)}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Passport Number</span>
+        <span class="info-value">${esc(submission.passportNumber || "—")}</span>
+      </div>
+      <div class="info-row" style="margin-top:6px">
+        <span class="info-label">Email Address</span>
+        <span class="info-value">${esc(submission.email || "—")}</span>
+      </div>
+      <div class="info-row" style="margin-top:6px">
+        <span class="info-label">Date of Birth</span>
+        <span class="info-value">${esc(submission.dateOfBirth || "—")}</span>
+      </div>
+    </div>
+    <div class="signed-badge">
+      <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#166534" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Signed &amp; Agreed — ${esc(signedDate)}
+    </div>
+  </div>
+
+  <!-- T&C body -->
+  <div class="tc-section">
+    <h2>Terms and Conditions of Service</h2>
+    <div class="tc-body">${esc(TERMS_TEXT)}</div>
+  </div>
+
+  <!-- Signature -->
+  <div class="sig-section">
+    <h2>Student Digital Signature</h2>
+    <div class="sig-box">
+      ${submission.termsSignatureUrl
+        ? `<img class="sig-img" src="${submission.termsSignatureUrl}" alt="Student signature" />`
+        : `<div style="height:80px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-style:italic;font-size:10pt">Signature on file</div>`
+      }
+      <div class="sig-meta">
+        Signed by: <strong>${esc(submission.name)}</strong><br/>
+        Date &amp; Time: <strong>${esc(signedDate)} (HKT)</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>HARROWGATE Consultancy Limited · Hong Kong</span>
+    <span>Generated ${new Date().toLocaleDateString("en-HK")} · Ref HGT-TC-${String(submissionId).padStart(5,"0")}</span>
+  </div>
+
+</div>
+</body>
+</html>`;
+
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(html);
+  } catch (err) {
+    console.error("[terms-pdf] Failed:", err);
+    res.status(500).send("Failed to generate T&C document");
+  }
+});
+
 export default router;
