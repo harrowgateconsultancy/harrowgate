@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "wouter";
-import { useUser, useClerk, useSession } from "@clerk/react";
+import { useStudentUser, studentSignOut, getStudentAuthHeaders } from "../../lib/studentAuth";
 import ApplyForm from "./ApplyForm";
 import PaymentPage from "./PaymentPage";
 import TermsModal from "./TermsModal";
@@ -250,7 +250,6 @@ interface EmailDetail extends EmailSummary { html: string | null; text: string |
 interface OutboxItem { id: number; toAddress: string; subject: string; body: string; status: string; createdAt: string; }
 
 function InboxCard({ submission, onUnreadChange }: { submission: Submission; onUnreadChange?: (n: number) => void }) {
-  const { session } = useSession();
   const [emails, setEmails] = useState<EmailSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -645,9 +644,7 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
 }
 
 export default function Portal() {
-  const { user, isLoaded } = useUser();
-  const { signOut } = useClerk();
-  const { session } = useSession();
+  const { user, isLoaded } = useStudentUser();
   const [submission, setSubmission] = useState<Submission | null | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [showTimeline, setShowTimeline] = useState(false);
@@ -679,31 +676,28 @@ export default function Portal() {
   const captureIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const portalRef = useRef<HTMLDivElement | null>(null);
 
-  const authHeaders = async (): Promise<HeadersInit> => {
-    const token = await session?.getToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
+  const authHeaders = (): Record<string, string> => getStudentAuthHeaders();
 
   const fetchSubmission = async () => {
     try {
       setLoading(true);
-      const email = user?.primaryEmailAddress?.emailAddress;
+      const email = user?.email;
       const url = email
         ? `${getApiBase()}/api/student/submissions/me?email=${encodeURIComponent(email)}`
         : `${getApiBase()}/api/student/submissions/me`;
-      const res = await fetch(url, { credentials: "include", headers: await authHeaders() });
+      const res = await fetch(url, { credentials: "include", headers: authHeaders() });
       if (res.ok) setSubmission(await res.json());
       else if (res.status === 401) setSubmission(null);
     } catch { setSubmission(null); }
     finally { setLoading(false); }
   };
 
-  useEffect(() => { if (isLoaded && session) fetchSubmission(); }, [isLoaded, session]);
+  useEffect(() => { if (isLoaded) fetchSubmission(); }, [isLoaded]);
 
   const fetchMessages = async (id: number) => {
     try {
       const res = await fetch(`${getApiBase()}/api/student/submissions/${id}/messages`, {
-        credentials: "include", headers: await authHeaders(),
+        credentials: "include", headers: authHeaders(),
       });
       if (res.ok) setMessages(await res.json());
     } catch { /* silent */ }
@@ -715,7 +709,7 @@ export default function Portal() {
       const url = email
         ? `${getApiBase()}/api/student/submissions/me?email=${encodeURIComponent(email)}`
         : `${getApiBase()}/api/student/submissions/me`;
-      const res = await fetch(url, { credentials: "include", headers: await authHeaders() });
+      const res = await fetch(url, { credentials: "include", headers: authHeaders() });
       if (res.ok) {
         const data = await res.json();
         setSubmission(prev => JSON.stringify(prev) !== JSON.stringify(data) ? data : prev);
@@ -726,7 +720,7 @@ export default function Portal() {
   const silentFetchMessages = async (id: number) => {
     try {
       const res = await fetch(`${getApiBase()}/api/student/submissions/${id}/messages`, {
-        credentials: "include", headers: await authHeaders(),
+        credentials: "include", headers: authHeaders(),
       });
       if (res.ok) {
         const data = await res.json();
@@ -769,7 +763,7 @@ export default function Portal() {
       const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/messages/reply`, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+        headers: { "Content-Type": "application/json", ...(authHeaders()) },
         body: JSON.stringify({ body: replyBody.trim(), attachments: replyAttachments }),
       });
       if (!res.ok) throw new Error("Failed");
@@ -784,14 +778,14 @@ export default function Portal() {
     if (!submission) return;
     setCompletingUni(true);
     try {
-      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/complete-university-interview`, { method: "POST", credentials: "include", headers: await authHeaders() });
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/complete-university-interview`, { method: "POST", credentials: "include", headers: authHeaders() });
       if (res.ok) fetchSubmission();
     } finally { setCompletingUni(false); }
   };
 
   const handleOfferLetterView = async (submissionId: number, docId: number) => {
     try {
-      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/view`, { credentials: "include", headers: await authHeaders() });
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/view`, { credentials: "include", headers: authHeaders() });
       if (!res.ok) throw new Error("Failed to load file");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -802,7 +796,7 @@ export default function Portal() {
 
   const handleOfferLetterDownload = async (submissionId: number, docId: number, fileName: string) => {
     try {
-      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/download`, { credentials: "include", headers: await authHeaders() });
+      const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${docId}/download`, { credentials: "include", headers: authHeaders() });
       if (!res.ok) throw new Error("Failed to download file");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -819,7 +813,7 @@ export default function Portal() {
     setUploadingAdditionalDocs(true); setAdditionalDocsError(null);
     try {
       const { url } = await uploadToStorage(file);
-      const hdrs = await authHeaders() as Record<string, string>;
+      const hdrs = authHeaders() as Record<string, string>;
       const res = await fetch(`${getApiBase()}/api/student/submissions/${submission.id}/additional-docs`, {
         method: "POST", headers: { "Content-Type": "application/json", ...hdrs }, credentials: "include",
         body: JSON.stringify({ fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type, note: additionalDocsNote }),
@@ -992,7 +986,7 @@ export default function Portal() {
                 </div>
               )}
             </div>
-            <button onClick={() => signOut({ redirectUrl: BASE || "/" })}
+            <button onClick={() => { studentSignOut(); window.location.href = BASE || "/"; }}
               className="text-xs px-3 py-1.5 rounded-full border transition-all hover:opacity-80"
               style={{ borderColor: "rgba(162,137,89,0.2)", color: "rgba(232,218,180,0.88)" }}>
               {t("nav.signOut")}

@@ -6,6 +6,7 @@ import applicationsRouter from "./applications";
 import documentsRouter from "./documents";
 import statsRouter from "./stats";
 import studentRouter from "./student";
+import studentAuthRouter from "./studentAuth";
 import adminSubmissionsRouter from "./adminSubmissions";
 import id995aRouter from "./id995a";
 import immigrationLettersRouter from "./immigrationLetters";
@@ -27,6 +28,7 @@ router.use(clientsRouter);
 router.use(applicationsRouter);
 router.use(documentsRouter);
 router.use(statsRouter);
+router.use(studentAuthRouter);
 router.use(studentRouter);
 
 // Admin login + /admin/me (no auth required — must come before the auth wall)

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
-import { useSession } from "@clerk/react";
+import { getStudentAuthHeaders } from "../../lib/studentAuth";
 import { COURSES, LEVEL_LABELS, getCoursesByLevel, type DegreeLevel } from "../../data/courses";
 
 const BG = "#0b2213";
@@ -165,7 +165,6 @@ function AgentDropdown({
 }
 
 export default function ApplyForm({ user, onSubmitted }: Props) {
-  const { session } = useSession();
   const [, setLocation] = useLocation();
   const [surname, setSurname] = useState("");
   const [givenName, setGivenName] = useState("");
@@ -190,10 +189,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
       .catch(() => {});
   }, []);
 
-  const authHeaders = async (): Promise<Record<string, string>> => {
-    const token = await session?.getToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
+  const authHeaders = (): Record<string, string> => getStudentAuthHeaders();
 
   const handleFileChange = async (index: number, file: File | null) => {
     if (!file) return;
@@ -249,7 +245,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
 
     setSubmitting(true);
     try {
-      const hdrs = await authHeaders();
+      const hdrs = authHeaders();
       const res = await fetch(`${getApiBase()}/api/student/submissions`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...hdrs },

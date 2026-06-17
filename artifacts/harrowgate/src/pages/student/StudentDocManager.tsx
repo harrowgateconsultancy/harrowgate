@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useSession } from "@clerk/react";
+import { getStudentAuthHeaders } from "../../lib/studentAuth";
 
 const GOLD = "#a28959";
 const BG = "#0b2213";
@@ -37,7 +37,6 @@ async function uploadToStorage(file: File): Promise<{ url: string }> {
 }
 
 export default function StudentDocManager({ submissionId, documents, onResubmit, onDocsChanged }: Props) {
-  const { session } = useSession();
   const [uploading, setUploading] = useState<string | null>(null);
   const [preview, setPreview] = useState<Doc | null>(null);
   const [resubmitting, setResubmitting] = useState(false);
@@ -45,10 +44,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
   const [dragOverSlot, setDragOverSlot] = useState<string | null>(null);
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const authHeaders = async (): Promise<Record<string, string>> => {
-    const token = await session?.getToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
+  const authHeaders = (): Record<string, string> => getStudentAuthHeaders();
 
   const studentDocs = documents.filter(d => !d.documentType.startsWith("admin_") && d.documentType !== "payment_receipt");
 
@@ -56,7 +52,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
     setUploading(type); setError(null);
     try {
       const { url } = await uploadToStorage(file);
-      const hdrs = await authHeaders();
+      const hdrs = authHeaders();
       const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents`, {
         method: "POST", headers: { "Content-Type": "application/json", ...hdrs }, credentials: "include",
         body: JSON.stringify({ documentType: type, fileName: file.name, fileUrl: url, fileSize: file.size, mimeType: file.type }),
@@ -70,7 +66,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
   const handleDelete = async (doc: Doc) => {
     if (!confirm(`Remove "${doc.fileName}"?`)) return;
     try {
-      const hdrs = await authHeaders();
+      const hdrs = authHeaders();
       await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/documents/${doc.id}`, {
         method: "DELETE", credentials: "include", headers: hdrs,
       });
@@ -84,7 +80,7 @@ export default function StudentDocManager({ submissionId, documents, onResubmit,
     if (!hasDoc) { setError("Please upload at least Document 1 before re-submitting."); return; }
     setResubmitting(true); setError(null);
     try {
-      const hdrs = await authHeaders();
+      const hdrs = authHeaders();
       const res = await fetch(`${getApiBase()}/api/student/submissions/${submissionId}/resubmit`, {
         method: "POST", credentials: "include", headers: hdrs,
       });

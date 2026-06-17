@@ -32,13 +32,9 @@ COPY artifacts/harrowgate/ artifacts/harrowgate/
 COPY attached_assets/      attached_assets/
 
 ARG BASE_PATH=/
-ARG VITE_CLERK_PUBLISHABLE_KEY
-ARG VITE_CLERK_PROXY_URL
 
 ENV PORT=3000
 ENV BASE_PATH=${BASE_PATH}
-ENV VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
-ENV VITE_CLERK_PROXY_URL=${VITE_CLERK_PROXY_URL}
 ENV NODE_ENV=production
 
 RUN pnpm --filter @workspace/harrowgate run build

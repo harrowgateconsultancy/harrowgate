@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { Readable } from "stream";
 import { randomUUID } from "crypto";
-import { getAuth } from "@clerk/express";
+import { verifyStudentToken } from "./studentAuth";
 import { db } from "@workspace/db";
 import { studentSubmissionsTable, studentDocumentsTable, studentMessagesTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -295,10 +295,11 @@ async function generateSignedTermsPDF(opts: {
 }
 
 const requireStudentAuth = (req: any, res: any, next: any) => {
-  const auth = getAuth(req);
-  const userId = auth?.userId;
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
-  req.clerkUserId = userId;
+  const auth = req.headers.authorization;
+  const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+  const studentId = verifyStudentToken(token);
+  if (!studentId) return res.status(401).json({ error: "Unauthorized" });
+  req.studentUserId = studentId;
   next();
 };
 
@@ -306,7 +307,7 @@ router.get("/student/submissions/me", requireStudentAuth, async (req: any, res) 
   try {
     // Primary lookup by Clerk user ID
     let [submission] = await db.select().from(studentSubmissionsTable)
-      .where(eq(studentSubmissionsTable.clerkUserId, req.clerkUserId)).limit(1);
+      .where(eq(studentSubmissionsTable.clerkUserId, req.studentUserId)).limit(1);
 
     // Fallback: if not found by clerkUserId, try matching by email
     // (handles case where admin submitted on behalf of the student)
@@ -318,7 +319,7 @@ router.get("/student/submissions/me", requireStudentAuth, async (req: any, res) 
         if (byEmail) {
           // Link this submission to the student's actual Clerk account
           const [linked] = await db.update(studentSubmissionsTable)
-            .set({ clerkUserId: req.clerkUserId })
+            .set({ clerkUserId: req.studentUserId })
             .where(eq(studentSubmissionsTable.id, byEmail.id))
             .returning();
           submission = linked;
@@ -337,14 +338,14 @@ router.post("/student/submissions", requireStudentAuth, async (req: any, res) =>
     const { name, dateOfBirth, passportNumber, email, preferredLevel, preferredCourse, preferredInstitution, agentCode } = req.body;
     if (!name || !dateOfBirth || !passportNumber) return res.status(400).json({ error: "Name, date of birth, and passport number are required" });
     const existing = await db.select().from(studentSubmissionsTable)
-      .where(eq(studentSubmissionsTable.clerkUserId, req.clerkUserId)).limit(1);
+      .where(eq(studentSubmissionsTable.clerkUserId, req.studentUserId)).limit(1);
     if (existing.length > 0) {
       const [updated] = await db.update(studentSubmissionsTable).set({ name, dateOfBirth, passportNumber, email, preferredLevel, preferredCourse, preferredInstitution, agentCode: agentCode || null })
-        .where(eq(studentSubmissionsTable.clerkUserId, req.clerkUserId)).returning();
+        .where(eq(studentSubmissionsTable.clerkUserId, req.studentUserId)).returning();
       return res.json(updated);
     }
     const [created] = await db.insert(studentSubmissionsTable)
-      .values({ clerkUserId: req.clerkUserId, name, dateOfBirth, passportNumber, email, preferredLevel, preferredCourse, preferredInstitution, agentCode: agentCode || null }).returning();
+      .values({ clerkUserId: req.studentUserId, name, dateOfBirth, passportNumber, email, preferredLevel, preferredCourse, preferredInstitution, agentCode: agentCode || null }).returning();
     sendNewApplicationEmail({ name, email: email || null, passportNumber, dateOfBirth, docCount: 0 }).catch(() => {});
     // WhatsApp notification via CallMeBot (set CALLMEBOT_API_KEY secret to enable)
     const waKey = process.env.CALLMEBOT_API_KEY;
@@ -368,7 +369,7 @@ router.post("/student/submissions/:id/documents", requireStudentAuth, async (req
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
     const { documentType, fileName, fileUrl, fileSize, mimeType } = req.body;
     const existing = await db.select().from(studentDocumentsTable)
@@ -394,7 +395,7 @@ router.delete("/student/submissions/:id/documents/:docId", requireStudentAuth, a
     const submissionId = parseInt(req.params.id);
     const docId = parseInt(req.params.docId);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
     if (!["docs_requested", "pending"].includes(submission.status)) {
       return res.status(400).json({ error: "Cannot delete documents at this stage" });
@@ -413,7 +414,7 @@ router.post("/student/submissions/:id/resubmit", requireStudentAuth, async (req:
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
     if (submission.status !== "docs_requested") return res.status(400).json({ error: "Submission is not awaiting resubmission" });
     const [updated] = await db.update(studentSubmissionsTable).set({ status: "pending", adminNotes: null })
@@ -437,7 +438,7 @@ router.get("/student/submissions/:id/documents/:docId/view", requireStudentAuth,
     const submissionId = parseInt(req.params.id);
     const docId = parseInt(req.params.docId);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(403).json({ error: "Forbidden" });
     const [doc] = await db.select().from(studentDocumentsTable)
       .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId))).limit(1);
@@ -463,7 +464,7 @@ router.post("/student/submissions/:id/complete-university-interview", requireStu
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
     if (submission.status !== "university_interview_arranged") return res.status(400).json({ error: "Interview not yet arranged" });
     const [updated] = await db.update(studentSubmissionsTable)
@@ -477,7 +478,7 @@ router.post("/student/submissions/:id/accept-terms", requireStudentAuth, async (
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
     if (submission.termsAcceptedAt) return res.status(400).json({ error: "Terms already accepted" });
     const { signatureData } = req.body;
@@ -515,7 +516,7 @@ router.post("/student/submissions/:id/receipt", requireStudentAuth, async (req: 
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
     if (submission.status !== "payment_pending") return res.status(400).json({ error: "Submission is not awaiting payment" });
     const { fileName, fileUrl, fileSize, mimeType } = req.body;
@@ -535,7 +536,7 @@ router.post("/student/submissions/:id/additional-docs", requireStudentAuth, asyn
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
     if (!submission.additionalDocsRequested) return res.status(400).json({ error: "No additional documents have been requested" });
     const { fileName, fileUrl, fileSize, mimeType, note } = req.body;
@@ -557,7 +558,7 @@ router.get("/student/submissions/:id/documents/:docId/view", requireStudentAuth,
     const submissionId = parseInt(req.params.id);
     const docId = parseInt(req.params.docId);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(403).json({ error: "Forbidden" });
     const [doc] = await db.select().from(studentDocumentsTable)
       .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId))).limit(1);
@@ -586,7 +587,7 @@ router.get("/student/submissions/:id/documents/:docId/download", requireStudentA
     const submissionId = parseInt(req.params.id);
     const docId = parseInt(req.params.docId);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(403).json({ error: "Forbidden" });
     const [doc] = await db.select().from(studentDocumentsTable)
       .where(and(eq(studentDocumentsTable.id, docId), eq(studentDocumentsTable.submissionId, submissionId))).limit(1);
@@ -613,7 +614,7 @@ router.post("/student/submissions/:id/receipt2", requireStudentAuth, async (req:
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
     if (submission.status !== "second_payment_pending") return res.status(400).json({ error: "Submission is not awaiting 2nd payment" });
     const { fileName, fileUrl, fileSize, mimeType } = req.body;
@@ -632,7 +633,7 @@ router.post("/student/submissions/:id/receipt3", requireStudentAuth, async (req:
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Submission not found" });
     if (submission.status !== "offer_letter_pending") return res.status(400).json({ error: "Submission is not awaiting final payment" });
     const { fileName, fileUrl, fileSize, mimeType } = req.body;
@@ -652,7 +653,7 @@ router.get("/student/submissions/:id/messages", requireStudentAuth, async (req: 
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Not found" });
     // Mark unread admin messages as read
     await db.update(studentMessagesTable)
@@ -670,7 +671,7 @@ router.post("/student/submissions/:id/messages/reply", requireStudentAuth, async
   try {
     const submissionId = parseInt(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
-      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.clerkUserId))).limit(1);
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
     if (!submission) return res.status(404).json({ error: "Not found" });
     const { body, attachments, subject } = req.body;
     if (!body?.trim() && (!attachments || attachments.length === 0)) {
@@ -696,9 +697,10 @@ router.post("/student/submissions/:id/messages/reply", requireStudentAuth, async
 });
 
 // ─── Inbox: list emails ──────────────────────────────────────────────────────
-router.get("/student/submissions/:id/inbox", async (req, res) => {
+router.get("/student/submissions/:id/inbox", async (req: any, res) => {
   try {
-    const { userId } = getAuth(req);
+    const auth = req.headers.authorization;
+    const userId = verifyStudentToken(auth?.startsWith("Bearer ") ? auth.slice(7) : null);
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
     const submissionId = Number(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
@@ -717,9 +719,10 @@ router.get("/student/submissions/:id/inbox", async (req, res) => {
 });
 
 // ─── Inbox: get single email ─────────────────────────────────────────────────
-router.get("/student/submissions/:id/inbox/:uid", async (req, res) => {
+router.get("/student/submissions/:id/inbox/:uid", async (req: any, res) => {
   try {
-    const { userId } = getAuth(req);
+    const auth = req.headers.authorization;
+    const userId = verifyStudentToken(auth?.startsWith("Bearer ") ? auth.slice(7) : null);
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
     const submissionId = Number(req.params.id);
     const uid = Number(req.params.uid);
@@ -740,9 +743,10 @@ router.get("/student/submissions/:id/inbox/:uid", async (req, res) => {
 });
 
 // ─── Outbox: student composes email (saved as pending) ───────────────────────
-router.post("/student/submissions/:id/outbox", async (req, res) => {
+router.post("/student/submissions/:id/outbox", async (req: any, res) => {
   try {
-    const { userId } = getAuth(req);
+    const auth = req.headers.authorization;
+    const userId = verifyStudentToken(auth?.startsWith("Bearer ") ? auth.slice(7) : null);
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
     const submissionId = Number(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)
@@ -773,9 +777,10 @@ router.post("/student/submissions/:id/outbox", async (req, res) => {
 });
 
 // ─── Outbox: list student's sent emails ──────────────────────────────────────
-router.get("/student/submissions/:id/outbox", async (req, res) => {
+router.get("/student/submissions/:id/outbox", async (req: any, res) => {
   try {
-    const { userId } = getAuth(req);
+    const auth = req.headers.authorization;
+    const userId = verifyStudentToken(auth?.startsWith("Bearer ") ? auth.slice(7) : null);
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
     const submissionId = Number(req.params.id);
     const [submission] = await db.select().from(studentSubmissionsTable)

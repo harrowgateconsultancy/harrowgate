@@ -3,6 +3,7 @@ import app from "./app";
 import { logger } from "./lib/logger";
 import { setupScreenMirror } from "./lib/screenMirror";
 import { initAdminCredentialsTables } from "./routes/adminAuth";
+import { initStudentTables } from "./routes/studentAuth";
 
 process.on("uncaughtException", (err) => {
   logger.error({ err }, "Uncaught exception — keeping server alive");
@@ -31,6 +32,11 @@ setupScreenMirror(httpServer);
 // Ensure admin credential override tables exist
 initAdminCredentialsTables().catch(err =>
   logger.warn({ err }, "Could not init admin credentials tables")
+);
+
+// Ensure student auth tables exist
+initStudentTables().catch(err =>
+  logger.warn({ err }, "Could not init student auth tables")
 );
 
 httpServer.listen(port, (err?: Error) => {
