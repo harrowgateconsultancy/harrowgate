@@ -80,6 +80,46 @@ router.get("/agents/approved", async (_req, res) => {
   }
 });
 
+// Admin: create an agent directly
+router.post("/admin/agents", async (req, res) => {
+  try {
+    const {
+      username, password,
+      companyName, contactName, officeAddress, email, contactNumber,
+      whatsappAvailable, autoApprove,
+    } = req.body || {};
+
+    if (!username || !password || !companyName || !contactName || !officeAddress || !contactNumber) {
+      return res.status(400).json({ error: "Required fields missing" });
+    }
+
+    const passwordHash = hashPassword(password);
+    const status = autoApprove ? "approved" : "pending";
+    const agentCode = autoApprove ? await generateAgentCode() : null;
+
+    const [agent] = await db.insert(agentsTable).values({
+      username,
+      passwordHash,
+      plainPassword: password,
+      companyName,
+      contactName,
+      officeAddress,
+      email: email || null,
+      contactNumber,
+      whatsappAvailable: whatsappAvailable === "yes" ? "yes" : "no",
+      status,
+      agentCode,
+    }).returning();
+
+    res.status(201).json(agent);
+  } catch (e: any) {
+    if (e?.message?.includes("unique")) {
+      return res.status(409).json({ error: "Username already taken" });
+    }
+    res.status(500).json({ error: "Failed to create agent" });
+  }
+});
+
 // Admin: list all agents
 router.get("/admin/agents", async (_req, res) => {
   try {

@@ -384,6 +384,202 @@ function Field({ label, value, mono }: { label: string; value: string; mono?: bo
   );
 }
 
+// ── Add Agent Modal ──────────────────────────────────────────────────────────
+function AddAgentModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const C = useAgentColors();
+  const [form, setForm] = useState({
+    companyName: "", contactName: "", email: "", contactNumber: "",
+    officeAddress: "", username: "", password: "", whatsappAvailable: "no", autoApprove: true,
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [showPass, setShowPass] = useState(false);
+
+  const set = (k: keyof typeof form, v: string | boolean) =>
+    setForm(f => ({ ...f, [k]: v }));
+
+  const submit = async () => {
+    const { companyName, contactName, contactNumber, officeAddress, username, password } = form;
+    if (!companyName || !contactName || !contactNumber || !officeAddress || !username || !password) {
+      setError("Please fill in all required fields."); return;
+    }
+    setSaving(true); setError("");
+    try {
+      const res = await adminFetch("/admin/agents", {
+        method: "POST",
+        body: JSON.stringify({ ...form }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        setError((j as any).error || "Failed to create agent");
+      } else {
+        onCreated();
+      }
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", background: C.inputBg, border: `1px solid ${C.bdr}`,
+    borderRadius: 8, padding: "9px 13px", color: C.text, fontSize: 13.5, outline: "none",
+    boxSizing: "border-box",
+  };
+  const label = (txt: string, required = false) => (
+    <label style={{ display: "block", fontSize: 11, color: C.textMid, fontWeight: 600, marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+      {txt}{required && <span style={{ color: "#e07070" }}> *</span>}
+    </label>
+  );
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.78)", zIndex: 1000,
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+    }}>
+      <div style={{
+        background: C.card, border: `1px solid ${C.bdr}`, borderRadius: 16,
+        width: "100%", maxWidth: 560, maxHeight: "90vh", display: "flex", flexDirection: "column",
+        overflow: "hidden", boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
+      }}>
+        {/* Header */}
+        <div style={{ padding: "20px 24px 16px", borderBottom: `1px solid ${C.bdrFaint}`, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <p style={{ margin: 0, color: GOLD, fontWeight: 700, fontSize: 16, display: "flex", alignItems: "center", gap: 8 }}>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 15, height: 15 }}><path d="M8 2v4M8 10v4M2 8h4M10 8h4" strokeLinecap="round"/><circle cx="8" cy="8" r="6"/></svg>
+              Add New Agent
+            </p>
+            <p style={{ margin: "3px 0 0", color: C.textMid, fontSize: 12 }}>Create an agent account directly from the admin panel</p>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: C.textMid, fontSize: 22, cursor: "pointer", lineHeight: 1 }}>×</button>
+        </div>
+
+        {/* Scrollable body */}
+        <div style={{ flex: "1 1 auto", overflowY: "auto", padding: "20px 24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 16px" }}>
+            {/* Company Name */}
+            <div style={{ gridColumn: "1 / -1" }}>
+              {label("Company / Agency Name", true)}
+              <input style={inputStyle} value={form.companyName} onChange={e => set("companyName", e.target.value)} placeholder="e.g. Global Education Partners Ltd." />
+            </div>
+
+            {/* Contact Name */}
+            <div>
+              {label("Contact Person", true)}
+              <input style={inputStyle} value={form.contactName} onChange={e => set("contactName", e.target.value)} placeholder="Full name" />
+            </div>
+
+            {/* Email */}
+            <div>
+              {label("Email Address")}
+              <input style={inputStyle} type="email" value={form.email} onChange={e => set("email", e.target.value)} placeholder="agent@example.com" />
+            </div>
+
+            {/* Contact Number */}
+            <div>
+              {label("Contact Number", true)}
+              <input style={inputStyle} value={form.contactNumber} onChange={e => set("contactNumber", e.target.value)} placeholder="+852 XXXX XXXX" />
+            </div>
+
+            {/* WhatsApp */}
+            <div>
+              {label("WhatsApp Available")}
+              <select style={{ ...inputStyle, cursor: "pointer" }} value={form.whatsappAvailable} onChange={e => set("whatsappAvailable", e.target.value)}>
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+
+            {/* Office Address */}
+            <div style={{ gridColumn: "1 / -1" }}>
+              {label("Office Address", true)}
+              <input style={inputStyle} value={form.officeAddress} onChange={e => set("officeAddress", e.target.value)} placeholder="Full office address" />
+            </div>
+
+            {/* Divider */}
+            <div style={{ gridColumn: "1 / -1", borderTop: `1px solid ${C.bdrFaint}`, margin: "2px 0" }} />
+            <div style={{ gridColumn: "1 / -1" }}>
+              <p style={{ margin: "0 0 12px", fontSize: 12, color: C.textMid, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Login Credentials</p>
+            </div>
+
+            {/* Username */}
+            <div>
+              {label("Username", true)}
+              <input style={inputStyle} value={form.username} onChange={e => set("username", e.target.value.toLowerCase().replace(/\s/g, ""))} placeholder="e.g. globaleduhk" autoComplete="off" />
+            </div>
+
+            {/* Password */}
+            <div>
+              {label("Password", true)}
+              <div style={{ position: "relative" }}>
+                <input
+                  style={{ ...inputStyle, paddingRight: 64 }}
+                  type={showPass ? "text" : "password"}
+                  value={form.password}
+                  onChange={e => set("password", e.target.value)}
+                  placeholder="Set a password"
+                  autoComplete="new-password"
+                />
+                <button
+                  onClick={() => setShowPass(v => !v)}
+                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: GOLD, fontSize: 11, cursor: "pointer", padding: "2px 6px", fontWeight: 600 }}
+                >
+                  {showPass ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div style={{ gridColumn: "1 / -1", borderTop: `1px solid ${C.bdrFaint}`, margin: "2px 0" }} />
+
+            {/* Auto-approve toggle */}
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
+                <div
+                  onClick={() => set("autoApprove", !form.autoApprove)}
+                  style={{
+                    width: 40, height: 22, borderRadius: 11, flexShrink: 0,
+                    background: form.autoApprove ? GOLD : C.bdr,
+                    position: "relative", transition: "background 0.2s", cursor: "pointer",
+                  }}
+                >
+                  <div style={{
+                    position: "absolute", top: 3, left: form.autoApprove ? 21 : 3,
+                    width: 16, height: 16, borderRadius: "50%",
+                    background: form.autoApprove ? "#0b2213" : "#fff",
+                    transition: "left 0.2s",
+                  }} />
+                </div>
+                <div>
+                  <p style={{ margin: 0, fontSize: 13.5, color: C.text, fontWeight: 600 }}>Approve immediately &amp; assign agent code</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 12, color: C.textMid }}>Agent will be active right away with an auto-generated HGT-XXX code</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {error && <p style={{ margin: "14px 0 0", color: "#e07070", fontSize: 13 }}>{error}</p>}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: "16px 24px", borderTop: `1px solid ${C.bdrFaint}`, flexShrink: 0, display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <button onClick={onClose} style={{ background: "none", border: `1px solid ${C.bdr}`, color: C.textMid, borderRadius: 8, padding: "9px 20px", cursor: "pointer", fontSize: 13 }}>
+            Cancel
+          </button>
+          <button
+            onClick={submit}
+            disabled={saving}
+            style={{ background: saving ? "rgba(162,137,89,0.4)" : GOLD, color: "#071a10", border: "none", borderRadius: 8, padding: "9px 24px", cursor: saving ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 700 }}
+          >
+            {saving ? "Creating…" : "Create Agent"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ───────────────────────────────────────────────────────────────
 export default function AgentsPage() {
   const C = useAgentColors();
@@ -396,6 +592,8 @@ export default function AgentsPage() {
   const [confirm, setConfirm] = useState<{ message: string; onConfirm: () => void } | null>(null);
   // Email modal state
   const [emailTarget, setEmailTarget] = useState<Agent | null>(null);
+  // Add agent modal
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -480,14 +678,39 @@ export default function AgentsPage() {
         <EmailModal agent={emailTarget} onClose={() => setEmailTarget(null)} />
       )}
 
+      {/* Add Agent Modal */}
+      {showAddModal && (
+        <AddAgentModal
+          onClose={() => setShowAddModal(false)}
+          onCreated={() => { setShowAddModal(false); load(); }}
+        />
+      )}
+
       {/* Title */}
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ color: GOLD, fontSize: 26, fontWeight: 700, margin: "0 0 6px", fontFamily: "Georgia, serif" }}>
-          Agent Applications
-        </h1>
-        <p style={{ color: C.textMid, fontSize: 14, margin: 0 }}>
-          {agents.length} agent{agents.length !== 1 ? "s" : ""} registered · {counts.pending} pending review
-        </p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
+        <div>
+          <h1 style={{ color: GOLD, fontSize: 26, fontWeight: 700, margin: "0 0 6px", fontFamily: "Georgia, serif" }}>
+            Agents
+          </h1>
+          <p style={{ color: C.textMid, fontSize: 14, margin: 0 }}>
+            {agents.length} agent{agents.length !== 1 ? "s" : ""} registered · {counts.pending} pending review
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          style={{
+            display: "flex", alignItems: "center", gap: 8,
+            background: GOLD, color: "#071a10", border: "none",
+            borderRadius: 10, padding: "10px 20px",
+            fontSize: 13.5, fontWeight: 700, cursor: "pointer",
+            flexShrink: 0,
+          }}
+        >
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 14, height: 14 }}>
+            <path d="M8 3v10M3 8h10" strokeLinecap="round"/>
+          </svg>
+          Add Agent
+        </button>
       </div>
 
       {/* Toolbar */}
