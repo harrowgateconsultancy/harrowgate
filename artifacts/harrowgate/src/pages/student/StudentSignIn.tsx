@@ -139,15 +139,6 @@ export default function StudentSignIn() {
                 <GoogleIcon />
                 Continue with Google
               </a>
-              <a
-                href={`${getApiBase()}/api/student/auth/apple`}
-                style={{ ...oauthBtnStyle, gap: "8px" }}
-                onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
-                onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
-              >
-                <AppleIcon />
-                Continue with Apple
-              </a>
             </div>
 
             {/* ── Divider ── */}
