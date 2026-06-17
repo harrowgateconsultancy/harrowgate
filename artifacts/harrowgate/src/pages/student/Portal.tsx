@@ -266,8 +266,8 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
   const [composeSending, setComposeSending] = useState(false);
   const [composeSent, setComposeSent] = useState(false);
 
-  const authHdr = async () => {
-    const token = await session?.getToken();
+  const authHdr = () => {
+    const token = localStorage.getItem("student_token");
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
@@ -734,13 +734,13 @@ export default function Portal() {
   }, [submission?.id]);
 
   useEffect(() => {
-    if (!submission?.id || !session) return;
+    if (!submission?.id) return;
     const pollId = setInterval(() => {
       silentFetchSubmission();
       silentFetchMessages(submission.id);
     }, 10000);
     return () => clearInterval(pollId);
-  }, [submission?.id, session?.id]);
+  }, [submission?.id]);
 
   const handleReplyAttachment = async (file: File) => {
     setUploadingReplyAttachment(true);

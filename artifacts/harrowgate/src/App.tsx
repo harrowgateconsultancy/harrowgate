@@ -33,6 +33,7 @@ import TaxPage from "@/pages/admin/Tax";
 import StaffDashboard from "@/pages/staff/StaffDashboard";
 import PrintView from "@/pages/print";
 import NotFound from "@/pages/not-found";
+import OAuthCallback from "@/pages/auth/OAuthCallback";
 import { isStudentLoggedIn } from "@/lib/studentAuth";
 
 const queryClient = new QueryClient({
@@ -93,6 +94,7 @@ function AppRoutes() {
       <TooltipProvider>
         <Switch>
           <Route path="/" component={HomeRedirect} />
+          <Route path="/auth/callback" component={OAuthCallback} />
           <Route path="/sign-in" component={StudentSignIn} />
           <Route path="/sign-up" component={StudentSignUp} />
           <Route path="/portal" component={PortalPage} />

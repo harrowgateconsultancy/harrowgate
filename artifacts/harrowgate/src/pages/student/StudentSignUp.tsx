@@ -7,6 +7,25 @@ const GOLD_L = "#f0d28c";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
 
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+      <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
+      <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
+      <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
+      <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
+    </svg>
+  );
+}
+
+function AppleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 814 1000" aria-hidden="true">
+      <path fill="currentColor" d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.3-164-39.3c-76.5 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 790.7 0 663 0 541.8c0-207.5 135.4-317.3 268.7-317.3 72.6 0 132.8 45.1 177 45.1 42.2 0 109.5-47.7 191.8-47.7 30.4 0 108.2 2.6 164.2 99.3zM504.4 72.1C527.8 44.1 544.8 4.5 544.8 0c0-.6 0-1.2-.1-1.8-26.7 1-58.1 17.7-78.2 39.5-20.1 21.7-38.9 57.9-38.9 97.4 0 .8.1 1.6.2 2.4.7.1 1.5.2 2.3.2 24.4 0 56.1-15.8 74.3-65.6z"/>
+    </svg>
+  );
+}
+
 export default function StudentSignUp() {
   const [, setLocation] = useLocation();
   const [name, setName] = useState("");
@@ -38,6 +57,23 @@ export default function StudentSignUp() {
       setError("Network error — please try again");
     } finally { setLoading(false); }
   }
+
+  const oauthBtnStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "10px",
+    width: "100%",
+    padding: "11px 16px",
+    borderRadius: "9999px",
+    border: "1px solid rgba(196,169,110,0.25)",
+    background: "rgba(255,255,255,0.05)",
+    color: "#f0e8d0",
+    fontSize: "14px",
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+  } as React.CSSProperties;
 
   return (
     <div
@@ -88,6 +124,37 @@ export default function StudentSignUp() {
           }}
         >
           <div className="w-full sm:rounded-[calc(1.5rem-2px)] overflow-hidden p-8" style={{ background: BG }}>
+
+            {/* ── OAuth buttons ── */}
+            <div className="flex flex-col gap-3 mb-6">
+              <a
+                href={`${getApiBase()}/api/student/auth/google`}
+                style={oauthBtnStyle}
+                onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+              >
+                <GoogleIcon />
+                Continue with Google
+              </a>
+              <a
+                href={`${getApiBase()}/api/student/auth/apple`}
+                style={{ ...oauthBtnStyle, gap: "8px" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+              >
+                <AppleIcon />
+                Continue with Apple
+              </a>
+            </div>
+
+            {/* ── Divider ── */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex-1 h-px" style={{ background: "rgba(196,169,110,0.15)" }} />
+              <span className="text-xs font-medium" style={{ color: "rgba(196,169,110,0.45)" }}>or create an account with email</span>
+              <div className="flex-1 h-px" style={{ background: "rgba(196,169,110,0.15)" }} />
+            </div>
+
+            {/* ── Email / Password form ── */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold tracking-wide" style={{ color: "rgba(196,169,110,0.85)" }}>

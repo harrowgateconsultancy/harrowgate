@@ -27,7 +27,7 @@ function verifyPassword(password: string, stored: string): boolean {
   } catch { return false; }
 }
 
-function makeStudentToken(studentId: string): string {
+export function makeStudentToken(studentId: string): string {
   const exp = Date.now() + 30 * 24 * 60 * 60 * 1000;
   const payload = `${studentId}:${exp}`;
   const sig = createHmac("sha256", getSecret()).update(payload).digest("hex");
@@ -59,12 +59,16 @@ export async function initStudentTables() {
     CREATE TABLE IF NOT EXISTS student_users (
       id TEXT PRIMARY KEY,
       email TEXT NOT NULL UNIQUE,
-      password_hash TEXT NOT NULL,
+      password_hash TEXT,
       name TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+  // Add OAuth columns if they don't already exist (safe to run every startup)
+  await pool.query(`ALTER TABLE student_users ALTER COLUMN password_hash DROP NOT NULL`).catch(() => {});
+  await pool.query(`ALTER TABLE student_users ADD COLUMN IF NOT EXISTS google_id TEXT UNIQUE`);
+  await pool.query(`ALTER TABLE student_users ADD COLUMN IF NOT EXISTS apple_id TEXT UNIQUE`);
 }
 
 router.post("/student/register", async (req, res) => {
