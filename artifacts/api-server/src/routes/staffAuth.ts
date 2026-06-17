@@ -85,8 +85,16 @@ router.post("/staff/login", async (req, res) => {
 
 // Heartbeat — keeps staff session alive
 router.post("/staff/heartbeat", (req: any, res) => {
-  const { sessionId } = req.body || {};
-  if (sessionId) heartbeatSession(sessionId);
+  const { sessionId, role, name } = req.body || {};
+  if (sessionId) {
+    const found = heartbeatSession(sessionId);
+    if (!found && role && name) {
+      const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim()
+        || req.socket?.remoteAddress
+        || "unknown";
+      registerSession(sessionId, role, name, ip);
+    }
+  }
   res.json({ ok: true });
 });
 

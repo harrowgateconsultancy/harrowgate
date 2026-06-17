@@ -80,14 +80,17 @@ export default function StaffDashboard() {
     loadTasks();
     pollRef.current = setInterval(() => loadTasks(true), 15_000);
 
-    // Heartbeat to keep session alive
+    // Heartbeat to keep session alive; re-registers if session lost after server restart
     const sessionId = localStorage.getItem("staff_session_id");
+    const staffData = JSON.parse(localStorage.getItem("staff_user") || "{}");
+    const heartbeatRole = staffData.role ?? "staff";
+    const heartbeatName = staffData.name ?? "Staff";
     function sendHeartbeat() {
       if (!sessionId) return;
       fetch(`${getApiBase()}/api/staff/heartbeat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ sessionId, role: heartbeatRole, name: heartbeatName }),
       }).catch(() => {});
     }
     sendHeartbeat();

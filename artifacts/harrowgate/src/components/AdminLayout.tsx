@@ -40,15 +40,17 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   const navItems = ALL_NAV_ITEMS.filter(item => item.roles.includes(role));
 
-  // Heartbeat — keeps this session alive in the server's session tracker
+  // Heartbeat — keeps this session alive; also re-registers after server restarts
   useEffect(() => {
     const sessionId = localStorage.getItem("admin_session_id");
     if (!sessionId) return;
+    const heartbeatRole = localStorage.getItem("admin_role") ?? "admin";
+    const heartbeatName = localStorage.getItem("admin_name") ?? "Admin";
     function beat() {
       fetch(`${getApiBaseLayout()}/api/admin/heartbeat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ sessionId, role: heartbeatRole, name: heartbeatName }),
       }).catch(() => {});
     }
     beat();
