@@ -1,0 +1,91 @@
+version: "3.9"
+
+services:
+
+  # ── PostgreSQL database ────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: harrowgate-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: harrowgate
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: harrowgate
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U harrowgate"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── API Server ────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: api
+    container_name: harrowgate-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: "8080"
+      NODE_ENV: production
+      DATABASE_URL: postgresql://harrowgate:${DB_PASSWORD}@postgres:5432/harrowgate
+
+      # Clerk Auth
+      CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+
+      # Admin portal login
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+      # File storage — stored on your NAS volume
+      LOCAL_UPLOAD_DIR: /data/uploads
+
+      # Gmail notifications (optional)
+      GMAIL_USER: ${GMAIL_USER:-}
+      GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD:-}
+
+      # Google Drive / Sheets (optional)
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${GOOGLE_SERVICE_ACCOUNT_JSON:-}
+      GOOGLE_SHEETS_ID: ${GOOGLE_SHEETS_ID:-}
+      GOOGLE_DRIVE_ROOT_FOLDER_ID: ${GOOGLE_DRIVE_ROOT_FOLDER_ID:-}
+
+      # MEGA cloud backup (optional)
+      MEGA_PASSWORD: ${MEGA_PASSWORD:-}
+
+      # WebDAV storage (optional — alternative to local)
+      WEBDAV_URL: ${WEBDAV_URL:-}
+      WEBDAV_USERNAME: ${WEBDAV_USERNAME:-}
+      WEBDAV_PASSWORD: ${WEBDAV_PASSWORD:-}
+
+      # WhatsApp/CallMeBot notifications (optional)
+      CALLMEBOT_API_KEY: ${CALLMEBOT_API_KEY:-}
+    volumes:
+      - uploads_data:/data/uploads
+    expose:
+      - "8080"
+
+  # ── Frontend (nginx serving React + proxying /api/) ──────────────────────
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: frontend
+      args:
+        BASE_PATH: /
+        VITE_CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
+    container_name: harrowgate-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "${WEB_PORT:-3000}:80"
+
+volumes:
+  postgres_data:
+  uploads_data:
