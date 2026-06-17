@@ -5,7 +5,11 @@ import { pool } from "@workspace/db";
 const router = Router();
 
 function getSecret(): string {
-  return process.env.STUDENT_JWT_SECRET || process.env.ADMIN_PASSWORD || "fallback-student-secret-change-me";
+  const secret = process.env.STUDENT_JWT_SECRET || process.env.ADMIN_PASSWORD;
+  if (!secret) {
+    throw new Error("STUDENT_JWT_SECRET (or ADMIN_PASSWORD) must be set — student token signing is not safe without a secret");
+  }
+  return secret;
 }
 
 function hashPassword(password: string): string {
