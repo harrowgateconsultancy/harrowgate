@@ -30,6 +30,7 @@ import AgentsPage from "@/pages/admin/Agents";
 import AgentSignup from "@/pages/agent/AgentSignup";
 import StaffLogin from "@/pages/staff/StaffLogin";
 import InvoicePage from "@/pages/admin/Invoice";
+import TaxPage from "@/pages/admin/Tax";
 import StaffDashboard from "@/pages/staff/StaffDashboard";
 import PrintView from "@/pages/print";
 import NotFound from "@/pages/not-found";
@@ -439,6 +440,9 @@ function ClerkProviderWithRoutes() {
                     <Route path="/admin/invoice" component={InvoicePage} />
                     <Route path="/admin/agents">
                       <AdminOnlyGuard><AgentsPage /></AdminOnlyGuard>
+                    </Route>
+                    <Route path="/admin/tax">
+                      <AdminOnlyGuard><TaxPage /></AdminOnlyGuard>
                     </Route>
                     <Route component={NotFound} />
                   </Switch>

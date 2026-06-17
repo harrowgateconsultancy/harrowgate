@@ -1,0 +1,69 @@
+I need you to build a complete Hong Kong tax accounting web application with the following features:
+
+## Core Requirements:
+
+2. The page must have input fields for:
+   - Revenue
+   - Cost of goods sold (COGS)
+   - Operating expenses
+   - Other income
+   - Interest/finance costs
+   - Depreciation
+
+3. The application must automatically calculate and display:
+   - A Profit & Loss statement showing:
+     * Revenue
+     * Cost of goods sold
+     * Gross profit
+     * Operating expenses
+     * Depreciation
+     * Other income
+     * Interest/finance costs
+     * Net profit (before tax)
+   
+   - A Balance Sheet showing:
+     * Current assets (cash, receivables)
+     * Fixed assets (net)
+     * Total assets
+     * Current liabilities
+     * Long-term liabilities
+     * Equity (share capital + retained earnings)
+     * Total liabilities + equity (must balance with total assets)
+
+4. A summary card showing:
+   - Net profit
+   - Total assets
+   - Total liabilities
+   - Equity
+   - A balance check indicator (showing if assets = liabilities + equity)
+
+## Hong Kong Tax Compliance:
+- The layout should be suitable for Hong Kong profits tax return (Form BIR51/52)
+- Use HKD currency format (with $ sign)
+- Include a badge showing "FY 2025/26 · April filing"
+- Include a footnote about HK GAAP / IRD requirements
+
+## PDF Export Functionality:
+- Add a prominent "Export PDF" button
+- When clicked, it should use window.print() with @media print styles
+- The print view should:
+  - Hide all buttons, input fields, and action elements
+  - Show only the statements, summaries, and headers
+  - Maintain professional formatting suitable for tax filing
+  - Use clean, print-friendly styling (white background, proper spacing)
+
+## User Experience:
+- All inputs should auto-update the statements when changed (no need to click update)
+- Include a "Reset" button to clear all fields
+- Include a "Load sample data" button that populates with realistic values
+- Responsive design that works on both desktop and mobile
+- Professional, clean design with a blue color scheme
+
+
+## Technical Notes:
+- The balance sheet should always balance (assets = liabilities + equity)
+- Format numbers with commas and $ sign
+- All calculations should be accurate to 2 decimal places
+
+
+Make sure the PDF export works properly and the print styles hide all interactive elements while keeping the financial statements looking professional.
