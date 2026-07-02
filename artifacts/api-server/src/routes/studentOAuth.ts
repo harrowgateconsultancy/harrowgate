@@ -111,7 +111,6 @@ router.get("/student/auth/google", (req: any, res) => {
   url.searchParams.set("access_type", "offline");
   url.searchParams.set("prompt", "select_account");
   url.searchParams.set("state", makeOAuthState());
-  console.log("[oauth/google] full auth URL =", url.toString());
   res.redirect(url.toString());
 });
 
