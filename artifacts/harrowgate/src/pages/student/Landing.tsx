@@ -757,7 +757,7 @@ export default function Landing() {
                   the: 36,
                   students: "30,000+",
                   desc: "Hong Kong's oldest and most prestigious institution. Globally recognised for medicine, law, and social sciences with a stunning Victorian campus.",
-                  photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Loke_Yew_Hall.jpg/800px-Loke_Yew_Hall.jpg",
+                  photo: "/uni-hku.jpg",
                   tags: ["Medicine", "Law", "Business"],
                 },
                 {
@@ -768,7 +768,7 @@ export default function Landing() {
                   the: 69,
                   students: "16,500+",
                   desc: "A research powerhouse that rapidly climbed global rankings. Perched over Clear Water Bay with outstanding science, engineering and MBA programmes.",
-                  photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/HKUST_campus_overview.jpg/800px-HKUST_campus_overview.jpg",
+                  photo: "/uni-hkust.jpg",
                   tags: ["Engineering", "Business", "Science"],
                 },
                 {
@@ -779,7 +779,7 @@ export default function Landing() {
                   the: 116,
                   students: "33,000+",
                   desc: "A leading applied-sciences university celebrated for design, nursing, hospitality management, and professional disciplines across 30+ schools.",
-                  photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/PolyU_20080719.jpg/800px-PolyU_20080719.jpg",
+                  photo: "/uni-polyu.jpg",
                   tags: ["Design", "Nursing", "Computing"],
                 },
                 {
@@ -790,7 +790,7 @@ export default function Landing() {
                   the: 133,
                   students: "21,000+",
                   desc: "An innovative, research-led university excelling in computer science, creative media, law, and business at the heart of Kowloon.",
-                  photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/City_University_of_Hong_Kong.jpg/800px-City_University_of_Hong_Kong.jpg",
+                  photo: "/uni-cityu.jpg",
                   tags: ["CS", "Media", "Law"],
                 },
               ].map((uni, i) => (
