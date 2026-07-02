@@ -19,6 +19,15 @@ interface BankDetails {
   additionalInfo: string;
 }
 
+interface PaymentMethods {
+  alipay: { enabled: boolean; accountName: string; accountId: string; qrCodeUrl: string; instructions: string };
+  card:   { enabled: boolean; paymentLink: string; instructions: string };
+}
+const DEFAULT_PM: PaymentMethods = {
+  alipay: { enabled: false, accountName: "", accountId: "", qrCodeUrl: "", instructions: "" },
+  card:   { enabled: false, paymentLink: "", instructions: "" },
+};
+
 async function uploadToStorage(file: File): Promise<{ url: string }> {
   const res = await fetch(`${getApiBase()}/api/storage/uploads/request-url`, {
     method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
@@ -38,12 +47,18 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [globalBankDetails, setGlobalBankDetails] = useState<BankDetails | null>(null);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethods>(DEFAULT_PM);
+  const [selectedMethod, setSelectedMethod] = useState<"bank" | "alipay" | "card">("bank");
   const pricing = usePricing();
 
   useEffect(() => {
     fetch(`${getApiBase()}/api/settings/bank-details`)
       .then(r => r.json())
       .then((b: BankDetails) => setGlobalBankDetails(b))
+      .catch(() => {});
+    fetch(`${getApiBase()}/api/settings/payment-methods`)
+      .then(r => r.json())
+      .then((pm: PaymentMethods) => setPaymentMethods(pm))
       .catch(() => {});
   }, []);
 
@@ -382,23 +397,40 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
       {!alreadySubmitted ? (
         <>
           {/* ── Steps ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {[
-              { n: "1", title: "Review Bank Details", body: "Bank details are shown below. Use Bank Transfer or FPS to make the payment." },
-              { n: "2", title: "Make the Transfer",   body: "Pay via Bank Transfer or FPS. Reference your full name on the transfer."  },
-              { n: "3", title: "Upload Your Receipt", body: "Take a screenshot of your payment confirmation and upload it below."      },
-            ].map(step => (
-              <div key={step.n} className="rounded-2xl p-4 border"
-                style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold mb-3"
-                  style={{ background: "rgba(162,137,89,0.14)", color: GOLD_B }}>
-                  {step.n}
-                </div>
-                <p className="text-sm font-semibold mb-1" style={{ color: GOLD_L }}>{step.title}</p>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(162,137,89,0.55)" }}>{step.body}</p>
+          {(() => {
+            const stepsMap = {
+              bank:   [
+                { n: "1", title: "Review Bank Details",   body: "Bank details are shown below. Use Bank Transfer or FPS to make the payment." },
+                { n: "2", title: "Make the Transfer",     body: "Pay via Bank Transfer or FPS. Include your full name in the payment reference." },
+                { n: "3", title: "Upload Your Receipt",   body: "Take a screenshot of your payment confirmation and upload it below." },
+              ],
+              alipay: [
+                { n: "1", title: "Open Alipay",           body: "Open your Alipay app and go to Transfer or Scan QR." },
+                { n: "2", title: "Scan QR / Transfer",    body: "Scan the QR code shown below, or transfer to the Alipay account ID listed." },
+                { n: "3", title: "Upload Your Receipt",   body: "Take a screenshot of the Alipay confirmation screen and upload it below." },
+              ],
+              card:   [
+                { n: "1", title: "Click Payment Link",    body: "Use the secure payment link provided below to proceed to card checkout." },
+                { n: "2", title: "Complete Payment",      body: "Enter your Visa or Mastercard details on the secure payment page." },
+                { n: "3", title: "Upload Your Receipt",   body: "Take a screenshot of the payment confirmation and upload it below." },
+              ],
+            };
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {stepsMap[selectedMethod].map(step => (
+                  <div key={step.n} className="rounded-2xl p-4 border"
+                    style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold mb-3"
+                      style={{ background: "rgba(162,137,89,0.14)", color: GOLD_B }}>
+                      {step.n}
+                    </div>
+                    <p className="text-sm font-semibold mb-1" style={{ color: GOLD_L }}>{step.title}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: "rgba(162,137,89,0.55)" }}>{step.body}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            );
+          })()}
 
           {/* ── Payment info card — bank-statement style ── */}
           <div className="rounded-2xl border overflow-hidden"
@@ -460,15 +492,36 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                     </div>
                   );
                 })()}
-                <div className="flex justify-between items-center">
-                  <span className="text-sm" style={{ color: "rgba(162,137,89,0.70)" }}>Accepted Methods</span>
-                  <span className="text-sm font-semibold" style={{ color: GOLD_B }}>Bank Transfer / FPS</span>
-                </div>
+                {/* Payment method selector */}
+                {(paymentMethods.alipay.enabled || paymentMethods.card.enabled) && (
+                  <div>
+                    <span className="text-xs" style={{ color: "rgba(162,137,89,0.55)" }}>Choose Payment Method</span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {([
+                        { id: "bank"  as const, label: "Bank / FPS",       icon: "🏦" },
+                        ...(paymentMethods.alipay.enabled ? [{ id: "alipay" as const, label: "Alipay 支付宝",   icon: "🔵" }] : []),
+                        ...(paymentMethods.card.enabled   ? [{ id: "card"   as const, label: "Visa / Mastercard", icon: "💳" }] : []),
+                      ]).map(m => (
+                        <button key={m.id} onClick={() => setSelectedMethod(m.id)}
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-semibold transition-all"
+                          style={{
+                            background: selectedMethod === m.id ? "rgba(196,169,110,0.18)" : "rgba(162,137,89,0.05)",
+                            borderColor: selectedMethod === m.id ? GOLD_B : "rgba(162,137,89,0.20)",
+                            color: selectedMethod === m.id ? GOLD_L : GOLD_B,
+                            boxShadow: selectedMethod === m.id ? `0 0 12px rgba(196,169,110,0.12)` : "none",
+                          }}>
+                          <span>{m.icon}</span>
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Section: Bank Details */}
-            {bankDetails && (bankDetails.bankName || bankDetails.accountName || bankDetails.accountNumber || bankDetails.fps) && (
+            {/* Section: Bank / FPS Details */}
+            {selectedMethod === "bank" && bankDetails && (bankDetails.bankName || bankDetails.accountName || bankDetails.accountNumber || bankDetails.fps) && (
               <div className="px-5 pt-4 pb-5 space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(162,137,89,0.45)" }}>
                   Bank Details
@@ -490,12 +543,11 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                     <span style={{ color: "rgba(162,137,89,0.60)" }}>Account No.</span>
                     <div className="flex items-center gap-2">
                       <span className="font-mono font-bold" style={{ color: GOLD_L }}>{bankDetails.accountNumber}</span>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(bankDetails.accountNumber)}
+                      <button onClick={() => navigator.clipboard.writeText(bankDetails.accountNumber)}
                         className="text-xs px-2 py-0.5 rounded border transition-opacity hover:opacity-70"
-                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}
-                        title="Copy"
-                      >Copy</button>
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}>
+                        Copy
+                      </button>
                     </div>
                   </div>
                 )}
@@ -504,18 +556,87 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                     <span style={{ color: "rgba(162,137,89,0.60)" }}>FPS</span>
                     <div className="flex items-center gap-2">
                       <span className="font-mono font-bold" style={{ color: GOLD_L }}>{bankDetails.fps}</span>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(bankDetails.fps)}
+                      <button onClick={() => navigator.clipboard.writeText(bankDetails.fps)}
                         className="text-xs px-2 py-0.5 rounded border transition-opacity hover:opacity-70"
-                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}
-                        title="Copy"
-                      >Copy</button>
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}>
+                        Copy
+                      </button>
                     </div>
                   </div>
                 )}
                 <p className="text-xs pt-3 border-t" style={{ borderColor: "rgba(162,137,89,0.10)", color: "rgba(162,137,89,0.45)" }}>
                   {bankDetails?.additionalInfo || "Please include your full name in the payment reference."}
                 </p>
+              </div>
+            )}
+
+            {/* Section: Alipay Details */}
+            {selectedMethod === "alipay" && paymentMethods.alipay.enabled && (
+              <div className="px-5 pt-4 pb-5 space-y-4">
+                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(162,137,89,0.45)" }}>
+                  Alipay 支付宝
+                </p>
+                {paymentMethods.alipay.accountName && (
+                  <div className="flex justify-between text-sm">
+                    <span style={{ color: "rgba(162,137,89,0.60)" }}>Account Name</span>
+                    <span className="font-bold" style={{ color: GOLD_L }}>{paymentMethods.alipay.accountName}</span>
+                  </div>
+                )}
+                {paymentMethods.alipay.accountId && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span style={{ color: "rgba(162,137,89,0.60)" }}>Alipay ID</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold" style={{ color: GOLD_L }}>{paymentMethods.alipay.accountId}</span>
+                      <button onClick={() => navigator.clipboard.writeText(paymentMethods.alipay.accountId)}
+                        className="text-xs px-2 py-0.5 rounded border transition-opacity hover:opacity-70"
+                        style={{ borderColor: "rgba(162,137,89,0.25)", color: GOLD, background: "rgba(162,137,89,0.07)" }}>
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {paymentMethods.alipay.qrCodeUrl && (
+                  <div className="flex flex-col items-center gap-2 pt-1">
+                    <span className="text-xs" style={{ color: "rgba(162,137,89,0.50)" }}>Scan to Pay</span>
+                    <div className="p-3 rounded-2xl border" style={{ background: "#fff", borderColor: "rgba(162,137,89,0.25)" }}>
+                      <img src={paymentMethods.alipay.qrCodeUrl} alt="Alipay QR Code"
+                        className="w-44 h-44 object-contain" />
+                    </div>
+                  </div>
+                )}
+                {paymentMethods.alipay.instructions && (
+                  <p className="text-xs pt-2 border-t" style={{ borderColor: "rgba(162,137,89,0.10)", color: "rgba(162,137,89,0.50)" }}>
+                    {paymentMethods.alipay.instructions}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Section: Card Payment Details */}
+            {selectedMethod === "card" && paymentMethods.card.enabled && (
+              <div className="px-5 pt-4 pb-5 space-y-4">
+                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(162,137,89,0.45)" }}>
+                  Visa / Mastercard
+                </p>
+                {paymentMethods.card.paymentLink && (
+                  <a href={paymentMethods.card.paymentLink} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-3 w-full py-3 rounded-xl border font-semibold text-sm transition-all hover:opacity-80"
+                    style={{ background: "rgba(162,137,89,0.12)", borderColor: GOLD_B, color: GOLD_L }}>
+                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                      <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
+                      <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd"/>
+                    </svg>
+                    Pay by Card
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 opacity-60">
+                      <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </a>
+                )}
+                {paymentMethods.card.instructions && (
+                  <p className="text-xs pt-2 border-t" style={{ borderColor: "rgba(162,137,89,0.10)", color: "rgba(162,137,89,0.50)" }}>
+                    {paymentMethods.card.instructions}
+                  </p>
+                )}
               </div>
             )}
           </div>

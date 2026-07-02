@@ -78,4 +78,26 @@ router.put("/admin/settings/bank-details", async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to update bank details" }); }
 });
 
+const DEFAULT_PAYMENT_METHODS = {
+  alipay: { enabled: false, accountName: "", accountId: "", qrCodeUrl: "", instructions: "" },
+  card:   { enabled: false, paymentLink: "", instructions: "" },
+};
+
+router.get("/settings/payment-methods", async (_req, res) => {
+  try {
+    const [row] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "payment_methods")).limit(1);
+    res.json(row ? row.value : DEFAULT_PAYMENT_METHODS);
+  } catch { res.status(500).json({ error: "Failed to fetch payment methods" }); }
+});
+
+router.put("/admin/settings/payment-methods", async (req, res) => {
+  try {
+    const methods = req.body;
+    await db.insert(appSettingsTable)
+      .values({ key: "payment_methods", value: methods })
+      .onConflictDoUpdate({ target: appSettingsTable.key, set: { value: methods, updatedAt: new Date() } });
+    res.json(methods);
+  } catch { res.status(500).json({ error: "Failed to update payment methods" }); }
+});
+
 export default router;

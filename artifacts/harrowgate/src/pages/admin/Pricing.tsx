@@ -91,6 +91,13 @@ export default function Pricing() {
   const [featSaving, setFeatSaving] = useState(false);
   const [featSaved, setFeatSaved] = useState(false);
   const [featError, setFeatError] = useState<string | null>(null);
+  const [pmConfig, setPmConfig] = useState({
+    alipay: { enabled: false, accountName: "", accountId: "", qrCodeUrl: "", instructions: "" },
+    card:   { enabled: false, paymentLink: "", instructions: "" },
+  });
+  const [pmSaving, setPmSaving] = useState(false);
+  const [pmSaved, setPmSaved] = useState(false);
+  const [pmError, setPmError] = useState<string | null>(null);
 
   const inputStyle: React.CSSProperties = { background: C.inputBg, borderColor: C.borderMed, color: C.inputText };
 
@@ -121,6 +128,8 @@ export default function Pricing() {
 
     fetch(`${getApiBase()}/api/settings/bank-details`)
       .then(r => r.json()).then((b: BankDetails) => setBankDetails(b)).catch(() => {});
+    fetch(`${getApiBase()}/api/settings/payment-methods`)
+      .then(r => r.json()).then((pm: any) => setPmConfig(pm)).catch(() => {});
   }, []);
 
   async function saveBankDetails() {
@@ -145,6 +154,17 @@ export default function Pricing() {
       setFeatSaved(true); setTimeout(() => setFeatSaved(false), 3000);
     } catch { setFeatError("Failed to save. Please try again."); }
     finally { setFeatSaving(false); }
+  }
+
+  async function savePaymentMethods() {
+    setPmSaving(true); setPmError(null);
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/settings/payment-methods`, { method: "PUT", body: JSON.stringify(pmConfig) });
+      if (!res.ok) throw new Error();
+      const result = await res.json(); setPmConfig(result);
+      setPmSaved(true); setTimeout(() => setPmSaved(false), 3000);
+    } catch { setPmError("Failed to save. Please try again."); }
+    finally { setPmSaving(false); }
   }
 
   function updateFeat(i: number, field: "text" | "bold", value: string | boolean) {
@@ -582,6 +602,133 @@ export default function Pricing() {
                 <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Saved</>
               ) : (
                 <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 11V13h11V11M7 2v7M4.5 6.5L7 9l2.5-2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>Save Bank Details</>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* Payment Methods */}
+      <div className="mt-10">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: C.muted, border: `1px solid ${C.borderMed}` }}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4" style={{ color: GOLD_B }}>
+              <path d="M2 5a1 1 0 011-1h10a1 1 0 011 1v1H2V5zM2 8h12v4a1 1 0 01-1 1H3a1 1 0 01-1-1V8zm3 2h1.5m2 0h2" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold" style={{ color: C.tHead }}>Payment Methods</h2>
+            <p className="text-xs" style={{ color: C.tFaint }}>
+              Enable additional payment options for students alongside Bank / FPS.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {/* Alipay */}
+          <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
+            <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${GOLD_B}, transparent)` }} />
+            <div className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🔵</span>
+                  <span className="font-semibold text-sm" style={{ color: C.tHead }}>Alipay 支付宝</span>
+                </div>
+                <button onClick={() => { setPmConfig(p => ({ ...p, alipay: { ...p.alipay, enabled: !p.alipay.enabled } })); setPmSaved(false); }}
+                  className="relative w-11 h-6 rounded-full border-2 transition-all"
+                  style={{ background: pmConfig.alipay.enabled ? "rgba(162,137,89,0.30)" : C.muted, borderColor: pmConfig.alipay.enabled ? GOLD_B : C.border }}>
+                  <span className="absolute top-0.5 transition-all w-4 h-4 rounded-full"
+                    style={{ background: pmConfig.alipay.enabled ? GOLD_B : C.tFaint, left: pmConfig.alipay.enabled ? "calc(100% - 1.25rem)" : "0.125rem" }} />
+                </button>
+              </div>
+              {pmConfig.alipay.enabled && (
+                <div className="grid md:grid-cols-2 gap-4">
+                  {[
+                    { key: "accountName" as const, label: "Account Holder Name", placeholder: "e.g. Harrowgate Consultancy" },
+                    { key: "accountId"   as const, label: "Alipay ID / Phone",   placeholder: "e.g. +852 6060 6457" },
+                    { key: "qrCodeUrl"   as const, label: "QR Code Image URL",   placeholder: "https://... (paste image URL)" },
+                  ].map(({ key, label, placeholder }) => (
+                    <div key={key} className={key === "qrCodeUrl" ? "md:col-span-2" : ""}>
+                      <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: C.tFaint }}>{label}</label>
+                      <input type="text" value={pmConfig.alipay[key]}
+                        onChange={e => { setPmConfig(p => ({ ...p, alipay: { ...p.alipay, [key]: e.target.value } })); setPmSaved(false); }}
+                        placeholder={placeholder}
+                        className="w-full px-3 py-2.5 rounded-xl border text-sm outline-none transition-all placeholder:opacity-30"
+                        style={inputStyle} />
+                    </div>
+                  ))}
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: C.tFaint }}>Instructions (optional)</label>
+                    <textarea rows={2} value={pmConfig.alipay.instructions}
+                      onChange={e => { setPmConfig(p => ({ ...p, alipay: { ...p.alipay, instructions: e.target.value } })); setPmSaved(false); }}
+                      placeholder="e.g. Include your full name in the Alipay transfer note."
+                      className="w-full px-3 py-2.5 rounded-xl border text-sm outline-none transition-all resize-none placeholder:opacity-30"
+                      style={inputStyle} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Visa / Mastercard */}
+          <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
+            <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${GOLD_B}, transparent)` }} />
+            <div className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">💳</span>
+                  <span className="font-semibold text-sm" style={{ color: C.tHead }}>Visa / Mastercard</span>
+                </div>
+                <button onClick={() => { setPmConfig(p => ({ ...p, card: { ...p.card, enabled: !p.card.enabled } })); setPmSaved(false); }}
+                  className="relative w-11 h-6 rounded-full border-2 transition-all"
+                  style={{ background: pmConfig.card.enabled ? "rgba(162,137,89,0.30)" : C.muted, borderColor: pmConfig.card.enabled ? GOLD_B : C.border }}>
+                  <span className="absolute top-0.5 transition-all w-4 h-4 rounded-full"
+                    style={{ background: pmConfig.card.enabled ? GOLD_B : C.tFaint, left: pmConfig.card.enabled ? "calc(100% - 1.25rem)" : "0.125rem" }} />
+                </button>
+              </div>
+              {pmConfig.card.enabled && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: C.tFaint }}>Payment Link URL</label>
+                    <input type="text" value={pmConfig.card.paymentLink}
+                      onChange={e => { setPmConfig(p => ({ ...p, card: { ...p.card, paymentLink: e.target.value } })); setPmSaved(false); }}
+                      placeholder="https://pay.example.com/harrowgate"
+                      className="w-full px-3 py-2.5 rounded-xl border text-sm outline-none transition-all placeholder:opacity-30"
+                      style={inputStyle} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: C.tFaint }}>Instructions (optional)</label>
+                    <textarea rows={2} value={pmConfig.card.instructions}
+                      onChange={e => { setPmConfig(p => ({ ...p, card: { ...p.card, instructions: e.target.value } })); setPmSaved(false); }}
+                      placeholder="e.g. A 2.5% processing fee applies to card payments."
+                      className="w-full px-3 py-2.5 rounded-xl border text-sm outline-none transition-all resize-none placeholder:opacity-30"
+                      style={inputStyle} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Save */}
+          <div className="flex items-center gap-4 pt-1">
+            {pmError && (
+              <div className="flex items-center gap-2 text-xs" style={{ color: "#f87171" }}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11v.5" strokeLinecap="round"/></svg>
+                {pmError}
+              </div>
+            )}
+            <button onClick={savePaymentMethods} disabled={pmSaving}
+              className="ml-auto flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-40 hover:opacity-90 border"
+              style={{
+                background: pmSaved ? "rgba(162,137,89,0.12)" : C.accentBg,
+                color: pmSaved ? C.tHead : GOLD_B,
+                borderColor: pmSaved ? C.borderStr : C.borderMed,
+              }}>
+              {pmSaving ? (
+                <><span className="w-3.5 h-3.5 rounded-full border-2 animate-spin" style={{ borderColor: GOLD_B, borderTopColor: "transparent" }} />Saving…</>
+              ) : pmSaved ? (
+                <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5 shrink-0"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Saved</>
+              ) : (
+                <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 11V13h11V11M7 2v7M4.5 6.5L7 9l2.5-2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>Save Payment Methods</>
               )}
             </button>
           </div>
