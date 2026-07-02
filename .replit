@@ -40,6 +40,7 @@ externalPort = 80
 
 [userenv.shared]
 GMAIL_USER = "harrowgateconsultancy@gmail.com"
+GOOGLE_REDIRECT_URI = "https://8406eb44-1c18-45e5-825a-162971318e71-00-1zzkjoduft6kr.sisko.replit.dev/api/student/auth/google/callback"
 
 [nix]
 channel = "stable-25_05"
