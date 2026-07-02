@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { DEFAULT_PRICING, type PricingConfig } from "../../hooks/usePricing";
+import { DEFAULT_PRICING, DEFAULT_FEATURES, type PricingConfig, type PricingFeature } from "../../hooks/usePricing";
 import { useAdminTheme } from "../../contexts/AdminThemeContext";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -36,28 +36,12 @@ function useColors() {
   } as const;
 }
 
-const SHARED_FEATURES: { text: string; bold?: boolean }[] = [
-  { text: "1st semester tuition fee inclusive (paid by students)", bold: true },
-  { text: "Application documents review" },
-  { text: "University enrollment guidance" },
-  { text: "Visa document checklist" },
-  { text: "Full application & form filling guide" },
-  { text: "Immigration letter assistance" },
-  { text: "Visa form review & Guidance" },
-  { text: "Pre-departure briefing session" },
-  { text: "Phone plan setup guide" },
-  { text: "Emergency contact protocols" },
-  { text: "Priority WhatsApp support" },
-  { text: "Service ends upon arrival at university", bold: true },
-];
-
 const TIERS = [
   {
     id: "associate", label: "Associate Degree", badge: false,
     totalKey: "associateTotal" as keyof PricingConfig,
     stage2Key: "associateStage2" as keyof PricingConfig,
     stage3Key: "associateLastPayment" as keyof PricingConfig,
-    features: SHARED_FEATURES,
     note: "HK$3,000 initial fee is for consultancy services only. Non-refundable once paid — separate from tuition.",
   },
   {
@@ -65,7 +49,6 @@ const TIERS = [
     totalKey: "bachelorTotal" as keyof PricingConfig,
     stage2Key: "bachelorStage2" as keyof PricingConfig,
     stage3Key: "bachelorLastPayment" as keyof PricingConfig,
-    features: SHARED_FEATURES,
     note: "Initial HK$3,000 covers professional consultancy (non-refundable). Full payment schedule contractually binding per HK law.",
   },
   {
@@ -73,7 +56,6 @@ const TIERS = [
     totalKey: "mastersTotal" as keyof PricingConfig,
     stage2Key: "mastersStage2" as keyof PricingConfig,
     stage3Key: "mastersLastPayment" as keyof PricingConfig,
-    features: SHARED_FEATURES,
     note: "The HK$3,000 initial fee is solely for consultancy services (non-refundable). Balance stages are binding after this payment.",
   },
   {
@@ -81,7 +63,6 @@ const TIERS = [
     totalKey: "diplomaTotal" as keyof PricingConfig,
     stage2Key: "diplomaStage2" as keyof PricingConfig,
     stage3Key: "diplomaLastPayment" as keyof PricingConfig,
-    features: SHARED_FEATURES,
     note: "HK$3,000 initial fee covers consultancy services only (non-refundable). Balance stages are contractually binding upon first payment per HK law.",
   },
 ];
@@ -106,6 +87,10 @@ export default function Pricing() {
   const [bankSaving, setBankSaving] = useState(false);
   const [bankSaved, setBankSaved] = useState(false);
   const [bankError, setBankError] = useState<string | null>(null);
+  const [featDraft, setFeatDraft] = useState<PricingFeature[]>(DEFAULT_FEATURES);
+  const [featSaving, setFeatSaving] = useState(false);
+  const [featSaved, setFeatSaved] = useState(false);
+  const [featError, setFeatError] = useState<string | null>(null);
 
   const inputStyle: React.CSSProperties = { background: C.inputBg, borderColor: C.borderMed, color: C.inputText };
 
@@ -114,6 +99,7 @@ export default function Pricing() {
       .then(r => r.json())
       .then((p: PricingConfig) => {
         setPricing(p);
+        setFeatDraft(p.features && p.features.length > 0 ? p.features : DEFAULT_FEATURES);
         const d: Record<string, TierDraft> = {};
         TIERS.forEach(tier => {
           d[tier.id] = {
@@ -146,6 +132,45 @@ export default function Pricing() {
       setBankSaved(true); setTimeout(() => setBankSaved(false), 3000);
     } catch { setBankError("Failed to save. Please try again."); }
     finally { setBankSaving(false); }
+  }
+
+  async function saveFeatures() {
+    setFeatSaving(true); setFeatError(null);
+    const updated: PricingConfig = { ...pricing, features: featDraft };
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/settings/pricing`, { method: "PUT", body: JSON.stringify(updated) });
+      if (!res.ok) throw new Error();
+      const result = await res.json(); setPricing(result);
+      qc.invalidateQueries({ queryKey: ["pricing"] });
+      setFeatSaved(true); setTimeout(() => setFeatSaved(false), 3000);
+    } catch { setFeatError("Failed to save. Please try again."); }
+    finally { setFeatSaving(false); }
+  }
+
+  function updateFeat(i: number, field: "text" | "bold", value: string | boolean) {
+    setFeatDraft(prev => prev.map((f, idx) => idx === i ? { ...f, [field]: value } : f));
+    setFeatSaved(false);
+  }
+
+  function moveFeat(i: number, dir: -1 | 1) {
+    setFeatDraft(prev => {
+      const next = [...prev];
+      const j = i + dir;
+      if (j < 0 || j >= next.length) return prev;
+      [next[i], next[j]] = [next[j], next[i]];
+      return next;
+    });
+    setFeatSaved(false);
+  }
+
+  function deleteFeat(i: number) {
+    setFeatDraft(prev => prev.filter((_, idx) => idx !== i));
+    setFeatSaved(false);
+  }
+
+  function addFeat() {
+    setFeatDraft(prev => [...prev, { text: "", bold: false }]);
+    setFeatSaved(false);
   }
 
   function updateDraft(tierId: string, field: keyof TierDraft, value: string) {
@@ -256,7 +281,7 @@ export default function Pricing() {
 
                 {/* Features */}
                 <ul className="space-y-1.5 mb-5">
-                  {tier.features.map((f, fi) => (
+                  {featDraft.map((f, fi) => (
                     <li key={fi} className="flex items-start gap-2 text-xs"
                       style={{ color: f.bold ? GOLD_B : C.tMid, fontWeight: f.bold ? 600 : 400 }}>
                       <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: f.bold ? GOLD_B : GOLD }}>
@@ -375,6 +400,119 @@ export default function Pricing() {
           Amounts must balance — Total must equal HK$3,000 (first payment) + Stage 2 + Stage 3.
           Changes take effect immediately on the public packages page. Each card saves independently.
         </p>
+      </div>
+
+      {/* Package Features Editor */}
+      <div className="mt-10">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: C.muted, border: `1px solid ${C.borderMed}` }}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4" style={{ color: GOLD_B }}>
+              <path d="M3 8l3.5 3.5L13 4.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold" style={{ color: C.tHead }}>Package Features</h2>
+            <p className="text-xs" style={{ color: C.tFaint }}>
+              These bullet points appear on all four package cards. Edit, reorder, or toggle bold styling.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed }}>
+          <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${GOLD_B}, transparent)` }} />
+
+          <div className="p-5 space-y-2">
+            {featDraft.map((feat, i) => (
+              <div key={i} className="flex items-center gap-2 p-2 rounded-xl border" style={{ background: C.muted, borderColor: C.border }}>
+                {/* Up/down */}
+                <div className="flex flex-col gap-0.5 shrink-0">
+                  <button onClick={() => moveFeat(i, -1)} disabled={i === 0}
+                    className="w-5 h-5 flex items-center justify-center rounded transition-opacity disabled:opacity-20 hover:opacity-70"
+                    style={{ color: GOLD_B }}>
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3"><path d="M4 10l4-4 4 4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </button>
+                  <button onClick={() => moveFeat(i, 1)} disabled={i === featDraft.length - 1}
+                    className="w-5 h-5 flex items-center justify-center rounded transition-opacity disabled:opacity-20 hover:opacity-70"
+                    style={{ color: GOLD_B }}>
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3"><path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </button>
+                </div>
+
+                {/* Checkmark */}
+                <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0" style={{ color: GOLD }}>
+                  <path d="M3 8l3.5 3.5L13 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+
+                {/* Text input */}
+                <input
+                  type="text"
+                  value={feat.text}
+                  onChange={e => updateFeat(i, "text", e.target.value)}
+                  placeholder="Feature description…"
+                  className="flex-1 px-2.5 py-1.5 rounded-lg border text-xs outline-none transition-all placeholder:opacity-30"
+                  style={{ ...inputStyle, fontWeight: feat.bold ? 700 : 400 }}
+                />
+
+                {/* Bold toggle */}
+                <button
+                  onClick={() => updateFeat(i, "bold", !feat.bold)}
+                  title="Toggle bold"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg border text-xs font-extrabold transition-all shrink-0"
+                  style={{
+                    background: feat.bold ? "rgba(196,169,110,0.2)" : C.muted,
+                    borderColor: feat.bold ? C.borderStr : C.border,
+                    color: feat.bold ? GOLD_B : C.tFaint,
+                  }}>
+                  B
+                </button>
+
+                {/* Delete */}
+                <button onClick={() => deleteFeat(i)}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg border transition-all shrink-0 hover:opacity-70"
+                  style={{ background: "rgba(248,113,113,0.07)", borderColor: "rgba(248,113,113,0.2)", color: "#f87171" }}>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
+                    <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="px-5 pb-5 flex items-center gap-3 flex-wrap">
+            {/* Add feature */}
+            <button onClick={addFeat}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-semibold transition-all hover:opacity-80"
+              style={{ background: C.muted, borderColor: C.borderMed, color: C.tMid }}>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3.5 h-3.5"><path d="M8 3v10M3 8h10" strokeLinecap="round"/></svg>
+              Add Feature
+            </button>
+
+            {/* Error */}
+            {featError && (
+              <div className="flex items-center gap-2 text-xs" style={{ color: "#f87171" }}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11v.5" strokeLinecap="round"/></svg>
+                {featError}
+              </div>
+            )}
+
+            {/* Save */}
+            <button onClick={saveFeatures} disabled={featSaving}
+              className="ml-auto flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-40 hover:opacity-90 border"
+              style={{
+                background: featSaved ? "rgba(162,137,89,0.12)" : C.accentBg,
+                color: featSaved ? C.tHead : GOLD_B,
+                borderColor: featSaved ? C.borderStr : C.borderMed,
+              }}>
+              {featSaving ? (
+                <><span className="w-3.5 h-3.5 rounded-full border-2 animate-spin" style={{ borderColor: GOLD_B, borderTopColor: "transparent" }} /> Saving…</>
+              ) : featSaved ? (
+                <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>Saved</>
+              ) : (
+                <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5"><path d="M2 11V13h11V11M7 2v7M4.5 6.5L7 9l2.5-2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>Save Features</>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Bank Details */}

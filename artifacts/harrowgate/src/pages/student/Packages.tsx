@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { useLang, LANG_LIST } from "../../i18n";
-import { usePricing } from "../../hooks/usePricing";
+import { usePricing, DEFAULT_FEATURES } from "../../hooks/usePricing";
 import { usePageSEO } from "../../hooks/usePageSEO";
 
 const BG        = "#0b2213";
@@ -13,20 +13,6 @@ const GOLD_DIM    = "rgba(162,137,89,0.7)";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-const FEATURE_KEYS: { key: string; bold?: boolean }[] = [
-  { key: "pkg.feat1",  bold: true },
-  { key: "pkg.feat2" },
-  { key: "pkg.feat3" },
-  { key: "pkg.feat4" },
-  { key: "pkg.feat5" },
-  { key: "pkg.feat6" },
-  { key: "pkg.feat7" },
-  { key: "pkg.feat8" },
-  { key: "pkg.feat9" },
-  { key: "pkg.feat10" },
-  { key: "pkg.feat11" },
-  { key: "pkg.feat12", bold: true },
-];
 
 const PACKAGES = [
   { tierKey: "tier3", badge: false, highlight: false, cardNoteKey: "pkg.note.tier3" },
@@ -296,8 +282,8 @@ export default function Packages() {
 
                     {/* Features */}
                     <ul className="space-y-1 mb-6">
-                      {FEATURE_KEYS.map((f, fi) => (
-                        <FeatureItem key={fi} bold={f.bold} accentColor={accentColor} label={t(f.key)} />
+                      {(pricing.raw.features && pricing.raw.features.length > 0 ? pricing.raw.features : DEFAULT_FEATURES).map((f, fi) => (
+                        <FeatureItem key={fi} bold={f.bold} accentColor={accentColor} label={f.text} />
                       ))}
                     </ul>
 

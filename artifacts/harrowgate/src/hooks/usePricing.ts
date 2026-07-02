@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+export type PricingFeature = { text: string; bold?: boolean };
+
 export type PricingConfig = {
   mastersTotal: number;
   bachelorTotal: number;
@@ -15,7 +17,23 @@ export type PricingConfig = {
   bachelorLastPayment: number;
   associateLastPayment: number;
   diplomaLastPayment: number;
+  features?: PricingFeature[];
 };
+
+export const DEFAULT_FEATURES: PricingFeature[] = [
+  { text: "1st semester tuition fee inclusive (paid by students)", bold: true },
+  { text: "Application documents review" },
+  { text: "University enrollment guidance" },
+  { text: "Visa document checklist" },
+  { text: "Full application & form filling guide" },
+  { text: "Immigration letter assistance" },
+  { text: "Visa form review & Guidance" },
+  { text: "Pre-departure briefing session" },
+  { text: "Phone plan setup guide" },
+  { text: "Emergency contact protocols" },
+  { text: "Priority WhatsApp support" },
+  { text: "Service ends upon arrival at university", bold: true },
+];
 
 export const DEFAULT_PRICING: PricingConfig = {
   mastersTotal: 130000,
@@ -30,6 +48,7 @@ export const DEFAULT_PRICING: PricingConfig = {
   bachelorLastPayment: 57000,
   associateLastPayment: 47000,
   diplomaLastPayment: 42000,
+  features: DEFAULT_FEATURES,
 };
 
 export function fmtHKD(n: number): string {

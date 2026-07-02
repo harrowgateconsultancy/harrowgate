@@ -5,6 +5,21 @@ import { eq } from "drizzle-orm";
 
 const router = Router();
 
+const DEFAULT_FEATURES = [
+  { text: "1st semester tuition fee inclusive (paid by students)", bold: true },
+  { text: "Application documents review" },
+  { text: "University enrollment guidance" },
+  { text: "Visa document checklist" },
+  { text: "Full application & form filling guide" },
+  { text: "Immigration letter assistance" },
+  { text: "Visa form review & Guidance" },
+  { text: "Pre-departure briefing session" },
+  { text: "Phone plan setup guide" },
+  { text: "Emergency contact protocols" },
+  { text: "Priority WhatsApp support" },
+  { text: "Service ends upon arrival at university", bold: true },
+];
+
 const DEFAULT_PRICING = {
   mastersTotal: 130000,
   bachelorTotal: 120000,
@@ -18,6 +33,7 @@ const DEFAULT_PRICING = {
   bachelorLastPayment: 57000,
   associateLastPayment: 47000,
   diplomaLastPayment: 42000,
+  features: DEFAULT_FEATURES,
 };
 
 const DEFAULT_BANK_DETAILS = {
