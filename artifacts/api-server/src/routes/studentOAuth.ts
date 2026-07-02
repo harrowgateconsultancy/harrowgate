@@ -101,9 +101,12 @@ router.get("/student/auth/google", (req: any, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) return res.redirect(errorRedirect(req, "Google sign-in is not configured on this server"));
 
+  const redirectUri = googleCallbackUri(req);
+  console.log("[oauth/google] redirect_uri =", redirectUri);
+
   const url = new URL(GOOGLE_AUTH_URL);
   url.searchParams.set("client_id", clientId);
-  url.searchParams.set("redirect_uri", googleCallbackUri(req));
+  url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", "openid email profile");
   url.searchParams.set("access_type", "offline");
