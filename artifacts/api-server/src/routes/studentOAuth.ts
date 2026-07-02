@@ -102,7 +102,6 @@ router.get("/student/auth/google", (req: any, res) => {
   if (!clientId) return res.redirect(errorRedirect(req, "Google sign-in is not configured on this server"));
 
   const redirectUri = googleCallbackUri(req);
-  console.log("[oauth/google] redirect_uri =", redirectUri);
 
   const url = new URL(GOOGLE_AUTH_URL);
   url.searchParams.set("client_id", clientId);
@@ -112,6 +111,7 @@ router.get("/student/auth/google", (req: any, res) => {
   url.searchParams.set("access_type", "offline");
   url.searchParams.set("prompt", "select_account");
   url.searchParams.set("state", makeOAuthState());
+  console.log("[oauth/google] full auth URL =", url.toString());
   res.redirect(url.toString());
 });
 
