@@ -481,6 +481,10 @@ export default function Landing() {
         .svc-icon { transition: background 0.3s, transform 0.3s; }
         .svc-card:hover .svc-icon { background: rgba(162,137,89,0.25) !important; transform: scale(1.18); }
         .gradient-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(162,137,89,0.3) 20%, rgba(162,137,89,0.3) 80%, transparent); }
+        .uni-card { transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), box-shadow 0.35s ease, border-color 0.35s ease; }
+        .uni-card:hover { transform: translateY(-10px) scale(1.01); box-shadow: 0 28px 70px rgba(162,137,89,0.22); border-color: rgba(196,169,110,0.45) !important; }
+        .uni-img { transition: transform 0.55s ease; }
+        .uni-card:hover .uni-img { transform: scale(1.08); }
       `}</style>
 
       {/* Subtle background glow */}
@@ -723,6 +727,130 @@ export default function Landing() {
                 </Reveal>
               ))}
             </div>
+          </div>
+        </section>
+
+        <div className="gradient-divider" />
+
+        {/* ── Partner Universities ── */}
+        <section className="py-24 px-6 lg:px-16 xl:px-24">
+          <div className="max-w-7xl mx-auto">
+            <Reveal idx={50} visible={visible} setRef={setRef}>
+              <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: LABEL_COLOR }}>WORLD-RANKED UNIVERSITIES</p>
+            </Reveal>
+            <Reveal idx={51} visible={visible} setRef={setRef} delay={80}>
+              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>Study at Asia's Top Universities</h2>
+            </Reveal>
+            <Reveal idx={52} visible={visible} setRef={setRef} delay={140}>
+              <p className="text-center mb-14 text-base max-w-2xl mx-auto" style={{ color: GOLD_DIM }}>
+                Hong Kong is home to five of the world's top 100 universities — offering globally recognised degrees, English-taught programmes, and unmatched career access across Asia.
+              </p>
+            </Reveal>
+
+            <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
+              {[
+                {
+                  name: "The University of Hong Kong",
+                  short: "HKU",
+                  est: 1911,
+                  qs: 17,
+                  the: 36,
+                  students: "30,000+",
+                  desc: "Hong Kong's oldest and most prestigious institution. Globally recognised for medicine, law, and social sciences with a stunning Victorian campus.",
+                  photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Loke_Yew_Hall.jpg/800px-Loke_Yew_Hall.jpg",
+                  tags: ["Medicine", "Law", "Business"],
+                },
+                {
+                  name: "HK University of Science & Technology",
+                  short: "HKUST",
+                  est: 1991,
+                  qs: 47,
+                  the: 69,
+                  students: "16,500+",
+                  desc: "A research powerhouse that rapidly climbed global rankings. Perched over Clear Water Bay with outstanding science, engineering and MBA programmes.",
+                  photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/HKUST_campus_overview.jpg/800px-HKUST_campus_overview.jpg",
+                  tags: ["Engineering", "Business", "Science"],
+                },
+                {
+                  name: "Hong Kong Polytechnic University",
+                  short: "PolyU",
+                  est: 1937,
+                  qs: 57,
+                  the: 116,
+                  students: "33,000+",
+                  desc: "A leading applied-sciences university celebrated for design, nursing, hospitality management, and professional disciplines across 30+ schools.",
+                  photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/PolyU_20080719.jpg/800px-PolyU_20080719.jpg",
+                  tags: ["Design", "Nursing", "Computing"],
+                },
+                {
+                  name: "City University of Hong Kong",
+                  short: "CityU",
+                  est: 1984,
+                  qs: 62,
+                  the: 133,
+                  students: "21,000+",
+                  desc: "An innovative, research-led university excelling in computer science, creative media, law, and business at the heart of Kowloon.",
+                  photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/City_University_of_Hong_Kong.jpg/800px-City_University_of_Hong_Kong.jpg",
+                  tags: ["CS", "Media", "Law"],
+                },
+              ].map((uni, i) => (
+                <Reveal key={uni.short} idx={53 + i} visible={visible} setRef={setRef} delay={i * 90}>
+                  <div className="uni-card flex flex-col rounded-3xl border overflow-hidden cursor-default h-full"
+                    style={{ background: "rgba(162,137,89,0.04)", borderColor: GOLD_FAINT }}>
+
+                    {/* Photo */}
+                    <div className="relative overflow-hidden" style={{ height: 200 }}>
+                      <img
+                        src={uni.photo}
+                        alt={uni.name}
+                        className="uni-img w-full h-full object-cover"
+                        loading="lazy"
+                        onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                      />
+                      {/* Dark gradient over photo */}
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(11,34,19,0.1) 0%, rgba(11,34,19,0.55) 100%)" }} />
+                      {/* Short-name badge */}
+                      <div style={{ position: "absolute", top: 14, left: 14, background: "rgba(11,34,19,0.78)", backdropFilter: "blur(8px)", border: "1px solid rgba(196,169,110,0.35)", borderRadius: 999, padding: "3px 12px" }}>
+                        <span className="text-xs font-bold tracking-widest" style={{ color: GOLD }}>{uni.short}</span>
+                      </div>
+                      {/* QS rank badge */}
+                      <div style={{ position: "absolute", top: 14, right: 14, background: "linear-gradient(135deg,#b8965e,#e0bc78)", borderRadius: 999, padding: "3px 11px" }}>
+                        <span className="text-xs font-black" style={{ color: "#0b2213" }}>QS #{uni.qs}</span>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex flex-col flex-1 p-6 gap-3">
+                      <div>
+                        <h3 className="text-base font-bold leading-snug mb-1" style={{ color: GOLD }}>{uni.name}</h3>
+                        <p className="text-xs" style={{ color: CREAM_DIM }}>Est. {uni.est} · {uni.students} students</p>
+                      </div>
+                      <p className="text-sm leading-relaxed flex-1" style={{ color: GOLD_DIM }}>{uni.desc}</p>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {uni.tags.map(tag => (
+                          <span key={tag} className="text-[11px] font-semibold px-2.5 py-1 rounded-full border"
+                            style={{ color: CREAM_DIM, borderColor: "rgba(162,137,89,0.18)", background: "rgba(162,137,89,0.07)" }}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="pt-3 border-t flex items-center justify-between" style={{ borderColor: "rgba(162,137,89,0.1)" }}>
+                        <span className="text-xs" style={{ color: CREAM_DIM }}>
+                          <span style={{ color: GOLD, fontWeight: 700 }}>QS #{uni.qs}</span> · THE #{uni.the} World
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+
+            {/* Rankings note */}
+            <Reveal idx={57} visible={visible} setRef={setRef} delay={350}>
+              <p className="text-center mt-10 text-xs" style={{ color: CREAM_DIM }}>
+                Rankings based on <span style={{ color: CREAM }}>QS World University Rankings 2025</span> and <span style={{ color: CREAM }}>Times Higher Education 2025</span>
+              </p>
+            </Reveal>
           </div>
         </section>
 
