@@ -1,0 +1,33 @@
+# Exclude large/unnecessary directories from the Docker build context
+
+**/node_modules
+**/.git
+**/.replit
+**/.local
+**/dist
+**/build
+**/.cache
+**/.env
+**/.env.*
+!deploy/.env.example
+
+# Replit-specific files
+.replit
+replit.nix
+.upm/
+.config/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+
+# Mockup sandbox (not needed in production)
+artifacts/mockup-sandbox/
