@@ -1,4 +1,8 @@
 import { createServer } from "http";
+import path from "path";
+import { fileURLToPath } from "url";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { db } from "@workspace/db";
 import app from "./app";
 import { logger } from "./lib/logger";
 import { setupScreenMirror } from "./lib/screenMirror";
@@ -26,8 +30,19 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const migrationsFolder = path.join(__dirname, "drizzle");
+
 const httpServer = createServer(app);
 setupScreenMirror(httpServer);
+
+// Run database migrations (creates all tables on first run, safe to run every time)
+try {
+  await migrate(db, { migrationsFolder });
+  logger.info("Database migrations applied");
+} catch (err) {
+  logger.error({ err }, "Database migration failed — continuing anyway");
+}
 
 // Ensure admin credential override tables exist
 initAdminCredentialsTables().catch(err =>
