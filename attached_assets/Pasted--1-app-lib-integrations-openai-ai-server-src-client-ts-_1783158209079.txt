@@ -1,0 +1,120 @@
+-1       | /app/lib/integrations-openai-ai-server/src/client.ts:4
+
+app-1       |   throw new Error(
+
+app-1       |         ^
+app-1       | 
+app-1       | 
+app-1       | Error: AI_INTEGRATIONS_OPENAI_BASE_URL must be set. Did you forget to provision the OpenAI AI integration?
+app-1       |     at <anonymous> (/app/lib/integrations-openai-ai-server/src/client.ts:4:9)
+app-1       |     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+app-1       |     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+
+app-1       |     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+app-1       | 
+
+app-1       | Node.js v20.20.2
+
+app-1       | /app/lib/integrations-openai-ai-server/src/client.ts:4
+app-1       |   throw new Error(
+app-1       |         ^
+app-1       | 
+app-1       | 
+app-1       | Error: AI_INTEGRATIONS_OPENAI_BASE_URL must be set. Did you forget to provision the OpenAI AI integration?
+app-1       |     at <anonymous> (/app/lib/integrations-openai-ai-server/src/client.ts:4:9)
+app-1       |     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+app-1       |     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+app-1       |     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+app-1       | 
+app-1       | Node.js v20.20.2
+postgres-1  | 
+postgres-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres-1  | 
+postgres-1  | 2026-07-04 09:41:34.097 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres-1  | 2026-07-04 09:41:34.097 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1  | 2026-07-04 09:41:34.097 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-1  | 2026-07-04 09:41:34.098 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1  | 2026-07-04 09:41:34.101 UTC [29] LOG:  database system was shut down at 2026-07-04 09:36:59 UTC
+postgres-1  | 2026-07-04 09:41:34.106 UTC [1] LOG:  database system is ready to accept connections
+app-1       | /app/lib/integrations-openai-ai-server/src/client.ts:4
+app-1       |   throw new Error(
+app-1       |         ^
+app-1       | 
+app-1       | 
+app-1       | Error: AI_INTEGRATIONS_OPENAI_BASE_URL must be set. Did you forget to provision the OpenAI AI integration?
+app-1       |     at <anonymous> (/app/lib/integrations-openai-ai-server/src/client.ts:4:9)
+app-1       |     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+
+app-1       |     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+app-1       |     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+app-1       | 
+
+app-1       | Node.js v20.20.2
+app-1 exited with code 1
+
+
+app-1       | /app/lib/integrations-openai-ai-server/src/client.ts:4
+app-1       |   throw new Error(
+app-1       |         ^
+app-1       | 
+app-1       | 
+app-1       | Error: AI_INTEGRATIONS_OPENAI_BASE_URL must be set. Did you forget to provision the OpenAI AI integration?
+app-1       |     at <anonymous> (/app/lib/integrations-openai-ai-server/src/client.ts:4:9)
+app-1       |     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+app-1       |     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+app-1       |     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+app-1       | 
+
+app-1       | Node.js v20.20.2
+app-1       | /app/lib/integrations-openai-ai-server/src/client.ts:4
+app-1       |   throw new Error(
+app-1       |         ^
+app-1       | 
+app-1       | 
+app-1       | Error: AI_INTEGRATIONS_OPENAI_BASE_URL must be set. Did you forget to provision the OpenAI AI integration?
+app-1       |     at <anonymous> (/app/lib/integrations-openai-ai-server/src/client.ts:4:9)
+app-1       |     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+app-1       |     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+app-1       |     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1       | /app/lib/integrations-openai-ai-server/src/client.ts:4
+app-1       |   throw new Error(
+
+app-1       |         ^
+app-1       | 
+app-1       | 
+
+app-1       | Error: AI_INTEGRATIONS_OPENAI_BASE_URL must be set. Did you forget to provision the OpenAI AI integration?
+app-1       |     at <anonymous> (/app/lib/integrations-openai-ai-server/src/client.ts:4:9)
+app-1       |     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+
+app-1       |     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+app-1       |     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1       | /app/lib/integrations-openai-ai-server/src/client.ts:4
+app-1       |   throw new Error(
+app-1       |         ^
+app-1       | 
+app-1       | 
+app-1       | Error: AI_INTEGRATIONS_OPENAI_BASE_URL must be set. Did you forget to provision the OpenAI AI integration?
+
+app-1       |     at <anonymous> (/app/lib/integrations-openai-ai-server/src/client.ts:4:9)
+app-1       |     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+app-1       |     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+app-1       |     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1       | /app/lib/integrations-openai-ai-server/src/client.ts:4
+app-1       |   throw new Error(
+app-1       |         ^
+app-1       | 
+app-1       | 
+app-1       | Error: AI_INTEGRATIONS_OPENAI_BASE_URL must be set. Did you forget to provision the OpenAI AI integration?
+app-1       |     at <anonymous> (/app/lib/integrations-openai-ai-server/src/client.ts:4:9)
+app-1       |     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+app-1       |     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+app-1       |     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+app-1       | 
+app-1       | Node.js v20.20.2

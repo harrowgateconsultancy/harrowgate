@@ -1,3 +1,4 @@
 - [IMMD ID995A PDF filling](id995a-pdf-filling.md) — official PDF is AES-encrypted; only pypdf+cryptography can parse/fill it; pdf-lib completely fails on this PDF.
 - [Self-hosted student JWT auth](student-jwt-auth.md) — Clerk fully removed; student auth uses HMAC-SHA256 tokens stored in localStorage; `student_users` table created at startup via initStudentTables().
 - [Google Drive + Sheets integration](google-integration.md) — service account wired to Drive folders + master Sheet; IDs auto-extracted from full URLs; folder must be shared with service account email as Editor.
+- [NAS deploy - lazy Replit integrations](nas-deploy-lazy-integrations.md) — lib/integrations-openai-ai-server clients throw at module load; must use lazy Proxy pattern for NAS builds.
