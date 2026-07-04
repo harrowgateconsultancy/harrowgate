@@ -190,10 +190,10 @@ router.post("/admin/login", async (req, res) => {
         return res.json({ token: makeAdminToken(), role: "admin", name: "Admin", sessionId });
       }
     } else {
-      // 2. Fall back to env-var credentials
-      const expectedUser = process.env.ADMIN_USERNAME;
+      // 2. Fall back to env-var credentials (ADMIN_USERNAME defaults to "admin")
+      const expectedUser = process.env.ADMIN_USERNAME || "admin";
       const expectedPass = process.env.ADMIN_PASSWORD;
-      if (expectedUser && expectedPass && username === expectedUser && password === expectedPass) {
+      if (expectedPass && username === expectedUser && password === expectedPass) {
         const sessionId = randomBytes(16).toString("hex");
         registerSession(sessionId, "admin", username, ip);
         return res.json({ token: makeAdminToken(), role: "admin", name: "Admin", sessionId });
