@@ -1,0 +1,125 @@
+tendDist":"/app/artifacts/harrowgate/dist/public","msg":"Serving frontend static files"}
+app-1          | {"level":30,"time":1783174377831,"pid":1,"hostname":"2a55c39fff0f","msg":"Database migrations applied"}
+app-1          | {"level":30,"time":1783174377838,"pid":1,"hostname":"2a55c39fff0f","port":3000,"msg":"Server listening"}
+app-1          | {"level":30,"time":1783176102413,"pid":1,"hostname":"2a55c39fff0f","frontendDist":"/app/artifacts/harrowgate/dist/public","msg":"Serving frontend static files"}
+
+app-1          | {"level":30,"time":1783176103055,"pid":1,"hostname":"2a55c39fff0f","msg":"Database migrations applied"}
+app-1          | {"level":30,"time":1783176103061,"pid":1,"hostname":"2a55c39fff0f","port":3000,"msg":"Server listening"}
+app-1          | {"level":30,"time":1783176393206,"pid":1,"hostname":"2a55c39fff0f","frontendDist":"/app/artifacts/harrowgate/dist/public","msg":"Serving frontend static files"}
+app-1          | {"level":30,"time":1783176393272,"pid":1,"hostname":"2a55c39fff0f","msg":"Database migrations applied"}
+app-1          | {"level":30,"time":1783176393275,"pid":1,"hostname":"2a55c39fff0f","port":3000,"msg":"Server listening"}
+postgres-1     | 
+postgres-1     | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres-1     | 
+postgres-1     | 2026-07-04 14:12:50.076 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres-1     | 2026-07-04 14:12:50.076 UTC [1] LOG:  listening 
+on IPv4 address "0.0.0.0", port 5432
+postgres-1     | 2026-07-04 14:12:50.076 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-1     | 2026-07-04 14:12:50.077 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1     | 2026-07-04 14:12:50.080 UTC [29] LOG:  database system was shut down at 2026-07-04 13:58:58 UTC
+postgres-1     | 2026-07-04 14:12:50.099 UTC [1] LOG:  database system is ready to accept connections
+postgres-1     | 2026-07-04 14:17:50.168 UTC [27] LOG:  checkpoint starting: time
+postgres-1     | 2026-07-04 14:18:04.421 UTC [27] LOG:  checkpoint complete: wrote 145 buffers (0.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=14.246 s, sync=0.003 s, total=14.254 s; sync files=141, longest=0.002 s, average=0.001 s; distance=756 kB, estimate=756 kB; lsn=0/1A6B0F8, redo lsn=0/1A6B0C0
+postgres-1     | 2026-07-04 14:39:19.389 UTC [1] LOG:  received fast
+ shutdown request
+postgres-1     | 2026-07-04 14:39:19.407 UTC [1] LOG:  aborting any active transactions
+postgres-1     | 2026-07-04 14:39:19.413 UTC [1] LOG:  background worker "logical replication launcher" (PID 32) exited with exit code 1
+postgres-1     | 2026-07-04 14:39:19.459 UTC [27] LOG:  shutting down
+postgres-1     | 2026-07-04 14:39:19.467 UTC [27] LOG:  checkpoint starting: shutdown immediate
+postgres-1     | 2026-07-04 14:39:19.494 UTC [27] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.036 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=680 kB; lsn=0/1A6B1A8, redo lsn=0/1A6B1A8
+postgres-1     | 2026-07-04 14:39:19.501 UTC [1] LOG:  database system is shut down
+postgres-1     | 
+postgres-1     | PostgreSQL Database directory appears to contain a database; Skipping initializat
+ion
+postgres-1     | 
+postgres-1     | 2026-07-04 14:41:41.077 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres-1     | 2026-07-04 14:41:41.077 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1     | 2026-07-04 14:41:41.077 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-1     | 2026-07-04 14:41:41.148 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1     | 2026-07-04 14:41:41.183 UTC [29] LOG:  database system was shut down at 2026-07-04 14:39:19 UTC
+postgres-1     | 2026-07-04 14:41:41.343 UTC [1] LOG:  database system is ready to accept connections
+postgres-1     | 2026-07-04 14:43:04.965 UTC [1] LOG:  received fast shutdown request
+postgres-1     | 2026-07-04 14:43:04.966 UTC [1] LOG:  aborting any active transactions
+postgres-
+1     | 2026-07-04 14:43:04.969 UTC [1] LOG:  background worker "logical replication launcher" (PID 32) exited with exit code 1
+postgres-1     | 2026-07-04 14:43:04.970 UTC [27] LOG:  shutting down
+postgres-1     | 2026-07-04 14:43:04.971 UTC [27] LOG:  checkpoint starting: shutdown immediate
+postgres-1     | 2026-07-04 14:43:04.978 UTC [27] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.002 s, total=0.009 s; sync files=4, longest=0.002 s, average=0.001 s; distance=8 kB, estimate=8 kB; lsn=0/1A6D1F0, redo lsn=0/1A6D1F0
+postgres-1     | 2026-07-04 14:43:04.987 UTC [1] LOG:  database system is shut down
+postgres-1     | 
+postgres-1     | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres-1     | 
+postgres-1     | 2026-07-04 14:46:25.559 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-
+pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres-1     | 2026-07-04 14:46:25.559 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1     | 2026-07-04 14:46:25.559 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-1     | 2026-07-04 14:46:25.560 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1     | 2026-07-04 14:46:25.564 UTC [29] LOG:  database system was shut down at 2026-07-04 14:43:04 UTC
+postgres-1     | 2026-07-04 14:46:25.570 UTC [1] LOG:  database system is ready to accept connections
+cloudflared-1  | 2026-07-04T14:46:37Z INF precheck component="TCP Connectivity" details="HTTP/2 connection successful" run_id=549a187d-1e8f-4864-aa3d-3b3c998cafd9 status=pass target=region1.v2.argotunnel.com
+cloudflared-1  | 2026-07-04T14:46:37Z INF precheck component="TCP Connectivity" details="HTTP/2 connection successful" run_id=
+549a187d-1e8f-4864-aa3d-3b3c998cafd9 status=pass target=region2.v2.argotunnel.com
+cloudflared-1  | 2026-07-04T14:46:37Z INF precheck component="Cloudflare API" details="API is reachable" run_id=549a187d-1e8f-4864-aa3d-3b3c998cafd9 status=pass target=api.cloudflare.com:443
+cloudflared-1  | 2026-07-04T14:46:37Z INF precheck complete hard_fail=false run_id=549a187d-1e8f-4864-aa3d-3b3c998cafd9 suggested_protocol=quic
+cloudflared-1  | 2026-07-04T14:46:38Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:38Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowg
+ateconsultancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:38Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:38Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:41Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-
+1  | 2026-07-04T14:46:41Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:42Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:42Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:42Z ERR  error="Unabl
+e to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:42Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:42Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:42Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be re
+sponding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:43Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:43Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:43Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: co
+nnect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:43Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:44Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:44Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgatec
+onsultancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:44Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:44Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:44Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  |
+ 2026-07-04T14:46:44Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:44Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:44Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:45Z ERR  error="Unable to
+ reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:45Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:46:45Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:46:45Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be respon
+ding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:47:17Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:47:17Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:47:18Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connec
+t: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:47:18Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:47:18Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:47:18Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsu
+ltancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:47:19Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:47:19Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:47:19Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 
+2026-07-04T14:47:19Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest
+=https://harrowgateconsultancy.com/ event=0 ip=198.41.200.43 type=http
+
+cloudflared-1  | 2026-07-04T14:47:19Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:47:19Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:47:19Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:47:19Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/ event=0 ip=198.41.200.43 type=http
+cloudflared-1  | 2026-07-04T14:47:20Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+cloudflared-1  | 2026-07-04T14:47:20Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/favicon.ico event=0 ip=198.41.200.43 type=http
+
+cloudflared-1  | 2026-07-04T14:47:22Z ERR  error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 event=1 ingressRule=0 originService=https://localhost:3000
+
+cloudflared-1  | 2026-07-04T14:47:22Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:3000: connect: connection refused" connIndex=3 dest=https://harrowgateconsultancy.com/ event=0 ip=198.41.200.43 type=http
