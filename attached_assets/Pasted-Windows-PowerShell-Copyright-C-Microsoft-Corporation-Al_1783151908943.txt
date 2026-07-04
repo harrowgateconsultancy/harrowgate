@@ -1,0 +1,82 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\User> git clone https://github.com/harrowgateconsultancy/harrowgate.git
+Cloning into 'harrowgate'...
+remote: Enumerating objects: 3640, done.
+remote: Counting objects: 100% (53/53), done.
+remote: Compressing objects: 100% (41/41), done.
+remote: Total 3640 (delta 13), reused 32 (delta 12), pack-reused 3587 (from 1)
+Receiving objects: 100% (3640/3640), 50.64 MiB | 339.00 KiB/s, done.
+Resolving deltas: 100% (2542/2542), done.
+Updating files: 100% (521/521), done.
+PS C:\Users\User> cd harrowgategit clone https://github.com/harrowgateconsultancy/harrowgate.git
+Set-Location : A positional parameter cannot be found that accepts argument 'clone'.
+At line:1 char:1
++ cd harrowgategit clone https://github.com/harrowgateconsultancy/harro ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Set-Location], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.SetLocationCommand
+
+PS C:\Users\User> copy deploy\.env.example deploy\.env
+copy : Cannot find path 'C:\Users\User\deploy\.env.example' because it does not exist.
+At line:1 char:1
++ copy deploy\.env.example deploy\.env
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\User\deploy\.env.example:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+PS C:\Users\User> notepad deploy\.env
+PS C:\Users\User> copy deploy\.env.example deploy\.env
+copy : Cannot find path 'C:\Users\User\deploy\.env.example' because it does not exist.
+At line:1 char:1
++ copy deploy\.env.example deploy\.env
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\User\deploy\.env.example:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+PS C:\Users\User> notepad deploy\.envcd harrowgate
+PS C:\Users\User> copy deploy\.env.example deploy\.env
+copy : Cannot find path 'C:\Users\User\deploy\.env.example' because it does not exist.
+At line:1 char:1
++ copy deploy\.env.example deploy\.env
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\User\deploy\.env.example:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+PS C:\Users\User> cd harrowgate
+PS C:\Users\User\harrowgate> copy deploy\.env.example deploy\.env
+copy : Cannot find path 'C:\Users\User\harrowgate\deploy\.env.example' because it does not exist.
+At line:1 char:1
++ copy deploy\.env.example deploy\.env
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\User\h...oy\.env.example:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+PS C:\Users\User\harrowgate> node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+node : The term 'node' is not recognized as the name of a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ node -e "console.log(require('crypto').randomBytes(32).toString('hex' ...
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (node:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\User\harrowgate> cd
+PS C:\Users\User\harrowgate> cd
+PS C:\Users\User\harrowgate> node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+node : The term 'node' is not recognized as the name of a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ node -e "console.log(require('crypto').randomBytes(32).toString('hex' ...
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (node:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Users\User\harrowgate>
