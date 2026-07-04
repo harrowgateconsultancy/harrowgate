@@ -28,3 +28,15 @@ GOOGLE_REDIRECT_URI = "https://8406eb44-1c18-45e5-825a-162971318e71-00-1zzkjoduf
 
 [nix]
 channel = "stable-25_05"
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 80
+
+[[ports]]
+localPort = 20089
+externalPort = 3000
