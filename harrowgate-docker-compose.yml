@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: harrowgate
+      POSTGRES_USER: harrowgate
+      POSTGRES_PASSWORD: "Hawwa@2809"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U harrowgate -d harrowgate"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      DATABASE_URL: "postgres://harrowgate:Hawwa@2809@postgres:5432/harrowgate"
+      STUDENT_JWT_SECRET: "bfacd0ca90efa0273b44de7a854812d55cc85e1990fb2eaa738c3340b6e11369"
+      ADMIN_USERNAME: "admin"
+      ADMIN_PASSWORD: "Hawwa@2809"
+      GOOGLE_CLIENT_ID: "383457570609-fudqum5n80ioncmm4gpfa31o9koao6i0.apps.googleusercontent.com"
+      GOOGLE_CLIENT_SECRET: "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"
+      GMAIL_USER: "harrowgateconsultancy@gmail.com"
+      GMAIL_APP_PASSWORD: "ssqdbiabcbrcuysi"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token eyJhIjoiMjA0MDM0MmZkMDg2OWE0NWQ3OWEzZTgyZDI4YjA2M2YiLCJ0IjoiODM0YzFjN2MtMzY5OC00N2EwLWFmYmYtNmQzN2U4MTkyNTExIiwicyI6IlltWmtOR1U1WmpjdE5UTTNOUzAwWlRBekxXSm1NVEF0TURSa05EVXdaV0ZsT0RnMiJ9
+    depends_on:
+      - app
+
+volumes:
+  postgres_data:
