@@ -14,6 +14,21 @@ const GOLD_DIM    = "rgba(162,137,89,0.7)";
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 
+const FEAT_KEY_MAP: Record<string, string> = {
+  "1st semester tuition fee inclusive (paid by students)": "pkg.feat1",
+  "Application documents review":                          "pkg.feat2",
+  "University enrollment guidance":                        "pkg.feat3",
+  "Visa document checklist":                               "pkg.feat4",
+  "Full application & form filling guide":                 "pkg.feat5",
+  "Immigration letter assistance":                         "pkg.feat6",
+  "Visa form review & Guidance":                           "pkg.feat7",
+  "Pre-departure briefing session":                        "pkg.feat8",
+  "Phone plan setup guide":                                "pkg.feat9",
+  "Emergency contact protocols":                           "pkg.feat10",
+  "Priority WhatsApp support":                             "pkg.feat11",
+  "Service ends upon arrival at university":               "pkg.feat12",
+};
+
 const PACKAGES = [
   { tierKey: "tier3", badge: false, highlight: false, cardNoteKey: "pkg.note.tier3" },
   { tierKey: "tier2", badge: true,  highlight: true,  cardNoteKey: "pkg.note.tier2" },
@@ -283,7 +298,8 @@ export default function Packages() {
                     {/* Features */}
                     <ul className="space-y-1 mb-6">
                       {(pricing.raw.features && pricing.raw.features.length > 0 ? pricing.raw.features : DEFAULT_FEATURES).map((f, fi) => (
-                        <FeatureItem key={fi} bold={f.bold} accentColor={accentColor} label={f.text} />
+                        <FeatureItem key={fi} bold={f.bold} accentColor={accentColor}
+                          label={FEAT_KEY_MAP[f.text] ? t(FEAT_KEY_MAP[f.text]) : f.text} />
                       ))}
                     </ul>
 

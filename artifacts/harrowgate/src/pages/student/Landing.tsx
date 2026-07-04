@@ -736,14 +736,14 @@ export default function Landing() {
         <section className="py-24 px-6 lg:px-16 xl:px-24">
           <div className="max-w-7xl mx-auto">
             <Reveal idx={50} visible={visible} setRef={setRef}>
-              <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: LABEL_COLOR }}>WORLD-RANKED UNIVERSITIES</p>
+              <p className="text-xs font-semibold tracking-[0.3em] uppercase text-center mb-4" style={{ color: LABEL_COLOR }}>{t("univ.label")}</p>
             </Reveal>
             <Reveal idx={51} visible={visible} setRef={setRef} delay={80}>
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>Study at Asia's Top Universities</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: GOLD }}>{t("univ.heading")}</h2>
             </Reveal>
             <Reveal idx={52} visible={visible} setRef={setRef} delay={140}>
               <p className="text-center mb-14 text-base max-w-2xl mx-auto" style={{ color: GOLD_DIM }}>
-                Hong Kong is home to five of the world's top 100 universities — offering globally recognised degrees, English-taught programmes, and unmatched career access across Asia.
+                {t("univ.desc")}
               </p>
             </Reveal>
 
@@ -848,7 +848,7 @@ export default function Landing() {
             {/* Rankings note */}
             <Reveal idx={57} visible={visible} setRef={setRef} delay={350}>
               <p className="text-center mt-10 text-xs" style={{ color: CREAM_DIM }}>
-                Rankings based on <span style={{ color: CREAM }}>QS World University Rankings 2025</span> and <span style={{ color: CREAM }}>Times Higher Education 2025</span>
+                {t("univ.rankNote")}
               </p>
             </Reveal>
           </div>
