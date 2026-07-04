@@ -1,0 +1,94 @@
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          7/4/2026   4:10 PM                deploy
+
+
+PS C:\Users\User\harrowgate>
+PS C:\Users\User\harrowgate> @'
+>> FROM node:20 AS builder
+>> RUN corepack enable && corepack prepare pnpm@9 --activate
+>> WORKDIR /app
+>> COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+>> COPY lib/ ./lib/
+>> COPY artifacts/harrowgate/ ./artifacts/harrowgate/
+>> COPY artifacts/api-server/ ./artifacts/api-server/
+>> COPY scripts/ ./scripts/
+>> RUN mkdir -p attached_assets
+>> COPY attached_assets/ ./attached_assets/
+>> RUN pnpm install --frozen-lockfile
+>> ENV NODE_ENV=production BASE_PATH=/ PORT=3001
+>> RUN pnpm --filter @workspace/harrowgate run build
+>> RUN pnpm --filter @workspace/api-server run build
+>>
+>> FROM node:20-alpine
+>> WORKDIR /app
+>> ENV NODE_ENV=production PORT=3000
+>> COPY --from=builder /app/artifacts/api-server/dist ./artifacts/api-server/dist
+>> COPY --from=builder /app/artifacts/harrowgate/dist/public ./artifacts/harrowgate/dist/public
+>> EXPOSE 3000
+>> CMD ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]
+>> '@ | Set-Content -Path deploy\Dockerfile -Encoding UTF8
+PS C:\Users\User\harrowgate>
+PS C:\Users\User\harrowgate> @'
+>> version: "3.9"
+>> services:
+>>   postgres:
+>>     image: postgres:16-alpine
+>>     restart: unless-stopped
+>>     environment:
+>>       POSTGRES_DB: harrowgate
+>>       POSTGRES_USER: harrowgate
+>>       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+>>     volumes:
+>>       - postgres_data:/var/lib/postgresql/data
+>>     healthcheck:
+>>       test: ["CMD-SHELL", "pg_isready -U harrowgate -d harrowgate"]
+>>       interval: 5s
+>>       timeout: 5s
+>>       retries: 10
+>>   app:
+>>     build:
+>>       context: ..
+>>       dockerfile: deploy/Dockerfile
+>>     restart: unless-stopped
+>>     ports:
+>>       - "${APP_PORT:-3000}:3000"
+>>     environment:
+>>       DATABASE_URL: "postgres://harrowgate:${POSTGRES_PASSWORD}@postgres:5432/harrowgate"
+>>       STUDENT_JWT_SECRET: ${STUDENT_JWT_SECRET}
+>>       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+>>       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+>>       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+>>       GMAIL_USER: ${GMAIL_USER}
+>>       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
+>>     depends_on:
+>>       postgres:
+>>         condition: service_healthy
+>> volumes:
+>>   postgres_data:
+>> '@ | Set-Content -Path deploy\docker-compose.yml -Encoding UTF8
+PS C:\Users\User\harrowgate>
+PS C:\Users\User\harrowgate> @'
+>> POSTGRES_PASSWORD=Hawwa@2809
+>> APP_PORT=3000
+>> STUDENT_JWT_SECRET=bfacd0ca90efa0273b44de7a854812d55cc85e1990fb2eaa738c3340b6e11369
+>> ADMIN_PASSWORD=Hawwa@2809
+>> GOOGLE_CLIENT_ID=383457570609-fudqum5n80ioncmm4gpfa31o9koao6i0.apps.googleusercontent.com
+>> GOOGLE_CLIENT_SECRET=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
+>> GMAIL_USER=harrowgateconsultancy@gmail.com
+>> GMAIL_APP_PASSWORD=ssqdbiabcbrcuysi
+>> '@ | Set-Content -Path deploy\.env -Encoding UTF8
+PS C:\Users\User\harrowgate>
+PS C:\Users\User\harrowgate> Write-Host "All files created. Now building..."
+All files created. Now building...
+PS C:\Users\User\harrowgate> cd deploy
+PS C:\Users\User\harrowgate\deploy> docker-compose up -d --build
+docker-compose : The term 'docker-compose' is not recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try
+again.
+At line:1 char:1
++ docker-compose up -d --build
++ ~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (docker-compose:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
