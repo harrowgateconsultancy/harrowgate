@@ -1,0 +1,165 @@
+ostgres-1  | 
+
+postgres-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres-1  | 
+postgres-1  | 2026-07-04 09:34:23.667 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres-1  | 2026-07-04 09:34:23.667 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1  | 2026-07-04 09:34:23.667 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-1  | 2026-07-04 09:34:23.669 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1  | 2026-07-04 09:34:23.671 UTC [29] LOG:  database system was shut down at 2026-07-04 09:28:08 UTC
+postgres-1  | 2026-07-04 09:34:23.678 UTC [1] LOG:  database system is ready to accept connections
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'openai' imported from /app/artifacts/api-server/dist/index.mjs
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1       | node:internal/modules/esm/resolve:873
+app-1       | 
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'openai' imported from /app/artifacts/api-server/dist/index.mjs
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._lin
+k (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1       | node:internal/modules/esm/resolve:873
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'openai' imported from /app/artifacts/api-server/dist/index.mjs
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1       | node:internal/modules/esm/resolve:873
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'openai' imported from /app/artifacts/api-server/dist/index.mjs
+
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       | node:internal/modules/esm/resolve:873
+
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+
+app-1       | Node.js v20.20.2
+
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'openai' imported from /app/artifacts/api-server/dist/index.mjs
+
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1 exited with code 1
+
+app-1       | node:internal/modules/esm/resolve:873
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'openai' imported from /app/artifacts/api-server/dist/index.mjs
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1       | node:internal/modules/esm/resolve:873
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'openai' imported from /app/artifacts/api-server/dist/index.mjs
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1       | node:internal/modules/esm/resolve:873
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'openai' imported from /app/artifacts/api-server/dist/index.mjs
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2

@@ -64,7 +64,7 @@ async function buildAll() {
       "@opentelemetry/*",
       "@google-cloud/*",
       "@google/*",
-      "googleapis",
+      
       "firebase-admin",
       "@parcel/watcher",
       "@sentry/profiling-node",
@@ -99,7 +99,7 @@ async function buildAll() {
       "puppeteer",
       "puppeteer-core",
       "electron",
-      "openai",
+      
     ],
     sourcemap: "linked",
     plugins: [
