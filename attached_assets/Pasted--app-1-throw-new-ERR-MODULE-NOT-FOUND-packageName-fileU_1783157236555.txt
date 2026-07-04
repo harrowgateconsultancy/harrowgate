@@ -1,0 +1,157 @@
+
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@google-cloud/storage' imported from /app/artifacts/api-server/dist/index.mjs
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1       | node:internal/modules/esm/resolve:873
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@google-cloud/storage' imported from /app/artifacts/api-server/dist/index.mjs
+
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
+
+app-1       | node:internal/modules/esm/resolve:873
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+postgres-1  | 2026-07-04 09:01:30.663 UTC [42] LOG:  checkpoint starting: shutdown immediate
+
+postgres-1  | 2026-07-04 09:01:30.801 UTC [42] LOG:  checkpoint complete: wrote 926 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.132 s, sync=0.004 s, total=0.140 s; sync files=301, longest=0.002 s, average=0.001 s; distance=4283 kB, estimate=4283 kB; lsn=0/1925D68, redo lsn=0/1925D68
+postgres-1  | 2026-07-04 09:01:30.814 UTC [41] LOG:  database system is shut down
+postgres-1  |  done
+postgres-1  | server stopped
+postgres-1  | 
+postgres-1  | PostgreSQL init process complete; ready for start up.
+postgres-1  | 
+postgres-1  | 2026-07-04 09:01:30.895 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+
+postgres-1  | 2026-07-04 09:01:30.895 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1  | 2026-07-04 09:01:30.895 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-1  | 2026-07-04 09:01:30.897 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1  | 2026-07-04 09:01:30.902 UTC [57] LOG:  database system was shut down at 2026-07-04 09:01:30 UTC
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@google-cloud/storage' imported from /app/artifacts/api-server/dist/index.mjs
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+
+postgres-1  | 2026-07-04 09:01:30.909 UTC [1] LOG:  database system is ready to accept connections
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+
+postgres-1  | 2026-07-04 09:06:30.999 UTC [55] LOG:  checkpoint starting: time
+postgres-1  | 2026-07-04 09:06:35.219 UTC [55] LOG:  checkpoint complete: wrote 45 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=4.213 s, sync=0.003 s, total=4.220 s; sync files=12, longest=0.002 s, average=0.001 s; distance=261 kB, estimate=261 kB; lsn=0/19671A0, redo lsn=0/1967168
+postgres-1  | 2026-07-04 09:15:04.694 UTC [1] LOG:  received fast shutdown request
+postgres-1  | 2026-07-04 09:15:04.696 UTC [1] LOG:  aborting any active transactions
+postgres-1  | 2026-07-04 09:15:04.699 UTC [1] LOG:  background worker "logical replication launcher" (PID 60) exited with exit code 1
+postgres-1  | 2026-07-04 09:15:04.700 UTC [55] LOG:  shutting down
+postgres-1  | 2026-07-04 09:15:04.702 UTC [55] LOG:  checkpoint starting: shutdown immediate
+postgres-1  | 2026-07-04 09:15:04.707 UTC [55] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync
+=0.001 s, total=0.008 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=234 kB; lsn=0/1967250, redo lsn=0/1967250
+postgres-1  | 2026-07-04 09:15:04.713 UTC [1] LOG:  database system is shut down
+postgres-1  | 
+postgres-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres-1  | 
+postgres-1  | 2026-07-04 09:15:05.169 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres-1  | 2026-07-04 09:15:05.169 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1  | 2026-07-04 09:15:05.169 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-1  | 2026-07-04 09:15:05.170 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1  | 2026-07-04 09:15:05.174 UTC [29] LOG:  database system was shut down at 2026-07
+-04 09:15:04 UTC
+postgres-1  | 2026-07-04 09:15:05.178 UTC [1] LOG:  database system is ready to accept connections
+postgres-1  | 2026-07-04 09:20:05.271 UTC [27] LOG:  checkpoint starting: time
+postgres-1  | 2026-07-04 09:20:05.277 UTC [27] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.001 s, total=0.006 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/1967338, redo lsn=0/1967300
+postgres-1  | 2026-07-04 09:24:52.795 UTC [1] LOG:  received fast shutdown request
+postgres-1  | 2026-07-04 09:24:52.796 UTC [1] LOG:  aborting any active transactions
+postgres-1  | 2026-07-04 09:24:52.801 UTC [1] LOG:  background worker "logical replication launcher" (PID 32) exited with exit code 1
+postgres-1  | 2026-07-04 09:24:52.801 UTC [27] LOG:  shutting down
+postgres-1  | 2026-07-04 09:24:52.802 UTC [27] LOG
+:  checkpoint starting: shutdown immediate
+postgres-1  | 2026-07-04 09:24:52.806 UTC [27] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.005 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=0 kB; lsn=0/19673E8, redo lsn=0/19673E8
+postgres-1  | 2026-07-04 09:24:52.815 UTC [1] LOG:  database system is shut down
+postgres-1  | 
+postgres-1  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres-1  | 
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
+postgres-1  | 2026-07-04 09:24:55.503 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 
+15.2.0) 15.2.0, 64-bit
+postgres-1  | 2026-07-04 09:24:55.503 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1  | 2026-07-04 09:24:55.503 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-1  | 2026-07-04 09:24:55.504 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1  | 2026-07-04 09:24:55.507 UTC [29] LOG:  database system was shut down at 2026-07-04 09:24:52 UTC
+postgres-1  | 2026-07-04 09:24:55.515 UTC [1] LOG:  database system is ready to accept connections
+
+app-1       | node:internal/modules/esm/resolve:873
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@google-cloud/storage' imported from /app/artifacts/api-server/dist/index.mjs
+
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+
+app-1       | }
+
+app-1       | 
+app-1       | Node.js v20.20.2
+app-1 exited with code 1
+
+app-1       | node:internal/modules/esm/resolve:873
+
+app-1       |   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+
+app-1       |         ^
+app-1       | 
+app-1       | Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@google-cloud/storage' imported from /app/artifacts/api-server/dist/index.mjs
+app-1       |     at packageResolve (node:internal/modules/esm/resolve:873:9)
+app-1       |     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+app-1       |     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+app-1       |     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+app-1       |     at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+app-1       |     at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+app-1       |     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+app-1       |     at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+app-1       |   code: 'ERR_MODULE_NOT_FOUND'
+app-1       | }
+app-1       | 
+app-1       | Node.js v20.20.2
