@@ -1,4 +1,4 @@
-import type { Storage as StorageType, File } from "@google-cloud/storage";
+import type { File } from "@google-cloud/storage";
 import { Readable } from "stream";
 import { randomUUID } from "crypto";
 import {
@@ -12,34 +12,16 @@ import { LocalStorageFile, LocalStorageService, isLocalStorageMode } from "./loc
 
 const localStorageService = new LocalStorageService();
 
-const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
-
-let _objectStorageClient: StorageType | null = null;
-export function getObjectStorageClient(): StorageType {
-  if (!_objectStorageClient) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { Storage } = require("@google-cloud/storage");
-    _objectStorageClient = new Storage({
-      credentials: {
-        audience: "replit",
-        subject_token_type: "access_token",
-        token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-        type: "external_account",
-        credential_source: {
-          url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-          format: {
-            type: "json",
-            subject_token_field_name: "access_token",
-          },
-        },
-        universe_domain: "googleapis.com",
-      },
-      projectId: "",
-    });
-  }
-  return _objectStorageClient;
+function gcsNotAvailable(): never {
+  throw new Error(
+    "Google Cloud Storage is not available in this deployment. " +
+    "Ensure PRIVATE_OBJECT_DIR is unset to use local storage mode."
+  );
 }
-export const objectStorageClient = { bucket: (name: string) => getObjectStorageClient().bucket(name) } as StorageType;
+
+export const objectStorageClient = new Proxy({} as any, {
+  get() { gcsNotAvailable(); }
+});
 
 export class ObjectNotFoundError extends Error {
   constructor() {
