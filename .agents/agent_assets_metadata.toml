@@ -24,3 +24,9 @@ id = "cZFGWH4dpFgOoMTpvNUA9"
 uri = "file://harrowgate-docker-compose.yml"
 type = "unspecified"
 title = "docker-compose.yml"
+
+[[outputs]]
+id = "nNVhE7ZZtTclQqZrqZW5A"
+uri = "file://harrowgate-update.tar.gz"
+type = "unspecified"
+title = "harrowgate-update.tar.gz"
