@@ -1,7 +1,13 @@
+networks:
+  hg_net:
+    driver: bridge
+
 services:
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
+    networks:
+      - hg_net
     environment:
       POSTGRES_DB: harrowgate
       POSTGRES_USER: harrowgate
@@ -17,8 +23,11 @@ services:
   app:
     image: node:20-alpine
     restart: unless-stopped
+    networks:
+      - hg_net
     working_dir: /app
-    mem_limit: 512m
+    ports:
+      - "3000:3000"
     volumes:
       - ./artifacts/api-server/dist:/app/artifacts/api-server/dist
       - ./artifacts/harrowgate/dist/public:/app/artifacts/harrowgate/dist/public
@@ -46,6 +55,8 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
+    networks:
+      - hg_net
     command: tunnel --no-autoupdate run --token eyJhIjoiMjA0MDM0MmZkMDg2OWE0NWQ3OWEzZTgyZDI4YjA2M2YiLCJ0IjoiODM0YzFjN2MtMzY5OC00N2EwLWFmYmYtNmQzN2U4MTkyNTExIiwicyI6IlltWmtOR1U1WmpjdE5UTTNOUzAwWlRBekxXSm1NVEF0TURSa05EVXdaV0ZsT0RnMiJ9
     depends_on:
       - app

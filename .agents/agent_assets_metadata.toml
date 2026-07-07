@@ -17,7 +17,7 @@ title = "HARROWGATE — Complete Codebase"
 id = "rFCRTEpR4qD1IO2zDCR-B"
 uri = "file://harrowgate-deploy.tar.gz"
 type = "unspecified"
-title = "harrowgate-deploy.tar.gz (submit fix)"
+title = "harrowgate-deploy.tar.gz (network fix)"
 
 [[outputs]]
 id = "cZFGWH4dpFgOoMTpvNUA9"
