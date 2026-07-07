@@ -11,7 +11,7 @@ function getApiBase() {
   return `${window.location.origin}${BASE}`;
 }
 
-type Props = { user: any; onSubmitted: () => void };
+type Props = { user: any; onSubmitted: (submission: any) => void };
 type UploadState = { file: File | null; uploading: boolean; url: string | null; name: string | null; error: string | null };
 const emptyUpload = (): UploadState => ({ file: null, uploading: false, url: null, name: null, error: null });
 
@@ -280,7 +280,7 @@ export default function ApplyForm({ user, onSubmitted }: Props) {
           });
         }
       }
-      onSubmitted();
+      onSubmitted(submission);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {

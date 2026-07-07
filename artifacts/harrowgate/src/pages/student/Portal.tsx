@@ -1050,7 +1050,10 @@ export default function Portal() {
       </nav>
 
       <main className="w-full px-6 lg:px-10 xl:px-16 py-5 sm:py-8">
-        {submission === null && <ApplyForm user={user} onSubmitted={fetchSubmission} />}
+        {submission === null && <ApplyForm user={user} onSubmitted={(sub) => {
+          setSubmission({ ...sub, documents: [] });
+          fetchSubmission();
+        }} />}
 
         {submission && (
           <>
