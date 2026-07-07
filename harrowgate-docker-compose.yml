@@ -55,8 +55,7 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
-    networks:
-      - hg_net
+    network_mode: host
     command: tunnel --no-autoupdate run --token eyJhIjoiMjA0MDM0MmZkMDg2OWE0NWQ3OWEzZTgyZDI4YjA2M2YiLCJ0IjoiODM0YzFjN2MtMzY5OC00N2EwLWFmYmYtNmQzN2U4MTkyNTExIiwicyI6IlltWmtOR1U1WmpjdE5UTTNOUzAwWlRBekxXSm1NVEF0TURSa05EVXdaV0ZsT0RnMiJ9
     depends_on:
       - app
