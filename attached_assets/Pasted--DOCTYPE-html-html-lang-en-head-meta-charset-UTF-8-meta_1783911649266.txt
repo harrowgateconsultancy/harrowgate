@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J&G Fair Visa Portal | On-Arrival Registration</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0b1a2e 0%, #1a3b5c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            max-width: 850px;
+            width: 100%;
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            padding: 35px 40px;
+            transition: 0.3s;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .header .badge {
+            background: #d4af37;
+            color: #0b1a2e;
+            font-weight: 700;
+            font-size: 12px;
+            padding: 6px 16px;
+            border-radius: 50px;
+            display: inline-block;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0b1a2e;
+        }
+        .header h1 i {
+            color: #d4af37;
+            margin-right: 10px;
+        }
+        .header p {
+            color: #4b5563;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 35px;
+            position: relative;
+        }
+        .progress-container::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 30px;
+            right: 30px;
+            height: 4px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            flex: 1;
+        }
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.4s;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .step.active .step-circle {
+            background: #d4af37;
+            color: #0b1a2e;
+            border-color: #d4af37;
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.4);
+        }
+        .step.completed .step-circle {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        .step-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .step.active .step-label {
+            color: #0b1a2e;
+        }
+
+        /* Form Sections */
+        .form-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 25px;
+        }
+        .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 6px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1f2937;
+        }
+        .form-group label i {
+            color: #d4af37;
+            margin-right: 6px;
+            width: 18px;
+        }
+        .form-group label .required {
+            color: #ef4444;
+            margin-left: 3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 14px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #f9fafb;
+            transition: 0.2s;
+            outline: none;
+            width: 100%;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #d4af37;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+        .form-group .hint {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        /* File Upload Styling */
+        .upload-box {
+            border: 2px dashed #d1d5db;
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .upload-box:hover {
+            border-color: #d4af37;
+            background: #fef9e7;
+        }
+        .upload-box i {
+            font-size: 28px;
+            color: #d4af37;
+            margin-bottom: 8px;
+        }
+        .upload-box p {
+            font-size: 13px;
+            color: #4b5563;
+        }
+        .upload-box input[type="file"] {
+            display: none;
+        }
+        .file-name {
+            font-size: 13px;
+            color: #10b981;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            gap: 15px;
+        }
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-prev {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+        .btn-prev:hover {
+            background: #d1d5db;
+        }
+        .btn-next {
+            background: #0b1a2e;
+            color: white;
+            margin-left: auto;
+        }
+        .btn-next:hover {
+            background: #1a3b5c;
+            transform: scale(1.02);
+        }
+        .btn-submit {
+            background: #d4af37;
+            color: #0b1a2e;
+            width: 100%;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .btn-submit:hover {
+            background: #c09e2e;
+            transform: scale(1.02);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Review Section */
+        .review-item {
+            background: #f9fafb;
+            padding: 12px 16px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            border-left: 4px solid #d4af37;
+            margin-bottom: 8px;
+        }
+        .review-item strong {
+            color: #1f2937;
+        }
+        .review-item span {
+            color: #4b5563;
+            text-align: right;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container { padding: 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .step-label { font-size: 10px; }
+            .header h1 { font-size: 22px; }
+            .btn { padding: 12px 20px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="badge"><i class="fas fa-passport"></i> Hong Kong Trade Fair 2026</div>
+        <h1><i class="fas fa-gem"></i> On-Arrival Visa Portal</h1>
+        <p>Secure your entry for the Jewellery & Gem Fair • September 14-18, 2026</p>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-container">
+        <div class="step active" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Personal</div>
+        </div>
+        <div class="step" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Travel</div>
+        </div>
+        <div class="step" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Business</div>
+        </div>
+        <div class="step" data-step="4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Documents</div>
+        </div>
+        <div class="step" data-step="5">
+            <div class="step-circle">5</div>
+            <div class="step-label">Review</div>
+        </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="visaForm" novalidate>
+
+        <!-- STEP 1: PERSONAL INFO -->
+        <div class="form-section active" data-section="1">
+            <h3 style="margin-bottom: 18px; color: #0b1a2e;"><i class="fas fa-user-circle" style="color:#d4af37;"></i> Personal Information</h3>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Full Name (as in Passport) <span class="required">*</span></label>
+                    <input type="text" id="fullName" placeholder="e.g. Rajesh Kumar Sharma" required>
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth <span class="required">*</span></label>
+                    <input type="date" id="dob" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender <span class="required">*</span></label>
+                    <select id="gender" required>
+                        <option value="">Select</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nationality <span class="required">*</span></label>
+                    <input type="text" id="nationality" placeholder="e.g. Indian" required>
+                </div>
+                <div class="form-group">
+                    <label>Passport Number <span class="required">*</span></label>
+                    <input type="text" id="passportNo" placeholder="e.g. Z1234567" required>
+                </div>
+                <div class="form-group">
+                    <label>Passport Expiry Date <span class="required">*</span></label>
+                    <input type="date" id="passportExpiry" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>Country of Issue <span class="required">*</span></label>
+                    <input type="text" id="issueCountry" placeholder="e.g. India" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: TRAVEL DETAILS -->
+        <div class="form-section" data-section="2">
+            <h3 style="margin-bottom: 18px; color: #0b1a2e;"><i class="fas fa-plane" style="color:#d4af37;"></i> Travel Itinerary</h3>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Intended Date of Arrival in Hong Kong <span class="required">*</span></label>
+                    <input type="date" id="arrivalDate" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>Intended Date of Departure <span class="required">*</span></label>
+                    <input type="date" id="departureDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Flight Number (Arrival)</label>
+                    <input type="text" id="flightNo" placeholder="e.g. CX 694">
+                </div>
+                <div class="form-group">
+                    <label>Hotel / Accommodation <span class="required">*</span></label>
+                    <input type="text" id="hotel" placeholder="e.g. Regal Kowloon Hotel" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>Full Address in Hong Kong <span class="required">*</span></label>
+                    <input type="text" id="hkAddress" placeholder="e.g. 71 Mody Road, Tsim Sha Tsui" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: BUSINESS & FAIR INFO -->
+        <div class="form-section" data-section="3">
+            <h3 style="margin-bottom: 18px; color: #0b1a2e;"><i class="fas fa-briefcase" style="color:#d4af37;"></i> Business & Fair Details</h3>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Company / Business Name <span class="required">*</span></label>
+                    <input type="text" id="company" placeholder="e.g. Global Gems Pvt Ltd" required>
+                </div>
+                <div class="form-group">
+                    <label>Business Address</label>
+                    <input type="text" id="businessAddress" placeholder="e.g. Mumbai, India">
+                </div>
+                <div class="form-group">
+                    <label>Phone (with Country Code) <span class="required">*</span></label>
+                    <input type="tel" id="phone" placeholder="e.g. +91 98765 43210" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" placeholder="you@company.com" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>Purpose of Visit <span class="required">*</span></label>
+                    <select id="purpose" required>
+                        <option value="">Select Purpose</option>
+                        <option>Attending Jewellery & Gem Fair as Visitor</option>
+                        <option>Exhibiting at Jewellery & Gem Fair</option>
+                        <option>Business Negotiations with Suppliers</option>
+                        <option>Product Sourcing for Retail</option>
+                        <option>Other Business Activity</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Are you a first-time visitor to this fair?</label>
+                    <select id="firstTime">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Any additional comments or special requests?</label>
+                    <textarea id="comments" placeholder="e.g. Need assistance with hotel booking or local transport..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: DOCUMENT UPLOAD -->
+        <div class="form-section" data-section="4">
+            <h3 style="margin-bottom: 18px; color: #0b1a2e;"><i class="fas fa-cloud-upload-alt" style="color:#d4af37;"></i> Document Upload</h3>
+            <p style="color: #4b5563; margin-bottom: 20px;">Please upload clear, colour scans of the following documents. We will verify and submit them on your behalf.</p>
+            
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>1. Passport Bio-Page <span class="required">*</span></label>
+                    <div class="upload-box" onclick="document.getElementById('passportUpload').click()">
+                        <i class="fas fa-id-card"></i>
+                        <p>Click to upload or drag & drop</p>
+                        <input type="file" id="passportUpload" accept=".pdf,.jpg,.jpeg,.png">
+                        <div class="file-name" id="passportFileName">No file chosen</div>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>2. Recent Passport-size Photo (White background) <span class="required">*</span></label>
+                    <div class="upload-box" onclick="document.getElementById('photoUpload').click()">
+                        <i class="fas fa-camera"></i>
+                        <p>Click to upload or drag & drop</p>
+                        <input type="file" id="photoUpload" accept=".jpg,.jpeg,.png">
+                        <div class="file-name" id="photoFileName">No file chosen</div>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>3. Hotel Booking Confirmation <span class="required">*</span></label>
+                    <div class="upload-box" onclick="document.getElementById('hotelUpload').click()">
+                        <i class="fas fa-hotel"></i>
+                        <p>Click to upload or drag & drop</p>
+                        <input type="file" id="hotelUpload" accept=".pdf,.jpg,.jpeg,.png">
+                        <div class="file-name" id="hotelFileName">No file chosen</div>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>4. Business Card or Company Letterhead (Optional but recommended)</label>
+                    <div class="upload-box" onclick="document.getElementById('businessUpload').click()">
+                        <i class="fas fa-building"></i>
+                        <p>Click to upload or drag & drop</p>
+                        <input type="file" id="businessUpload" accept=".pdf,.jpg,.jpeg,.png">
+                        <div class="file-name" id="businessFileName">No file chosen</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 5: REVIEW & SUBMIT -->
+        <div class="form-section" data-section="5">
+            <h3 style="margin-bottom: 18px; color: #0b1a2e;"><i class="fas fa-check-circle" style="color:#d4af37;"></i> Review Your Application</h3>
+            <p style="color: #4b5563; margin-bottom: 20px;">Please verify all details are correct before submitting.</p>
+            <div id="reviewContainer"></div>
+            <div style="margin-top: 25px; background: #fef9e7; padding: 15px; border-radius: 12px; border-left: 5px solid #d4af37;">
+                <p style="font-size: 14px; color: #0b1a2e;"><i class="fas fa-info-circle" style="color:#d4af37;"></i> <strong>Declaration:</strong> I confirm that all information provided is true and accurate. I understand that visa approval is at the sole discretion of the Hong Kong Immigration Department.</p>
+            </div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="btn-group">
+            <button type="button" class="btn btn-prev" id="prevBtn" style="display:none;"><i class="fas fa-arrow-left"></i> Back</button>
+            <button type="button" class="btn btn-next" id="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
+            <button type="button" class="btn btn-submit" id="submitBtn" style="display:none;"><i class="fas fa-paper-plane"></i> Submit Application</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // ----- ELEMENTS -----
+        const sections = document.querySelectorAll('.form-section');
+        const steps = document.querySelectorAll('.step');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('visaForm');
+        const reviewContainer = document.getElementById('reviewContainer');
+
+        // File name displays
+        const fileInputs = [
+            { id: 'passportUpload', display: 'passportFileName' },
+            { id: 'photoUpload', display: 'photoFileName' },
+            { id: 'hotelUpload', display: 'hotelFileName' },
+            { id: 'businessUpload', display: 'businessFileName' }
+        ];
+        fileInputs.forEach(({id, display}) => {
+            const input = document.getElementById(id);
+            const displayEl = document.getElementById(display);
+            if (input && displayEl) {
+                input.addEventListener('change', function(e) {
+                    if (this.files && this.files.length > 0) {
+                        displayEl.textContent = this.files[0].name;
+                    } else {
+                        displayEl.textContent = 'No file chosen';
+                    }
+                });
+            }
+        });
+
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        // ----- FUNCTIONS -----
+        function updateUI() {
+            // Show/Hide sections
+            sections.forEach((sec, idx) => {
+                sec.classList.toggle('active', (idx + 1) === currentStep);
+            });
+
+            // Update progress steps
+            steps.forEach((step, idx) => {
+                const num = idx + 1;
+                step.classList.remove('active', 'completed');
+                if (num === currentStep) step.classList.add('active');
+                else if (num < currentStep) step.classList.add('completed');
+            });
+
+            // Buttons visibility
+            prevBtn.style.display = currentStep === 1 ? 'none' : 'inline-flex';
+            nextBtn.style.display = currentStep === totalSteps ? 'none' : 'inline-flex';
+            submitBtn.style.display = currentStep === totalSteps ? 'inline-flex' : 'none';
+
+            // If on review step, build the review
+            if (currentStep === totalSteps) {
+                buildReview();
+            }
+        }
+
+        // ----- VALIDATE CURRENT SECTION -----
+        function validateSection(stepNum) {
+            const section = document.querySelector(`.form-section[data-section="${stepNum}"]`);
+            if (!section) return true;
+
+            const inputs = section.querySelectorAll('input[required], select[required], textarea[required]');
+            let valid = true;
+
+            inputs.forEach(input => {
+                // Special handling for file inputs (they are hidden, we check the wrapper)
+                if (input.type === 'file') {
+                    // For file inputs, we check if a file is selected via the display text
+                    const displayId = input.id.replace('Upload', 'FileName');
+                    const displayEl = document.getElementById(displayId);
+                    if (displayEl && displayEl.textContent === 'No file chosen') {
+                        valid = false;
+                        input.style.borderColor = 'red';
+                        // highlight the upload box
+                        const box = input.closest('.upload-box');
+                        if (box) box.style.borderColor = 'red';
+                    } else {
+                        const box = input.closest('.upload-box');
+                        if (box) box.style.borderColor = '#d1d5db';
+                    }
+                    return;
+                }
+
+                if (!input.value.trim()) {
+                    valid = false;
+                    input.style.borderColor = '#ef4444';
+                } else {
+                    input.style.borderColor = '#d1d5db';
+                }
+
+                // Email validation
+                if (input.type === 'email' && input.value.trim()) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(input.value.trim())) {
+                        valid = false;
+                        input.style.borderColor = '#ef4444';
+                    }
+                }
+
+                // Date logic: arrival must be before departure (only check if both exist)
+                if (stepNum === 2) {
+                    const arrival = document.getElementById('arrivalDate');
+                    const departure = document.getElementById('departureDate');
+                    if (arrival && departure && arrival.value && departure.value) {
+                        if (new Date(arrival.value) >= new Date(departure.value)) {
+                            valid = false;
+                            arrival.style.borderColor = '#ef4444';
+                            departure.style.borderColor = '#ef4444';
+                            alert('Arrival date must be before departure date.');
+                        }
+                    }
+                }
+            });
+
+            return valid;
+        }
+
+        // ----- NAVIGATION -----
+        function goToStep(step) {
+            if (step < 1 || step > totalSteps) return;
+
+            // Validate before moving forward
+            if (step > currentStep) {
+                if (!validateSection(currentStep)) {
+                    alert('Please fill in all required fields correctly before proceeding.');
+                    return;
+                }
+            }
+
+            currentStep = step;
+            updateUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ----- BUILD REVIEW -----
+        function buildReview() {
+            const fields = [
+                { label: 'Full Name', id: 'fullName' },
+                { label: 'Date of Birth', id: 'dob' },
+                { label: 'Gender', id: 'gender' },
+                { label: 'Nationality', id: 'nationality' },
+                { label: 'Passport Number', id: 'passportNo' },
+                { label: 'Passport Expiry', id: 'passportExpiry' },
+                { label: 'Country of Issue', id: 'issueCountry' },
+                { label: 'Arrival Date', id: 'arrivalDate' },
+                { label: 'Departure Date', id: 'departureDate' },
+                { label: 'Flight Number', id: 'flightNo' },
+                { label: 'Hotel', id: 'hotel' },
+                { label: 'HK Address', id: 'hkAddress' },
+                { label: 'Company', id: 'company' },
+                { label: 'Business Address', id: 'businessAddress' },
+                { label: 'Phone', id: 'phone' },
+                { label: 'Email', id: 'email' },
+                { label: 'Purpose', id: 'purpose' },
+                { label: 'First Time?', id: 'firstTime' },
+                { label: 'Comments', id: 'comments' }
+            ];
+
+            let html = '';
+            fields.forEach(f => {
+                const el = document.getElementById(f.id);
+                if (el) {
+                    let value = el.value || 'Not provided';
+                    if (el.type === 'date' && value) {
+                        const d = new Date(value);
+                        value = d.toLocaleDateString('en-GB');
+                    }
+                    html += `
+                        <div class="review-item">
+                            <strong>${f.label}</strong>
+                            <span>${value}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            // Add file info
+            const files = [
+                { label: 'Passport Bio-Page', id: 'passportFileName' },
+                { label: 'Passport Photo', id: 'photoFileName' },
+                { label: 'Hotel Booking', id: 'hotelFileName' },
+                { label: 'Business Card', id: 'businessFileName' }
+            ];
+            files.forEach(f => {
+                const el = document.getElementById(f.id);
+                if (el) {
+                    html += `
+                        <div class="review-item">
+                            <strong>${f.label}</strong>
+                            <span>${el.textContent}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            reviewContainer.innerHTML = html;
+        }
+
+        // ----- SUBMIT (COLLECT DATA) -----
+        function submitApplication() {
+            // Final validation on all sections
+            let allValid = true;
+            for (let i = 1; i <= totalSteps; i++) {
+                if (!validateSection(i)) {
+                    allValid = false;
+                    break;
+                }
+            }
+
+            if (!allValid) {
+                alert('Please complete all required fields in every section.');
+                return;
+            }
+
+            // Gather data into a JSON object
+            const formData = {
+                personal: {
+                    fullName: document.getElementById('fullName').value,
+                    dob: document.getElementById('dob').value,
+                    gender: document.getElementById('gender').value,
+                    nationality: document.getElementById('nationality').value,
+                    passportNo: document.getElementById('passportNo').value,
+                    passportExpiry: document.getElementById('passportExpiry').value,
+                    issueCountry: document.getElementById('issueCountry').value,
+                },
+                travel: {
+                    arrivalDate: document.getElementById('arrivalDate').value,
+                    departureDate: document.getElementById('departureDate').value,
+                    flightNo: document.getElementById('flightNo').value,
+                    hotel: document.getElementById('hotel').value,
+                    hkAddress: document.getElementById('hkAddress').value,
+                },
+                business: {
+                    company: document.getElementById('company').value,
+                    businessAddress: document.getElementById('businessAddress').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    purpose: document.getElementById('purpose').value,
+                    firstTime: document.getElementById('firstTime').value,
+                    comments: document.getElementById('comments').value,
+                },
+                documents: {
+                    passportFile: document.getElementById('passportFileName').textContent,
+                    photoFile: document.getElementById('photoFileName').textContent,
+                    hotelFile: document.getElementById('hotelFileName').textContent,
+                    businessFile: document.getElementById('businessFileName').textContent,
+                }
+            };
+
+            // DISPLAY THE DATA (For Demo)
+            console.log('✅ COLLECTED DATA:', JSON.stringify(formData, null, 2));
+
+            // Show success message with the data (so you can copy it)
+            alert(
+                '✅ APPLICATION SUBMITTED!\n\n' +
+                'All data has been collected. Check the browser console (F12) for the full JSON.\n\n' +
+                'In a live environment, this would be sent to your server/email.\n\n' +
+                `📧 Email: ${formData.business.email}\n` +
+                `📞 Phone: ${formData.business.phone}\n` +
+                `🏢 Company: ${formData.business.company}`
+            );
+
+            // Reset form (optional)
+            // form.reset();
+            // goToStep(1);
+        }
+
+        // ----- EVENT LISTENERS -----
+        prevBtn.addEventListener('click', () => goToStep(currentStep - 1));
+        nextBtn.addEventListener('click', () => goToStep(currentStep + 1));
+        submitBtn.addEventListener('click', submitApplication);
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                if (currentStep === totalSteps) {
+                    submitApplication();
+                } else {
+                    goToStep(currentStep + 1);
+                }
+            }
+        });
+
+        // INIT
+        updateUI();
+
+    })();
+</script>
+
+</body>
+</html>

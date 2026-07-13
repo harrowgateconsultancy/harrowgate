@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FileText, Menu, X, Bell, TrendingUp, UserCog, Tag, Sun, Moon, Settings, LogOut, Shield, Receipt, Calculator } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Menu, X, Bell, TrendingUp, UserCog, Tag, Sun, Moon, Settings, LogOut, Shield, Receipt, Calculator, Globe } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AdminThemeProvider, useAdminTheme } from "@/contexts/AdminThemeContext";
 
@@ -27,6 +27,7 @@ const ALL_NAV_ITEMS = [
   { href: "/admin/settings",     label: "Settings",     icon: Settings,        exact: false, roles: ["admin"] },
   { href: "/admin/agents",       label: "Agents",       icon: Users,           exact: false, roles: ["admin"] },
   { href: "/admin/tax",          label: "Tax",          icon: Calculator,      exact: false, roles: ["admin"] },
+  { href: "/admin/pages",        label: "Pages",        icon: Globe,           exact: false, roles: ["admin"] },
 ];
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {

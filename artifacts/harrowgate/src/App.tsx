@@ -34,6 +34,8 @@ import StaffDashboard from "@/pages/staff/StaffDashboard";
 import PrintView from "@/pages/print";
 import NotFound from "@/pages/not-found";
 import OAuthCallback from "@/pages/auth/OAuthCallback";
+import OnArrivalVisa from "@/pages/OnArrivalVisa";
+import PagesAdmin from "@/pages/admin/Pages";
 import { isStudentLoggedIn } from "@/lib/studentAuth";
 
 const queryClient = new QueryClient({
@@ -104,6 +106,8 @@ function AppRoutes() {
           <Route path="/staff/login" component={StaffLogin} />
           <Route path="/staff" component={StaffDashboard} />
 
+          <Route path="/on-arrival-visa" component={OnArrivalVisa} />
+
           <Route path="/agent-signup" component={AgentSignup} />
 
           <Route path="/admin/login" component={AdminLogin} />
@@ -150,6 +154,9 @@ function AppRoutes() {
                   </Route>
                   <Route path="/admin/tax">
                     <AdminOnlyGuard><TaxPage /></AdminOnlyGuard>
+                  </Route>
+                  <Route path="/admin/pages">
+                    <AdminOnlyGuard><PagesAdmin /></AdminOnlyGuard>
                   </Route>
                   <Route component={NotFound} />
                 </Switch>

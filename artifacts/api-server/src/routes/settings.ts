@@ -100,4 +100,25 @@ router.put("/admin/settings/payment-methods", async (req, res) => {
   } catch { res.status(500).json({ error: "Failed to update payment methods" }); }
 });
 
+// ── On-Arrival Visa page toggle ──
+const DEFAULT_ON_ARRIVAL = { live: false };
+
+router.get("/settings/on-arrival", async (_req, res) => {
+  try {
+    const [row] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "on_arrival")).limit(1);
+    res.json(row ? row.value : DEFAULT_ON_ARRIVAL);
+  } catch { res.status(500).json({ error: "Failed to fetch on-arrival setting" }); }
+});
+
+router.put("/admin/settings/on-arrival", async (req, res) => {
+  try {
+    const { live } = req.body;
+    const value = { live: !!live };
+    await db.insert(appSettingsTable)
+      .values({ key: "on_arrival", value })
+      .onConflictDoUpdate({ target: appSettingsTable.key, set: { value, updatedAt: new Date() } });
+    res.json(value);
+  } catch { res.status(500).json({ error: "Failed to update on-arrival setting" }); }
+});
+
 export default router;
