@@ -103,6 +103,7 @@ export default function OnArrivalVisa() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [appId, setAppId] = useState<number | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${apiBase()}/api/settings/on-arrival`)
@@ -181,10 +182,11 @@ export default function OnArrivalVisa() {
       }
       const data = await res.json();
       setAppId(data.id ?? null);
+      setSubmitError(null);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
-      setErrors({ comments: err?.message || "Submission failed — please try again." });
+      setSubmitError(err?.message || "Submission failed — please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -558,6 +560,17 @@ export default function OnArrivalVisa() {
                   I understand that visa approval is at the sole discretion of the Hong Kong Immigration Department.
                 </p>
               </div>
+            </div>
+          )}
+
+          {/* Submit error */}
+          {submitError && step === 5 && (
+            <div className="flex items-start gap-3 rounded-xl px-4 py-3.5 mt-6"
+              style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.3)" }}>
+              <svg className="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10" /><path d="M12 8v4m0 4h.01" strokeLinecap="round" />
+              </svg>
+              <p className="text-sm font-medium" style={{ color: "#b91c1c" }}>{submitError}</p>
             </div>
           )}
 

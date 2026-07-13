@@ -45,7 +45,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB per file
   fileFilter: (_req, file, cb) => {
     const ok = /\.(pdf|jpg|jpeg|png)$/i.test(file.originalname);
     cb(null, ok);
@@ -53,38 +53,46 @@ const upload = multer({
 });
 
 // ── Public submit ─────────────────────────────────────────────────────────────
-router.post(
-  "/on-arrival/submit",
-  upload.fields([
-    { name: "passport", maxCount: 1 },
-    { name: "photo", maxCount: 1 },
-    { name: "hotel", maxCount: 1 },
-    { name: "business", maxCount: 1 },
-  ]),
-  async (req: any, res: any) => {
-    try {
-      const files = req.files as Record<string, Express.Multer.File[]>;
-      const formData = JSON.parse(req.body.formData || "{}");
+const uploadFields = upload.fields([
+  { name: "passport", maxCount: 1 },
+  { name: "photo", maxCount: 1 },
+  { name: "hotel", maxCount: 1 },
+  { name: "business", maxCount: 1 },
+]);
 
-      const [row] = await db
-        .insert(onArrivalApplicationsTable)
-        .values({
-          formData,
-          passportPath: files?.passport?.[0]?.path ?? null,
-          photoPath: files?.photo?.[0]?.path ?? null,
-          hotelPath: files?.hotel?.[0]?.path ?? null,
-          businessPath: files?.business?.[0]?.path ?? null,
-          status: "pending",
-        })
-        .returning();
-
-      res.json({ ok: true, id: row.id });
-    } catch (err) {
-      console.error("on-arrival submit error", err);
-      res.status(500).json({ error: "Submission failed — please try again." });
+router.post("/on-arrival/submit", (req: any, res: any, next: any) => {
+  uploadFields(req, res, (err: any) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({ error: "One or more files are too large. Maximum size is 50 MB per file." });
+      }
+      return res.status(400).json({ error: `File upload error: ${err.message}` });
     }
+    next();
+  });
+}, async (req: any, res: any) => {
+  try {
+    const files = req.files as Record<string, Express.Multer.File[]>;
+    const formData = JSON.parse(req.body.formData || "{}");
+
+    const [row] = await db
+      .insert(onArrivalApplicationsTable)
+      .values({
+        formData,
+        passportPath: files?.passport?.[0]?.path ?? null,
+        photoPath: files?.photo?.[0]?.path ?? null,
+        hotelPath: files?.hotel?.[0]?.path ?? null,
+        businessPath: files?.business?.[0]?.path ?? null,
+        status: "pending",
+      })
+      .returning();
+
+    res.json({ ok: true, id: row.id });
+  } catch (err) {
+    console.error("on-arrival submit error", err);
+    res.status(500).json({ error: "Submission failed — please try again." });
   }
-);
+});
 
 // ── Admin: list all applications ──────────────────────────────────────────────
 router.get("/admin/pages/on-arrival/applications", async (_req, res: any) => {
