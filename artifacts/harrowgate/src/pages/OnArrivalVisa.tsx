@@ -102,6 +102,7 @@ export default function OnArrivalVisa() {
   const [errors, setErrors] = useState<Partial<FormData & { passportFile: string; photoFile: string; hotelFile: string }>>({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [appId, setAppId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch(`${apiBase()}/api/settings/on-arrival`)
@@ -178,6 +179,8 @@ export default function OnArrivalVisa() {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.error || `Server error (${res.status})`);
       }
+      const data = await res.json();
+      setAppId(data.id ?? null);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
@@ -222,45 +225,83 @@ export default function OnArrivalVisa() {
 
   // ── success ──
   if (submitted) {
+    const refNo = appId
+      ? `HG-OAV-${String(appId).padStart(6, "0")}`
+      : `HG-OAV-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #163524 100%)` }}>
-        <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-10 text-center">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-            style={{ background: "rgba(16,185,129,0.1)" }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5">
-              <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold mb-2" style={{ color: NAVY }}>Application Submitted!</h2>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: "#4b5563" }}>
-            Thank you, <strong>{form.fullName}</strong>. Your on-arrival visa application has been received.
-            Our team will review your documents and contact you at <strong>{form.email}</strong> within 1–2 business days.
-          </p>
-          <div className="rounded-xl p-4 text-left mb-6 space-y-2" style={{ background: "#f9fafb", borderLeft: `4px solid ${GOLD}` }}>
-            <p className="text-xs font-semibold" style={{ color: NAVY }}>Application Summary</p>
-            {[
-              ["Passport", form.passportNo],
-              ["Arrival", form.arrivalDate],
-              ["Departure", form.departureDate],
-              ["Company", form.company],
-            ].map(([k, v]) => (
-              <div key={k} className="flex justify-between text-xs">
-                <span style={{ color: "#6b7280" }}>{k}</span>
-                <span className="font-medium" style={{ color: NAVY }}>{v || "—"}</span>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href={`${BASE}/`}
-              className="px-6 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-80 text-center"
-              style={{ background: "#f3f4f6", color: NAVY, border: "1px solid #e5e7eb" }}>
-              ← Back to Home
-            </a>
-            <button onClick={() => { setSubmitted(false); setForm(EMPTY); setStep(1); setFiles({ passport: null, photo: null, hotel: null, business: null }); }}
-              className="px-6 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-80"
-              style={{ background: NAVY, color: "#f0d28c" }}>
-              Submit Another Application
-            </button>
+      <div className="min-h-screen flex items-center justify-center px-4 py-10"
+        style={{ background: `linear-gradient(135deg, ${NAVY} 0%, #163524 100%)` }}>
+        <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden">
+          {/* Green top bar */}
+          <div className="h-2 w-full" style={{ background: "linear-gradient(90deg, #10b981, #059669)" }} />
+
+          <div className="p-8 sm:p-10 text-center">
+            {/* Tick */}
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
+              style={{ background: "rgba(16,185,129,0.1)", border: "2px solid rgba(16,185,129,0.25)" }}>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5">
+                <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+
+            <h2 className="text-2xl font-bold mb-1" style={{ color: NAVY }}>Application Submitted!</h2>
+            <p className="text-sm mb-6" style={{ color: "#6b7280" }}>
+              Thank you, <strong style={{ color: NAVY }}>{form.fullName}</strong>. We have received your application.
+            </p>
+
+            {/* Reference number — prominent */}
+            <div className="rounded-2xl px-6 py-5 mb-6 text-center"
+              style={{ background: `linear-gradient(135deg, rgba(196,169,110,0.12) 0%, rgba(162,137,89,0.06) 100%)`, border: `1.5px solid rgba(196,169,110,0.35)` }}>
+              <p className="text-xs font-semibold tracking-[0.22em] uppercase mb-2" style={{ color: "rgba(162,137,89,0.7)" }}>
+                Your Reference Number
+              </p>
+              <p className="text-2xl font-bold tracking-widest" style={{ color: NAVY, fontVariantNumeric: "tabular-nums" }}>
+                {refNo}
+              </p>
+              <p className="text-xs mt-2" style={{ color: "#9ca3af" }}>
+                Please keep this number for your records
+              </p>
+            </div>
+
+            {/* Contact message */}
+            <div className="rounded-xl px-4 py-3.5 mb-6 text-sm text-left"
+              style={{ background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.15)" }}>
+              <p style={{ color: "#065f46" }}>
+                <strong>HARROWGATE Consultancy</strong> will review your documents and contact you at{" "}
+                <strong>{form.email}</strong> within <strong>1–2 business days</strong>.
+              </p>
+            </div>
+
+            {/* Summary */}
+            <div className="rounded-xl p-4 text-left mb-7 space-y-2" style={{ background: "#f9fafb", borderLeft: `4px solid ${GOLD}` }}>
+              <p className="text-xs font-semibold mb-1" style={{ color: NAVY }}>Application Summary</p>
+              {([
+                ["Passport No.", form.passportNo],
+                ["Arrival Date", form.arrivalDate],
+                ["Departure Date", form.departureDate],
+                ["Company", form.company],
+                ["Phone", form.phone],
+              ] as [string, string][]).map(([k, v]) => v ? (
+                <div key={k} className="flex justify-between text-xs">
+                  <span style={{ color: "#6b7280" }}>{k}</span>
+                  <span className="font-medium" style={{ color: NAVY }}>{v}</span>
+                </div>
+              ) : null)}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <a href={`${BASE}/`}
+                className="px-6 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-80 text-center"
+                style={{ background: "#f3f4f6", color: NAVY, border: "1px solid #e5e7eb" }}>
+                ← Back to Home
+              </a>
+              <button onClick={() => { setSubmitted(false); setForm(EMPTY); setStep(1); setAppId(null); setFiles({ passport: null, photo: null, hotel: null, business: null }); }}
+                className="px-6 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-80"
+                style={{ background: NAVY, color: "#f0d28c" }}>
+                Submit Another Application
+              </button>
+            </div>
           </div>
         </div>
       </div>
