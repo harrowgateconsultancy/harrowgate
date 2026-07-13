@@ -697,6 +697,68 @@ export default function Landing() {
           </div>
         </section>
 
+        {/* ── On-Arrival Visa — conditional banner ── */}
+        {onArrivalLive && (
+          <section className="py-16 px-6 lg:px-16 xl:px-24">
+            <div className="max-w-5xl mx-auto">
+              <div className="relative overflow-hidden rounded-3xl border px-8 py-10 sm:px-14 sm:py-12 flex flex-col sm:flex-row items-center gap-8"
+                style={{
+                  background: "linear-gradient(135deg, rgba(162,137,89,0.13) 0%, rgba(11,34,19,0.92) 50%, rgba(162,137,89,0.09) 100%)",
+                  borderColor: "rgba(196,169,110,0.35)",
+                  boxShadow: "0 0 60px rgba(162,137,89,0.15), inset 0 1px 0 rgba(240,210,140,0.12)",
+                }}>
+                {/* Decorative glow */}
+                <div style={{ position: "absolute", top: "-40px", left: "-40px", width: "200px", height: "200px", background: "radial-gradient(circle, rgba(196,169,110,0.18) 0%, transparent 70%)", pointerEvents: "none" }} />
+                <div style={{ position: "absolute", bottom: "-40px", right: "-40px", width: "200px", height: "200px", background: "radial-gradient(circle, rgba(196,169,110,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+                {/* Diamond logo */}
+                <div className="flex-shrink-0 relative z-10">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center"
+                    style={{ background: "linear-gradient(135deg, rgba(196,169,110,0.22) 0%, rgba(162,137,89,0.12) 100%)", border: "1.5px solid rgba(196,169,110,0.4)", boxShadow: "0 0 28px rgba(196,169,110,0.3)" }}>
+                    {/* Diamond / Gem SVG */}
+                    <svg viewBox="0 0 48 48" fill="none" className="w-11 h-11 sm:w-13 sm:h-13">
+                      <polygon points="24,4 44,18 24,44 4,18" fill="none" stroke="#f0d28c" strokeWidth="2" strokeLinejoin="round"/>
+                      <polygon points="24,4 14,18 24,44 34,18" fill="rgba(240,210,140,0.10)" stroke="#f0d28c" strokeWidth="1" strokeLinejoin="round"/>
+                      <polygon points="4,18 14,18 24,44" fill="rgba(196,169,110,0.12)" stroke="rgba(240,210,140,0.4)" strokeWidth="0.75" strokeLinejoin="round"/>
+                      <polygon points="44,18 34,18 24,44" fill="rgba(196,169,110,0.12)" stroke="rgba(240,210,140,0.4)" strokeWidth="0.75" strokeLinejoin="round"/>
+                      <polygon points="4,18 14,18 24,4" fill="rgba(240,210,140,0.08)" stroke="rgba(240,210,140,0.3)" strokeWidth="0.75" strokeLinejoin="round"/>
+                      <polygon points="44,18 34,18 24,4" fill="rgba(240,210,140,0.08)" stroke="rgba(240,210,140,0.3)" strokeWidth="0.75" strokeLinejoin="round"/>
+                      <line x1="4" y1="18" x2="44" y2="18" stroke="rgba(240,210,140,0.5)" strokeWidth="1"/>
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Text */}
+                <div className="flex-1 relative z-10 text-center sm:text-left">
+                  <p className="text-xs font-semibold tracking-[0.28em] uppercase mb-2" style={{ color: "rgba(196,169,110,0.7)" }}>
+                    HARROWGATE SPECIAL SERVICE
+                  </p>
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: "#f0d28c" }}>
+                    On-Arrival Visa Portal
+                  </h2>
+                  <p className="text-sm sm:text-base leading-relaxed max-w-xl" style={{ color: "rgba(196,169,110,0.75)" }}>
+                    Attending the Hong Kong Jewellery &amp; Gem Fair (September 14–18, 2026)? Apply for your on-arrival visa through HARROWGATE — fast, guided, and fully managed.
+                  </p>
+                </div>
+
+                {/* CTA button */}
+                <div className="flex-shrink-0 relative z-10">
+                  <Link href="/on-arrival-visa"
+                    className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full font-semibold text-sm whitespace-nowrap transition-all hover:opacity-90"
+                    style={{
+                      background: "linear-gradient(135deg, #c4a96e 0%, #a28959 100%)",
+                      color: "#0b2213",
+                      boxShadow: "0 6px 28px rgba(162,137,89,0.45)",
+                    }}>
+                    Apply Now
+                    <svg viewBox="0 0 20 20" fill="none" className="w-4 h-4"><path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* ── Services (scroll reveal) ── */}
         <section className="py-24" style={{ background: "rgba(0,0,0,0.22)" }}>
           <div className="w-full px-6 lg:px-16 xl:px-24">
