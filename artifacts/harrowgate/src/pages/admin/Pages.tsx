@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAdminColors } from "../../contexts/AdminThemeContext";
-import { Globe, Eye, EyeOff, ExternalLink, Download, RefreshCw } from "lucide-react";
+import { Globe, Eye, EyeOff, ExternalLink, Download, RefreshCw, Trash2, CheckSquare, Square } from "lucide-react";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 function getApiBase() { return `${window.location.origin}${BASE}`; }
@@ -47,6 +47,9 @@ export default function Pages() {
   const [apps, setApps] = useState<Application[]>([]);
   const [appsLoading, setAppsLoading] = useState(true);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null); // id of single delete confirm
 
   useEffect(() => {
     fetch(`${getApiBase()}/api/settings/on-arrival`)
@@ -58,11 +61,56 @@ export default function Pages() {
 
   function loadApps() {
     setAppsLoading(true);
+    setSelected(new Set());
     adminFetch(`${getApiBase()}/api/admin/pages/on-arrival/applications`)
       .then(r => r.json())
       .then(d => setApps(Array.isArray(d) ? d : []))
       .catch(() => setApps([]))
       .finally(() => setAppsLoading(false));
+  }
+
+  function toggleSelect(id: number) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelected(prev => prev.size === apps.length ? new Set() : new Set(apps.map(a => a.id)));
+  }
+
+  async function deleteSelected() {
+    if (selected.size === 0) return;
+    setDeleting(true);
+    try {
+      await adminFetch(`${getApiBase()}/api/admin/pages/on-arrival/applications`, {
+        method: "DELETE",
+        body: JSON.stringify({ ids: Array.from(selected) }),
+      });
+      setApps(prev => prev.filter(a => !selected.has(a.id)));
+      setSelected(new Set());
+    } catch {
+      setError("Failed to delete selected applications.");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  async function deleteSingle(id: number) {
+    setDeleting(true);
+    try {
+      await adminFetch(`${getApiBase()}/api/admin/pages/on-arrival/applications/${id}`, { method: "DELETE" });
+      setApps(prev => prev.filter(a => a.id !== id));
+      setSelected(prev => { const n = new Set(prev); n.delete(id); return n; });
+      if (expanded === id) setExpanded(null);
+    } catch {
+      setError("Failed to delete application.");
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(null);
+    }
   }
 
   async function toggle() {
@@ -108,8 +156,8 @@ export default function Pages() {
     <div className="p-6 lg:p-8 max-w-[1000px] mx-auto w-full space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight" style={{ color: C.navyText }}>Pages</h1>
-        <p className="text-sm mt-1" style={{ color: C.n50 }}>Manage public-facing pages on your website</p>
+        <h1 className="text-2xl font-bold tracking-tight" style={{ color: C.navyText }}>On Arrival Visa</h1>
+        <p className="text-sm mt-1" style={{ color: C.n50 }}>Manage the on-arrival visa application portal</p>
       </div>
 
       {/* On-Arrival Visa card */}
@@ -217,18 +265,37 @@ export default function Pages() {
 
       {/* Applications section */}
       <div className="rounded-2xl border overflow-hidden" style={{ borderColor: C.borderFaint, background: C.card }}>
-        <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: C.borderFaint }}>
-          <div>
-            <h2 className="font-bold text-base" style={{ color: C.navyText }}>Submitted Applications</h2>
-            <p className="text-xs mt-0.5" style={{ color: C.n45 }}>
-              {appsLoading ? "Loading…" : `${apps.length} application${apps.length !== 1 ? "s" : ""} received`}
-            </p>
+        <div className="px-6 py-4 border-b flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: C.borderFaint }}>
+          <div className="flex items-center gap-3">
+            {apps.length > 0 && (
+              <button onClick={toggleSelectAll} className="text-xs flex items-center gap-1.5 transition-opacity hover:opacity-80" style={{ color: C.n50 }}>
+                {selected.size === apps.length && apps.length > 0
+                  ? <CheckSquare size={15} style={{ color: GOLD }} />
+                  : <Square size={15} />}
+              </button>
+            )}
+            <div>
+              <h2 className="font-bold text-base" style={{ color: C.navyText }}>Submitted Applications</h2>
+              <p className="text-xs mt-0.5" style={{ color: C.n45 }}>
+                {appsLoading ? "Loading…" : `${apps.length} application${apps.length !== 1 ? "s" : ""} received`}
+                {selected.size > 0 && <span style={{ color: GOLD }}> · {selected.size} selected</span>}
+              </p>
+            </div>
           </div>
-          <button onClick={loadApps} disabled={appsLoading}
-            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all hover:opacity-80 disabled:opacity-50"
-            style={{ color: C.n60, background: C.n04, border: `1px solid ${C.borderFaint}` }}>
-            <RefreshCw size={11} className={appsLoading ? "animate-spin" : ""} /> Refresh
-          </button>
+          <div className="flex items-center gap-2">
+            {selected.size > 0 && (
+              <button onClick={deleteSelected} disabled={deleting}
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 disabled:opacity-50"
+                style={{ color: "#ef4444", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)" }}>
+                <Trash2 size={11} /> Delete {selected.size > 1 ? `(${selected.size})` : ""}
+              </button>
+            )}
+            <button onClick={loadApps} disabled={appsLoading}
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all hover:opacity-80 disabled:opacity-50"
+              style={{ color: C.n60, background: C.n04, border: `1px solid ${C.borderFaint}` }}>
+              <RefreshCw size={11} className={appsLoading ? "animate-spin" : ""} /> Refresh
+            </button>
+          </div>
         </div>
 
         {appsLoading ? (
@@ -246,39 +313,77 @@ export default function Pages() {
               const fd = app.formData as Record<string, string>;
               const sc = STATUS_COLORS[app.status] ?? STATUS_COLORS.pending;
               const isOpen = expanded === app.id;
+              const isSelected = selected.has(app.id);
+              const isConfirming = confirmDelete === app.id;
               const hasFile = (p: string | null) => !!p;
 
               return (
-                <div key={app.id} style={{ borderColor: C.borderFaint }}>
-                  {/* Row summary */}
-                  <button
-                    className="w-full px-6 py-4 flex flex-wrap items-center gap-3 text-left transition-all hover:opacity-80"
-                    style={{ background: isOpen ? C.subtle : "transparent" }}
-                    onClick={() => setExpanded(isOpen ? null : app.id)}>
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div key={app.id} className="border-b last:border-b-0" style={{ borderColor: C.borderFaint }}>
+
+                  {/* Row */}
+                  <div className="px-4 py-4 flex items-center gap-3"
+                    style={{ background: isOpen ? C.subtle : isSelected ? "rgba(196,169,110,0.05)" : "transparent" }}>
+
+                    {/* Checkbox */}
+                    <button onClick={() => toggleSelect(app.id)} className="shrink-0 transition-opacity hover:opacity-70"
+                      style={{ color: isSelected ? GOLD : C.n30 }}>
+                      {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
+                    </button>
+
+                    {/* Main clickable area */}
+                    <button className="flex flex-1 items-center gap-3 min-w-0 text-left"
+                      onClick={() => setExpanded(isOpen ? null : app.id)}>
                       <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
                         style={{ background: "rgba(196,169,110,0.12)", color: GOLD }}>
                         {(fd.fullName || "?").charAt(0).toUpperCase()}
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold truncate" style={{ color: C.navyText }}>{fd.fullName || "—"}</p>
                         <p className="text-xs truncate" style={{ color: C.n45 }}>{fd.email || "—"} · {fd.company || "—"}</p>
                       </div>
+                      <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <span className="text-xs hidden sm:block" style={{ color: C.n40 }}>
+                          {fd.arrivalDate ? `Arrival: ${fd.arrivalDate}` : ""}
+                        </span>
+                        <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
+                          style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
+                          {app.status}
+                        </span>
+                        <span className="text-xs hidden sm:block" style={{ color: C.n35 }}>
+                          {new Date(app.createdAt).toLocaleDateString()}
+                        </span>
+                        <span style={{ color: C.n30, fontSize: 10 }}>{isOpen ? "▲" : "▼"}</span>
+                      </div>
+                    </button>
+
+                    {/* Delete button */}
+                    <button onClick={() => setConfirmDelete(isConfirming ? null : app.id)}
+                      className="shrink-0 p-1.5 rounded-lg transition-all hover:opacity-80"
+                      style={{ color: C.n35, background: "transparent" }}
+                      title="Delete application">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+
+                  {/* Delete confirmation inline */}
+                  {isConfirming && (
+                    <div className="mx-4 mb-3 px-4 py-3 rounded-xl flex items-center gap-3"
+                      style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                      <p className="text-xs flex-1" style={{ color: "#b91c1c" }}>
+                        Delete <strong>{fd.fullName || "this application"}</strong>? This cannot be undone.
+                      </p>
+                      <button onClick={() => deleteSingle(app.id)} disabled={deleting}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 disabled:opacity-50"
+                        style={{ background: "#ef4444", color: "#fff" }}>
+                        {deleting ? "Deleting…" : "Yes, Delete"}
+                      </button>
+                      <button onClick={() => setConfirmDelete(null)}
+                        className="text-xs px-3 py-1.5 rounded-lg transition-all hover:opacity-70"
+                        style={{ color: C.n50, background: C.n04, border: `1px solid ${C.borderFaint}` }}>
+                        Cancel
+                      </button>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-xs" style={{ color: C.n40 }}>
-                        {fd.arrivalDate ? `Arrival: ${fd.arrivalDate}` : ""}
-                      </span>
-                      <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
-                        style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
-                        {app.status}
-                      </span>
-                      <span className="text-xs" style={{ color: C.n35 }}>
-                        {new Date(app.createdAt).toLocaleDateString()}
-                      </span>
-                      <span style={{ color: C.n30, fontSize: 10 }}>{isOpen ? "▲" : "▼"}</span>
-                    </div>
-                  </button>
+                  )}
 
                   {/* Expanded detail */}
                   {isOpen && (
@@ -333,9 +438,9 @@ export default function Pages() {
                       </div>
 
                       {/* Status update */}
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-wrap">
                         <span className="text-xs font-semibold" style={{ color: C.n50 }}>Status:</span>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           {STATUS_OPTS.map(s => {
                             const sc2 = STATUS_COLORS[s];
                             return (

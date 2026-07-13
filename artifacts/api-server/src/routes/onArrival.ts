@@ -125,6 +125,30 @@ router.put("/admin/pages/on-arrival/applications/:id/status", async (req: any, r
   }
 });
 
+// ── Admin: delete one application ────────────────────────────────────────────
+router.delete("/admin/pages/on-arrival/applications/:id", async (req: any, res: any) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    await db.delete(onArrivalApplicationsTable).where(eq(onArrivalApplicationsTable.id, id));
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: "Failed to delete application" });
+  }
+});
+
+// ── Admin: bulk delete applications ──────────────────────────────────────────
+router.delete("/admin/pages/on-arrival/applications", async (req: any, res: any) => {
+  try {
+    const { ids } = req.body as { ids: number[] };
+    if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ error: "No ids provided" });
+    const { inArray } = await import("drizzle-orm");
+    await db.delete(onArrivalApplicationsTable).where(inArray(onArrivalApplicationsTable.id, ids));
+    res.json({ ok: true, deleted: ids.length });
+  } catch {
+    res.status(500).json({ error: "Failed to delete applications" });
+  }
+});
+
 // ── Admin: download a file (token accepted via query param for <a> direct links) ─
 router.get("/admin/pages/on-arrival/file/:id/:type", async (req: any, res: any) => {
   // Accept token from query string so browser <a href> downloads work

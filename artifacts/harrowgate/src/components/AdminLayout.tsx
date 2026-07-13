@@ -27,7 +27,7 @@ const ALL_NAV_ITEMS = [
   { href: "/admin/settings",     label: "Settings",     icon: Settings,        exact: false, roles: ["admin"] },
   { href: "/admin/agents",       label: "Agents",       icon: Users,           exact: false, roles: ["admin"] },
   { href: "/admin/tax",          label: "Tax",          icon: Calculator,      exact: false, roles: ["admin"] },
-  { href: "/admin/pages",        label: "Pages",        icon: Globe,           exact: false, roles: ["admin"] },
+  { href: "/admin/pages",        label: "On Arrival Visa", icon: Globe,        exact: false, roles: ["admin"] },
 ];
 
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
