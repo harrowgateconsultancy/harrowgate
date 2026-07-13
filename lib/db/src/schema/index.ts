@@ -8,3 +8,4 @@ export * from "./finance";
 export * from "./staff";
 export * from "./tasks";
 export * from "./agents";
+export * from "./onArrival";

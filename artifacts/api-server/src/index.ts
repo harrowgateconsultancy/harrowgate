@@ -8,6 +8,7 @@ import { logger } from "./lib/logger";
 import { setupScreenMirror } from "./lib/screenMirror";
 import { initAdminCredentialsTables } from "./routes/adminAuth";
 import { initStudentTables } from "./routes/studentAuth";
+import { initOnArrivalTable } from "./routes/onArrival";
 
 process.on("uncaughtException", (err) => {
   logger.error({ err }, "Uncaught exception — keeping server alive");
@@ -52,6 +53,11 @@ initAdminCredentialsTables().catch(err =>
 // Ensure student auth tables exist
 initStudentTables().catch(err =>
   logger.warn({ err }, "Could not init student auth tables")
+);
+
+// Ensure on-arrival applications table exists
+initOnArrivalTable().catch(err =>
+  logger.warn({ err }, "Could not init on-arrival table")
 );
 
 httpServer.listen(port, (err?: Error) => {

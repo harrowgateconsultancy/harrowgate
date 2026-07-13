@@ -19,6 +19,7 @@ import staffAuthRouter from "./staffAuth";
 import tasksRouter from "./tasks";
 import agentsRouter from "./agents";
 import invoiceReceiptRouter from "./invoiceReceipt";
+import onArrivalRouter from "./onArrival";
 
 const router: IRouter = Router();
 
@@ -65,5 +66,6 @@ router.use(financeRouter);
 router.use(staffAuthRouter);   // covers both /staff/login (public) and /admin/staff (protected above)
 router.use(tasksRouter);
 router.use(invoiceReceiptRouter);
+router.use(onArrivalRouter);
 
 export default router;

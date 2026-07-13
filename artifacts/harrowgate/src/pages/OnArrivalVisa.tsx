@@ -162,10 +162,29 @@ export default function OnArrivalVisa() {
 
   async function handleSubmit() {
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 800));
-    setSubmitting(false);
-    setSubmitted(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    try {
+      const fd = new FormData();
+      fd.append("formData", JSON.stringify(form));
+      if (files.passport) fd.append("passport", files.passport);
+      if (files.photo)    fd.append("photo",    files.photo);
+      if (files.hotel)    fd.append("hotel",    files.hotel);
+      if (files.business) fd.append("business", files.business);
+
+      const res = await fetch(`${apiBase()}/api/on-arrival/submit`, {
+        method: "POST",
+        body: fd,
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || `Server error (${res.status})`);
+      }
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err: any) {
+      setErrors({ comments: err?.message || "Submission failed — please try again." });
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   // ── loading ──
@@ -231,11 +250,18 @@ export default function OnArrivalVisa() {
               </div>
             ))}
           </div>
-          <button onClick={() => { setSubmitted(false); setForm(EMPTY); setStep(1); setFiles({ passport: null, photo: null, hotel: null, business: null }); }}
-            className="px-6 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-80"
-            style={{ background: NAVY, color: "#f0d28c" }}>
-            Submit Another Application
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href={`${BASE}/`}
+              className="px-6 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-80 text-center"
+              style={{ background: "#f3f4f6", color: NAVY, border: "1px solid #e5e7eb" }}>
+              ← Back to Home
+            </a>
+            <button onClick={() => { setSubmitted(false); setForm(EMPTY); setStep(1); setFiles({ passport: null, photo: null, hotel: null, business: null }); }}
+              className="px-6 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-80"
+              style={{ background: NAVY, color: "#f0d28c" }}>
+              Submit Another Application
+            </button>
+          </div>
         </div>
       </div>
     );
