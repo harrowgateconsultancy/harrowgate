@@ -398,6 +398,15 @@ export default function Landing() {
   const [viewAllHov, setViewAllHov] = useState(false);
   const [signInHov, setSignInHov] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [onArrivalLive, setOnArrivalLive] = useState(false);
+
+  useEffect(() => {
+    const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+    fetch(`${window.location.origin}${BASE}/api/settings/on-arrival`)
+      .then(r => r.json())
+      .then(d => setOnArrivalLive(d.live ?? false))
+      .catch(() => {});
+  }, []);
 
   usePageSEO({
     title: "Harrowgate Consultancy — Hong Kong Education & University Placement",
@@ -508,6 +517,13 @@ export default function Landing() {
             {/* Desktop links */}
             <div className="hidden sm:flex items-center gap-2">
               <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
+              {onArrivalLive && (
+                <Link href="/on-arrival-visa"
+                  className="nav-link-pill text-sm font-semibold px-4 py-2 rounded-full border inline-flex items-center gap-1.5 transition-all"
+                  style={{ borderColor: "rgba(196,169,110,0.45)", color: "#f0d28c", background: "rgba(196,169,110,0.10)" }}>
+                  🛂 On-Arrival Visa
+                </Link>
+              )}
               <Link href="/packages" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border inline-flex items-center gap-1.5"
                 style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.05)" }}>Packages</Link>
               <Link href="/why-hong-kong" className="nav-link-pill text-sm font-medium px-4 py-2 rounded-full border inline-flex items-center gap-1.5"
@@ -557,6 +573,13 @@ export default function Landing() {
             borderTop: menuOpen ? `1px solid ${GOLD_FAINT}` : "1px solid transparent",
           }}>
             <div className="flex flex-col px-5 py-4 gap-3">
+              {onArrivalLive && (
+                <Link href="/on-arrival-visa" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
+                  style={{ borderColor: "rgba(196,169,110,0.35)", color: "#f0d28c", background: "rgba(196,169,110,0.10)" }}>
+                  <span style={{ fontSize: "1rem" }}>🛂</span> On-Arrival Visa
+                </Link>
+              )}
               <Link href="/packages" onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-semibold"
                 style={{ borderColor: "rgba(162,137,89,0.2)", color: GOLD, background: "rgba(162,137,89,0.06)" }}>

@@ -24,6 +24,7 @@ export default function Pages() {
   const [live, setLive] = useState<boolean | null>(null);
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${getApiBase()}/api/settings/on-arrival`)
@@ -34,13 +35,21 @@ export default function Pages() {
 
   async function toggle() {
     if (live === null) return;
+    setError(null);
     setSaving(true);
     try {
-      const res = await adminFetch(`${getApiBase()}/api/admin/settings/on-arrival`, {
+      const res = await adminFetch(`${getApiBase()}/api/admin/pages/on-arrival`, {
         method: "PUT",
         body: JSON.stringify({ live: !live }),
       });
-      if (res.ok) setLive(l => !l);
+      if (res.ok) {
+        setLive(l => !l);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || `Request failed (${res.status})`);
+      }
+    } catch (e: any) {
+      setError(e?.message || "Network error — please try again");
     } finally {
       setSaving(false);
     }
@@ -123,6 +132,15 @@ export default function Pages() {
             {showPreview ? "Hide Preview" : "Preview"}
           </button>
         </div>
+
+        {/* Error display */}
+        {error && (
+          <div className="mx-6 mb-0 mt-0 px-4 py-3 rounded-xl text-xs flex items-center gap-2"
+            style={{ background: "rgba(248,113,113,0.08)", color: "#f87171", border: "1px solid rgba(248,113,113,0.2)" }}>
+            <span>⚠</span> {error}
+            <button onClick={() => setError(null)} className="ml-auto opacity-60 hover:opacity-100">✕</button>
+          </div>
+        )}
 
         {/* Info box */}
         <div className="px-6 py-4">

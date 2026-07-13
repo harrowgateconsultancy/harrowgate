@@ -101,6 +101,8 @@ router.put("/admin/settings/payment-methods", async (req, res) => {
 });
 
 // ── On-Arrival Visa page toggle ──
+// Uses /admin/pages/* path so it's covered by requireAdminPanelAuth but NOT
+// the stricter requireAdminOnly guard that sits on /admin/settings/*.
 const DEFAULT_ON_ARRIVAL = { live: false };
 
 router.get("/settings/on-arrival", async (_req, res) => {
@@ -110,7 +112,7 @@ router.get("/settings/on-arrival", async (_req, res) => {
   } catch { res.status(500).json({ error: "Failed to fetch on-arrival setting" }); }
 });
 
-router.put("/admin/settings/on-arrival", async (req, res) => {
+router.put("/admin/pages/on-arrival", async (req, res) => {
   try {
     const { live } = req.body;
     const value = { live: !!live };
