@@ -103,19 +103,30 @@ router.put("/admin/settings/payment-methods", async (req, res) => {
 // ── On-Arrival Visa page toggle ──
 // Uses /admin/pages/* path so it's covered by requireAdminPanelAuth but NOT
 // the stricter requireAdminOnly guard that sits on /admin/settings/*.
-const DEFAULT_ON_ARRIVAL = { live: false };
+const DEFAULT_ON_ARRIVAL = { live: false, price: 1000 };
 
 router.get("/settings/on-arrival", async (_req, res) => {
   try {
     const [row] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "on_arrival")).limit(1);
-    res.json(row ? row.value : DEFAULT_ON_ARRIVAL);
+    const data = row ? row.value as Record<string, any> : {};
+    res.json({ ...DEFAULT_ON_ARRIVAL, ...data });
   } catch { res.status(500).json({ error: "Failed to fetch on-arrival setting" }); }
 });
 
 router.put("/admin/pages/on-arrival", async (req, res) => {
   try {
-    const { live } = req.body;
-    const value = { live: !!live };
+    // Fetch current value so we merge rather than overwrite
+    const [existing] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "on_arrival")).limit(1);
+    const current = (existing?.value as Record<string, any>) ?? DEFAULT_ON_ARRIVAL;
+
+    const patch: Record<string, any> = {};
+    if ("live" in req.body) patch.live = !!req.body.live;
+    if ("price" in req.body) {
+      const p = Number(req.body.price);
+      if (!isNaN(p) && p >= 0) patch.price = p;
+    }
+    const value = { ...current, ...patch };
+
     await db.insert(appSettingsTable)
       .values({ key: "on_arrival", value })
       .onConflictDoUpdate({ target: appSettingsTable.key, set: { value, updatedAt: new Date() } });

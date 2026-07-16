@@ -40,6 +40,9 @@ const STATUS_OPTS = ["pending", "processing", "approved", "rejected"];
 export default function Pages() {
   const C = useAdminColors();
   const [live, setLive] = useState<boolean | null>(null);
+  const [price, setPrice] = useState<number>(1000);
+  const [priceInput, setPriceInput] = useState<string>("1000");
+  const [savingPrice, setSavingPrice] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,10 +57,37 @@ export default function Pages() {
   useEffect(() => {
     fetch(`${getApiBase()}/api/settings/on-arrival`)
       .then(r => r.json())
-      .then(d => setLive(d.live ?? false))
+      .then(d => {
+        setLive(d.live ?? false);
+        if (typeof d.price === "number") {
+          setPrice(d.price);
+          setPriceInput(String(d.price));
+        }
+      })
       .catch(() => setLive(false));
     loadApps();
   }, []);
+
+  async function savePrice() {
+    const parsed = Number(priceInput);
+    if (isNaN(parsed) || parsed < 0) { setError("Please enter a valid price (0 or more)."); return; }
+    setSavingPrice(true);
+    setError(null);
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/pages/on-arrival`, {
+        method: "PUT",
+        body: JSON.stringify({ price: parsed }),
+      });
+      if (res.ok) {
+        setPrice(parsed);
+        setPriceInput(String(parsed));
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setError(d.error || "Failed to save price");
+      }
+    } catch { setError("Network error — could not save price"); }
+    finally { setSavingPrice(false); }
+  }
 
   function loadApps() {
     setAppsLoading(true);
@@ -234,8 +264,43 @@ export default function Pages() {
           </div>
         )}
 
-        {/* Info box */}
-        <div className="px-6 py-4">
+        {/* Pricing editor + Info box */}
+        <div className="px-6 py-5 space-y-4">
+          {/* Price */}
+          <div className="rounded-xl p-4" style={{ background: C.subtle, border: `1px solid ${C.borderFaint}` }}>
+            <p className="text-xs font-semibold mb-3" style={{ color: C.navyText }}>Service Fee (displayed to applicants)</p>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center rounded-lg overflow-hidden border flex-1 max-w-xs"
+                style={{ borderColor: C.borderFaint, background: C.card }}>
+                <span className="px-3 text-sm font-semibold shrink-0" style={{ color: C.n45, borderRight: `1px solid ${C.borderFaint}` }}>HKD</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="100"
+                  value={priceInput}
+                  onChange={e => setPriceInput(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && savePrice()}
+                  className="flex-1 px-3 py-2.5 text-sm font-semibold outline-none bg-transparent"
+                  style={{ color: C.navyText }}
+                />
+              </div>
+              <button onClick={savePrice} disabled={savingPrice}
+                className="px-4 py-2.5 rounded-lg text-xs font-semibold transition-all hover:opacity-80 disabled:opacity-50"
+                style={{ background: GOLD, color: "#fff" }}>
+                {savingPrice ? "Saving…" : "Save Price"}
+              </button>
+              {price > 0 && (
+                <span className="text-xs" style={{ color: C.n40 }}>
+                  Current: <strong style={{ color: C.navyText }}>HKD {price.toLocaleString()}</strong>
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] mt-2" style={{ color: C.n35 }}>
+              Covers complete document preparation &amp; visa assistance. Shown on the application form.
+            </p>
+          </div>
+
+          {/* Info box */}
           <div className="rounded-xl p-4 text-sm leading-relaxed" style={{ background: C.subtle, border: `1px solid ${C.borderFaint}` }}>
             <p className="font-semibold mb-2" style={{ color: C.navyText }}>About this page</p>
             <ul className="space-y-1 text-xs list-disc list-inside" style={{ color: C.n50 }}>

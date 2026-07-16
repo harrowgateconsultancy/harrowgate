@@ -96,6 +96,7 @@ type FileState = { passport: File | null; photo: File | null; hotel: File | null
 // ── main component ─────────────────────────────────────────────────────────────
 export default function OnArrivalVisa() {
   const [isLive, setIsLive] = useState<boolean | null>(null);
+  const [price, setPrice] = useState<number>(1000);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(EMPTY);
   const [files, setFiles] = useState<FileState>({ passport: null, photo: null, hotel: null, business: null });
@@ -108,7 +109,10 @@ export default function OnArrivalVisa() {
   useEffect(() => {
     fetch(`${apiBase()}/api/settings/on-arrival`)
       .then(r => r.json())
-      .then(d => setIsLive(d.live ?? false))
+      .then(d => {
+        setIsLive(d.live ?? false);
+        if (typeof d.price === "number") setPrice(d.price);
+      })
       .catch(() => setIsLive(false));
   }, []);
 
@@ -335,9 +339,23 @@ export default function OnArrivalVisa() {
             ✦ Hong Kong Trade Fair 2026
           </span>
           <h1 className="text-2xl font-bold mb-1" style={{ color: NAVY }}>On-Arrival Visa Portal</h1>
-          <p className="text-sm" style={{ color: "#4b5563" }}>
+          <p className="text-sm mb-4" style={{ color: "#4b5563" }}>
             Secure your entry for the Jewellery &amp; Gem Fair · September 14–18, 2026
           </p>
+          {/* Pricing badge */}
+          <div className="inline-flex items-center gap-3 rounded-2xl px-5 py-3"
+            style={{ background: "linear-gradient(135deg, rgba(196,169,110,0.12) 0%, rgba(162,137,89,0.06) 100%)", border: "1.5px solid rgba(196,169,110,0.3)" }}>
+            <div className="text-left">
+              <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5" style={{ color: "rgba(162,137,89,0.65)" }}>Service Fee</p>
+              <p className="text-xl font-bold leading-none" style={{ color: NAVY }}>
+                HKD {price.toLocaleString()}
+              </p>
+            </div>
+            <div className="w-px self-stretch" style={{ background: "rgba(196,169,110,0.2)" }} />
+            <p className="text-xs text-left max-w-[160px] leading-snug" style={{ color: "#4b5563" }}>
+              Complete document preparation &amp; visa assistance
+            </p>
+          </div>
         </div>
 
         {/* Progress */}
