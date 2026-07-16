@@ -1,0 +1,17 @@
+cloudflared-1  | 2026-07-16T11:09:48Z INF precheck component="UDP Connectivity" details="QUIC connection successful" run_id=2bfedf07-c9b8-44a3-92c6-cec317ffc54e status=pass target=region1.v2.argotunnel.com
+cloudflared-1  | 2026-07-16T11:09:48Z INF precheck component="UDP Connectivity" details="QUIC connection successful" run_id=2bfedf07-c9b8-44a3-92c6-cec317ffc54e status=pass target=region2.v2.argotunnel.com
+
+cloudflared-1  | 2026-07-16T11:09:48Z INF precheck component="TCP Connectivity" details="HTTP/2 connection successful" run_id=2bfedf07-c9b8-44a3-92c6-cec317ffc54e status=pass target=region1.v2.argotunnel.com
+cloudflared-1  | 2026-07-16T11:09:48Z INF precheck component="TCP Connectivity" details="HTTP/2 connection successful" run_id=2bfedf07-c9b8-44a3-92c6-cec317ffc54e status=pass target=region2.v2.argotunnel.com
+cloudflared-1  | 2026-07-16T11:09:48Z INF precheck component="Cloudflare API" details="API is reachable" run_id=2bfedf07-c9b8-44a3-92c6-cec317ffc54e status=pass target=api.cloudflare.com:443
+cloudflared-1  | 2026-07-16T11:09:48Z INF precheck complete hard_fail=false run_id=2bfedf07-c9b8-44a3-92c6-cec317ffc54e suggested_protocol=quic
+postgres-1     | 
+postgres-1     | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres-1     | 
+
+postgres-1     | 2026-07-16 11:10:02.537 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres-1     | 2026-07-16 11:10:02.538 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-1     | 2026-07-16 11:10:02.538 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-1     | 2026-07-16 11:10:02.541 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-1     | 2026-07-16 11:10:02.545 UTC [29] LOG:  database system was shut down at 2026-07-16 11:10:00 UTC
+postgres-1     | 2026-07-16 11:10:02.555 UTC [1] LOG:  database system is ready to accept connections
