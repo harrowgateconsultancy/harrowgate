@@ -1,0 +1,13 @@
+udflared-1  | 2026-07-16T11:28:34Z INF precheck component="UDP Connectivity" details="QUIC connection successful" run_id=09558b0e-8c7e-4924-a84a-6742d222ec8e status=pass target=region1.v2.argotunnel.com
+cloudflared-1  | 2026-07-16T11:28:34Z INF precheck component="UDP Connectivity" details="QUIC connection successful" run_id=09558b0e-8c7e-4924-a84a-6742d222ec8e status=pass target=region2.v2.argotunnel.com
+cloudflared-1  | 2026-07-16T11:28:34Z INF precheck component="TCP Connectivity" details="HTTP/2 connection successful" run_id=09558b0e-8c7e-4924-a84a-6742d222ec8e status=pass target=region1.v2.argotunnel.com
+cloudflared-1  | 2026-07-16T11:28:34Z INF precheck component="TCP Connectivity" details="HTTP/2 connection successful" run_id=095
+58b0e-8c7e-4924-a84a-6742d222ec8e status=pass target=region2.v2.argotunnel.com
+cloudflared-1  | 2026-07-16T11:28:34Z INF precheck component="Cloudflare API" details="API is reachable" run_id=09558b0e-8c7e-4924-a84a-6742d222ec8e status=pass target=api.cloudflare.com:443
+cloudflared-1  | 2026-07-16T11:28:34Z INF precheck complete hard_fail=false run_id=09558b0e-8c7e-4924-a84a-6742d222ec8e suggested_protocol=quic
+app-1          | {"level":30,"time":1784201418544,"pid":8,"hostname":"dd8efbfc2a0b","req":{"id":1,"method":"GET","url":"/"},"res":{"statusCode":200},"responseTime":15,"msg":"request completed"}
+app-1          | {"level":30,"time":1784201421186,"pid":8,"hostname":"dd8efbfc2a0b","req":{"id":2,"method":"GET","url":"/"},"res":{"statusCode":200},"responseTime":3,"msg":"request completed"}
+app-1          | {"level":30,"time":1784201422582,"pid":8,"hostname":"dd8efbfc2a0b","req":{"id":3,"method":"GET","url":"/assets/index-CrHc_CWr.css"},"res":{"statusCode":200},"responseTime":5,"msg":"request completed"}
+app-1          | {"level":30,"time":1784201423588,"pid":8,"hostname":"dd8efbfc2a0b","req":{"id":4,"method":"GET","url":"/assets/index-B-RVrMlO.js"},"res":{"statusCode":200},"responseTime":17,"msg":"request completed"}
+app-1          | {"level":30,"time":1784201423847,"pid":8,"hostname":"dd8efbfc2a0b","req":{"id":5,"method":"GET","url":"/assets/index-B-RVrMlO.js"},"res":{"statusCode":304},"responseTime":3,"msg":"request completed"}
+app-1          | {"level":30,"time":1784201423928,"pid":8,"hostname":"dd8efbfc2a0b","req":{"id":6,"method":"GET","url":"/assets/index-CrHc_CWr.css"},"res":{"statusCode":304},"responseTime":1,"msg":"request completed"}
