@@ -23,7 +23,7 @@ title = "harrowgate-deploy.tar.gz (latest build)"
 id = "cZFGWH4dpFgOoMTpvNUA9"
 uri = "file://harrowgate-docker-compose.yml"
 type = "unspecified"
-title = "docker-compose.yml (clean, no annotations)"
+title = "harrowgate-docker-compose.yml (updated)"
 
 [[outputs]]
 id = "nNVhE7ZZtTclQqZrqZW5A"

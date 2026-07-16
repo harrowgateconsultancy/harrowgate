@@ -33,7 +33,7 @@ services:
       - ./artifacts/harrowgate/dist/public:/app/artifacts/harrowgate/dist/public
     command: >
       sh -c "while true;
-             do node --enable-source-maps --max-old-space-size=384 artifacts/api-server/dist/index.mjs;
+             do node --max-old-space-size=512 artifacts/api-server/dist/index.mjs;
              echo 'App exited — restarting in 3s...';
              sleep 3;
              done"
