@@ -9,6 +9,7 @@ import { setupScreenMirror } from "./lib/screenMirror";
 import { initAdminCredentialsTables } from "./routes/adminAuth";
 import { initStudentTables } from "./routes/studentAuth";
 import { initOnArrivalTable } from "./routes/onArrival";
+import { initAppSettingsTable } from "./routes/settings";
 
 process.on("uncaughtException", (err) => {
   logger.error({ err }, "Uncaught exception — keeping server alive");
@@ -58,6 +59,11 @@ initStudentTables().catch(err =>
 // Ensure on-arrival applications table exists
 initOnArrivalTable().catch(err =>
   logger.warn({ err }, "Could not init on-arrival table")
+);
+
+// Ensure app_settings table exists (used for pricing, on-arrival toggle, etc.)
+initAppSettingsTable().catch(err =>
+  logger.warn({ err }, "Could not init app_settings table")
 );
 
 httpServer.listen(port, (err?: Error) => {

@@ -1,7 +1,22 @@
 import { Router } from "express";
-import { db } from "@workspace/db";
+import { db, pool } from "@workspace/db";
 import { appSettingsTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
+
+export async function initAppSettingsTable() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS "app_settings" (
+        "key" text PRIMARY KEY NOT NULL,
+        "value" jsonb NOT NULL,
+        "updated_at" timestamp with time zone DEFAULT now() NOT NULL
+      )
+    `);
+  } finally {
+    client.release();
+  }
+}
 
 const router = Router();
 
