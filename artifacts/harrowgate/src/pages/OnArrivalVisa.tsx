@@ -318,7 +318,18 @@ export default function OnArrivalVisa() {
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden">
 
         {/* Header */}
-        <div className="px-8 pt-8 pb-6 text-center border-b" style={{ borderColor: "#e5e7eb" }}>
+        <div className="px-8 pt-6 pb-6 text-center border-b" style={{ borderColor: "#e5e7eb" }}>
+          {/* Back link */}
+          <div className="flex justify-start mb-4">
+            <a href={`${BASE}/`}
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-all hover:opacity-70"
+              style={{ color: "#6b7280", background: "#f3f4f6", border: "1px solid #e5e7eb" }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M19 12H5M12 5l-7 7 7 7" />
+              </svg>
+              Back to Home
+            </a>
+          </div>
           <span className="inline-block text-xs font-bold tracking-widest uppercase px-4 py-1.5 rounded-full mb-3"
             style={{ background: "rgba(196,169,110,0.12)", color: GOLD_DARK, border: `1px solid rgba(196,169,110,0.25)` }}>
             ✦ Hong Kong Trade Fair 2026
