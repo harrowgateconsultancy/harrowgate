@@ -1042,7 +1042,12 @@ export default function Landing() {
           <div className="w-full">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
               <img src="/harrowgate-logo.png" alt="HARROWGATE" className="h-14 object-contain" style={{ opacity: 0.45 }} />
-              <p className="text-xs" style={{ color: CREAM_DIM }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
+              <div className="text-right text-xs space-y-1">
+                <p style={{ color: CREAM_DIM }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
+                <a href="mailto:info@harrowgateconsultancy.com" style={{ color: CREAM_DIM }} className="hover:opacity-70 transition-opacity">
+                  info@harrowgateconsultancy.com
+                </a>
+              </div>
             </div>
             <div className="rounded-xl border px-5 py-4 text-center" style={{ borderColor: "rgba(162,137,89,0.1)", background: "rgba(162,137,89,0.03)" }}>
               <p className="text-[11px] leading-relaxed" style={{ color: CREAM_DIM }}>

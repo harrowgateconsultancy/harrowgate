@@ -590,6 +590,11 @@ export default function WhyHongKong() {
         <p style={{ fontSize: "0.75rem", color: "rgba(162,137,89,0.4)" }}>
           © {new Date().getFullYear()} HARROWGATE Consultancy. All rights reserved.
         </p>
+        <a href="mailto:info@harrowgateconsultancy.com"
+          style={{ fontSize: "0.75rem", color: "rgba(162,137,89,0.4)", display: "block", marginTop: "0.25rem" }}
+          className="hover:opacity-70 transition-opacity">
+          info@harrowgateconsultancy.com
+        </a>
       </footer>
     </div>
   );

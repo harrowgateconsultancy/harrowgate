@@ -385,7 +385,12 @@ export default function Packages() {
           <div className="max-w-[1800px] mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-5">
               <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-12 object-contain opacity-50" />
-              <p className="text-xs" style={{ color: "rgba(162,137,89,0.3)" }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
+              <div className="text-right text-xs space-y-1">
+                <p style={{ color: "rgba(162,137,89,0.3)" }}>© {new Date().getFullYear()} HARROWGATE Consultancy, Hong Kong.</p>
+                <a href="mailto:info@harrowgateconsultancy.com" style={{ color: "rgba(162,137,89,0.3)" }} className="hover:opacity-70 transition-opacity">
+                  info@harrowgateconsultancy.com
+                </a>
+              </div>
             </div>
             <div className="rounded-xl border px-5 py-4 text-center" style={{ borderColor: "rgba(162,137,89,0.12)", background: "rgba(162,137,89,0.04)" }}>
               <p className="text-[11px] leading-relaxed" style={{ color: "rgba(162,137,89,0.4)" }}>
