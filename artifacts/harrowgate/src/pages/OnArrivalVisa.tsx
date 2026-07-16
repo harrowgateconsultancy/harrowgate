@@ -429,6 +429,14 @@ export default function OnArrivalVisa() {
                   <Input value={form.issueCountry} onChange={set("issueCountry")} placeholder="e.g. India" />
                   {errors.issueCountry && <ErrMsg msg={errors.issueCountry} />}
                 </Field>
+                <Field label="Phone (with Country Code)" required>
+                  <Input type="tel" value={form.phone} onChange={set("phone")} placeholder="e.g. +91 98765 43210" />
+                  {errors.phone && <ErrMsg msg={errors.phone} />}
+                </Field>
+                <Field label="Email Address" required>
+                  <Input type="email" value={form.email} onChange={set("email")} placeholder="you@company.com" />
+                  {errors.email && <ErrMsg msg={errors.email} />}
+                </Field>
               </div>
             </div>
           )}
@@ -480,14 +488,6 @@ export default function OnArrivalVisa() {
                 </div>
                 <Field label="Business Address">
                   <Input value={form.businessAddress} onChange={set("businessAddress")} placeholder="e.g. Mumbai, India" />
-                </Field>
-                <Field label="Phone (with Country Code)" required>
-                  <Input type="tel" value={form.phone} onChange={set("phone")} placeholder="e.g. +91 98765 43210" />
-                  {errors.phone && <ErrMsg msg={errors.phone} />}
-                </Field>
-                <Field label="Email Address" required>
-                  <Input type="email" value={form.email} onChange={set("email")} placeholder="you@company.com" />
-                  {errors.email && <ErrMsg msg={errors.email} />}
                 </Field>
                 <div className="sm:col-span-2">
                   <Field label="Purpose of Visit" required>
