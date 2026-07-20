@@ -178,7 +178,18 @@ router.get("/admin/pages/on-arrival/file/:id/:type", async (req: any, res: any) 
     if (!filePath || !fs.existsSync(filePath))
       return res.status(404).json({ error: "File not found" });
 
-    res.download(filePath, path.basename(filePath));
+    const ext = path.extname(filePath).toLowerCase();
+    const MIME: Record<string, string> = {
+      ".pdf":  "application/pdf",
+      ".jpg":  "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".png":  "image/png",
+    };
+    const mime = MIME[ext] ?? "application/octet-stream";
+    const inline = ext === ".pdf" || ext === ".jpg" || ext === ".jpeg" || ext === ".png";
+    res.setHeader("Content-Type", mime);
+    res.setHeader("Content-Disposition", `${inline ? "inline" : "attachment"}; filename="${path.basename(filePath)}"`);
+    res.sendFile(path.resolve(filePath));
   } catch {
     res.status(500).json({ error: "Failed to serve file" });
   }

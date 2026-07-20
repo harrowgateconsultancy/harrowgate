@@ -17,13 +17,13 @@ title = "HARROWGATE — Complete Codebase"
 id = "rFCRTEpR4qD1IO2zDCR-B"
 uri = "file://harrowgate-deploy.tar.gz"
 type = "unspecified"
-title = "harrowgate-deploy.tar.gz (with app_settings fix)"
+title = "harrowgate-deploy.tar.gz (PDF viewing fix)"
 
 [[outputs]]
 id = "cZFGWH4dpFgOoMTpvNUA9"
 uri = "file://harrowgate-docker-compose.yml"
 type = "unspecified"
-title = "harrowgate-docker-compose.yml (updated)"
+title = "harrowgate-docker-compose.yml (adds uploads volume)"
 
 [[outputs]]
 id = "nNVhE7ZZtTclQqZrqZW5A"

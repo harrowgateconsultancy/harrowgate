@@ -31,6 +31,7 @@ services:
     volumes:
       - ./artifacts/api-server/dist:/app/artifacts/api-server/dist
       - ./artifacts/harrowgate/dist/public:/app/artifacts/harrowgate/dist/public
+      - uploads_data:/app/uploads
     command: >
       sh -c "while true;
              do node --max-old-space-size=512 artifacts/api-server/dist/index.mjs;
@@ -62,3 +63,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
