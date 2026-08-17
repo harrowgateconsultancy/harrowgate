@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing } from "../../hooks/usePricing";
 import { usePageSEO } from "../../hooks/usePageSEO";
+import CurrencySwitcher from "../../components/CurrencySwitcher";
 
 /* ── Hong Kong Skyline Background ── */
 function HeroBackground() {
@@ -516,6 +517,7 @@ export default function Landing() {
 
             {/* Desktop links */}
             <div className="hidden sm:flex items-center gap-2">
+              <CurrencySwitcher />
               <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
               {onArrivalLive && (
                 <Link href="/on-arrival-visa"
@@ -552,6 +554,7 @@ export default function Landing() {
 
             {/* Mobile right side */}
             <div className="flex sm:hidden items-center gap-2">
+              <CurrencySwitcher compact />
               <LangPicker lang={lang} setLang={setLang} LANG_LIST={LANG_LIST} />
               <button
                 onClick={() => setMenuOpen(o => !o)}
@@ -945,10 +948,10 @@ export default function Landing() {
         <section className="py-20 px-6" style={{ background: "rgba(162,137,89,0.025)" }}>
           <div className="max-w-4xl mx-auto text-center">
             <Reveal idx={20} visible={visible} setRef={setRef}><p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: LABEL_COLOR }}>{t("pkg.badge")}</p></Reveal>
-            <Reveal idx={21} visible={visible} setRef={setRef} delay={80}><h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: GOLD }}>{t("pricing.startJust")}</h2></Reveal>
+            <Reveal idx={21} visible={visible} setRef={setRef} delay={80}><h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: GOLD }}>Start for Just <span style={{ color: "#f0d28c" }}>{pricing.firstPayment}</span></h2></Reveal>
             <Reveal idx={22} visible={visible} setRef={setRef} delay={130}><p className="text-base max-w-xl mx-auto mb-5" style={{ color: GOLD_DIM }}>{t("pricing.desc")}</p></Reveal>
             <Reveal idx={23} visible={visible} setRef={setRef} delay={180}>
-              <p className="text-sm font-semibold max-w-lg mx-auto mb-8 px-5 py-3 rounded-full border" style={{ color: GOLD, borderColor: "rgba(162,137,89,0.3)", background: "rgba(162,137,89,0.08)" }}>✦ {t("how.payPill")}</p>
+              <p className="text-sm font-semibold max-w-lg mx-auto mb-8 px-5 py-3 rounded-full border" style={{ color: GOLD, borderColor: "rgba(162,137,89,0.3)", background: "rgba(162,137,89,0.08)" }}>✦ Pay only {pricing.firstPayment} and an expert will guide you through the complete procedure from A–Z</p>
             </Reveal>
             <Reveal idx={24} visible={visible} setRef={setRef} delay={220}>
               <div className="flex flex-wrap gap-4 justify-center items-center mb-8">

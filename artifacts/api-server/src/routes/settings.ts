@@ -36,6 +36,7 @@ const DEFAULT_FEATURES = [
 ];
 
 const DEFAULT_PRICING = {
+  usdRate: 7.8,
   mastersTotal: 130000,
   bachelorTotal: 120000,
   associateTotal: 90000,
@@ -62,13 +63,18 @@ const DEFAULT_BANK_DETAILS = {
 router.get("/settings/pricing", async (_req, res) => {
   try {
     const [row] = await db.select().from(appSettingsTable).where(eq(appSettingsTable.key, "pricing")).limit(1);
-    res.json(row ? row.value : DEFAULT_PRICING);
+    res.json({ ...DEFAULT_PRICING, ...((row?.value ?? {}) as Record<string, unknown>) });
   } catch { res.status(500).json({ error: "Failed to fetch pricing" }); }
 });
 
 router.put("/admin/settings/pricing", async (req, res) => {
   try {
-    const pricing = req.body;
+    const pricing = { ...DEFAULT_PRICING, ...(req.body ?? {}) };
+    const usdRate = Number(pricing.usdRate);
+    if (!Number.isFinite(usdRate) || usdRate <= 0) {
+      return res.status(400).json({ error: "USD rate must be greater than zero" });
+    }
+    pricing.usdRate = usdRate;
     await db.insert(appSettingsTable)
       .values({ key: "pricing", value: pricing })
       .onConflictDoUpdate({ target: appSettingsTable.key, set: { value: pricing, updatedAt: new Date() } });

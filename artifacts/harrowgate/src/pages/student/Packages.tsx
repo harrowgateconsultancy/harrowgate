@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useLang, LANG_LIST } from "../../i18n";
 import { usePricing, DEFAULT_FEATURES } from "../../hooks/usePricing";
 import { usePageSEO } from "../../hooks/usePageSEO";
+import CurrencySwitcher from "../../components/CurrencySwitcher";
 
 const BG        = "#0b2213";
 const GOLD      = "#a28959";
@@ -171,6 +172,7 @@ export default function Packages() {
               <img src={`${basePath}/harrowgate-logo.png`} alt="HARROWGATE" className="h-20 object-contain cursor-pointer hover:opacity-80 transition-opacity" />
             </Link>
             <div className="flex items-center gap-3">
+              <CurrencySwitcher />
               <LangPicker lang={lang} setLang={setLang} />
               <Link href="/" className="text-sm transition-all hover:opacity-70 px-4 py-2" style={{ color: GOLD_DIM }}>{t("nav.back")}</Link>
               <Link href="/sign-up"
@@ -196,7 +198,7 @@ export default function Packages() {
             {t("pkg.heading")}
           </h1>
           <p className="text-lg max-w-xl mx-auto mb-2" style={{ color: GOLD_DIM }}>
-            {t("pkg.sub")} <span className="font-bold" style={{ color: GOLD_BRIGHT }}>HKD$ 3,000</span>. {t("pkg.sub2")}
+            {t("pkg.sub")} <span className="font-bold" style={{ color: GOLD_BRIGHT }}>{pricing.firstPayment}</span>. {t("pkg.sub2")}
           </p>
         </section>
 
@@ -287,7 +289,7 @@ export default function Packages() {
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold self-start"
                         style={{ background: "rgba(162,137,89,0.14)", color: GOLD_BRIGHT, border: "1px solid rgba(196,169,110,0.35)" }}>
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: GOLD_BRIGHT }} />
-                        {t("pkg.firstPay")}
+                        First payment: {pricing.firstPayment}
                       </div>
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-medium self-start"
                         style={{ background: "rgba(162,137,89,0.08)", color: "rgba(196,169,110,0.7)", border: "1px solid rgba(162,137,89,0.2)" }}>
@@ -376,7 +378,7 @@ export default function Packages() {
             <p className="text-lg font-bold mb-2"
               style={{ color: hoveredNote ? GOLD_LIGHT : GOLD_BRIGHT }}>{t("pkg.afterTitle")}</p>
             <p className="text-sm leading-relaxed"
-              style={{ color: hoveredNote ? "rgba(212,197,162,0.9)" : GOLD_DIM }}>{t("pkg.afterSub")}</p>
+              style={{ color: hoveredNote ? "rgba(212,197,162,0.9)" : GOLD_DIM }}>Once {pricing.firstPayment} is received, a dedicated HARROWGATE expert advisor will contact you via WhatsApp within 24 hours to walk you through every step of the application and documentation process.</p>
           </div>
         </section>
 

@@ -121,7 +121,7 @@ function getPaymentStep(status: string): number {
 
 const PAYMENT_JOURNEY = [
   { num: 1, labelKey: "journey.s1", amount: null as string | null, noteKey: null as string | null },
-  { num: 2, labelKey: "journey.s2", amount: "HKD$ 3,000",          noteKey: "journey.nonRefundable" },
+  { num: 2, labelKey: "journey.s2", amount: "__FIRST_PAYMENT__",    noteKey: "journey.nonRefundable" },
   { num: 3, labelKey: "journey.s3", amount: null,                   noteKey: null },
   {
     num: 4,
@@ -1479,7 +1479,7 @@ export default function Portal() {
                                         color: isUpcoming ? "rgba(232,218,180,0.45)" : isCurrent ? GOLD : "#f0d28c",
                                         border: `1px solid ${isUpcoming ? "rgba(162,137,89,0.1)" : isCurrent ? "rgba(162,137,89,0.3)" : "rgba(162,137,89,0.35)"}`,
                                       }}>
-                                      {step.amount}
+                                      {step.amount === "__FIRST_PAYMENT__" ? pricing.firstPayment : step.amount}
                                       {step.noteKey && <span className="ml-1 text-xs font-normal opacity-70">({t(step.noteKey)})</span>}
                                     </span>
                                   )}

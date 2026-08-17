@@ -98,6 +98,10 @@ export default function Pricing() {
   const [pmSaving, setPmSaving] = useState(false);
   const [pmSaved, setPmSaved] = useState(false);
   const [pmError, setPmError] = useState<string | null>(null);
+  const [usdRateDraft, setUsdRateDraft] = useState(String(DEFAULT_PRICING.usdRate));
+  const [usdRateSaving, setUsdRateSaving] = useState(false);
+  const [usdRateSaved, setUsdRateSaved] = useState(false);
+  const [usdRateError, setUsdRateError] = useState<string | null>(null);
 
   const inputStyle: React.CSSProperties = { background: C.inputBg, borderColor: C.borderMed, color: C.inputText };
 
@@ -107,6 +111,7 @@ export default function Pricing() {
       .then((p: PricingConfig) => {
         setPricing(p);
         setFeatDraft(p.features && p.features.length > 0 ? p.features : DEFAULT_FEATURES);
+        setUsdRateDraft(String(p.usdRate ?? DEFAULT_PRICING.usdRate));
         const d: Record<string, TierDraft> = {};
         TIERS.forEach(tier => {
           d[tier.id] = {
@@ -131,6 +136,23 @@ export default function Pricing() {
     fetch(`${getApiBase()}/api/settings/payment-methods`)
       .then(r => r.json()).then((pm: any) => setPmConfig(pm)).catch(() => {});
   }, []);
+
+  async function saveUsdRate() {
+    const rate = parseFloat(usdRateDraft);
+    if (!Number.isFinite(rate) || rate <= 0) {
+      setUsdRateError("Please enter a valid positive number."); return;
+    }
+    setUsdRateSaving(true); setUsdRateError(null);
+    const updated: PricingConfig = { ...pricing, usdRate: rate };
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/settings/pricing`, { method: "PUT", body: JSON.stringify(updated) });
+      if (!res.ok) throw new Error();
+      const result = await res.json(); setPricing(result);
+      qc.invalidateQueries({ queryKey: ["pricing"] });
+      setUsdRateSaved(true); setTimeout(() => setUsdRateSaved(false), 3000);
+    } catch { setUsdRateError("Failed to save. Please try again."); }
+    finally { setUsdRateSaving(false); }
+  }
 
   async function saveBankDetails() {
     setBankSaving(true); setBankError(null);
@@ -235,6 +257,51 @@ export default function Pricing() {
         <p className="text-xs" style={{ color: C.tFaint }}>
           Edit package totals and payment stage amounts. Changes apply immediately to the public pricing page.
         </p>
+      </div>
+
+      {/* USD Conversion Rate */}
+      <div className="mb-8 rounded-2xl border overflow-hidden" style={{ background: C.card, borderColor: C.borderMed, boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}>
+        <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
+        <div className="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex-1">
+            <h2 className="text-sm font-bold mb-0.5" style={{ color: C.tHead }}>USD Conversion Rate</h2>
+            <p className="text-xs" style={{ color: C.tFaint }}>
+              All package prices are stored in HKD. Set the rate used to display equivalent USD prices to visitors.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex items-center gap-2 rounded-xl border px-3 py-2" style={{ background: C.muted, borderColor: C.borderMed }}>
+              <span className="text-xs font-semibold" style={{ color: C.tFaint }}>1 USD =</span>
+              <input
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={usdRateDraft}
+                onChange={e => { setUsdRateDraft(e.target.value); setUsdRateSaved(false); setUsdRateError(null); }}
+                className="w-24 text-sm font-bold outline-none bg-transparent"
+                style={{ color: C.inputText }}
+              />
+              <span className="text-xs font-semibold" style={{ color: C.tFaint }}>HKD</span>
+            </div>
+            <button
+              onClick={saveUsdRate}
+              disabled={usdRateSaving}
+              className="px-4 py-2 rounded-xl text-xs font-bold transition-all"
+              style={{
+                background: usdRateSaved ? "rgba(74,222,128,0.15)" : "rgba(162,137,89,0.12)",
+                color: usdRateSaved ? "#4ade80" : GOLD_B,
+                border: `1px solid ${usdRateSaved ? "rgba(74,222,128,0.4)" : C.borderMed}`,
+                opacity: usdRateSaving ? 0.6 : 1,
+              }}>
+              {usdRateSaving ? "Saving…" : usdRateSaved ? "✓ Saved" : "Save Rate"}
+            </button>
+          </div>
+        </div>
+        {usdRateError && (
+          <div className="px-5 pb-4">
+            <p className="text-xs" style={{ color: "#f87171" }}>{usdRateError}</p>
+          </div>
+        )}
       </div>
 
       {/* Cards */}

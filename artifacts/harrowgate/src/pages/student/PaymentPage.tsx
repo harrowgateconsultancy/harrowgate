@@ -115,7 +115,7 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
       amountHtml = `
         <div class="info-row">
           <span class="info-label">Amount Due</span>
-          <span class="amount-value">HKD 3,000</span>
+          <span class="amount-value">${pricing.firstPayment}</span>
         </div>
         <div class="info-row" style="margin-top:2px">
           <span class="info-label"></span>
@@ -448,7 +448,7 @@ export default function PaymentPage({ submission, onUpdated, paymentType = "firs
                     <div className="text-right">
                       <span className="text-xl font-extrabold tracking-tight"
                         style={{ color: GOLD_L, textShadow: `0 0 18px rgba(240,210,140,0.25)` }}>
-                        HKD 3,000
+                        {pricing.firstPayment}
                       </span>
                       <span className="block text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.50)" }}>
                         non-refundable consultancy fee

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { usePricing } from "../hooks/usePricing";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -95,6 +96,7 @@ type FileState = { passport: File | null; photo: File | null; hotel: File | null
 
 // ── main component ─────────────────────────────────────────────────────────────
 export default function OnArrivalVisa() {
+  const { format: fmtPrice } = usePricing();
   const [isLive, setIsLive] = useState<boolean | null>(null);
   const [price, setPrice] = useState<number>(1000);
   const [step, setStep] = useState(1);
@@ -348,7 +350,7 @@ export default function OnArrivalVisa() {
             <div className="text-left">
               <p className="text-[10px] font-semibold uppercase tracking-widest mb-0.5" style={{ color: "rgba(162,137,89,0.65)" }}>Service Fee</p>
               <p className="text-xl font-bold leading-none" style={{ color: NAVY }}>
-                HKD {price.toLocaleString()}
+                {fmtPrice(price)}
               </p>
             </div>
             <div className="w-px self-stretch" style={{ background: "rgba(196,169,110,0.2)" }} />
