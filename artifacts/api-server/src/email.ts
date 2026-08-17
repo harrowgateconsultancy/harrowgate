@@ -23,8 +23,13 @@ export async function sendNewApplicationEmail(opts: {
     await transport.sendMail({
       from: `"HARROWGATE Portal" <${process.env.GMAIL_USER}>`,
       to: NOTIFY_TO,
-      subject: `Student Application Submission - Website — ${opts.name}`,
-      html: adminHtml("New Application Submitted", `A student has submitted a new visa application.`, [
+      subject: `🚨 New Application — ${opts.name}`,
+      headers: {
+        "X-Priority": "1",
+        "X-MSMail-Priority": "High",
+        "Importance": "high",
+      },
+      html: adminHtml("🚨 New Application Submitted", `A student has submitted a new visa application.`, [
         ["Full Name", opts.name], ["Email", opts.email || "—"],
         ["Passport Number", opts.passportNumber], ["Date of Birth", opts.dateOfBirth],
         ["Documents Uploaded", String(opts.docCount)],
