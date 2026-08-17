@@ -26,6 +26,7 @@ const VALID_STATUSES = [
   "second_payment_pending", "second_payment_received", "second_payment_confirmed",
   "university_interview_arranged", "university_interview_completed",
   "offer_letter_pending", "final_payment_received", "final_payment_confirmed",
+  "additional_payment_pending", "additional_payment_received", "additional_payment_confirmed",
   "visa_issued",
 ];
 
@@ -205,6 +206,53 @@ router.patch("/admin/student-submissions/:id/status", async (req, res) => {
 
     res.json(updated);
   } catch { res.status(500).json({ error: "Failed to update status" }); }
+});
+
+// Admin: request an additional payment from the student
+router.post("/admin/student-submissions/:id/request-additional-payment", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { amount, notes } = req.body as { amount: string; notes?: string };
+    if (!amount?.trim()) return res.status(400).json({ error: "amount is required" });
+    const [existing] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
+    if (!existing) return res.status(404).json({ error: "Not found" });
+    const currentBankDetails = (existing.customBankDetails as Record<string, unknown>) ?? {};
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({
+        status: "additional_payment_pending",
+        customBankDetails: { ...currentBankDetails, additionalPayment: { amount: amount.trim(), notes: notes?.trim() ?? "" } },
+      })
+      .where(eq(studentSubmissionsTable.id, id))
+      .returning();
+    upsertStudentRow({
+      submissionId: updated.id, name: updated.name, email: updated.email,
+      passportNumber: updated.passportNumber, dateOfBirth: updated.dateOfBirth,
+      nationality: (updated as any).nationality, status: updated.status,
+      immigrationRefNumber: updated.immigrationRefNumber,
+      createdAt: updated.createdAt,
+    }).catch(() => {});
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to request additional payment" }); }
+});
+
+// Admin: confirm additional payment
+router.post("/admin/student-submissions/:id/confirm-additional-payment", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const [updated] = await db.update(studentSubmissionsTable)
+      .set({ status: "additional_payment_confirmed" })
+      .where(eq(studentSubmissionsTable.id, id))
+      .returning();
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    upsertStudentRow({
+      submissionId: updated.id, name: updated.name, email: updated.email,
+      passportNumber: updated.passportNumber, dateOfBirth: updated.dateOfBirth,
+      nationality: (updated as any).nationality, status: updated.status,
+      immigrationRefNumber: updated.immigrationRefNumber,
+      createdAt: updated.createdAt,
+    }).catch(() => {});
+    res.json(updated);
+  } catch { res.status(500).json({ error: "Failed to confirm additional payment" }); }
 });
 
 // Send mock interview invite + update status to interview_arranged

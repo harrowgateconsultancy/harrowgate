@@ -653,6 +653,25 @@ router.post("/student/submissions/:id/receipt3", requireStudentAuth, async (req:
   } catch { res.status(500).json({ error: "Failed to upload final payment receipt" }); }
 });
 
+// Student: upload additional payment receipt
+router.post("/student/submissions/:id/receipt-additional", requireStudentAuth, async (req: any, res) => {
+  try {
+    const submissionId = parseInt(req.params.id);
+    const [submission] = await db.select().from(studentSubmissionsTable)
+      .where(and(eq(studentSubmissionsTable.id, submissionId), eq(studentSubmissionsTable.clerkUserId, req.studentUserId))).limit(1);
+    if (!submission) return res.status(404).json({ error: "Submission not found" });
+    if (submission.status !== "additional_payment_pending") return res.status(400).json({ error: "No additional payment is currently pending" });
+    const { fileName, fileUrl, fileSize, mimeType } = req.body;
+    await db.delete(studentDocumentsTable)
+      .where(and(eq(studentDocumentsTable.submissionId, submissionId), eq(studentDocumentsTable.documentType, "additional_payment_receipt")));
+    const [doc] = await db.insert(studentDocumentsTable)
+      .values({ submissionId, documentType: "additional_payment_receipt", fileName, fileUrl, fileSize, mimeType }).returning();
+    await db.update(studentSubmissionsTable).set({ status: "additional_payment_received" }).where(eq(studentSubmissionsTable.id, submissionId));
+    uploadToWebDav({ submissionId, studentName: submission.name, fileName, fileUrl, documentType: "additional_payment_receipt" }).catch(() => {});
+    res.json(doc);
+  } catch { res.status(500).json({ error: "Failed to upload additional payment receipt" }); }
+});
+
 // Student: get messages for their submission
 router.get("/student/submissions/:id/messages", requireStudentAuth, async (req: any, res) => {
   try {

@@ -55,6 +55,9 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   offer_letter_pending:            { label: "Offer Letter Sent",      color: "#c4a96e",   bg: "rgba(162,137,89,0.10)" },
   final_payment_received:          { label: "Final Receipt Received", color: "#c4a96e",   bg: "rgba(162,137,89,0.12)"  },
   final_payment_confirmed:         { label: "Final Payment Done",     color: "#f0d28c",   bg: "rgba(162,137,89,0.12)"  },
+  additional_payment_pending:      { label: "Extra Payment Pending",  color: "#fb923c",   bg: "rgba(251,146,60,0.12)"  },
+  additional_payment_received:     { label: "Extra Receipt Received", color: "#c4a96e",   bg: "rgba(162,137,89,0.12)"  },
+  additional_payment_confirmed:    { label: "Extra Payment Done",     color: "#f0d28c",   bg: "rgba(162,137,89,0.12)"  },
   visa_issued:                     { label: "e-Visa Issued",          color: "#f0d28c",   bg: "rgba(162,137,89,0.12)"  },
   rejected:                        { label: "Rejected",              color: "#f87171",   bg: "rgba(248,113,113,0.12)" },
 };
@@ -102,6 +105,11 @@ const nextActions: Record<string, { label: string; nextStatus: string; color: st
     { label: "Confirm Final Payment", nextStatus: "final_payment_confirmed", color: "#f0d28c", icon: IC.check },
   ],
   final_payment_confirmed: [],
+  additional_payment_pending: [],
+  additional_payment_received: [
+    { label: "Confirm Extra Payment", nextStatus: "additional_payment_confirmed", color: "#f0d28c", icon: IC.check },
+  ],
+  additional_payment_confirmed: [],
   visa_issued: [],
 };
 
@@ -324,6 +332,8 @@ export default function Submissions() {
   const [additionalDocsForm, setAdditionalDocsForm] = useState<{ note: string } | null>(null);
   const [sendingAdditionalDocs, setSendingAdditionalDocs] = useState(false);
   const [additionalDocsSent, setAdditionalDocsSent] = useState<number | null>(null);
+  const [additionalPaymentForm, setAdditionalPaymentForm] = useState<{ amount: string; notes: string } | null>(null);
+  const [sendingAdditionalPayment, setSendingAdditionalPayment] = useState(false);
   const [offerLetterUploading, setOfferLetterUploading] = useState(false);
   const [offerLetterSent, setOfferLetterSent] = useState<number | null>(null);
   const offerLetterFileRef = useRef<HTMLInputElement | null>(null);
@@ -685,6 +695,23 @@ export default function Submissions() {
       setSelected(prev => prev ? { ...prev, status: updated.status } : null);
       qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
     } catch { showToast("Failed to mark interview as completed.", "error"); }
+  };
+
+  const handleRequestAdditionalPayment = async () => {
+    if (!selected || !additionalPaymentForm) return;
+    setSendingAdditionalPayment(true);
+    try {
+      const res = await adminFetch(`${getApiBase()}/api/admin/student-submissions/${selected.id}/request-additional-payment`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: additionalPaymentForm.amount, notes: additionalPaymentForm.notes }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const updated = await res.json();
+      setAdditionalPaymentForm(null);
+      setSelected((prev: any) => prev ? { ...prev, status: updated.status, customBankDetails: updated.customBankDetails } : null);
+      qc.invalidateQueries({ queryKey: ["admin-student-submissions"] });
+    } catch { showToast("Failed to request additional payment.", "error"); }
+    finally { setSendingAdditionalPayment(false); }
   };
 
   const handleRequestAdditionalDocs = async () => {
@@ -2095,13 +2122,53 @@ export default function Submissions() {
                 {/* ── WORKFLOW TAB ── */}
                 {detailTab === "workflow" && (<div className="space-y-6">
                 {/* Empty state when no workflow panels apply */}
-                {!["acknowledged","interview_arranged","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(selected.status) && (
+                {!["payment_pending","second_payment_pending","acknowledged","interview_arranged","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","additional_payment_pending","additional_payment_received","additional_payment_confirmed","visa_issued"].includes(selected.status) && (
                   <div className="rounded-2xl border px-5 py-10 text-center" style={{ background: "rgba(31,125,83,0.03)", borderColor: "rgba(162,137,89,0.10)" }}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" className="w-8 h-8 mx-auto mb-2" style={{ color: "#a28959", opacity: 0.35 }}><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     <p className="text-sm font-medium" style={{ color: "rgba(162,137,89,0.55)" }}>No workflow actions yet</p>
                     <p className="text-xs mt-1.5" style={{ color: "rgba(162,137,89,0.45)" }}>Actions will appear here as the application progresses past the payment stage.</p>
                   </div>
                 )}
+                {/* ── Skip 1st Payment (payment_pending) ── */}
+                {selected.status === "payment_pending" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.18)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 7h14"/></svg>1st Payment — Awaiting Student
+                      </p>
+                    </div>
+                    <div className="px-4 py-4 space-y-2">
+                      <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>The student has been asked to pay. Waiting for their receipt upload. You can skip this payment and acknowledge the application without requiring payment.</p>
+                      <button onClick={() => { if (confirm("Skip the 1st payment and acknowledge the application without collecting payment?")) updateStatus.mutate({ id: selected.id, status: "acknowledged", adminNotes: notes }); }}
+                        disabled={updateStatus.isPending}
+                        className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
+                        style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.70)" }}>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip 1st Payment &amp; Acknowledge
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── Skip 2nd Payment (second_payment_pending) ── */}
+                {selected.status === "second_payment_pending" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.18)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 7h14"/></svg>2nd Payment — Awaiting Student
+                      </p>
+                    </div>
+                    <div className="px-4 py-4 space-y-2">
+                      <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>The student has been asked to pay the 2nd instalment. You can skip and confirm without collecting payment.</p>
+                      <button onClick={() => { if (confirm("Skip the 2nd payment and confirm without collecting payment?")) updateStatus.mutate({ id: selected.id, status: "second_payment_confirmed", adminNotes: notes }); }}
+                        disabled={updateStatus.isPending}
+                        className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
+                        style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.70)" }}>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip 2nd Payment &amp; Confirm
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Mock Interview — Schedule (acknowledged only) */}
                 {selected.status === "acknowledged" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.18)" }}>
@@ -2328,16 +2395,22 @@ export default function Submissions() {
                   </div>
                 )}
 
-                {/* Offer Letter Pending — info (offer_letter_pending) */}
+                {/* Offer Letter Pending — info + skip final payment (offer_letter_pending) */}
                 {selected.status === "offer_letter_pending" && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#0f2d18", borderColor: "#1F7D53" }}>
                     <div className="px-4 py-3 border-b" style={{ background: "rgba(31,125,83,0.18)", borderColor: "rgba(31,125,83,0.35)" }}>
                       <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c8aa7c" }}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M8 2L1 6l7 4 7-4-7-4z" strokeLinejoin="round"/><path d="M3 8v4c0 1.1 2.24 2 5 2s5-.9 5-2V8" strokeLinecap="round"/></svg>Offer Letter Sent</p>
                     </div>
-                    <div className="px-4 py-3">
+                    <div className="px-4 py-3 space-y-3">
                       <p className="text-xs font-medium" style={{ color: "rgba(31,125,83,0.80)" }}>
                         The offer letter has been sent to the student. They have been notified and will upload their final payment receipt once payment is made.
                       </p>
+                      <button onClick={() => { if (confirm("Skip the final payment and mark as confirmed without collecting payment?")) updateStatus.mutate({ id: selected.id, status: "final_payment_confirmed", adminNotes: notes }); }}
+                        disabled={updateStatus.isPending}
+                        className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
+                        style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.70)" }}>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip Final Payment &amp; Confirm
+                      </button>
                     </div>
                   </div>
                 )}
@@ -2356,8 +2429,109 @@ export default function Submissions() {
                   </div>
                 )}
 
+                {/* Additional Payment — Request (final_payment_confirmed) */}
+                {selected.status === "final_payment_confirmed" && (
+                  <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.18)" }}>
+                    <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                      <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M8 7v4M6 9h4" strokeLinecap="round"/></svg>Request Additional Payment
+                      </p>
+                    </div>
+                    <div className="px-4 py-4">
+                      {!additionalPaymentForm ? (
+                        <button onClick={() => setAdditionalPaymentForm({ amount: "", notes: "" })}
+                          className="w-full py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-80 flex items-center justify-center gap-2"
+                          style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.22)", color: "#c4a96e" }}>
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M8 7v4M6 9h4" strokeLinecap="round"/></svg>Ask for Extra Payment…
+                        </button>
+                      ) : (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.60)" }}>Amount (e.g. HKD 5,000) *</label>
+                            <input type="text" placeholder="HKD 5,000"
+                              value={additionalPaymentForm.amount}
+                              onChange={e => setAdditionalPaymentForm(f => f ? { ...f, amount: e.target.value } : f)}
+                              className="w-full rounded-xl px-3 py-2 text-sm outline-none border"
+                              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#c4a96e" }} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium mb-1" style={{ color: "rgba(162,137,89,0.60)" }}>Reason / Notes (shown to student)</label>
+                            <textarea rows={2} placeholder="e.g. Additional visa processing fee…"
+                              value={additionalPaymentForm.notes}
+                              onChange={e => setAdditionalPaymentForm(f => f ? { ...f, notes: e.target.value } : f)}
+                              className="w-full rounded-xl px-3 py-2 text-sm outline-none border resize-none"
+                              style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.20)", color: "#c4a96e" }} />
+                          </div>
+                          <div className="flex gap-2">
+                            <button onClick={handleRequestAdditionalPayment} disabled={sendingAdditionalPayment || !additionalPaymentForm.amount.trim()}
+                              className="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                              style={{ background: "rgba(162,137,89,0.10)", borderColor: "rgba(162,137,89,0.30)", color: "#c4a96e" }}>
+                              {sendingAdditionalPayment ? <><span className="w-3 h-3 rounded-full border animate-spin" style={{ borderColor: "#c4a96e", borderTopColor: "transparent" }} />Sending…</> : <>Send Payment Request</>}
+                            </button>
+                            <button onClick={() => setAdditionalPaymentForm(null)}
+                              className="px-4 py-2.5 rounded-xl text-sm border transition-all hover:opacity-70"
+                              style={{ borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.45)" }}>Cancel</button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Additional Payment — Pending (admin waiting for student to pay) */}
+                {selected.status === "additional_payment_pending" && (() => {
+                  const ap = (selected.customBankDetails as any)?.additionalPayment;
+                  return (
+                    <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(251,146,60,0.25)" }}>
+                      <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                        <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#fb923c" }}>
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 7h14"/></svg>Extra Payment Requested
+                        </p>
+                      </div>
+                      <div className="px-4 py-3 space-y-3">
+                        {ap && (
+                          <div className="rounded-xl px-3 py-2.5 border" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
+                            <p className="text-xs font-semibold" style={{ color: "#f0d28c" }}>Amount: {ap.amount}</p>
+                            {ap.notes && <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.60)" }}>{ap.notes}</p>}
+                          </div>
+                        )}
+                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>Waiting for the student to upload their payment receipt.</p>
+                        <button onClick={() => { if (confirm("Skip this additional payment and mark as confirmed?")) updateStatus.mutate({ id: selected.id, status: "additional_payment_confirmed", adminNotes: notes }); }}
+                          disabled={updateStatus.isPending}
+                          className="w-full py-2 rounded-xl text-xs font-semibold border transition-all hover:opacity-80 disabled:opacity-40 flex items-center justify-center gap-2"
+                          style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.18)", color: "rgba(162,137,89,0.70)" }}>
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5 shrink-0"><path d="M2 4l6 4-6 4V4zM9 4l6 4-6 4V4z" strokeLinejoin="round"/></svg>Skip &amp; Confirm Extra Payment
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Additional Payment — Receipt Received */}
+                {selected.status === "additional_payment_received" && (() => {
+                  const ap = (selected.customBankDetails as any)?.additionalPayment;
+                  return (
+                    <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.20)" }}>
+                      <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>
+                        <p className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#c4a96e" }}>
+                          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M1 7h14"/></svg>Extra Payment Receipt Received
+                        </p>
+                      </div>
+                      <div className="px-4 py-3 space-y-2">
+                        {ap && (
+                          <div className="rounded-xl px-3 py-2.5 border" style={{ background: "rgba(162,137,89,0.05)", borderColor: "rgba(162,137,89,0.15)" }}>
+                            <p className="text-xs font-semibold" style={{ color: "#f0d28c" }}>Amount: {ap.amount}</p>
+                            {ap.notes && <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.60)" }}>{ap.notes}</p>}
+                          </div>
+                        )}
+                        <p className="text-xs" style={{ color: "rgba(162,137,89,0.60)" }}>The student has uploaded their receipt. Review it in the documents section, then confirm.</p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Final Payment Confirmed + ID995A + e-Visa */}
-                {["final_payment_confirmed","visa_issued"].includes(selected.status) && (
+                {["final_payment_confirmed","additional_payment_pending","additional_payment_received","additional_payment_confirmed","visa_issued"].includes(selected.status) && (
                   <>
                     <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.20)" }}>
                       <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(162,137,89,0.12)" }}>

@@ -111,7 +111,7 @@ const statusMap: Record<string, { color: string; bg: string }> = {
 
 function getPaymentStep(status: string): number {
   if (status === "visa_issued") return 8;
-  if (["final_payment_confirmed", "final_payment_received"].includes(status)) return 6;
+  if (["final_payment_confirmed", "final_payment_received", "additional_payment_pending", "additional_payment_received", "additional_payment_confirmed"].includes(status)) return 6;
   if (["offer_letter_pending", "university_interview_completed", "university_interview_arranged", "second_payment_confirmed"].includes(status)) return 5;
   if (["second_payment_received", "second_payment_pending", "interview_completed"].includes(status)) return 4;
   if (["interview_arranged"].includes(status)) return 3;
@@ -162,14 +162,14 @@ function buildTimeline(submission: Submission, t: (key: string) => string): Time
   const ref = `STU${submission.passportNumber.slice(-4).toUpperCase()}`;
   const submittedDate = new Date(submission.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
-  const postStatuses = ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"];
+  const postStatuses = ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","additional_payment_pending","additional_payment_received","additional_payment_confirmed","visa_issued"];
   const afterPayment   = postStatuses.includes(s);
   const afterMock      = ["interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(s);
   const after2ndPay    = ["second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(s);
   const in2ndPay       = ["second_payment_pending","second_payment_received"].includes(s);
   const afterUniArr    = ["university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(s);
   const afterUniDone   = ["university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(s);
-  const afterFinalPay  = ["final_payment_confirmed","visa_issued"].includes(s);
+  const afterFinalPay  = ["final_payment_confirmed","additional_payment_pending","additional_payment_received","additional_payment_confirmed","visa_issued"].includes(s);
   const inFinalPay     = ["offer_letter_pending","final_payment_received"].includes(s);
   const eVisaDoc       = submission.documents.find(d => d.documentType === "evisa");
 
@@ -630,6 +630,70 @@ function InboxCard({ submission, onUnreadChange }: { submission: Submission; onU
   );
 }
 
+function AdditionalPaymentCard({ submission, ap, onUpdated }: { submission: Submission; ap: { amount: string; notes: string } | undefined; onUpdated: () => void }) {
+  const GOLD = "#c4a96e";
+  const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const apiBase = `${window.location.origin}${BASE}`;
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+
+  const getHdrs = () => {
+    const token = localStorage.getItem("student_token");
+    return token ? { Authorization: `Bearer ${token}` } as Record<string, string> : {} as Record<string, string>;
+  };
+
+  const handleFile = async (file: File) => {
+    setUploading(true); setError(null);
+    try {
+      const res1 = await fetch(`${apiBase}/api/storage/uploads/request-url`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+      });
+      if (!res1.ok) throw new Error("Upload URL failed");
+      const { uploadURL, objectPath } = await res1.json();
+      await fetch(uploadURL, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      const res2 = await fetch(`${apiBase}/api/student/submissions/${submission.id}/receipt-additional`, {
+        method: "POST", headers: { "Content-Type": "application/json", ...getHdrs() }, credentials: "include",
+        body: JSON.stringify({ fileName: file.name, fileUrl: objectPath, fileSize: file.size, mimeType: file.type }),
+      });
+      if (!res2.ok) throw new Error("Upload failed");
+      onUpdated();
+    } catch { setError("Upload failed. Please try again."); }
+    finally { setUploading(false); }
+  };
+
+  return (
+    <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(251,146,60,0.25)" }}>
+      <div className="px-6 py-5 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
+        <h3 className="text-base font-semibold" style={{ color: "#fb923c" }}>Additional Payment Required</h3>
+        <p className="text-xs mt-0.5" style={{ color: "rgba(251,146,60,0.70)" }}>Your Harrowgate advisor has requested an additional payment.</p>
+      </div>
+      <div className="px-6 py-5 space-y-4">
+        {ap && (
+          <div className="rounded-xl px-4 py-3 border" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)" }}>
+            <p className="text-sm font-bold" style={{ color: "#f0d28c" }}>Amount: {ap.amount}</p>
+            {ap.notes && <p className="text-sm mt-1" style={{ color: "rgba(240,210,140,0.75)" }}>{ap.notes}</p>}
+          </div>
+        )}
+        <p className="text-sm" style={{ color: "rgba(232,218,180,0.80)", lineHeight: 1.6 }}>
+          Please transfer the amount using your bank details on file, then upload your proof of payment below.
+        </p>
+        {error && <p className="text-xs" style={{ color: "#f87171" }}>{error}</p>}
+        <button onClick={() => fileRef.current?.click()} disabled={uploading}
+          className="w-full py-3 rounded-2xl text-sm font-semibold border transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+          style={{ background: "rgba(162,137,89,0.08)", borderColor: `rgba(196,169,110,0.40)`, color: GOLD, borderStyle: "dashed" }}>
+          {uploading
+            ? <><span className="w-4 h-4 rounded-full border-2 animate-spin shrink-0" style={{ borderColor: GOLD, borderTopColor: "transparent" }} />Uploading…</>
+            : <><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0"><path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3"/><path d="M8 7v4M6 9h4" strokeLinecap="round"/></svg>Upload Payment Receipt</>}
+        </button>
+        <input ref={fileRef} type="file" className="hidden" accept="image/*,.pdf"
+          onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+      </div>
+    </div>
+  );
+}
+
 async function uploadToStorage(file: File): Promise<{ url: string }> {
   const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
   const apiBase = `${window.location.origin}${BASE}`;
@@ -826,7 +890,7 @@ export default function Portal() {
   };
 
   useEffect(() => {
-    if (submission && ["interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"].includes(submission.status)) {
+    if (submission && ["interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","additional_payment_pending","additional_payment_received","additional_payment_confirmed","visa_issued"].includes(submission.status)) {
       setShowTimeline(true);
     }
   }, [submission?.status]);
@@ -889,7 +953,7 @@ export default function Portal() {
   const unreadMsgs = messages.filter(m => m.fromAdmin && !m.isRead).length;
   const totalUnread = unreadMsgs + emailUnreadCount;
 
-  const postStatuses = ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","visa_issued"];
+  const postStatuses = ["acknowledged","interview_arranged","interview_completed","second_payment_pending","second_payment_received","second_payment_confirmed","university_interview_arranged","university_interview_completed","offer_letter_pending","final_payment_received","final_payment_confirmed","additional_payment_pending","additional_payment_received","additional_payment_confirmed","visa_issued"];
 
   return (
     <div ref={portalRef} className="min-h-screen" dir={isRtl ? "rtl" : "ltr"} style={{ background: BG }}>
@@ -1330,8 +1394,36 @@ export default function Portal() {
               </div>
             )}
 
-            {/* ── FINAL PAYMENT CONFIRMED / VISA ISSUED ── */}
-            {(submission.status === "final_payment_confirmed" || submission.status === "visa_issued") && (() => {
+            {/* ── ADDITIONAL PAYMENT PENDING ── */}
+            {submission.status === "additional_payment_pending" && (() => {
+              const ap = (submission.customBankDetails as any)?.additionalPayment;
+              return (
+                <AdditionalPaymentCard submission={submission} ap={ap} onUpdated={fetchSubmission} />
+              );
+            })()}
+
+            {/* ── ADDITIONAL PAYMENT RECEIVED ── */}
+            {submission.status === "additional_payment_received" && (
+              <div className="mt-6 rounded-2xl border overflow-hidden" style={{ background: "rgba(0,0,0,0.25)", borderColor: "rgba(162,137,89,0.2)" }}>
+                <div className="px-6 py-5 flex items-center gap-3 border-b" style={{ borderColor: "rgba(162,137,89,0.15)" }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(196,169,110,0.12)", border: "1px solid rgba(196,169,110,0.3)" }}>
+                    <svg viewBox="0 0 48 48" fill="none" className="w-5 h-5"><path d="M10 8H38M10 40H38M14 8c0 8 10 10 10 16S14 32 14 40M34 8c0 8-10 10-10 16s10 8 10 16" stroke="#c4a96e" strokeWidth="2.5" strokeLinecap="round"/></svg>
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold" style={{ color: "#f0d28c" }}>Additional Payment Under Review</h3>
+                    <p className="text-xs mt-0.5" style={{ color: "rgba(240,210,140,0.65)" }}>Your receipt has been received — our team will confirm shortly.</p>
+                  </div>
+                </div>
+                <div className="px-6 py-4">
+                  <div className="rounded-xl px-4 py-3 border text-sm" style={{ background: "rgba(162,137,89,0.06)", borderColor: "rgba(162,137,89,0.2)", color: "rgba(240,210,140,0.7)", lineHeight: 1.6 }}>
+                    Once confirmed, your application will continue to the next stage.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── FINAL PAYMENT CONFIRMED / ADDITIONAL PAYMENT CONFIRMED / VISA ISSUED ── */}
+            {(submission.status === "final_payment_confirmed" || submission.status === "additional_payment_confirmed" || submission.status === "visa_issued") && (() => {
               const offerDoc = submission.documents.find(d => d.documentType === "offer_letter");
               const eVisaDoc = submission.documents.find(d => d.documentType === "evisa");
               return (
