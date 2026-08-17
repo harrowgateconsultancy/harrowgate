@@ -69,18 +69,21 @@ async function findOrCreateOAuthStudent(
   const cleanEmail = email.toLowerCase().trim();
 
   const byId = await pool.query(`SELECT id, email, name FROM student_users WHERE ${col} = $1 LIMIT 1`, [oauthId]);
-  if (byId.rows.length > 0) return byId.rows[0];
+  if (byId.rows.length > 0) {
+    await pool.query(`UPDATE student_users SET last_auth_provider = $1, updated_at = NOW() WHERE id = $2`, [provider, byId.rows[0].id]);
+    return byId.rows[0];
+  }
 
   const byEmail = await pool.query("SELECT id, email, name FROM student_users WHERE email = $1 LIMIT 1", [cleanEmail]);
   if (byEmail.rows.length > 0) {
-    await pool.query(`UPDATE student_users SET ${col} = $1 WHERE id = $2`, [oauthId, byEmail.rows[0].id]);
+    await pool.query(`UPDATE student_users SET ${col} = $1, last_auth_provider = $2, updated_at = NOW() WHERE id = $3`, [oauthId, provider, byEmail.rows[0].id]);
     return byEmail.rows[0];
   }
 
   const id = randomUUID();
   await pool.query(
-    `INSERT INTO student_users (id, email, name, ${col}) VALUES ($1, $2, $3, $4)`,
-    [id, cleanEmail, name?.trim() || null, oauthId]
+    `INSERT INTO student_users (id, email, name, ${col}, last_auth_provider) VALUES ($1, $2, $3, $4, $5)`,
+    [id, cleanEmail, name?.trim() || null, oauthId, provider]
   );
   return { id, email: cleanEmail, name: name?.trim() || null };
 }

@@ -61,12 +61,14 @@ export async function initStudentTables() {
       email TEXT NOT NULL UNIQUE,
       password_hash TEXT,
       name TEXT,
+      last_auth_provider TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
   // Add OAuth columns if they don't already exist (safe to run every startup)
   await pool.query(`ALTER TABLE student_users ALTER COLUMN password_hash DROP NOT NULL`).catch(() => {});
+  await pool.query(`ALTER TABLE student_users ADD COLUMN IF NOT EXISTS last_auth_provider TEXT`).catch(() => {});
   await pool.query(`ALTER TABLE student_users ADD COLUMN IF NOT EXISTS google_id TEXT UNIQUE`);
   await pool.query(`ALTER TABLE student_users ADD COLUMN IF NOT EXISTS apple_id TEXT UNIQUE`);
 }
@@ -84,8 +86,8 @@ router.post("/student/register", async (req, res) => {
     const id = randomUUID();
     const passwordHash = hashPassword(password);
     await pool.query(
-      "INSERT INTO student_users (id, email, password_hash, name) VALUES ($1, $2, $3, $4)",
-      [id, email_, passwordHash, name?.trim() || null]
+      "INSERT INTO student_users (id, email, password_hash, name, last_auth_provider) VALUES ($1, $2, $3, $4, $5)",
+      [id, email_, passwordHash, name?.trim() || null, "password"]
     );
     const token = makeStudentToken(id);
     res.status(201).json({ token, student: { id, email: email_, name: name?.trim() || null } });
@@ -109,6 +111,7 @@ router.post("/student/login", async (req, res) => {
     const student = result.rows[0];
     if (!verifyPassword(password, student.password_hash)) return res.status(401).json({ error: "Invalid email or password" });
 
+    await pool.query("UPDATE student_users SET last_auth_provider = $1, updated_at = NOW() WHERE id = $2", ["password", student.id]);
     const token = makeStudentToken(student.id);
     res.json({ token, student: { id: student.id, email: student.email, name: student.name } });
   } catch { res.status(500).json({ error: "Login failed" }); }

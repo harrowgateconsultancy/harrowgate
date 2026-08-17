@@ -21,6 +21,8 @@ type Submission = {
   id: number; name: string; email: string | null; dateOfBirth: string;
   passportNumber: string; status: string; adminNotes: string | null;
   createdAt: string; documents: Document[];
+  signInEmail?: string | null;
+  signInMethod?: "google" | "harrowgate" | "apple" | null;
   interviewZoomLink?: string | null; interviewDateTime?: string | null;
   uniInterviewLink?: string | null; uniInterviewDateTime?: string | null; uniInterviewPlatform?: string | null;
   additionalDocsRequested?: boolean | null; additionalDocsRequestNote?: string | null;
@@ -1343,9 +1345,15 @@ export default function Submissions() {
                           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3 shrink-0"><path d="M10.5 2.5a2.5 2.5 0 013.54 3.54L5.5 14.55a3.5 3.5 0 01-4.95-4.95L9 1.1" strokeLinecap="round"/></svg>Docs Requested
                         </span>
                       )}
+                      {s.signInMethod && (
+                        <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                          style={{ background: "rgba(162,137,89,0.08)", color: "#c4a96e", border: "1px solid rgba(162,137,89,0.16)" }}>
+                          {s.signInMethod === "google" ? "Google sign-in" : s.signInMethod === "harrowgate" ? "Harrowgate sign-in" : "Apple sign-in"}
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center gap-3 text-xs flex-wrap" style={{ color: "rgba(162,137,89,0.68)" }}>
-                      {s.email && <span className="truncate max-w-[180px]">{s.email}</span>}
+                      {(s.signInEmail || s.email) && <span className="truncate max-w-[220px]">{s.signInEmail || s.email}</span>}
                       <span className="font-mono" style={{ color: "#c4a96e" }}>{s.passportNumber}</span>
                       <span>{docCount} doc{docCount !== 1 ? "s" : ""}</span>
                       <span>{new Date(s.createdAt).toLocaleDateString("en-GB")}</span>
@@ -1671,6 +1679,33 @@ export default function Submissions() {
 
                 {/* ── OVERVIEW TAB ── */}
                 {detailTab === "overview" && (<div className="space-y-6">
+                {/* Sign-in account */}
+                <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: selected.signInEmail ? "rgba(162,137,89,0.22)" : "rgba(162,137,89,0.12)" }}>
+                  <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: "rgba(162,137,89,0.10)" }}>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(162,137,89,0.10)", color: "#c4a96e" }}>
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 14c.5-2.5 2.5-4 6-4s5.5 1.5 6 4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold" style={{ color: "#f0d28c" }}>Student sign-in account</p>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(162,137,89,0.55)" }}>The email and method used to access the student portal</p>
+                    </div>
+                  </div>
+                  <div className="px-4 py-4 flex items-center justify-between gap-4 flex-wrap">
+                    <div className="min-w-0">
+                      <p className="text-xs mb-1" style={{ color: "rgba(162,137,89,0.55)" }}>Sign-in email</p>
+                      <p className="text-sm font-mono font-semibold break-all" style={{ color: selected.signInEmail ? "#f0d28c" : "rgba(162,137,89,0.42)" }}>
+                        {selected.signInEmail || "No linked sign-in account"}
+                      </p>
+                    </div>
+                    <span className="text-xs px-2.5 py-1 rounded-full font-semibold shrink-0" style={{
+                      color: selected.signInMethod ? "#f0d28c" : "rgba(162,137,89,0.45)",
+                      background: selected.signInMethod ? "rgba(162,137,89,0.12)" : "rgba(162,137,89,0.05)",
+                      border: `1px solid ${selected.signInMethod ? "rgba(162,137,89,0.24)" : "rgba(162,137,89,0.12)"}`,
+                    }}>
+                      {selected.signInMethod === "google" ? "Google" : selected.signInMethod === "harrowgate" ? "Harrowgate account" : selected.signInMethod === "apple" ? "Apple" : "Not linked"}
+                    </span>
+                  </div>
+                </div>
                 {/* Application Details — always visible summary of all recorded info */}
                 {(selected.interviewZoomLink || selected.interviewDateTime || selected.uniInterviewLink || selected.uniInterviewDateTime || selected.additionalDocsRequestNote || selected.adminNotes) && (
                   <div className="rounded-2xl border overflow-hidden" style={{ background: "#0b2213", borderColor: "rgba(162,137,89,0.18)" }}>

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { Readable } from "stream";
-import { db } from "@workspace/db";
+import { db, pool } from "@workspace/db";
 import {
   studentSubmissionsTable,
   studentDocumentsTable,
@@ -29,6 +29,50 @@ const VALID_STATUSES = [
   "visa_issued",
 ];
 
+type StudentAuthDetails = {
+  email: string | null;
+  provider: "google" | "harrowgate" | "apple" | null;
+};
+
+function getAuthProvider(row: any): StudentAuthDetails["provider"] {
+  if (row.last_auth_provider === "google" || row.last_auth_provider === "apple") {
+    return row.last_auth_provider;
+  }
+  if (row.last_auth_provider === "password") return "harrowgate";
+  if (row.google_id) return "google";
+  if (row.apple_id) return "apple";
+  if (row.password_hash) return "harrowgate";
+  return null;
+}
+
+async function getStudentAuthDetails(submissions: Array<{ clerkUserId: string; email: string | null }>) {
+  const ids = [...new Set(submissions.map(s => s.clerkUserId).filter(Boolean))];
+  const emails = [...new Set(submissions.map(s => s.email?.toLowerCase().trim()).filter(Boolean))] as string[];
+  const byId = new Map<string, StudentAuthDetails>();
+  const byEmail = new Map<string, StudentAuthDetails>();
+  if (!ids.length && !emails.length) return { byId, byEmail };
+
+  try {
+    const result = await pool.query(
+      `SELECT id, email, password_hash, google_id, apple_id, last_auth_provider
+       FROM student_users
+       WHERE ($1::text[] = '{}' OR id = ANY($1::text[]))
+          OR ($2::text[] = '{}' OR LOWER(email) = ANY($2::text[]))`,
+      [ids, emails],
+    );
+    for (const row of result.rows) {
+      const details = { email: row.email ?? null, provider: getAuthProvider(row) };
+      if (row.id) byId.set(row.id, details);
+      if (row.email) byEmail.set(String(row.email).toLowerCase(), details);
+    }
+  } catch {
+    // The auth table is initialized during server startup. If an older server
+    // is queried before that completes, keep submissions available without
+    // exposing an incorrect sign-in method.
+  }
+  return { byId, byEmail };
+}
+
 router.get("/admin/active-sessions", (_req, res) => {
   try {
     res.json(getActiveSessions());
@@ -40,6 +84,7 @@ router.get("/admin/student-submissions", async (_req, res) => {
     const submissions = await db.select().from(studentSubmissionsTable)
       .where(isNull(studentSubmissionsTable.deletedAt))
       .orderBy(desc(studentSubmissionsTable.createdAt));
+    const authDetails = await getStudentAuthDetails(submissions);
 
     const agentCodes = [...new Set(submissions.map(s => s.agentCode).filter(Boolean))] as string[];
     const agents = agentCodes.length
@@ -51,7 +96,15 @@ router.get("/admin/student-submissions", async (_req, res) => {
     const withDocs = await Promise.all(submissions.map(async (s) => {
       const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, s.id));
       const agentInfo = s.agentCode ? agentMap[s.agentCode] : null;
-      return { ...s, documents, agentCompanyName: agentInfo?.companyName ?? null, agentContactName: agentInfo?.contactName ?? null };
+      const auth = authDetails.byId.get(s.clerkUserId) ?? (s.email ? authDetails.byEmail.get(s.email.toLowerCase().trim()) : undefined);
+      return {
+        ...s,
+        documents,
+        signInEmail: auth?.email ?? null,
+        signInMethod: auth?.provider ?? null,
+        agentCompanyName: agentInfo?.companyName ?? null,
+        agentContactName: agentInfo?.contactName ?? null,
+      };
     }));
     res.json(withDocs);
   } catch { res.status(500).json({ error: "Failed to fetch submissions" }); }
@@ -63,6 +116,8 @@ router.get("/admin/student-submissions/:id", async (req, res) => {
     const [submission] = await db.select().from(studentSubmissionsTable).where(eq(studentSubmissionsTable.id, id)).limit(1);
     if (!submission) return res.status(404).json({ error: "Not found" });
     const documents = await db.select().from(studentDocumentsTable).where(eq(studentDocumentsTable.submissionId, id));
+    const authDetails = await getStudentAuthDetails([{ clerkUserId: submission.clerkUserId, email: submission.email }]);
+    const auth = authDetails.byId.get(submission.clerkUserId) ?? (submission.email ? authDetails.byEmail.get(submission.email.toLowerCase().trim()) : undefined);
     let agentCompanyName: string | null = null;
     let agentContactName: string | null = null;
     if (submission.agentCode) {
@@ -71,7 +126,14 @@ router.get("/admin/student-submissions/:id", async (req, res) => {
       agentCompanyName = agent?.companyName ?? null;
       agentContactName = agent?.contactName ?? null;
     }
-    res.json({ ...submission, documents, agentCompanyName, agentContactName });
+    res.json({
+      ...submission,
+      documents,
+      signInEmail: auth?.email ?? null,
+      signInMethod: auth?.provider ?? null,
+      agentCompanyName,
+      agentContactName,
+    });
   } catch { res.status(500).json({ error: "Failed to fetch submission" }); }
 });
 

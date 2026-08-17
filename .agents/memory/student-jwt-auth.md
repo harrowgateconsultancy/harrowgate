@@ -15,3 +15,11 @@ Student auth uses self-hosted HMAC-SHA256 tokens stored in `localStorage` — no
 - Frontend auth helpers live in `artifacts/harrowgate/src/lib/studentAuth.ts`. `authHeaders()` is synchronous (no `await` needed) — different from the old Clerk pattern.
 - The `student_users` table is auto-created at startup. The existing `clerkUserId` column in `student_submissions` now stores the student UUID from `student_users`.
 - Existing Clerk-registered students need a migration to create `student_users` rows (no built-in migration yet).
+
+## Sign-in provenance
+
+The student account records its last successful sign-in method so admin staff can distinguish the portal email from the application contact email and see whether the student used a Harrowgate password account, Google, or Apple.
+
+**Why:** A student can submit a different contact email from the email used to access the portal, and a linked OAuth account can also have a password login.
+
+**How to apply:** Update the recorded provider only after successful authentication; when displaying it to admins, prefer the last recorded method and fall back to the account's available credential/link for older accounts.
