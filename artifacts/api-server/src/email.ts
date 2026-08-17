@@ -2,6 +2,31 @@ import nodemailer from "nodemailer";
 
 const NOTIFY_TO = "harrowgateconsultancy@gmail.com";
 
+// ── ntfy phone-ring alert ────────────────────────────────────────────────────
+// Uses ntfy.sh (open-source, MIT). Admin installs the ntfy app on their phone
+// and subscribes to the topic stored in NTFY_TOPIC.
+export async function sendNtfyAlert(opts: {
+  title: string;
+  body: string;
+  tags?: string[];
+}) {
+  const topic = process.env.NTFY_TOPIC;
+  if (!topic) { console.warn("[ntfy] NTFY_TOPIC not set — skipping alert"); return; }
+  try {
+    await fetch(`https://ntfy.sh/${encodeURIComponent(topic)}`, {
+      method: "POST",
+      headers: {
+        "Title":    opts.title,
+        "Priority": "urgent",
+        "Tags":     (opts.tags ?? ["rotating_light", "bell"]).join(","),
+        "Content-Type": "text/plain",
+      },
+      body: opts.body,
+    });
+    console.log("[ntfy] Alert sent:", opts.title);
+  } catch (err) { console.error("[ntfy] Failed to send alert:", err); }
+}
+
 function createTransport() {
   const user = process.env.GMAIL_USER;
   const pass = process.env.GMAIL_APP_PASSWORD;

@@ -5,7 +5,7 @@ import { verifyStudentToken } from "./studentAuth";
 import { db } from "@workspace/db";
 import { studentSubmissionsTable, studentDocumentsTable, studentMessagesTable } from "@workspace/db/schema";
 import { eq, and } from "drizzle-orm";
-import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail, sendAdditionalDocsSubmittedEmail, sendFinalReceiptEmail, sendStudentReplyNotificationEmail, sendOutboxPendingNotification } from "../email";
+import { sendNewApplicationEmail, sendReceiptUploadEmail, sendSecondReceiptUploadEmail, sendResubmitEmail, sendAdditionalDocsSubmittedEmail, sendFinalReceiptEmail, sendStudentReplyNotificationEmail, sendOutboxPendingNotification, sendNtfyAlert } from "../email";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { isLocalStorageMode, LocalStorageService } from "../lib/localStorageService";
 import { ensureStudentFolder, upsertStudentRow } from "../lib/googleIntegration";
@@ -347,6 +347,11 @@ router.post("/student/submissions", requireStudentAuth, async (req: any, res) =>
     const [created] = await db.insert(studentSubmissionsTable)
       .values({ clerkUserId: req.studentUserId, name, dateOfBirth, passportNumber, email, preferredLevel, preferredCourse, preferredInstitution, agentCode: agentCode || null }).returning();
     sendNewApplicationEmail({ name, email: email || null, passportNumber, dateOfBirth, docCount: 0 }).catch(() => {});
+    sendNtfyAlert({
+      title: "🚨 New Harrowgate Application",
+      body: `${name} (${passportNumber}) just submitted.\nEmail: ${email || "N/A"}`,
+      tags: ["rotating_light", "bell"],
+    }).catch(() => {});
     // WhatsApp notification via CallMeBot (set CALLMEBOT_API_KEY secret to enable)
     const waKey = process.env.CALLMEBOT_API_KEY;
     if (waKey) {
