@@ -57,10 +57,10 @@ export const DEFAULT_PRICING: PricingConfig = {
 
 export function formatMoney(n: number, currency: "HKD" | "USD", usdRate: number): string {
   const safeRate = Number.isFinite(usdRate) && usdRate > 0 ? usdRate : 7.8;
-  const amount = currency === "USD" ? n / safeRate : n;
+  const amount = currency === "USD" ? Math.round(n / safeRate) : n;
   return `${currency}$ ${amount.toLocaleString(currency === "USD" ? "en-US" : "en-HK", {
-    minimumFractionDigits: currency === "USD" ? 2 : 0,
-    maximumFractionDigits: currency === "USD" ? 2 : 0,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   })}`;
 }
 
