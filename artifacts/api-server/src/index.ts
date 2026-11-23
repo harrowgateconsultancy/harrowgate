@@ -18,7 +18,7 @@ process.on("unhandledRejection", (reason) => {
   logger.error({ reason }, "Unhandled rejection — keeping server alive");
 });
 
-const rawPort = process.env["APP_PORT"];
+const rawPort = process.env["PORT"] || 3000;
 
 if (!rawPort) {
   throw new Error(
