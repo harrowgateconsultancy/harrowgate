@@ -18,12 +18,12 @@ process.on("unhandledRejection", (reason) => {
   logger.error({ reason }, "Unhandled rejection — keeping server alive");
 });
 
-const rawPort = process.env["PORT"] || 3000;
 
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
 }
 
 const port = Number(rawPort);
