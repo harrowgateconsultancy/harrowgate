@@ -31,13 +31,13 @@ export const openai = new Proxy({} as OpenAI, {
 
 export async function generateImageBuffer(prompt: string, size: "1024x1024" | "512x512" | "256x256" = "1024x1024"): Promise<Buffer> {
   const response = await openai.images.generate({ model: "gpt-image-1", prompt, size });
-  return Buffer.from(response.data[0]?.b64_json ?? "", "base64");
+  return Buffer.from(response.data?.[0]?.b64_json ?? "", "base64");
 }
 
 export async function editImages(imageFiles: string[], prompt: string, outputPath?: string): Promise<Buffer> {
   const images = await Promise.all(imageFiles.map((file) => toFile(fs.createReadStream(file), file, { type: "image/png" })));
   const response = await openai.images.edit({ model: "gpt-image-1", image: images, prompt });
-  const imageBytes = Buffer.from(response.data[0]?.b64_json ?? "", "base64");
+  const imageBytes = Buffer.from(response.data?.[0]?.b64_json ?? "", "base64");
   if (outputPath) fs.writeFileSync(outputPath, imageBytes);
   return imageBytes;
 }
