@@ -6,6 +6,12 @@
     "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
     "typecheck:libs": "tsc --build",
+    "dev": "pnpm --parallel --filter @workspace/api-server --filter @workspace/harrowgate run dev",
+    "dev:backend": "pnpm --filter @workspace/api-server run dev",
+    "dev:frontend": "pnpm --filter @workspace/harrowgate run dev",
+    "start": "pnpm --parallel --filter @workspace/api-server --filter @workspace/harrowgate run start",
+    "start:backend": "pnpm --filter @workspace/api-server run start",
+    "start:frontend": "pnpm --filter @workspace/harrowgate run serve",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
   "private": true,
