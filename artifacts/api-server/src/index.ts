@@ -1,8 +1,7 @@
 import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { db } from "@workspace/db";
+import { runDatabaseMigrations } from "@workspace/db";
 import app from "./app";
 import { logger } from "./lib/logger";
 import { setupScreenMirror } from "./lib/screenMirror";
@@ -10,6 +9,7 @@ import { initAdminCredentialsTables } from "./routes/adminAuth";
 import { initStudentTables } from "./routes/studentAuth";
 import { initOnArrivalTable } from "./routes/onArrival";
 import { initAppSettingsTable } from "./routes/settings";
+import { startAppointmentNotificationWorker } from "./lib/appointmentNotifications";
 
 process.on("uncaughtException", (err) => {
   logger.error({ err }, "Uncaught exception — keeping server alive");
@@ -17,7 +17,6 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason) => {
   logger.error({ reason }, "Unhandled rejection — keeping server alive");
 });
-
 
 const rawPort = process.env["PORT"];
 
@@ -39,12 +38,20 @@ const migrationsFolder = path.join(__dirname, "drizzle");
 const httpServer = createServer(app);
 setupScreenMirror(httpServer);
 
-// Run database migrations (creates all tables on first run, safe to run every time)
-try {
-  await migrate(db, { migrationsFolder });
-  logger.info("Database migrations applied");
-} catch (err) {
-  logger.error({ err }, "Database migration failed — continuing anyway");
+// Imported NAS databases can already have a schema without matching Drizzle
+// migration history. Let that deployment skip Drizzle's fresh-database pass.
+if (process.env.SKIP_DB_MIGRATIONS === "true") {
+  logger.warn("Database migrations skipped by configuration");
+} else {
+  try {
+    await runDatabaseMigrations(migrationsFolder);
+    logger.info("Database migrations applied");
+  } catch (err) {
+    logger.error({ err }, "Database migration failed — continuing anyway");
+    if (process.env.REQUIRE_DB_MIGRATIONS === "true") {
+      process.exit(1);
+    }
+  }
 }
 
 // Ensure admin credential override tables exist
@@ -66,6 +73,8 @@ initOnArrivalTable().catch(err =>
 initAppSettingsTable().catch(err =>
   logger.warn({ err }, "Could not init app_settings table")
 );
+
+startAppointmentNotificationWorker();
 
 httpServer.listen(port, (err?: Error) => {
   if (err) {
